@@ -12,7 +12,7 @@
 # See the file "license.terms" for information on usage and redistribution
 # of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 #
-# RCS: @(#) $Id: Makefile 1.1 Fri, 26 May 2000 16:32:40 +0200 peter $
+# RCS: @(#) $Id: Makefile 1.2 Tue, 27 Jun 2000 10:03:21 +0200 peter $
 
 #========================================================================
 # Edit the following few lines when writing a new extension
@@ -59,7 +59,7 @@ OBJECTS = $(Class_OBJECTS)
 # objects and the library itself in a platform-independent manner.
 #========================================================================
 
-Class_LIB_FILE = libClass0.3.so
+Class_LIB_FILE = libClass0.4.so
 $(Class_LIB_FILE)_OBJECTS = $(Class_OBJECTS)
 
 #========================================================================
@@ -85,7 +85,7 @@ SHELL = /bin/sh
 
 srcdir = .
 top_srcdir = .
-prefix = /usr
+prefix = /usr/local
 exec_prefix = ${prefix}
 
 bindir = ${exec_prefix}/bin
@@ -104,17 +104,17 @@ tcllibdir = ${prefix}/lib
 
 DESTDIR =
 
-pkgdatadir = $(datadir)/Class0.3
-pkglibdir = $(libdir)/Class0.3
-pkgtcllibdir = $(tcllibdir)/Class0.3
-pkgincludedir = $(includedir)/Class0.3
+pkgdatadir = $(datadir)/Class0.4
+pkglibdir = $(libdir)/Class0.4
+pkgtcllibdir = $(tcllibdir)/Class0.4
+pkgincludedir = $(includedir)/Class0.4
 
 top_builddir = .
 
 INSTALL = /usr/bin/install -c
 INSTALL_PROGRAM = ${INSTALL}
 INSTALL_DATA = ${INSTALL} -m 644
-INSTALL_SCRIPT = ${INSTALL_PROGRAM}
+INSTALL_SCRIPT = ${INSTALL}
 INSTALL_STRIP_FLAG =
 transform = s,x,x,
 
@@ -126,7 +126,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 
 PACKAGE = Class
-VERSION = 0.3
+VERSION = 0.4
 CC = cc
 CFLAGS_DEBUG = -g
 CFLAGS_DEFAULT = -O
@@ -142,17 +142,17 @@ MAKE_STATIC_LIB = ${STLIB_LD} $@ $($@_OBJECTS)
 OBJEXT = o
 RANLIB = :
 SHLIB_CFLAGS = -fPIC
-SHLIB_LD = gcc -shared
+SHLIB_LD = gcc -pipe -shared
 SHLIB_LDFLAGS = 
-SHLIB_LD_LIBS = -L/usr/lib -ltcl8.0${TCL_DBGX}
+SHLIB_LD_LIBS = 
 STLIB_LD = 
 TCL_BIN_DIR = /usr/lib
 TCL_DEFS =  -DHAVE_GETCWD=1 -DHAVE_UNISTD_H=1 -DHAVE_SYS_TIME_H=1 -DTIME_WITH_SYS_TIME=1 -DHAVE_TM_ZONE=1 -DHAVE_TM_GMTOFF=1 -DHAVE_TIMEZONE_VAR=1 -DHAVE_ST_BLKSIZE=1 -DSTDC_HEADERS=1 -DNEED_MATHERR=1 -DRETSIGTYPE=void -DHAVE_SIGNED_CHAR=1 -DHAVE_SYS_IOCTL_H=1 
 TCL_EXTRA_CFLAGS = 
 TCL_LD_FLAGS = -rdynamic
 TCL_LIBS = -ldl  -lm
-TCL_SHLIB_LD_LIBS = 
-TCL_SRC_DIR = /usr/src/bs/BUILD/tcltk-8.0.4/tcl8.0.4
+TCL_SHLIB_LD_LIBS = ${LIBS}
+TCL_SRC_DIR = /usr/src/RPM/BUILD/tcltk-8.0.5/tcl8.0.5
 TCL_DBGX = 
 TCL_STUB_LIB_FILE = 
 TCL_STUB_LIB_SPEC = 
@@ -164,7 +164,7 @@ INCLUDE_DIR_NATIVE = @INCLUDE_DIR_NATIVE@
 TCL_BMAP_DIR_NATIVE = @TCL_BMAP_DIR_NATIVE@
 TCL_PLATFORM_DIR_NATIVE = @TCL_PLATFORM_DIR_NATIVE@
 TCL_GENERIC_DIR_NATIVE = @TCL_GENERIC_DIR_NATIVE@
-TCLSH_PROG = /usr/bin/tclsh8.0
+TCLSH_PROG = /usr//bin/tclsh8.0
 SHARED_BUILD = 1
 TCL_LIB_SPEC = -L/usr/lib -ltcl8.0${TCL_DBGX}
 
@@ -172,11 +172,11 @@ AUTOCONF = autoconf
 
 LDFLAGS = $(LDFLAGS_DEFAULT)
 
-INCLUDES = -I"/usr/include"
+INCLUDES = -I"/usr//include"
 
 EXTRA_CFLAGS = $(TCL_DEFS) $(PROTO_FLAGS) $(SECURITY_FLAGS) $(MEM_DEBUG_FLAGS) $(KEYSYM_FLAGS) $(NO_DEPRECATED_FLAGS) $(TCL_EXTRA_CFLAGS)
 
-DEFS =  -DVERSION=\"0.3\"  $(EXTRA_CFLAGS)
+DEFS =  -DVERSION=\"0.4\" -DUSE_TCL_STUBS=1  $(EXTRA_CFLAGS)
 
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 CONFIGDIR = $(top_srcdir)
@@ -246,13 +246,13 @@ install-libraries: libraries
 	echo "Adapting pkgIndex.tcl"
 	$(TCLSH_PROG) $(srcdir)/install-replace.tcl \
 		$(srcdir)/../pkgIndex.tcl $(DESTDIR)$(pkglibdir)/pkgIndex.tcl \
-		@TCLLIBDIR@ "$(DESTDIR)$(tcllibdir)/Class0.3" \
+		@TCLLIBDIR@ "$(DESTDIR)$(tcllibdir)/Class0.4" \
 	echo "Adapting lib/init.tcl"
 	$(TCLSH_PROG) $(srcdir)/install-replace.tcl \
 		$(srcdir)/../lib/init.tcl $(DESTDIR)$(pkgtcllibdir)/lib/init.tcl \
 		@LIB_LIBRARY@ "$(Class_LIB_FILE)" \
 		@LIBDIR@ "$(DESTDIR)$(libdir)" \
-		@TCLLIBDIR@ "$(DESTDIR)$(tcllibdir)/Class0.3" \
+		@TCLLIBDIR@ "$(DESTDIR)$(tcllibdir)/Class0.4" \
 		@DATADIR@ "$(DESTDIR)$(datadir)" \
 		@BINDIR@ "$(DESTDIR)$(bindir)"
 

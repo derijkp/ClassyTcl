@@ -11,7 +11,7 @@
 # See the file "license.terms" for information on usage and redistribution
 # of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 #
-# RCS: @(#) $Id: Makefile.in 1.1 Fri, 26 May 2000 16:32:40 +0200 peter $
+# RCS: @(#) $Id: Makefile.in 1.2 Tue, 27 Jun 2000 10:03:21 +0200 peter $
 
 #========================================================================
 # Edit the following few lines when writing a new extension
@@ -273,8 +273,8 @@ install-doc: doc
 #	    done
 	TCLLIBPATH="$(srcdir)/.." \
 	$(TCLSH_PROG) $(srcdir)/makedoc.tcl
-	$(mkinstalldirs) $(DESTDIR)$(pkgtcllibdir)/docs
-	$(INSTALL_DATA) $(srcdir)/../docs/* $(DESTDIR)$(pkgtcllibdir)/docs
+	$(mkinstalldirs) $(DESTDIR)$(pkgtcllibdir)/help
+	$(INSTALL_DATA) $(srcdir)/../help/* $(DESTDIR)$(pkgtcllibdir)/help
 
 test: binaries libraries
 	TCL_LIBRARY=$(TCL_LIBRARY_DIR) \
@@ -384,16 +384,16 @@ install-lib-binaries: installdirs
 	  if test -f $$p; then \
 	    ext=`echo $$p|sed -e "s/.*\.//"`; \
 	    if test "x$$ext" = "xdll"; then \
-	        echo " $(INSTALL_DATA) $$p $(DESTDIR)$(bindir)/$$p"; \
-	        $(INSTALL_DATA) $$p $(DESTDIR)$(bindir)/$$p; \
+	        echo " $(INSTALL) $$p $(DESTDIR)$(bindir)/$$p"; \
+	        $(INSTALL) $$p $(DESTDIR)$(bindir)/$$p; \
 		lib=`basename $$p|sed -e 's/.[^.]*$$//'`.lib; \
 		if test -f $$lib; then \
-		    echo " $(INSTALL_DATA) $$lib $(DESTDIR)$(libdir)/$$lib"; \
-	            $(INSTALL_DATA) $$lib $(DESTDIR)$(libdir)/$$lib; \
+		    echo " $(INSTALL) $$lib $(DESTDIR)$(libdir)/$$lib"; \
+	            $(INSTALL) $$lib $(DESTDIR)$(libdir)/$$lib; \
 		fi; \
 	    else \
-		echo " $(INSTALL_DATA) $$p $(DESTDIR)$(libdir)/$$p"; \
-	        $(INSTALL_DATA) $$p $(DESTDIR)$(libdir)/$$p; \
+		echo " $(INSTALL) $$p $(DESTDIR)$(libdir)/$$p"; \
+	        $(INSTALL) $$p $(DESTDIR)$(libdir)/$$p; \
 	    fi; \
 	  else :; fi; \
 	done

@@ -10,7 +10,7 @@ package require Tcl 8.0
 # $Format: "set ::Class::version 0.$ProjectMajorVersion$"$
 set ::Class::version 0.4
 # $Format: "set ::Class::patchlevel $ProjectMinorVersion$"$
-set ::Class::patchlevel 1
+set ::Class::patchlevel 2
 package provide Class $::Class::version
 
 proc ::Class::init {name testcmd} {
@@ -69,7 +69,7 @@ proc ::Class::init {name testcmd} {
 			}
 		} else {
 			set noc 1
-			source [file join ${dir} lib listnoc.tcl]
+			source [file join ${dir} lib Class-tcl.tcl]
 		}
 		catch {unset libbase}
 	}

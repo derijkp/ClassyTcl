@@ -29,8 +29,8 @@ AC_INIT(../src/class.c)
 PACKAGE=Class
 
 MAJOR_VERSION=0
-# $Format: "MINOR_VERSION=$ProjectMajorVersion: 4 $ \"$
-MINOR_VERSION=3
+# $Format: "MINOR_VERSION=$ProjectMajorVersion: 4 $"$
+MINOR_VERSION=4
 PATCHLEVEL=
 
 VERSION=${MAJOR_VERSION}.${MINOR_VERSION}${PATCHLEVEL}

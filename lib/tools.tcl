@@ -26,16 +26,20 @@ proc Class::cmd_split {data} {
 }
 
 proc Class::auto_mkindex {dir args} {
-	eval ::auto_mkindex $dir $args
 	global errorCode errorInfo
 	set oldDir [pwd]
+	set error [catch {eval ::auto_mkindex $dir $args} result]
+	if $error {
+		cd $oldDir
+		return -code error $result
+	}
 	cd $dir
 	set dir [pwd]
 	append index "\n# Addition of ClassyTcl classes defined in the directory\n"
 	if {$args == ""} {
 		set args *.tcl
 	}
-	foreach file [eval glob $args] {
+	foreach file [eval glob -nocomplain $args] {
 		set f ""
 		set error [catch {
 			set f [open $file]
