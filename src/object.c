@@ -391,7 +391,7 @@ int Classy_SuperObjCmd(
 	} else {
 		if (current->parent == NULL) {
 			Tcl_ResetResult(interp);
-			Tcl_AppendResult(interp,"No method \"",option,"\" defined for super of ",classname,
+			Tcl_AppendResult(interp,"No classmethod \"",option,"\" defined for super of ",classname,
 				" (at class \"",Tcl_GetStringFromObj(current->class,NULL),"\"", (char *)NULL);
 			if (new != 0) {Tcl_DeleteHashEntry(entry);}
 			return TCL_ERROR;
@@ -418,7 +418,7 @@ int Classy_SuperObjCmd(
 			}
 		}
 		Tcl_ResetResult(interp);
-		Tcl_AppendResult(interp,"No method \"",option,"\" defined for super of ",classname,
+		Tcl_AppendResult(interp,"No classmethod \"",option,"\" defined for super of ",classname,
 			" (at class \"",Tcl_GetStringFromObj(current->class,NULL),"\")", (char *)NULL);
 		if (new != 0) {Tcl_DeleteHashEntry(entry);}
 		return TCL_ERROR;

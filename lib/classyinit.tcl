@@ -6,7 +6,7 @@
 # of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 #
 # ---------------------------------------------------------------
-package require Extral 0.96
+package require Extral 1.0
 package require Class 0.1
 lappend auto_path [file join ${::class::dir} widgets] [file join ${::class::dir} dialogs]
 
@@ -17,7 +17,7 @@ namespace eval ::Classy {}
 #----------------------------------------------------------------------
 if {"$tcl_platform(platform)"=="unix"} {
 	if {"$::Classy::script"==""} {set ::Classy::script "wish"}
-	if {"[file pathtype $::Classy::script]"!="absolute"} {set ::Classy::script [file join [pwd] [string trimleft $::Classy::script "./"]]}
+	if {"[file pathtype $::Classy::script]"!="absolute"} {set ::Classy::script [file join [pwd] $::Classy::script]}
 	while 1 {
 		if [catch {set link [file readlink $::Classy::script]}] break
 		if {"[file pathtype $link]"=="absolute"} {

@@ -1943,9 +1943,8 @@ Classy::Canvas method print {} {
 	private $object w data
 	set page [$w coords _page]
 	if [winfo exists .classy__.printdialog] {
-		.classy__.printdialog place
-	} else {
-		Classy::printdialog .classy__.printdialog -papersize [lrange $page 2 3] -getdata [list $object _getprint]
-		.classy__.printdialog configure -cache 1
+		destroy .classy__.printdialog
 	}
+	Classy::printdialog .classy__.printdialog -papersize [lrange $page 2 3] -getdata [list $object _getprint]
+	.classy__.printdialog configure -cache 1
 }

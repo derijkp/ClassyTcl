@@ -37,7 +37,7 @@ Classy::export LineChartDialog {}
 ::Classy::LineChartDialog classmethod init {args} {
 	super init -resize {1 1}
 	set w $object.options
-	$object add print "Postscript" "printcanvas $w.chart"
+	$object add print "Print" [list $object print]
 	$object add rangeconfig "Configure Ranges" "$object rangeconfigure"
 	$object add dataconfig "Configure Data" "$object dataconfigure"
 
@@ -455,4 +455,38 @@ Classy::LineChartDialog method yview {args} {
 	set yrange [$object.options.chart configure -yrange]
 	set ywidth [expr [lindex $options(-yrange) 1] - [lindex $options(-yrange) 0]]
 	$object.options.vbar	set [expr 1.0-[lindex $yrange 1]/double($ywidth)] [expr 1.0-[lindex $yrange 0]/double($ywidth)]
+}
+
+Classy::LineChartDialog method _getprint {var} {
+	upvar #0 ::$var print
+	set w $object.options.canvas
+	if $print(portrait) {set rotate 0} else {set rotate 1}
+	set x [winfo fpixels $object $print(x)]
+	set y [winfo fpixels $object $print(y)]
+	if $print(scaledxy) {
+		set x [expr {100.0*$x/$print(scale)}]
+		set y [expr {100.0*$y/$print(scale)}]
+	}
+	set pagewidth [expr {$print(scale)*$print(pwidth)/[winfo fpixels $object 100p]}]
+	set height $print(height)
+	if [regexp {[0-9]$} $height] {append height p}
+	set pagey $print(pagey)
+	if [regexp {[0-9]$} $pagey] {append pagey p}
+	set pagey [expr {([winfo fpixels $object $height] - [winfo fpixels $object $pagey])/[winfo fpixels $object 1p]}]
+	set result [$w postscript \
+		-rotate $rotate -colormode $print(colormode) \
+		-width $print(pwidth) -height $print(pheight) \
+		-pagewidth $pagewidth \
+		-x $x -y $y \
+		-pageanchor $print(pageanchor) -pagex $print(pagex) -pagey $pagey]
+	return $result
+}
+
+Classy::LineChartDialog method print {} {
+	set w $object.options.canvas
+	set pagesize [list [winfo width $w] [winfo height $w]]
+	if [winfo exists .classy__.printdialog] {
+		destroy .classy__.printdialog place
+	}
+	Classy::printdialog .classy__.printdialog -papersize $pagesize -getdata [list $object _getprint]
 }

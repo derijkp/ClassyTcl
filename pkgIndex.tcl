@@ -9,16 +9,20 @@
 
 namespace eval __temp [list set dir $dir]
 namespace eval __temp {
-	# $Format: "set version $ProjectVersion$"$
-set version 1.1
+	# $Format: "\tset version 0.$ProjectMajorVersion$"$
+	set version 0.1
+	# $Format: "\tset minorversion $ProjectMinorVersion$"$
+	set minorversion 2
 	regsub -all {[ab]} $version {} version
 	set loadcmd {
 		package provide Class @version@
 		namespace eval ::class {set dir @dir@}
 		source [file join @dir@ lib init.tcl]
 		namespace eval ::class {set version @version@}
+		namespace eval ::class {set minorversion @minorversion@}
 	}
 	regsub -all {@version@} $loadcmd [list $version] loadcmd
+	regsub -all {@minorversion@} $loadcmd [list $minorversion] loadcmd
 	regsub -all {@dir@} $loadcmd [list $dir] loadcmd
 	package ifneeded Class $version $loadcmd
 

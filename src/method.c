@@ -74,7 +74,7 @@ int Classy_ExecClassMethod(
 	int error,i;
 	if (method->proc != NULL) {
 		Tcl_CmdInfo cmdinfo;
-		Tcl_Obj *objvstatic[10],**objv;\
+		Tcl_Obj *objvstatic[10],**objv;
 		int objc;
 
 		if ((argc < method->min)||((method->max != -1)&&(argc > method->max))) {
@@ -117,7 +117,7 @@ int Classy_ExecMethod(
 	int error,i;
 	if (method->proc != NULL) {
 		Tcl_CmdInfo cmdinfo;
-		Tcl_Obj *objvstatic[20],**objv;\
+		Tcl_Obj *objvstatic[20],**objv;
 		int objc;
 
 		if ((argc < method->min)||((method->max != -1)&&(argc > method->max))) {

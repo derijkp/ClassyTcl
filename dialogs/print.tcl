@@ -183,7 +183,7 @@ Classy::print_autoscale $window
 } $window}] \
 		-list [lunmerge [option get $window paperSizes PaperSizes]]
 	$window.options.paper.autoscale1 configure \
-		-background [Classy::realcolor DarkBackground] \
+		-background [Classy::realcolor darkBackground] \
 		-command [varsubst window {invoke {} {
 upvar #0 ::Classy::print print
 Classy::print_autoscale $window
@@ -202,7 +202,7 @@ close $f
 }]
 	$window persistent set save
 # ClassyTcl Finalise
-upvar #0 Classy::print print
+upvar #0 ::Classy::print print
 set print(psize) $opt(-papersize)
 foreach {type def} {
 	width 595p

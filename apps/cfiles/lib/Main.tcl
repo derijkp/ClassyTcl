@@ -2,7 +2,6 @@ proc main {args} {
 	mainw
 }
 
-
 proc mainw args {# ClassyTcl generated Toplevel
 	if [regexp {^\.} $args] {
 		set window [lshift args]

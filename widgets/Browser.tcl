@@ -55,8 +55,8 @@ Classy::Browser classmethod init {args} {
 	# ------------------------
 	private $object curpos display
 	set curpos 0
-	set display(font) [Classy::realfont [Classy::optionget $object.c font Font BoldFont]]
-	set display(datafont) [Classy::realfont [Classy::optionget $object.c dataFont Font Font]]
+	set display(font) [Classy::realfont [Classy::optionget $object font Font BoldFont]]
+	set display(datafont) [Classy::realfont [Classy::optionget $object dataFont Font Font]]
 
 	# REM Configure initial arguments
 	# -------------------------------

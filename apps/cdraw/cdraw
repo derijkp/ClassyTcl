@@ -1,6 +1,6 @@
 #!/bin/sh
 # the next line restarts using wish \
-exec wish8.0 "$0" "$@"
+exec wish8.0 "$0" -- ${1+"$@"}
 #
 
 wm withdraw .
@@ -13,7 +13,9 @@ if {"$script"==""} {
 	set appname classyapp
 } else {
 	if {"$tcl_platform(platform)"=="unix"} {
-		if {"[file pathtype $script]"!="absolute"} {set script [file join [pwd] [string trimleft $script "./"]]}
+		if {"[file pathtype $script]"!="absolute"} {
+			set script [file join [pwd] $script]
+		}
 		while 1 {
 			if [catch {set link [file readlink $script]}] break
 			if {"[file pathtype $link]"=="absolute"} {
