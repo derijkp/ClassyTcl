@@ -5,6 +5,8 @@ setevent <<Cut>> <Alt-x>
 setevent <<Copy>> <Alt-c>
 ## Paste {Paste key} key
 setevent <<Paste>> <Alt-v>
+## Paste {Paste special key} key
+setevent <<PasteSpecial>> <Alt-V>
 ## Undo {Undo key} key
 setevent <<Undo>> <Alt-u>
 ## Redo {Redo key} key
@@ -76,13 +78,13 @@ setevent <<Default>> <Alt-d>
 ## Complete {Complete key} key
 #setevent <<CompleteTab>> <Control-Shift-v>
 ## FocusNext {FocusNext key} key
-setevent <<FocusNext>> <Tab>
+setevent <<FocusNext>> <Tab> <Control-Tab>
 ## FocusPrev {FocusPrev key} key
-setevent <<FocusPrev>> <Shift-Tab>
-## TextFocusNext {TextFocusNext key} key
-setevent <<TextFocusNext>> <Control-Tab>
-## TextFocusPrev {TextFocusPrev key} key
-setevent <<TextFocusPrev>> <Shift-Tab>
+setevent <<FocusPrev>> <ISO_Left_Tab>
+## SpecialFocusNext {TextFocusNext key} key
+setevent <<SpecialFocusNext>> <Control-Tab>
+## SpecialFocusPrev {TextFocusPrev key} key
+setevent <<SpecialFocusPrev>> <ISO_Left_Tab>
 
 ## ---- Misc ----
 ## Help {Help key} key
@@ -186,3 +188,20 @@ setevent <<ScrollPageUp>> <Control-Prior> <Control-Alt-Up>
 ## ScrollPageDown {ScrollPageDown key} key
 setevent <<ScrollPageDown>> <Control-Next> <Control-Alt-Down>
 
+## ---- Table ----
+## TableUp {Table Up key} key
+setevent <<TableUp>> <Control-Up>
+## TableDown {Table Down key} key
+setevent <<TableDown>> <Control-Down>
+## TableLeft {Table Left key} key
+setevent <<TableLeft>> <Control-Left>
+## TableRight {Table Right key} key
+setevent <<TableRight>> <Control-Right>
+## SelectTableUp {Table Up Select key} key
+setevent <<SelectTableUp>> <Control-Shift-Up>
+## SelectTableDown {Table Down Select key} key
+setevent <<SelectTableDown>> <Control-Shift-Down>
+## SelectTableLeft {Table Left Select key} key
+setevent <<SelectTableLeft>> <Control-Shift-Left>
+## SelectTableRight {Table Right Select key} key
+setevent <<SelectTableRight>> <Control-Shift-Right>

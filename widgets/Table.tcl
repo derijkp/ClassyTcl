@@ -16,7 +16,7 @@
 # <dl>
 # <dt>getcommand object w row col
 # <dd>the parameter object is the name of the table, the parameter w gives the window of the cell
-# associated with the row and column given in row and col.<br>
+# asCsociated with the row and column given in row and col.<br>
 # The getcommand must return the value to be shown in the given cell. If the getcommand
 # wishes to set the value itself (eg. in a text), it can return with a -code break, so
 # that its return value will not be used.
@@ -47,12 +47,10 @@ option add *Classy::Table.base.Text.borderWidth 1 widgetDefault
 option add *Classy::Table::xpane.width 1 widgetDefault
 option add *Classy::Table::xpane.relief flat widgetDefault
 option add *Classy::Table::xpane.cursor sb_h_double_arrow widgetDefault
-#option add *Classy::Table::xpane.background green widgetDefault
 
 option add *Classy::Table::ypane.height 1 widgetDefault
 option add *Classy::Table::ypane.relief flat widgetDefault
 option add *Classy::Table::ypane.cursor sb_v_double_arrow widgetDefault
-#option add *Classy::Table::ypane.background green widgetDefault
 
 proc Classy::Tableobject {w args} {
 	eval [winfo parent [winfo parent $w]] $args
@@ -63,21 +61,25 @@ bind Classy::Table::xpane <<Action-Motion>> {Classy::Tableobject %W _drag %W %X 
 bind Classy::Table::ypane <<Action>> {Classy::Tableobject %W _startdrag y %W %X %Y}
 bind Classy::Table::ypane <<Action-Motion>> {Classy::Tableobject %W _drag %W %X %Y}
 
-bind Classy::Table::text <FocusOut> {Classy::Tableobject %W _set %W}
-bind Classy::Table::text <Control-Up> {Classy::Tableobject %W movey %W -1}
-bind Classy::Table::text <Control-Down> {Classy::Tableobject %W movey %W 1}
-bind Classy::Table::text <Control-Left> {Classy::Tableobject %W movex %W -1}
-bind Classy::Table::text <Control-Right> {Classy::Tableobject %W movex %W 1}
-
-bind Classy::Table::entry <<Return>> {Classy::Tableobject %W _set %W ; Classy::Tableobject %W movey %W 1}
-bind Classy::Table::entry <FocusOut> {Classy::Tableobject %W _set %W}
-bind Classy::Table::entry <<Up>> {Classy::Tableobject %W movey %W -1}
-bind Classy::Table::entry <<Down>> {Classy::Tableobject %W movey %W 1}
-bind Classy::Table::entry <Control-Up> {Classy::Tableobject %W movey %W -1}
-bind Classy::Table::entry <Control-Down> {Classy::Tableobject %W movey %W 1}
-bind Classy::Table::entry <Control-Left> {Classy::Tableobject %W movex %W -1}
-bind Classy::Table::entry <Control-Right> {Classy::Tableobject %W movex %W 1}
 bind Classy::Table <Configure> {%W _redraw}
+
+bind Classy::Table::all <FocusOut> {Classy::Tableobject %W _set %W;break}
+bind Classy::Table::all <<TableUp>> {Classy::Tableobject %W movey %W -1;break}
+bind Classy::Table::all <<TableDown>> {Classy::Tableobject %W movey %W 1;break}
+bind Classy::Table::all <<TableLeft>> {Classy::Tableobject %W movex %W -1;break}
+bind Classy::Table::all <<TableRight>> {Classy::Tableobject %W movex %W 1;break}
+bind Classy::Table::all <<PasteSpecial>> {Classy::Tableobject %W paste;break}
+bind Classy::Table::all <<PageUp>> {Classy::Tableobject %W yview scroll -1 page;break}
+bind Classy::Table::all <<PageDown>> {Classy::Tableobject %W yview scroll 1 page;break}
+
+bind Classy::Table::text <<SpecialFocusPrev>> {Classy::Tableobject %W movex %W -1;break}
+bind Classy::Table::text <<SpecialFocusNext>> {Classy::Tableobject %W movex %W 1;break}
+bind Classy::Table::text <FocusOut> {Classy::Tableobject %W _set %W;break}
+bind Classy::Table::entry <<FocusPrev>> {Classy::Tableobject %W movex %W -1;break}
+bind Classy::Table::entry <<FocusNext>> {Classy::Tableobject %W movex %W 1;break}
+bind Classy::Table::entry <<Return>> {Classy::Tableobject %W _set %W ; Classy::Tableobject %W movey %W 1;break}
+bind Classy::Table::entry <<Up>> {Classy::Tableobject %W movey %W -1;break}
+bind Classy::Table::entry <<Down>> {Classy::Tableobject %W movey %W 1;break}
 # ------------------------------------------------------------------
 #  Widget creation
 # ------------------------------------------------------------------
@@ -99,7 +101,8 @@ Classy::Table classmethod init {args} {
 
 	# REM set variables
 	# -----------------
-	private $object drow dcol
+	private $object drow dcol redrawing
+	set redrawing 0
 	set drow(start) 0
 	set dcol(start) 0
 	set dcol(num) 0
@@ -124,11 +127,15 @@ Classy::Table component book {$object.book}
 # gives the number of columns in the table
 #}
 Classy::Table addoption -cols {cols cols 5} {
+	if {$value < 1} {set value 1}
+	Classy::todo $object _redraw
 }
 #doc {Table options -rows} option {-rows rows rows} descr {
 # gives the number of rows in the table
 #}
 Classy::Table addoption -rows {rows Rows 20} {
+	if {$value < 1} {set value 1}
+	Classy::todo $object _redraw
 }
 #doc {Table options -colsize} option {-colsize colsize colsize} descr {
 # gives the default column size
@@ -195,6 +202,7 @@ Classy::Table addoption -yscrollcommand {yScrollCommand ScrollCommand {}} {}
 # wishes to set the value itself (eg. in a text), it can return with a -code break, so
 # that its return value will not be used.
 #}
+
 Classy::Table addoption -getcommand {getCommand Command {}} {}
 #doc {Table options -setcommand} option {-setcommand setcommand setcommand} descr {
 # gives the command that will be called to set a given cell to a new value. It must have the 
@@ -204,6 +212,7 @@ Classy::Table addoption -getcommand {getCommand Command {}} {}
 # name of the currently associated cell, the row, the column and the new value.
 # If the setcommand fails, the previous value will be restored.
 #}
+
 Classy::Table addoption -setcommand {setCommand Command {}} {}
 #doc {Table options -xlabelcommand} option {-xlabelCommand xLabelCommand Command} descr {
 # If this option is empty, no xlabels will be displayed.
@@ -272,7 +281,17 @@ Classy::Table method colsize {col args} {
 			set dcol(s,$col) $size
 		}
 	}
-	$object _redraw
+	$object _scheduleredraw
+}
+
+Classy::Table method _scheduleredraw {} {
+	private $object redrawing
+	if $redrawing {
+		set redrawing 0
+	} else {
+		update
+		Classy::todo $object _redraw
+	}
 }
 
 #doc {Table command rowsize} cmd {
@@ -303,19 +322,117 @@ Classy::Table method rowsize {row args} {
 			set drow(s,$row) $size
 		}
 	}
-	$object _redraw
+	$object _scheduleredraw
+}
+
+#doc {Table command set} cmd {
+#pathname set rrow rcol value
+#} descr {
+# set the value of the cell at $rrow and $rcol to $value
+#}
+Classy::Table method set {rrow rcol value} {
+	private $object options drow dcol data
+	set col [expr {$rcol-$dcol(start)}]
+	set row [expr {$rrow-$drow(start)}]
+	set w $object.base.e$row,$col
+	catch {eval $options(-setcommand)	{$object $object.base.e$row,$col $rrow $rcol $value}} res
+	$object refreshcell $rrow $rcol
+}
+
+#doc {Table command paste} cmd {
+#pathname paste ?column ...?
+#} descr {
+# paste data in the table. The data must be a list where each element is a list that contains the values
+# for one column. If no arguments are given, the data in the clipboard is pasted.
+#}
+Classy::Table method paste {args} {
+	private $object options drow dcol
+	if {"$args" == ""} {
+		set data [selection get -displayof $object -selection CLIPBOARD]
+	} else {
+		set data $args
+	}
+	set w [focus -lastfor $object]
+	regexp {([0-9]+),([0-9]+)$} $w temp row col
+	set rcol [expr {$col+$dcol(start)}]
+	foreach column $data {
+		set rrow [expr {$row+$drow(start)}]
+		foreach value $column {
+			$object set $rrow $rcol $value
+			incr rrow
+		}
+		incr rcol
+	}
+}
+
+Classy::Table method selection {option args} {
+	private $object selection dcol drow
+	switch $option {
+		add {
+			if {[llength $args] != 4} {
+				error "wrong # args: must be: \"$object selection add startrow startcol endrow endcol\""
+			}
+			foreach val $args var {startrow startcol endrow endcol} {
+				set $var $val
+			}
+			for {set rcol $startcol} {$rcol <= $endcol} {incr rcol} {
+				for {set rrow $startrow} {$rrow <= $endrow} {incr rrow} {
+					set name [list $rrow $rcol]
+					set col [expr {$rcol-$dcol(start)}]
+					set row [expr {$rrow-$drow(start)}]
+					if ![info exists selection($name)] {
+						set w $object.base.e$row,$col
+						if [winfo exists $w] {
+							set selection($name) [list [$w cget -bg] [$w cget -fg]]
+							$w configure -bg [option get $w selectBackground Foreground] \
+										-fg [option get $w selectForeground Background]
+						} else {
+							set selection($name) {}
+						}
+					}
+				}
+			}
+		}
+		clear {
+			foreach name [array names selection] {
+				if {"$selection($name)" != ""} {
+					set rrow [lindex $name 0]
+					set rcol [lindex $name 1]
+					set row [expr {$rrow-$drow(start)}]
+					set col [expr {$rcol-$dcol(start)}]
+					set w $object.base.e$row,$col
+					catch {$w configure -bg [lindex $selection($name) 0] -fg [lindex $selection($name) 1]}
+				}
+			}
+			unset selection
+		}
+		current {
+			catch {unset a}
+			set result ""
+			foreach name [array names selection] {
+				lappend a([lindex $name 1]) $name
+			}
+			foreach col [lsort -integer [array names a]] {
+				lappend result [lsort -integer -index 0 $a($col)]
+			}
+			return $result
+		}
+		default {
+			error "unknown option \"$option\""
+		}
+	}
 }
 
 #doc {Table command movey} cmd {
-#pathname movey w step
+#pathname movey w step ?sel?
 #} descr {
 #
 #}
-Classy::Table method movey {w step} {
-	private $object options drow
+Classy::Table method movey {w step args} {
+	private $object options drow dcol
 	regexp {([0-9]+),([0-9]+)$} $w temp row col
-	set rrow [expr $row+$drow(start)+1]
-	if {($step > 0)&&($rrow >= $options(-rows))} return
+	set temp [expr {$row+$drow(start)+1}]
+	if {($step > 0)&&($temp >= $options(-rows))} return
 	set newrow [expr {$row + $step	}]
 	set end [expr {$drow(num)-2}]
 	if {$newrow >= $end} {
@@ -328,14 +445,20 @@ Classy::Table method movey {w step} {
 	} else {
 		focus $object.base.e$newrow,$col
 	}
+	if {"$args" != ""} {
+		set rrow [expr {$row+$drow(start)}]
+		set rcol [expr {$col+$dcol(start)}]
+		incr temp -1
+		$object selection add $temp $rcol $rrow $rcol
+	}
 }
 
 #doc {Table command movex} cmd {
-#pathname movex w step
+#pathname movex w step ?sel?
 #} descr {
 # 
 #}
-Classy::Table method movex {w step} {
+Classy::Table method movex {w step args} {
 	private $object options dcol
 	regexp {([0-9]+),([0-9]+)$} $w temp row col
 	set rcol [expr $col+$dcol(start)+1]
@@ -354,7 +477,7 @@ Classy::Table method movex {w step} {
 	}
 }
 
-Classy::Table method _set {w} {
+Classy::Table method _set {w args} {
 	private $object options drow dcol data
 	regexp {([0-9]+),([0-9]+)$} $w temp row col
 	switch $options(-type) {
@@ -367,35 +490,21 @@ Classy::Table method _set {w} {
 	}
 	set rcol [expr {$col+$dcol(start)}]
 	set rrow [expr {$row+$drow(start)}]
-	if {($rrow >= $options(-rows))||($rcol >= $options(-cols))} {
-		set res ""
-	} elseif [catch {$options(-setcommand)	$object $object.base.e$row,$col $rrow $rcol $value} res] {
-		$object _reset $row $col
-		return ""
-	}
-	switch $options(-type) {
-		entry {
-			set data($row,$col) $res
-		}
-		text {
-			$object.base.e$row,$col insert 1.0 $res
-		}
-	}
+	catch {eval $options(-setcommand)	{$object $object.base.e$row,$col $rrow $rcol $value}} res
+	$object refreshcell $rrow $rcol
 }
 
-Classy::Table method _reset {row col} {
-	private $object options drow dcol data
-	set rcol [expr {$col+$dcol(start)}]
-	set rrow [expr {$row+$drow(start)}]
-	if {($rrow >= $options(-rows))||($rcol >= $options(-cols))} {
-		set new ""
-	} else {
-		set code [catch {$options(-getcommand) $object $object.base.e$row,$col $rrow $rcol} new]
-		if {$code == 1} {
-			set new "ERROR: $new"
-		} elseif {$code != 0} {
-			unset new
-		}
+Classy::Table method refreshcell {rrow rcol} {
+	private $object options drow dcol data selection
+	set col [expr {$rcol-$dcol(start)}]
+	set row [expr {$rrow-$drow(start)}]
+	set w $object.base.e$row,$col
+	if ![winfo exists $w] return
+	set code [catch {eval $options(-getcommand) {$object $w $rrow $rcol}} new]
+	if {$code == 1} {
+		set new "ERROR: $new"
+	} elseif {$code != 0} {
+		unset new
 	}
 	if [info exists new] {
 		switch $options(-type) {
@@ -403,115 +512,91 @@ Classy::Table method _reset {row col} {
 				set data($row,$col) $new
 			}
 			text {
-				$object.base.e$row,$col delete 1.0 end
-				if {"$new" != ""} {$object.base.e$row,$col insert 1.0 $new}
+				$w delete 1.0 end
+				if {"$new" != ""} {$w insert 1.0 $new}
 			}
 		}
 	}
-}
-
-Classy::Table method _refresh {} {
-	private $object options drow dcol data
-	set rcol $dcol(start)
-	for {set col 0} {$col < $dcol(num)} {incr col} {
-		if [info exists dcol(s,$rcol)] {
-			grid columnconfigure $object.base [expr {2*$col+2}] -minsize $dcol(s,$rcol)
-		} else {
-			grid columnconfigure $object.base [expr {2*$col+2}] -minsize $dcol(s)
-		}
-		incr rcol
+	if [info exists selection([list $rrow $rcol])] {
+		$w configure -bg [option get $w selectBackground Foreground] \
+				-fg [option get $w selectForeground Background]
 	}
-	set rrow $drow(start)
-	for {set row 0} {$row < $drow(num)} {incr row} {
-		if [info exists drow(s,$rrow)] {
-			grid rowconfigure $object.base [expr {2*$row+2}] -minsize $drow(s,$rrow)
-		} else {
-			grid rowconfigure $object.base [expr {2*$row+2}] -minsize $drow(s)
-		}
-		incr rrow
-	}
-	set rrow $drow(start)
-	for {set row 0} {$row < $drow(num)} {incr row} {
-		set rcol $dcol(start)
-		for {set col 0} {$col < $dcol(num)} {incr col} {
-			set w $object.base.e$row,$col
-			if {($rrow >= $options(-rows))||($rcol >= $options(-cols))} {
-				set new ""
-			} else {
-				set code [catch {$options(-getcommand) $object $w $rrow $rcol} new]
-				if {$code == 1} {
-					set new "ERROR: $new"
-				} elseif {$code != 0} {
-					unset new
-				}
-			}
-			if [info exists new] {
-				switch $options(-type) {
-					entry {
-						set data($row,$col) $new
-					}
-					text {
-						$w delete 1.0 end
-						if {"$new" != ""} {$w insert 1.0 $new}
-					}
-				}
-			}
-			incr rcol
-		}
-		incr rrow
-	}
-
-	# labels
-	if {"$options(-ylabelcommand)" != ""} {
-		grid columnconfigure $object.base 0 -minsize $dcol(ls)
-		set rrow $drow(start)
-		for {set row 0} {$row < $drow(num)} {incr row} {
-			set code [catch {$options(-ylabelcommand) $object $w $rrow} new]
-			if {$code == 1} {
-				set new $rrow
-			} elseif {$code != 0} {
-				unset new
-			}
-			if [info exists new] {
-				$object.base.yl$row configure -text $new
-			}
-			incr rrow
-		}
-	}
-	if {"$options(-xlabelcommand)" != ""} {
-		grid rowconfigure $object.base 0 -minsize $drow(ls)
-		set rcol $dcol(start)
-		for {set col 0} {$col < $dcol(num)} {incr col} {
-			set code [catch {$options(-xlabelcommand) $object $w $rcol} new]
-			if {$code == 1} {
-				set new $rcol
-			} elseif {$code != 0} {
-				unset new
-			}
-			if [info exists new] {
-				$object.base.xl$col configure -text $new
-			}
-			incr rcol
-		}
-	}
-
-	# values
-	$object _sethbar
-	$object _setvbar
 }
 
 proc Classy::Table__create_elem {object type row col} {
 	switch $type {
 		entry {
 			entry $object.base.e$row,$col -width 1 -textvariable [privatevar $object data]($row,$col)
-			bindtags $object.base.e$row,$col [list $object Classy::Table::entry $object.base.e$row,$col Entry . all]
+			bindtags $object.base.e$row,$col [list Classy::Table::all Classy::Table::entry $object.base.e$row,$col Entry . all]
 		}
 		text {
 			text $object.base.e$row,$col -width 1 -height 0
-			bindtags $object.base.e$row,$col [list $object Classy::Table::text $object.base.e$row,$col Text . all]
+			bindtags $object.base.e$row,$col [list Classy::Table::all Classy::Table::text $object.base.e$row,$col Text . all]
 		}
 	}
 	grid $object.base.e$row,$col -row [expr {2*$row+2}] -column [expr {2*$col+2}] -sticky nwse
+}
+
+Classy::Table method _sethbar {} {
+	private $object options dcol
+	set curlow $dcol(start)
+	set curhigh [expr {$dcol(start) + $dcol(num)}]
+	set min 0
+	set max $options(-cols)
+
+	if {$curlow < $min} {set curlow $min}
+	if {$curhigh < $min} {set curhigh $min}
+	if {$curlow > $max} {set curlow $max}
+	if {$curhigh > $max} {set curhigh $max}
+	set realw [expr {$max - $min}]
+	if {"$options(-xscrollcommand)" != ""} {
+		eval $options(-xscrollcommand) {[expr double($curlow)/$realw] [expr {double($curhigh)/$realw}]}
+	}
+}
+
+Classy::Table method _setvbar {} {
+	private $object options drow
+	set curlow $drow(start)
+	set curhigh [expr {$drow(start) + $drow(num)}]
+	set min 0
+	set max $options(-rows)
+
+	if {$curlow < $min} {set curlow $min}
+	if {$curhigh < $min} {set curhigh $min}
+	if {$curlow > $max} {set curlow $max}
+	if {$curhigh > $max} {set curhigh $max}
+	set realw [expr {$max - $min}]
+	if {"$options(-yscrollcommand)" != ""} {
+		eval $options(-yscrollcommand) {[expr {double($curlow)/$realw}] [expr {double($curhigh)/$realw}]}
+	}
+}
+
+Classy::Table method _startdrag {dir w x y} {
+	private $object drag dcol drow
+	set drag(dir) $dir
+	set drag(x) $x
+	set drag(y) $y
+	regexp {.base.[xy]pane(.+)$} $w temp drag(pos)
+	if {"$dir"=="x"} {
+		if {"$drag(pos)" != "label"} {
+			set drag(pos) [expr {$drag(pos)+$dcol(start)}]
+		}
+		set drag(s) [$object colsize $drag(pos)]
+	} else {
+		if {"$drag(pos)" != "label"} {
+			set drag(pos) [expr {$drag(pos)+$drow(start)}]
+		}
+		set drag(s) [$object rowsize $drag(pos)]
+	}
+}
+
+Classy::Table method _drag {w x y} {
+	private $object drag dcol drow
+	if {"$drag(dir)"=="x"} {
+		$object colsize $drag(pos) [expr $drag(s)+$x-$drag(x)]
+	} else {
+		$object rowsize $drag(pos) [expr $drag(s)+$y-$drag(y)]
+	}
 }
 
 #doc {Table command _redraw} cmd {
@@ -526,6 +611,8 @@ Classy::Table method _redraw {} {
 	if ![winfo exists $object.base.xpanelabel] {
 		frame $object.base.xpanelabel -class Classy::Table::xpane
 	}
+	$object _sethbar
+	$object _setvbar
 	set width [winfo width $object]
 	set prevcol $dcol(num)
 	set dcol(num) 0
@@ -629,7 +716,15 @@ Classy::Table method _redraw {} {
 		grid $object.base.ypanelabel -row 1 -column 0 -columnspan $dcol(num) -sticky nwse
 		if {$rownum > 0} {
 			for {set row $prevrow} {$row < $drow(num)} {incr row} {
-				button $object.base.yl$row -width 1 -height 1 -anchor w
+#				button $object.base.yl$row -width 1 -height 1 -anchor w
+				switch $options(-type) {
+					entry {
+						entry $object.base.yl$row -width 1 -relief flat -textvariable [privatevar $object data](yl$row)
+					}
+					text {
+						text $object.base.yl$row -width 1 -height 0 -relief flat
+					}
+				}
 				grid $object.base.yl$row -row [expr {2*$row+2}] -column 0 -sticky nwse
 			}
 		} elseif {$rownum < 0} {
@@ -637,12 +732,23 @@ Classy::Table method _redraw {} {
 				destroy $object.base.yl$row
 			}
 		}
+	} else {
+		grid columnconfigure $object.base 0 -minsize 0
+		grid columnconfigure $object.base 1 -minsize 0
 	}
 	if {"$options(-xlabelcommand)" != ""} {
 		grid $object.base.xpanelabel -row 0 -column 1 -rowspan $drow(num) -sticky nwse
 		if {$colnum > 0} {
 			for {set col $prevcol} {$col < $dcol(num)} {incr col} {
-				button $object.base.xl$col -width 1 -height 1
+#				button $object.base.xl$col -width 1 -height 1
+				switch $options(-type) {
+					entry {
+						entry $object.base.xl$col -width 1 -relief flat -textvariable [privatevar $object data](xl$col)
+					}
+					text {
+						text $object.base.xl$col -width 1 -height 0 -relief flat
+					}
+				}
 				grid $object.base.xl$col -row 0 -column [expr {2*$col+2}] -sticky nwse
 			}
 		} elseif {$colnum < 0} {
@@ -650,8 +756,141 @@ Classy::Table method _redraw {} {
 				destroy $object.base.xl$col
 			}
 		}
+	} else {
+		grid rowconfigure $object.base 0 -minsize 0
+		grid rowconfigure $object.base 1 -minsize 0
 	}
-	$object _refresh	
+	foreach name [array names selection] {
+		if {"$selection($name)" != ""} {
+			set rrow [lindex $name 0]
+			set rcol [lindex $name 1]
+			set row [expr {$rrow-$drow(start)}]
+			set col [expr {$rcol-$dcol(start)}]
+			set w $object.base.e$row,$col
+			catch {$w configure -bg [lindex $selection($name) 0] -fg [lindex $selection($name) 1]}
+		}
+	}
+
+	# sizes
+	set rcol $dcol(start)
+	for {set col 0} {$col < $dcol(num)} {incr col} {
+		if [info exists dcol(s,$rcol)] {
+			grid columnconfigure $object.base [expr {2*$col+2}] -minsize $dcol(s,$rcol)
+		} else {
+			grid columnconfigure $object.base [expr {2*$col+2}] -minsize $dcol(s)
+		}
+		incr rcol
+	}
+	set rrow $drow(start)
+	for {set row 0} {$row < $drow(num)} {incr row} {
+		if [info exists drow(s,$rrow)] {
+			grid rowconfigure $object.base [expr {2*$row+2}] -minsize $drow(s,$rrow)
+		} else {
+			grid rowconfigure $object.base [expr {2*$row+2}] -minsize $drow(s)
+		}
+		incr rrow
+	}
+
+	# labels
+	if {"$options(-ylabelcommand)" != ""} {
+		grid columnconfigure $object.base 0 -minsize $dcol(ls)
+		set rrow $drow(start)
+		for {set row 0} {$row < $drow(num)} {incr row} {
+			set w $object.base.yl$row
+			set code [catch {eval $options(-ylabelcommand) {$object $w $rrow}} new]
+			if {$code == 1} {
+				set new $rrow
+			} elseif {$code != 0} {
+				unset new
+			}
+			if [info exists new] {
+				switch $options(-type) {
+					entry {
+						set data(yl$row) $new
+					}
+					text {
+						$object.base.yl$row delete 1.0 end
+						if {"$new" != ""} {$object.base.yl$row insert 1.0 $new}
+					}
+				}
+#				$object.base.yl$row configure -text $new
+			}
+			incr rrow
+		}
+	}
+	if {"$options(-xlabelcommand)" != ""} {
+		grid rowconfigure $object.base 0 -minsize $drow(ls)
+		set rcol $dcol(start)
+		for {set col 0} {$col < $dcol(num)} {incr col} {
+			set w $object.base.xl$col
+			set code [catch {eval $options(-xlabelcommand) {$object $w $rcol}} new]
+			if {$code == 1} {
+				set new $rcol
+			} elseif {$code != 0} {
+				unset new
+			}
+			if [info exists new] {
+				switch $options(-type) {
+					entry {
+						set data(xl$col) $new
+					}
+					text {
+						$object.base.xl$col delete 1.0 end
+						if {"$new" != ""} {$object.base.xl$col insert 1.0 $new}
+					}
+				}
+#				$object.base.xl$col configure -text $new
+			}
+			incr rcol
+		}
+	}
+	$object _refreshtable
+}
+
+Classy::Table method _refreshtable {} {
+	private $object options drow dcol data selection redrawing
+	#values
+	set redrawing 1
+	set rrow $drow(start)
+	for {set row 0} {$row < $drow(num)} {incr row} {
+		set rcol $dcol(start)
+		for {set col 0} {$col < $dcol(num)} {incr col} {
+			set w $object.base.e$row,$col
+			if {($rrow >= $options(-rows))||($rcol >= $options(-cols))} {
+				set new ""
+			} else {
+				set code [catch {eval $options(-getcommand) {$object $w $rrow $rcol}} new]
+				if {$code == 1} {
+					set new "ERROR: $new"
+				} elseif {$code != 0} {
+					unset new
+				}
+			}
+			if [info exists new] {
+				switch $options(-type) {
+					entry {
+						set data($row,$col) $new
+					}
+					text {
+						$w delete 1.0 end
+						if {"$new" != ""} {$w insert 1.0 $new}
+					}
+				}
+			}
+			incr rcol
+		}
+		incr rrow
+		update
+		if !$redrawing {
+			update
+			$object _redraw
+			return
+		}
+	}
+	set redrawing 0
+	foreach name [array names selection] {
+		$object refreshcell [lindex $name 0] [lindex $name 1]
+	}
 }
 
 #doc {Table command xview} cmd {
@@ -668,9 +907,9 @@ Classy::Table method xview {args} {
 
 	switch [lindex $args 0] {
 		"" {
-			set end [expr (double($pos + $size)/$max]
+			set end [expr {double($pos + $size)/$max}]
 			if {$end > 1} {set end 1}
-			return [list [expr double($pos)/$max] $end
+			return [list [expr {double($pos)/$max}] $end]
 		}
 		moveto {
 			set fraction [lindex $args 1]
@@ -690,7 +929,8 @@ Classy::Table method xview {args} {
 	if {$pos < 0} {set pos 0}
 
 	set dcol(start) [expr int($pos)]
-	$object _redraw
+	$object _sethbar
+	$object _scheduleredraw
 }
 
 #doc {Table command yview} cmd {
@@ -698,7 +938,7 @@ Classy::Table method xview {args} {
 #} descr {
 #}
 Classy::Table method yview {args} {
-	private $object options drow
+	private $object options drow redrawing
 	set pagesize $drow(num)
 	set pos $drow(start)
 	set size $drow(num)
@@ -707,9 +947,9 @@ Classy::Table method yview {args} {
 
 	switch [lindex $args 0] {
 		"" {
-			set end [expr (double($pos + $size)/$max]
+			set end [expr {double($pos + $size)/$max}]
 			if {$end > 1} {set end 1}
-			return [list [expr double($pos)/$max] $end
+			return [list [expr {double($pos)/$max}] $end]
 		}
 		moveto {
 			set fraction [lindex $args 1]
@@ -729,61 +969,6 @@ Classy::Table method yview {args} {
 	if {$pos < 0} {set pos 0}
 
 	set drow(start) [expr int($pos)]
-	$object _redraw
-}
-
-Classy::Table method _sethbar {} {
-	private $object options dcol
-	set curlow $dcol(start)
-	set curhigh [expr {$dcol(start) + $dcol(num)}]
-	set min 0
-	set max $options(-cols)
-
-	if {$curlow < $min} {set curlow $min}
-	if {$curhigh < $min} {set curhigh $min}
-	if {$curlow > $max} {set curlow $max}
-	if {$curhigh > $max} {set curhigh $max}
-	set realw [expr {$max - $min}]
-	if {"$options(-xscrollcommand)" != ""} {
-		eval $options(-xscrollcommand) {[expr double($curlow)/$realw] [expr {double($curhigh)/$realw}]}
-	}
-}
-
-Classy::Table method _setvbar {} {
-	private $object options drow
-	set curlow $drow(start)
-	set curhigh [expr {$drow(start) + $drow(num)}]
-	set min 0
-	set max $options(-rows)
-
-	if {$curlow < $min} {set curlow $min}
-	if {$curhigh < $min} {set curhigh $min}
-	if {$curlow > $max} {set curlow $max}
-	if {$curhigh > $max} {set curhigh $max}
-	set realw [expr {$max - $min}]
-	if {"$options(-yscrollcommand)" != ""} {
-		eval $options(-yscrollcommand) {[expr {double($curlow)/$realw}] [expr {double($curhigh)/$realw}]}
-	}
-}
-
-Classy::Table method _startdrag {dir w x y} {
-	private $object drag
-	set drag(dir) $dir
-	set drag(x) $x
-	set drag(y) $y
-	regexp {.base.[xy]pane(.+)$} $w temp drag(pos)
-	if {"$dir"=="x"} {
-		set drag(s) [$object colsize $drag(pos)]
-	} else {
-		set drag(s) [$object rowsize $drag(pos)]
-	}
-}
-
-Classy::Table method _drag {w x y} {
-	private $object drag
-	if {"$drag(dir)"=="x"} {
-		$object colsize $drag(pos) [expr $drag(s)+$x-$drag(x)]
-	} else {
-		$object rowsize $drag(pos) [expr $drag(s)+$y-$drag(y)]
-	}
+	$object _setvbar
+	$object _scheduleredraw
 }

@@ -264,7 +264,7 @@ Classy::Editor method saveas {file} {
 #}
 Classy::Editor method savebox {} {
 	private $object curfile
-	$object saveas [Classysavefile -title "Save as" \
+	$object saveas [Classy::savefile -title "Save as" \
 		-transfercommand "$object transfercommand" -initialfile $curfile]
 }
 

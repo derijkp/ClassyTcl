@@ -180,3 +180,21 @@ proc ::Classy::Message {window args} {
 		$window configure -width [expr [winfo width $window] - 2*[$window cget -bd]]
 	}]
 }
+
+set Classy::bgid 0
+proc Classy::bgstart {} {
+	incr ::Classy::bgid
+	set ::Classy::bg($::Classy::bgid) 1
+	return $::Classy::bgid
+}
+
+proc Classy::bgcheck {id} {
+	update
+	if ![info exists ::Classy::bg($id)] {
+		return -code return {}
+	}
+}
+
+proc Classy::bgstop {id} {
+	catch {unset ::Classy::bg($id)}
+}

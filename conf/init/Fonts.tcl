@@ -21,4 +21,7 @@ Classy::setfont *Menubutton.font BoldItalicFont
 Classy::setfont *Scale.font BoldItalicFont
 ## {Text font} {font used in text widgets} font
 Classy::setfont *Text.font NonPropFont
-
+## {Browser font} {font used for names in the browser widget} font
+Classy::setfont *Classy::Browser.font BoldFont
+## {Browser data font} {font used for data in the browser widget} font
+Classy::setfont *Classy::Browser.dataFont Font

@@ -197,10 +197,10 @@ bind Classy::CmdWidget <<CompleteVar>> {
 	%W complete var
 	break
 }
-bind Classy::CmdWidget <<TextFocusNext>> {
+bind Classy::CmdWidget <<SpecialFocusNext>> {
 	focus [tk_focusNext %W]
 }
-bind Classy::CmdWidget <<TextFocusPrev>> {
+bind Classy::CmdWidget <<SpecialFocusPrev>> {
 	focus [tk_focusPrev %W]
 }
 bind Classy::CmdWidget <Control-i> {
