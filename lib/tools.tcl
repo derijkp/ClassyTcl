@@ -364,3 +364,49 @@ proc Classy::orient {value} {
 	}
 }
 
+proc Classy::auto_mkindex {dir args} {
+	eval ::auto_mkindex $dir $args
+	global errorCode errorInfo
+	set oldDir [pwd]
+	cd $dir
+	set dir [pwd]
+	append index "\n# Addition of ClassyTcl classes defined in the directory\n"
+	if {$args == ""} {
+		set args *.tcl
+	}
+	foreach file [eval glob $args] {
+		set f ""
+		set error [catch {
+			set f [open $file]
+			while {[gets $f line] >= 0} {
+				if [regexp {#auto_index[ ]+([^ 	]*)} $line match Name] {
+					set Name [lindex [auto_qualify $Name "::"] 0]
+					append index "set [list auto_index($Name)]"
+					append index " \[list source \[file join \$dir [list $file]\]\]\n"
+				}
+			}
+			close $f
+		} msg]
+		if $error {
+			set code $errorCode
+			set info $errorInfo
+			catch {close $f}
+			cd $oldDir
+			error $msg $info $code
+		}
+	}
+	set f ""
+	set error [catch {
+		set f [open tclIndex a]
+		puts $f $index nonewline
+		close $f
+		cd $oldDir
+	} msg]
+	if $error {
+		set code $errorCode
+		set info $errorInfo
+		catch {close $f}
+		cd $oldDir
+		error $msg $info $code
+	}
+}

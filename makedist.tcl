@@ -12,7 +12,7 @@ if {[llength $argv] == 0} {
 # $Format: "\tset version 0.$ProjectMajorVersion$"$
 	set version 0.2
 # $Format: "\tset minorversion $ProjectMinorVersion$"$
-	set minorversion 1
+	set minorversion 2
 
 set targetdir [file join $targetdir ClassyTcl-$tcl_platform(os)-$version.$minorversion]
 puts "Building binary distribution in $targetdir"
@@ -67,7 +67,6 @@ proc clean {filemode dirmode dir} {
 			foreach file [glob [file join $targetdir bin *]] {
 				file attributes $file -permissions 0755
 			}
-			file attributes [file join $targetdir template template.tcl] -permissions 0755
 		}
 	}
 exit
