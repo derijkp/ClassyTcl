@@ -27,6 +27,12 @@ proc ::Classy::NumEntry {} {}
 proc NumEntry {} {}
 }
 
+option add *Classy::NumEntry.highlightThickness 0 widgetDefault
+option add *Classy::NumEntry*Frame.highlightThickness 0 widgetDefault
+option add *Classy::NumEntry*Frame.borderWidth 0 widgetDefault
+option add *Classy::NumEntry.entry.relief sunken widgetDefault
+option add *Classy::NumEntry.label.anchor w widgetDefault
+
 # ------------------------------------------------------------------
 #  Creation
 # ------------------------------------------------------------------

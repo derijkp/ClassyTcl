@@ -1,31 +1,22 @@
-## ---- Basic Fonts ----
-## Font {basic font} font
-Classy::setfont *Font {helvetica 10}
-## BoldFont {basic bold font class} font
-Classy::setfont *BoldFont {helvetica 10 bold}
-## ItalicFont {basic italic font class} font
-Classy::setfont *ItalicFont {helvetica 10 italic}
-## BoldItalicFont {basic bold-italic font class} font
-Classy::setfont *BoldItalicFont {helvetica 10 bold italic}
-## NonPropFont {basic non-proportional font class} font
-Classy::setfont *NonPropFont {courier 10}
+#ClassyTcl font configuration file
 
-## ---- Widget Fonts ----
-## {Button Font} {font used on buttons} font
-Classy::setfont *Button.font Font
-## {Menu Font} {font used in menus} font
-Classy::setfont *Menu.font BoldItalicFont
-## {Menubutton font} {font used in menu buttons} font
-Classy::setfont *Menubutton.font BoldItalicFont
-## {Scale Font} {font used in scales} font
-Classy::setfont *Scale.font BoldItalicFont
-## {Text font} {font used in text widgets} font
-Classy::setfont *Text.font NonPropFont
-## {Browser font} {font used for names in the browser widget} font
-Classy::setfont *Classy::Browser.font BoldFont
-## {Browser data font} {font used for data in the browser widget} font
-Classy::setfont *Classy::Browser.dataFont Font
-## {LargeBrowser font} {font used for names in the browser widget} font
-Classy::setfont *Classy::LargeBrowser.font BoldFont
-## {LargeBrowser data font} {font used for data in the browser widget} font
-Classy::setfont *Classy::LargeBrowser.dataFont Font
+Classy::configfont {Basic Fonts} {
+	Font *Font {helvetica 10} {basic font}
+	BoldFont *BoldFont {helvetica 10 bold} {basic bold font class}
+	ItalicFont *ItalicFont {helvetica 10 italic} {basic italic font class}
+	BoldItalicFont *BoldItalicFont {helvetica 10 bold italic} {basic bold-italic font class}
+	NonPropFont *NonPropFont {courier 10} {basic non-proportional font class}
+}
+
+Classy::configfont {Widget Fonts} {
+	{Button Font} *Button.font Font {font used on buttons}
+	{Menu Font} *Menu.font BoldItalicFont {font used in menus}
+	{Menubutton font} *Menubutton.font BoldItalicFont {font used in menu buttons}
+	{Scale Font} *Scale.font BoldItalicFont {font used in scales}
+	{Text font} *Text.font NonPropFont {font used in text widgets}
+	{Tree font} *treeFont Font {default font used for text in a tree}
+	{Browser font} *Classy::Browser.font BoldFont {font used for names in the browser widget}
+	{Browser data font} *Classy::Browser.dataFont Font {font used for data in the browser widget}
+	{LargeBrowser font} *Classy::LargeBrowser.font BoldFont {font used for names in the browser widget}
+	{LargeBrowser data font} *Classy::LargeBrowser.dataFont Font {font used for data in the browser widget}
+}

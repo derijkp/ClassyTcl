@@ -35,6 +35,8 @@ namespace eval ::Classy {
 	}
 }
 
+namespace eval ::Dialog {}
+
 if [file exists [file join ${::class::dir} classy[info sharedlibextension]]] {
 	if {"[info commands ::class::reinit]" == ""} {
 		load [file join ${::class::dir} classy[info sharedlibextension]]

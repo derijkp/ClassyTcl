@@ -1,5 +1,6 @@
-## Editor {menu used in the ClassyTcl Editor} menu
-Classy::setoption *Classy::Editor.Menu {
+#ClassyTcl menu configuration file
+
+Classy::configmenu Classy::Editor {menu used in the ClassyTcl Editor} {
 menu file "File" {
 	action Load "Open file" {eval %W load [Classy::selectfile -title Open -selectmode persistent]}
 	action LoadNext "Open next" "%W loadnext"
@@ -55,8 +56,8 @@ menu tools "Tools" {
 activemenu macros "Macros" {%W getmacromenu}
 activemenu pattern "Pattern" {%W getpatternmenu}
 }
-## Help {menu used in the ClassyTcl help system} menu
-Classy::setoption *Classy::Help.Menu {
+
+Classy::configmenu Classy::Help {menu used in the ClassyTcl help system} {
 menu file "File" {
 	action Reload "Reload" {%W reload}
 	action Edit "Edit" {%W edit}
@@ -75,8 +76,7 @@ menu go "Go" {
 activemenu general "General" {%W getgeneralmenu}
 }
 
-## Filer {menu used in the ClassyTcl Filer} menu
-Classy::setoption *Classy::Filer.Menu {
+Classy::configmenu Classy::Filer {menu used in the ClassyTcl Filer} {
 menu sel "Selection" {
 	action Delete "Delete" {%W deletefiles sel}
 	action Rename "Rename" {%W renamebox} C-r
@@ -96,5 +96,37 @@ menu option "Options" {
 	radio SmallIcons "Small icons" {-variable [privatevar %W view] -value small -command {%W redraw}}
 	radio FullInfo "Full info" {-variable [privatevar %W view] -value full -command {%W redraw}}
 }
+}
+
+Classy::configmenu Classy::Builder {menu used in the ClassyTcl Builder} {
+menu sel "File" {
+	action New "New" {%W new}
+	action Save "Save" {%W save}
+	action Delete "Delete" {%W delete}
+	action Close "Close" {%W destroy}
+}
+menu option "Windows" {
+	action AddLabel "Add Label" {%W add label}
+	action AddEntry "Add Entry" {%W add entry}
+	action AddText "Add Text" {%W add text}
+	action AddFrame "Add Frame" {%W add frame}
+}
+action Test "Test" {%W test}
+}
+
+Classy::configmenu Classy::WindowBuilder {menu used in the ClassyTcl WindowBuilder} {
+menu sel "File" {
+	action New "New" {%W new}
+	action Save "Save" {%W save}
+	action Delete "Delete" {%W delete}
+	action Close "Close" {%W close}
+}
+menu option "Windows" {
+	action AddLabel "Add Label" {%W add label}
+	action AddEntry "Add Entry" {%W add entry}
+	action AddText "Add Text" {%W add text}
+	action AddFrame "Add Frame" {%W add frame}
+}
+action Test "Test" {%W test}
 }
 

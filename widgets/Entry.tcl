@@ -81,6 +81,7 @@ Classy::Entry classmethod init {args} {
 	# REM Configure initial arguments
 	# -------------------------------
 	if {"$args" != ""} {eval $object configure $args}
+	Classy::todo $object _redrawentry
 }
 
 # ------------------------------------------------------------------
@@ -93,15 +94,7 @@ Classy::Entry chainoptions {$object.entry}
 # determines the position of the label relative to the entry: horizontal or vertical
 #}
 Classy::Entry addoption -orient {orient Orient horizontal} {
-	if [string match "hor*" "$value"] {
-		if [winfo exists $object.label] {pack $object.label -side left}
-		pack $object.frame -side left -expand yes -fill x
-		return horizontal
-	} else {
-		if [winfo exists $object.label] {pack $object.label -side top -fill x}
-		pack $object.frame -side bottom -expand yes -fill x
-		return vertical
-	}
+	Classy::todo $object _redrawentry
 }
 
 
@@ -160,6 +153,13 @@ Classy::Entry addoption -command {command Command {}}
 # No constraint is applied when it is set to the empty string.
 #}
 Classy::Entry addoption -constraint {constraint Constraint {}}
+
+#doc {Entry options -labelwidth} option {-labelwidth labelWidth LabelWidth} descr {
+# width of the label
+#}
+Classy::Entry addoption -labelwidth {labelWidth LabelWidth {}} {
+	Classy::todo $object _redrawentry
+}
 
 
 # ------------------------------------------------------------------
@@ -243,3 +243,20 @@ Classy::Entry method constrain {{warn 0}} {
 		}
 	}
 }	
+
+Classy::Entry method _redrawentry {} {
+	private $object options
+	if {"$options(-labelwidth)" != ""} {
+		catch {$object.label configure -width $options(-labelwidth)}
+	}
+	if [string match "hor*" "$options(-orient)"] {
+		if [winfo exists $object.label] {pack $object.label -side left}
+		pack $object.frame -side left -expand yes -fill x
+		return horizontal
+	} else {
+		if [winfo exists $object.label] {pack $object.label -side top -fill x}
+		pack $object.frame -side bottom -expand yes -fill x
+		return vertical
+	}
+}
+

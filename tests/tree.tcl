@@ -35,14 +35,19 @@ proc browse {tree dir} {
 			}
 		}
 	}
+	.c configure -scrollregion [.c bbox all]
 }
-canvas .c
-pack .c -expand yes -fill both
+canvas .c -yscrollcommand {.s set}
+scrollbar .s -command {.c yview}
+pack .s -fill y -side left
+pack .c -expand yes -fill both -side left
 Classy::Tree new try -canvas .c
 
 try addnode {} .. -text ..
 browse try ..
 browse try ../help
+update idletasks
+.c configure -scrollregion [.c bbox all]
 bind .c <<Action>> {
 	set node [try node %x %y]
 	browse try $node
@@ -57,5 +62,7 @@ if 0 {
 }
 # tree addnode ~ -image folder
 
-manualtest
-testsummarize
+#manualtest
+#testsummarize
+
+#try deletenode ../apps/cedit/conf/init/Menus.tcl

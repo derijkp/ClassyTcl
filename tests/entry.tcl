@@ -61,6 +61,15 @@ test Classy::Entry {constraint} {
 	.try get
 } {try}
 
+test Classy::Entry {gridlabel} {
+	classyclean
+	Classy::Entry .try -label short -labelwidth 15
+	Classy::Entry .try2 -label "a lot longer" -labelwidth 15
+	grid .try -row 0 -column 1 -sticky se
+	grid .try2 -row 1 -column 1 -sticky se
+	.try cget -label
+} {test}
+
 test Classy::FileEntry {create and configure} {
 	classyclean
 	Classy::FileEntry .try

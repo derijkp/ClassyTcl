@@ -222,6 +222,28 @@ Classy::Dialog method add {button text command args} {
 	return $object.actions.$button
 }
 
+#doc {Dialog command add} cmd {
+#pathname button ?button?
+#} descr {
+# returns a list of buttons; if button is given, returns the parameters given to this button.
+#}
+Classy::Dialog method button {{button {}}} {
+	if {"$button" == ""} {
+		set result ""
+		foreach b [winfo children $object.actions] {
+			regsub ^$object\\.actions\\. $b {} b
+			lappend result $b
+		}
+		return $result
+	} else {
+		set result [list [$object.actions.$button cget -text] [$object.actions.$button cget -command]]
+		if {"[$object.actions.$button cget -default]" == "active"} {
+			lappend result default
+		}
+		return $result
+	}
+}
+
 #doc {Dialog command persistent} cmd {
 #pathname persistent ?option button ...?
 #} descr {

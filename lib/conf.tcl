@@ -17,7 +17,7 @@ set Classy::dir(user) [file join $homedir .classy]
 set Classy::dir(appdef) [file join [set ::Classy::appdir] conf]
 set Classy::appname [tk appname]
 regsub { #[0-9]+$} $Classy::appname {} Classy::appname
-set Classy::dir(appuser) [file join $homedir .$Classy::appname]
+set Classy::dir(appuser) [file join $homedir .classy-apps $Classy::appname]
 set Classy::dirs [list \
 	$Classy::dir(def) \
 	$Classy::dir(user) \
@@ -29,6 +29,91 @@ foreach type {user appuser} {
 		set dir [file join $Classy::dir($type) $dir]
 		catch {file mkdir $dir}
 	}
+}
+
+proc Classy::configkey {name map} {
+	foreach {name event keys descr} $map {
+		if {"[string index $name 0]" == "#"} continue
+		event delete $event
+		eval event add $event $keys
+	}
+}
+
+proc Classy::configmouse {name map} {
+	foreach {name event keys descr} $map {
+		if {"[string index $name 0]" == "#"} continue
+		event delete $event
+		eval event add $event $keys
+	}
+	# Mouse button bindings
+	# Which mousebutton does what?
+	# Action = select, invoke button, ...
+	# Menu = popup associated popup menu
+	# Adjust = Alternative action, depends on the widget
+	#          e.g. when you click on a dialog button with Action,
+	#          it will execute the action, and close the dialog.
+	#          Often you can use the adjust button to execute
+	#          the action without closing the dialog.
+	#          In entries or texts under X, it works as the copy button 
+	# -----------------------------------------------------------------
+	set list ""
+	foreach {name num} {Action 1 Adjust 2 Menu 3} {
+		regexp {[0-9]+} [event info <<$name>>] num
+		lappend list $name $num
+	}
+	foreach {name key} $list {
+		foreach combo {ButtonRelease ButtonPress} {
+			if {"[event info <<$combo-$name>>]" == ""} {
+				setevent <<$combo-$name>> <$combo-$key>
+			}
+		}
+		
+		foreach combo {
+			Motion Leave Enter ButtonRelease ButtonPress
+		} {
+			if {"[event info <<$name-$combo>>]" == ""} {
+				setevent <<$name-$combo>> <B$key-$combo>
+			}
+		}
+	}
+}
+
+proc Classy::configcolor {name map} {
+	foreach {name option value descr} $map {
+		if {"[string index $name 0]" == "#"} continue
+		if {"$value" != ""} {
+			option add $option $value widgetDefault
+		}
+	}
+}
+
+proc Classy::configfont {name map} {
+	foreach {name option value descr} $map {
+		if {"[string index $name 0]" == "#"} continue
+		if {"$value" == ""} {
+		} elseif [regexp {^Font$|^BoldFont$|^ItalicFont$|^BoldItalicFont$|^NonPropFont$} $value] {
+			option add $option [option get . $value $value] widgetDefault
+		} else {
+			option add $option $value widgetDefault
+		}
+	}
+}
+
+proc Classy::configmisc {name map} {
+	foreach {name option value type descr} $map {
+		if {"[string index $name 0]" == "#"} continue
+		if {"$value" != ""} {
+			option add $option $value widgetDefault
+		}
+	}
+}
+
+proc Classy::configmenu {name help menu} {
+	Classy::DynaMenu define $name $menu
+}
+
+proc Classy::configtool {name help tool} {
+	Classy::DynaTool define $name $tool
 }
 
 proc setevent {event args} {
@@ -151,33 +236,6 @@ proc Classy::loadMouse {} {
 				setevent <<$name-$combo>> <B$key-$combo>
 			}
 		}
-#		if {"[event info <<Shift-$name-Motion>>]" == ""} {
-#			setevent <<Shift-$name-Motion>> <Shift-B$key-Motion>
-#		}
-#		if {"[event info <<Shift-$name-ButtonPress>>]" == ""} {
-#			setevent <<Shift-$name-ButtonPress>> <Shift-B$key-ButtonPress>
-#		}
-#		if {"[event info <<Shift-$name-ButtonRelease>>]" == ""} {
-#			setevent <<Shift-$name-ButtonRelease>> <Shift-B$key-ButtonRelease>
-#		}
-#		if {"[event info <<Control-$name-Motion>>]" == ""} {
-#			setevent <<Control-$name-Motion>> <Control-B$key-Motion>
-#		}
-#		if {"[event info <<Control-$name-ButtonPress>>]" == ""} {
-#			setevent <<Control-$name-ButtonPress>> <Control-B$key-ButtonPress>
-#		}
-#		if {"[event info <<Control-$name-ButtonRelease>>]" == ""} {
-#			setevent <<Control-$name-ButtonRelease>> <Control-B$key-ButtonRelease>
-#		}
-#		if {"[event info <<Meta-$name-Motion>>]" == ""} {
-#			setevent <<Meta-$name-Motion>> <Meta-B$key-Motion>
-#		}
-#		if {"[event info <<Meta-$name-ButtonPress>>]" == ""} {
-#			setevent <<Meta-$name-ButtonPress>> <Meta-B$key-ButtonPress>
-#		}
-#		if {"[event info <<Meta-$name-ButtonRelease>>]" == ""} {
-#			setevent <<Meta-$name-ButtonRelease>> <Meta-B$key-ButtonRelease>
-#		}
 	}
 }
 
@@ -185,11 +243,21 @@ proc Classy::initconf {} {
 	foreach event [event info] {
 		event delete $event
 	}
-	::Classy::loadconf Misc
-	::Classy::loadconf Fonts
-	::Classy::loadconf Colors
-	::Classy::loadKeys
-	::Classy::loadMouse
-	::Classy::loadconf Menus
-	::Classy::loadconf Toolbars
+	foreach dir [set ::Classy::dirs] {
+		foreach file [glob -nocomplain [file join $dir init *.tcl]] {
+			if [file readable $file] {
+				if [catch {uplevel #0 source $file} error] {
+					puts $error
+					bgerror "error while sourcing init file \"$file\":\n$error"
+				}
+			}
+		}
+	}
+#	::Classy::loadconf Misc
+#	::Classy::loadconf Fonts
+#	::Classy::loadconf Colors
+#	::Classy::loadKeys
+#	::Classy::loadMouse
+#	::Classy::loadconf Menus
+#	::Classy::loadconf Toolbars
 }

@@ -165,6 +165,45 @@ proc ::Classy::object {window} {
 	return -code error "\"$window\" is not part of a Widget"
 }
 
+proc Classy::cleargrid w {
+	catch {eval grid forget [grid slaves $w]}
+	while 1 {
+		set col [grid size $w]
+		set row [lpop col]
+		if {($col == 0)&&($row == 0)} break
+		if {$col != 0} {
+			grid columnconfigure $w [expr {$col-1}] -weight 0
+		}
+		if {$row != 0} {
+			grid rowconfigure $w [expr {$row-1}] -weight 0
+		}
+	}
+}
+
+proc Classy::loadfunction {file function {pattern {}}} {
+	if {"$pattern" == ""} {
+		set pattern "^\[ \t\]*proc [list $function] "
+	}
+	set f [open $file]
+	set c ""
+	while {![eof $f]} {
+		set line [gets $f]
+		if [regexp $pattern $line] {
+			append c $line
+			append c "\n"
+			while {![eof $f]} {
+				set line [gets $f]
+				append c $line
+				append c "\n"
+				if [info complete $c] break
+			}
+			break
+		}
+	}
+	close $f
+	return $c
+}
+
 # For debugging purposes only
 
 proc ::Classy::msg {text} {

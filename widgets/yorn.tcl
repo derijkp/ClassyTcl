@@ -36,6 +36,7 @@ proc Classy::yorn {message args} {
 		bind .classy__yorn <Escape> {.classy__yorn invoke no}
 	}
 	if [info exists opt(-help)] {.classy__yorn configure -help $opt(-help)}
+	update idletasks
 	grab set .classy__yorn
 	tkwait window .classy__yorn
 	update idletasks

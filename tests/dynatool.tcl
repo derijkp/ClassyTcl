@@ -19,9 +19,25 @@ test Classy::DynaTool {text} {
 	set try 1
 } {1}
 
-test Classy::DynaTool {pictures} {
+test Classy::DynaTool {text} {
 	classyclean
 	Classy::DynaTool define Test {
+		action open "Open" {puts open}
+		action "Test" "Test" {puts test}
+		action "OK" "OK" {puts OK}
+	}
+	Classy::DynaTool maketool Test .t .
+	pack .t -fill x
+	text .text
+	pack .text -side bottom -fill both -expand yes
+	manualtest
+	set try 1
+} {1}
+
+test Classy::DynaTool {no display} {
+	classyclean
+	Classy::DynaTool define Test {
+		nodisplay
 		action print "Print" {puts print}
 		action "OK" "OK" {puts OK}
 		check copy "Copy" {-variable copy}
@@ -30,7 +46,6 @@ test Classy::DynaTool {pictures} {
 	pack .t -fill x
 	text .text
 	pack .text -side bottom
-	manualtest
 	set try 1
 } {1}
 

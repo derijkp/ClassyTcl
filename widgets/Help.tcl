@@ -68,10 +68,8 @@ Classy::Help classmethod init {args} {
 	scrollbar $w.vbar -orient vertical -command "$w.html yview"
 	Classy::DynaMenu makemenu Classy::Help $w.menu $object Classy::Help
 	bindtags $object "Classy::Help [bindtags $object]"
-	if {[option get $w showTool ShowTool]} {
-		Classy::DynaTool maketool Classy::Help $w.tool $object
-		pack $w.tool -side top -fill x
-	}
+	Classy::DynaTool maketool Classy::Help $w.tool $object
+	pack $w.tool -side top -fill x
 	if {"[option get $w scrollSide ScrollSide]" == "right"} {
 		pack $w.vbar -side right -fill y
 	} else {

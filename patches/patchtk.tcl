@@ -104,6 +104,8 @@ proc Classy::patchtk {} {
 		Text <<Escape>> <Escape>
 		Text <<MAdd>> <<MIcursor>>
 		Entry <<MAdd>> <<MIcursor>>
+		Entry <<MXPaste>> <<ButtonRelease-Adjust>>
+		Text <<MXPaste>> <<ButtonRelease-Adjust>>
 		Scale <<MXPaste>> <<ButtonRelease-Adjust>>
 		Scrollbar <<MAdd> <<MPosition>>
 	} {

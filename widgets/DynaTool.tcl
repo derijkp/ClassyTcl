@@ -80,7 +80,12 @@ Classy::DynaTool method maketool {tooltype tool cmdw} {
 		frame $tool -class Classy::Tool -bd 0
 	}
 	set num 0
-	foreach current [splitcomplete $tooldata($tooltype)] {
+	set list [splitcomplete $tooldata($tooltype)]
+	if {[lsearch -regexp $list "^\[\t \]*nodisplay\[\t \]*\$"] != -1} {
+		$tool configure -height 0 -width 0
+		return
+	}
+	foreach current $list {
 		if {"$current" == ""} continue
 		set type [lshift current]
 		incr num
@@ -123,19 +128,14 @@ Classy::DynaTool method maketool {tooltype tool cmdw} {
 			append checks($tool) "$tool.$key configure $command\n"
 			lappend slaves($tool) $tool.$key
 		} elseif {"$type"=="widget"} {
-			$id $tool.$key
+			eval $id $tool.$key
 			update idletasks
 			lappend slaves($tool) $tool.$key
-#			set command [lindex $current 0]
-#			regsub -all %W $command $tool.$key command
-#			eval $command
-#			update idletasks
-#			lappend slaves($tool) $tool.$key
 		} elseif {"$type"=="separator"} {
 			lappend slaves($tool) separator
 		} elseif [regexp ^# $type] {
 			continue
-		} elseif {"$type" ==""} {
+		} elseif {"$type" == ""} {
 			continue
 		} else {
 			error "Unknown entrytype $type" 
@@ -381,10 +381,15 @@ Classy::DynaTool method conftool {tooltype} {
 #} descr {
 #}
 Classy::DynaTool method reqwidth {tool} {
-	set slaves [place slaves $tool]
+	private $object slaves
 	set x 0
-	foreach slave $slaves {
-		incr x [winfo reqwidth $slave]
+	if ![info exists slaves($tool)] {return 0}
+	foreach slave $slaves($tool) {
+		if {"$slave"=="separator"} {
+			incr x 5
+		} else {
+			incr x [winfo reqwidth $slave]
+		}
 	}
 	return [expr $x+2*[$tool cget -bd]+1]
 }
@@ -407,32 +412,35 @@ Classy::DynaTool method _placetopfirst {tool} {
 	private $object slaves
 	set mh 0
 	set x 0
-	foreach slave $slaves($tool) {
-		if {"$slave"=="separator"} {
-			set w 5
-			set h 0
-		} elseif ![winfo exists $slave] {
-			continue
-		} else {
-			set w [winfo reqwidth $slave]
-			set h [winfo reqheight $slave]
-			if {$h>$mh} {set mh $h}
+	if [info exists slaves($tool)] {
+		foreach slave $slaves($tool) {
+			if {"$slave"=="separator"} {
+				set w 5
+				set h 0
+			} elseif ![winfo exists $slave] {
+				continue
+			} else {
+				set w [winfo reqwidth $slave]
+				set h [winfo reqheight $slave]
+				if {$h>$mh} {set mh $h}
+			}
+			if {"$slave"!="separator"} {
+				place forget $slave
+				place $slave -x $x -y 1 -in $tool
+				raise $slave
+			}
+			incr x $w
 		}
-		if {"$slave"!="separator"} {
-			place forget $slave
-			place $slave -x $x -y 1 -in $tool
-			raise $slave
-		}
-		incr x $w
 	}
 	incr mh [$tool cget -bd]
-	$tool configure -height $mh -width $x
+	$tool configure -height $mh -width [expr $x+2*[$tool cget -bd]+1]
 	bind $tool <Configure> "$object _placetop $tool"
 }
 
 
 Classy::DynaTool method _placetop {tool} {
 	private $object slaves
+	if ![info exists slaves($tool)] {return 0}
 	set keep [bind $tool <Configure>]
 	bind $tool <Configure> {}
 	set width [expr [winfo width $tool]-2*[$tool cget -bd]-1]

@@ -17,7 +17,7 @@ namespace eval ::Classy {}
 # Find the appdir.
 #----------------------------------------------------------------------
 if {"$tcl_platform(platform)"=="unix"} {
-	if {"$Classy::script"==""} {set Classy::script tkdcse}
+	if {"$Classy::script"==""} {set Classy::script "wish"}
 	if {"[file pathtype $Classy::script]"!="absolute"} {set Classy::script [file join [pwd] [string trimleft $Classy::script "./"]]}
 	while 1 {
 		if [catch {set link [file readlink $Classy::script]}] break
@@ -37,3 +37,8 @@ if {[option get . patchTk PatchTk]==1} {
 	source [file join [set ::class::dir] patches patchtk.tcl]
 	source [file join [set ::class::dir] patches miscpatches.tcl]
 }
+
+#----------------------------------------------------------------------
+# add lib in the appdir to the auto_path
+#----------------------------------------------------------------------
+lappend auto_path [file join ${::Classy::appdir} lib]

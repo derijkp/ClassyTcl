@@ -86,13 +86,19 @@ Classy::Balloon method add {widget text} {
 Classy::Balloon method display {widget} {
 	private $object help
 	if ![info exists help($widget)] return
+	if ![winfo exists .classy::balloon] {
+		toplevel .classy::balloon -class Balloon
+		wm withdraw .classy::balloon
+		label .classy::balloon.text
+		pack .classy::balloon.text -fill x -expand no -padx 1 -pady 1
+		wm overrideredirect .classy::balloon 1
+	}
 	.classy::balloon.text configure -text $help($widget)
 	wm geometry .classy::balloon +[winfo rootx $widget]+[expr [winfo rooty $widget]+[winfo height $widget]]
 	update idle
 	wm deiconify .classy::balloon
 	raise .classy::balloon
 }
-
 
 #doc {Balloon revoke} cmd {
 #Balloon revoke 

@@ -49,7 +49,12 @@ Classy::Tree classmethod init {args} {
 		-canvas {}
 		-padx 10
 		-pady 2
+		-padtext 4
 		-font {}
+		-startx 10
+		-starty 10
+		-rootimage {}
+		-roottext {}
 	}
 	setprivate $object order ""
 	set options(-tag) "Tree:$object"
@@ -108,10 +113,25 @@ Classy::Tree method configure {args} {
 				-pady {
 					::Classy::todo $object _redraw
 				}
+				-padtext {
+					::Classy::todo $object _redraw
+				}
 				-font {
 					::Classy::todo $object _redraw
 				}
 				-tag {
+					::Classy::todo $object _redraw
+				}
+				-startx {
+					::Classy::todo $object _redraw
+				}
+				-starty {
+					::Classy::todo $object _redraw
+				}
+				-rootimage {
+					::Classy::todo $object _redraw
+				}
+				-roottext {
 					::Classy::todo $object _redraw
 				}
 			}
@@ -124,12 +144,12 @@ Classy::Tree method _drawnode {node} {
 	set canvas $options(-canvas)
 	if {"$canvas" == ""} return
 
-	array set pa $data($node)
+	array set drawinfo $data($node)
 	set tag $options(-tag)
-	set x [$canvas coords $pa(i)]
+	set x [$canvas coords $drawinfo(i)]
 	set y [lpop x]
 	set sy $y
-	set bbox [$canvas bbox $pa(i)]
+	set bbox [$canvas bbox $drawinfo(i)]
 	set height [expr {[lindex $bbox 3]-[lindex $bbox 1]}]
 	set width [expr {[lindex $bbox 2]-[lindex $bbox 0]}]
 	set y [expr {$y + $height/2}]
@@ -137,9 +157,14 @@ Classy::Tree method _drawnode {node} {
 	set minusicon [Classy::geticon minus]
 	set padx $options(-padx)
 	set pady $options(-pady)
-	set font $options(-font)
-	if ![info exists pa(l)] {return $y}
-	foreach name $pa(l) {
+	set padtext $options(-padtext)
+	if {"$options(-font)" == ""} {
+		set font [option get . treeFont TreeFont]
+	} else {
+		set font $options(-font)
+	}
+	if ![info exists drawinfo(l)] {return $y}
+	foreach name $drawinfo(l) {
 		catch {unset ca}
 		array set ca $data($name)
 		if ![info exists ca(w)] {
@@ -158,7 +183,7 @@ Classy::Tree method _drawnode {node} {
 		set ca(x) [$canvas create line $x $ypos $xpos $ypos \
 			-tags [list $tag classy::Tree $name line]]
 		$canvas lower $ca(x)
-		set ca(ti) [$canvas create text [expr {$x + $padx + $ca(len) + $width + 5}] $ypos -text $ca(txt) -anchor w \
+		set ca(ti) [$canvas create text [expr {$x + $padx + $ca(len) + $width + $padtext}] $ypos -text $ca(txt) -anchor w \
 			-tags [list $tag classy::Tree $name text]]
 		if {"$font" != ""} {
 			$canvas itemconfigure $ca(ti) -font $font
@@ -179,10 +204,10 @@ Classy::Tree method _drawnode {node} {
 			set y [$object _drawnode $name]
 		}
 	}
-	set pa(y) [$canvas create line $x $sy $x $ypos \
+	set drawinfo(y) [$canvas create line $x $sy $x $ypos \
 		-tags [list $tag classy::Tree $node yline]]
-	$canvas lower $pa(y)
-	set data($node) [array get pa]
+	$canvas lower $drawinfo(y)
+	set data($node) [array get drawinfo]
 	return $y
 }
 
@@ -191,11 +216,33 @@ Classy::Tree method _redraw {} {
 	::Classy::canceltodo $object _redraw
 	set canvas $options(-canvas)
 	if {"$canvas" == ""} return
-
 	::Classy::busy
 	$canvas delete $options(-tag)
-	set i [$canvas create text 10 10 -text "" -tags [list $options(-tag) classy::Tree]]
-	set data() [structlset $data() i $i]
+	if {("$options(-rootimage)" == "")&&("$options(-roottext)" == "")} {
+		set i [$canvas create text $options(-startx) $options(-starty) -text "" \
+			-tags [list $options(-tag) classy::Tree {}]]
+		set data() [structlset $data() i $i]
+	} else {
+		if {"$options(-font)" == ""} {
+			set font [option get . treeFont TreeFont]
+		} else {
+			set font $options(-font)
+		}
+		if {"$options(-rootimage)" == ""} {
+			set im [Classy::geticon sm_folder]
+		} else {
+			set im $options(-rootimage)
+		}
+		set i [$canvas create image $options(-startx) $options(-starty) -image $im \
+			-tags [list $options(-tag) classy::Tree {}]]
+		set bbox [$canvas bbox $i]
+		set width [expr {[lindex $bbox 2]-[lindex $bbox 0]}]
+		set ti [$canvas create text \
+				[expr {$options(-startx) + $width/2 + $options(-padtext)}] $options(-starty) \
+				-text $options(-roottext) -anchor w -font $font\
+				-tags [list $options(-tag) classy::Tree {}]]
+		set data() [structlset $data() i $i ti $ti]
+	}
 	$object _drawnode {}
 	::Classy::busy remove
 }
@@ -327,6 +374,10 @@ Classy::Tree method deletenode {node} {
 	set parent $ca(p)
 	array set pa $data($parent)
 	set pa(l) [lremove $pa(l) $node]
+	if {[llength $pa(l)] == 0} {
+		$object clearnode $parent
+		$canvas delete $ca(s)
+	}
 	set data($parent) [array get pa]
 
 	catch {unset data($node)}
@@ -361,7 +412,7 @@ Classy::Tree method node {index {y {}}} {
 	set canvas $options(-canvas)
 	if {"$canvas" == ""} return
 	if {"$y" != ""} {
-		set index [$canvas find overlapping $index $y $index $y]
+		set index [lindex [$canvas find overlapping [$canvas canvasx $index] [$canvas canvasy $y] [$canvas canvasx $index] [$canvas canvasy $y]] end]
 	}
 	set tags [$canvas itemcget $index -tags]
 	return [lindex $tags 2]
@@ -374,4 +425,13 @@ Classy::Tree method node {index {y {}}} {
 Classy::Tree method parentnode {node} {
 	private $object data
 	return [structlget $data($node) p]
+}
+
+#doc {Tree command children} cmd {
+# pathname children node
+#} descr {
+#}
+Classy::Tree method children {node} {
+	private $object data
+	return [structlget $data($node) l]
 }

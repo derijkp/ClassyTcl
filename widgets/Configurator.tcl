@@ -248,6 +248,7 @@ Classy::Configurator method _makeconf {conftype file} {
 }
 
 Classy::Configurator method _createconfw {entrytype} {
+puts create
 	private $object data
 	set confname $data(confname)
 	set args [lrange $entrytype 1 end]
@@ -345,6 +346,43 @@ Classy::Configurator method _createconfw {entrytype} {
 	Classy::Message $w.help -text "Help text" -anchor nw -justify left
 	grid $w.help - - - -sticky nwse
 	grid columnconfigure $w 3 -weight 1	
+	switch [lindex $entrytype 0] {
+		menu -
+		tool {
+			Classy::cleargrid $w
+			Classy::NoteBook $w.book -side left
+			foreach {level title} {
+				def "ClassyTcl Default"
+				user "ClassyTcl user"
+				appdef "Application Default"
+				appuser "Application user"
+			} {
+				set base $w.book_$level
+				frame $base
+				$w.book manage $title $base
+				grid $w.${level}_label -in $base -row 0 -column 0
+				raise $w.${level}_label
+				grid $w.${level}_rem -in $base -row 0 -column 1 -columnspan 2
+				raise $w.${level}_rem
+				grid $w.$level -in $base -row 1 -column 0 -columnspan 2 -sticky nwse
+				raise $w.$level
+				grid $w.${level}_bar -in $base -row 1 -column 2 -sticky nwse
+				raise $w.${level}_bar
+				grid rowconfigure $base 1 -weight 1
+				grid columnconfigure $base 0 -weight 1
+				grid columnconfigure $base 1 -weight 0
+			}
+			grid $w.title -row 0 -column 0 -columnspan 2 -sticky nwse
+			grid $w.book -row 1 -column 0 -columnspan 2 -sticky nwse
+			grid $w.activate $w.current -row 2 -sticky nwse
+			grid $w.help -row 3 -column 0 -columnspan 3 -sticky nwse
+			grid rowconfigure $w.book 0 -weight 1
+			grid columnconfigure $w.book 0 -weight 1
+			grid rowconfigure $w 1 -weight 1
+			grid columnconfigure $w 1 -weight 1
+			$w.book select "Application user"
+		}
+	}
 }
 
 Classy::Configurator method _configureitem {descr} {

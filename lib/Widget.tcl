@@ -81,21 +81,21 @@ namespace eval ::class {
 	namespace export findoptions setoption getoption getconfigure
 }
 
-proc ::class::getwidgetoptions {w} {
+;proc ::class::getwidgetoptions {w} {
 	foreach list [$w configure] {
 		lappend options [lindex $list 0]
 	}
 	return $options
 }
 
-proc ::class::getwidgetdefaults {w} {
+;proc ::class::getwidgetdefaults {w} {
 	foreach list [$w configure] {
 		lappend options [lindex $list end]
 	}
 	return $options
 }
 
-proc ::class::getwidgetmethods {w} {
+;proc ::class::getwidgetmethods {w} {
 	catch {$w @} result
 	if ![regsub "bad option \"@\": must be " $result {} result] {
 		return -code error $result
@@ -104,7 +104,7 @@ proc ::class::getwidgetmethods {w} {
 	return $result
 }
 
-proc ::class::findoptions {class object} {
+;proc ::class::findoptions {class object} {
 	private $class options _chain
 	set result [array names options]
 	eval laddnew result [lremove [array names _chain] {}]
@@ -114,7 +114,7 @@ proc ::class::findoptions {class object} {
 	return $result
 }
 
-proc ::class::getconfigure {class object option} {
+;proc ::class::getconfigure {class object option} {
 	if [info exists ::class::${object},,v,options($option)] {
 		set result "$option [set ::class::${class},,v,options($option)]"
 		lappend result [set ::class::${object},,v,options($option)]
@@ -130,7 +130,7 @@ proc ::class::getconfigure {class object option} {
 	}
 }
 
-proc ::class::getoption {class object option} {
+;proc ::class::getoption {class object option} {
 	if [info exists ::class::${object},,v,options($option)] {
 		return [set ::class::${object},,v,options($option)]
 	}
@@ -144,7 +144,7 @@ proc ::class::getoption {class object option} {
 	}
 }
 
-proc ::class::setoption {class object option value} {
+;proc ::class::setoption {class object option value} {
 	set classvar ::class::${class},,v,options($option)
 	set privatevar ::class::${object},,v,options($option)
 	if ![info exists $classvar] {
@@ -345,7 +345,7 @@ Widget method configure {args} {
 	if {"$args" == ""} {
 		set result ""
 		foreach option [::class::findoptions $class $object] {
-			lappend result [::class::getconfigure $class $object $option]
+			catch {lappend result [::class::getconfigure $class $object $option]}
 		}
 		return $result
 	} elseif {[llength $args] == 1} { 

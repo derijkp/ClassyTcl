@@ -1,209 +1,118 @@
-## ---- Edit ----
-## Cut {Cut key} key
-setevent <<Cut>> <Alt-x>
-## Copy {Copy key} key
-setevent <<Copy>> <Alt-c>
-## Paste {Paste key} key
-setevent <<Paste>> <Alt-v>
-## Paste {Paste special key} key
-setevent <<PasteSpecial>> <Alt-V>
-## Undo {Undo key} key
-setevent <<Undo>> <Alt-u>
-## Redo {Redo key} key
-setevent <<Redo>> <Alt-U>
-## Insert {Insert key} key
-setevent <<Insert>> <Insert>
-## Empty {Empty key} key
-setevent <<Empty>> <Control-u>
-## Delete {Delete key} key
-setevent <<Delete>> <Delete>
-## BackSpace {BackSpace key} key
-setevent <<BackSpace>> <BackSpace>
-## Transpose {Transpose key: switches the letters before and after the cursor} key
-setevent <<Transpose>> <Control-t>
-## DeleteEnd {Delete from cursor to end} key
-setevent <<DeleteEnd>> <Control-k>
+#ClassyTcl key configuration file
 
-## ---- Select ----
-## SelectAll {SelectAll key} key
-setevent <<SelectAll>> <Alt-a>
-## SelectNone {SelectNone key} key
-setevent <<SelectNone>> <Alt-z>
-## StartSelect {StartSelect key} key
-setevent <<StartSelect>> <Control-space>
-## EndSelect {EndSelect key} key
-setevent <<EndSelect>> <Control-Shift-space>
+Classy::configkey Edit {
+	Cut <<Cut>> <Alt-x> {Cut key}
+	Copy <<Copy>> <Alt-c> {Copy key}
+	Paste <<Paste>> <Alt-v> {Paste key}
+	{Paste special} <<PasteSpecial>> <Alt-V> {Paste special key}
+	Undo <<Undo>> <Alt-u> {Undo key}
+	Redo <<Redo>> <Alt-U> {Redo key}
+	Insert <<Insert>> <Insert> {Insert key}
+	Empty <<Empty>> <Control-u> {Empty key}
+	Delete <<Delete>> <Delete> {Delete key}
+	BackSpace <<BackSpace>> <BackSpace> {BackSpace key}
+	Transpose <<Transpose>> <Control-t> {Transpose key: switches the letters before and after the cursor}
+	DeleteEnd <<DeleteEnd>> <Control-k> {Delete from cursor to end}
+}
 
-## ---- File ----
-## Load {Load key} key
-setevent <<Load>> <Alt-o>
-## LoadNext {LoadNext key} key
-setevent <<LoadNext>> <Control-Alt-o>
-## Save {Save key} key
-setevent <<Save>> <Alt-s>
-## SaveAs {SaveAs key} key
-setevent <<SaveAs>> <Alt-S>
-## Quit {Quit key} key
-setevent <<Quit>> <Alt-Q>
-## Close {Close key} key
-setevent <<Close>> <Alt-q>
-## Reopen {Reopen key} key
-setevent <<Reopen>> <Alt-r>
-## Macro {Macro key} key
-setevent <<Macro>> <Alt-m>
-
-## ---- Find ----
-## Goto {Goto key} key
-setevent <<Goto>> <Alt-j>
-## Find {Find key} key
-setevent <<Find>> <Alt-F>
-## FindNext {FindNext key} key
-setevent <<FindNext>> <Alt-f>
-## FindPrev {FindPrev key} key
-setevent <<FindPrev>> <Alt-b>
-## ReplaceFindNext {ReplaceFindNext key} key
-setevent <<ReplaceFindNext>> <Alt-g>
-## FindFunction {FindFunction key} key
-setevent <<FindFunction>> <Control-Alt-f>
-
-## ---- Control ----
-## Escape {Escape key} key
-setevent <<Escape>> <Escape>
-## Return {Return key} key
-setevent <<Return>> <Return>
-## Invoke {Invoke key} key
-setevent <<Invoke>> <space>
-## KeyMenu {KeyMenu key} key
-setevent <<KeyMenu>> <Alt-m>
-## Default {Default key} key
-setevent <<Default>> <Alt-d>
-## Complete {Complete key} key
-#setevent <<CompleteTab>> <Control-Shift-v>
-## FocusNext {FocusNext key} key
-setevent <<FocusNext>> <Tab> <Control-Tab>
-## FocusPrev {FocusPrev key} key
-setevent <<FocusPrev>> <ISO_Left_Tab>
-## SpecialFocusNext {TextFocusNext key} key
-setevent <<SpecialFocusNext>> <Control-Tab>
-## SpecialFocusPrev {TextFocusPrev key} key
-setevent <<SpecialFocusPrev>> <ISO_Left_Tab>
-
-## ---- Misc ----
-## Help {Help key} key
-setevent <<Help>> <F1>
-## Format {Format key} key
-setevent <<Format>> <Control-Alt-j>
-## Print {Print key} key
-setevent <<Print>> <Control-p>
-## MarkerSet {MarkerSet key} key
-setevent <<MarkerSet>> <Alt-w>
-## MarkerSelect {MarkerSelect key} key
-setevent <<MarkerSelect>> <Alt-Shift-w>
-## MarkerCurrent {MarkerCurrent key} key
-setevent <<MarkerCurrent>> <Control-w>
-## MarkerPrev {MarkerPrev key} key
-setevent <<MarkerPrev>> <Control-Shift-w>
-## IndentIn {IndentIn key} key
-setevent <<IndentIn>> <Alt-i>
-## IndentOut {IndentOut key} key
-setevent <<IndentOut>> <Alt-I>
-## Connect {Connect key} key
-setevent <<Connect>> <Control-c>
-## {Execute command} {Execute command key} key
-setevent <<ExecuteCmd>> <Alt-e>
-## HistoryUp {HistoryUp key} key
-setevent <<HistoryUp>> <Alt-Up>
-## HistoryDown {HistoryDown key} key
-setevent <<HistoryDown>> <Alt-Down>
-
-## ---- Movement ----
-## Up {Up key} key
-setevent <<Up>> <Up>
-## Down {Down key} key
-setevent <<Down>> <Down>
-## Left {Left key} key
-setevent <<Left>> <Left>
-## Right {Right key} key
-setevent <<Right>> <Right>
-## Home {Home key} key
-setevent <<Home>> <Home> <Alt-Left>
-## End {End key} key
-setevent <<End>> <End> <Alt-Right>
-## Top {Top key} key
-setevent <<Top>> <Control-Home>
-## Bottom {Bottom key} key
-setevent <<Bottom>> <Control-End>
-## PageTop {PageTop key} key
-setevent <<PageTop>> <Alt-Up>
-## PageBottom {PageBottom key} key
-setevent <<PageBottom>> <Alt-Down>
-## PageUp {PageUp key} key
-setevent <<PageUp>> <Prior>
-## PageDown {PageDown key} key
-setevent <<PageDown>> <Next>
-## WordLeft {WordLeft key} key
-setevent <<WordLeft>> <Control-Left>
-## WordRight {WordRight key} key
-setevent <<WordRight>> <Control-Right>
-## ParaUp {ParaUp key} key
-setevent <<ParaUp>> <Control-Up>
-## ParaDown {ParaDown key} key
-setevent <<ParaDown>> <Control-Down>
-
-## ---- Movement with selection ----
-## SelectUp {SelectUp key} key
-setevent <<SelectUp>> <Shift-Up>
-## SelectDown {SelectDown key} key
-setevent <<SelectDown>> <Shift-Down>
-## SelectLeft {SelectLeft key} key
-setevent <<SelectLeft>> <Shift-Left>
-## SelectRight {SelectRight key} key
-setevent <<SelectRight>> <Shift-Right>
-## SelectHome {SelectHome key} key
-setevent <<SelectHome>> <Shift-Home> <Shift-Alt-Left>
-## SelectEnd {SelectEnd key} key
-setevent <<SelectEnd>> <Shift-End> <Shift-Alt-Right>
-## SelectTop {SelectTop key} key
-setevent <<SelectTop>> <Shift-Control-Home>
-## SelectBottom {SelectBottom key} key
-setevent <<SelectBottom>> <Shift-Control-End>
-## SelectPageTop {SelectPageTop key} key
-setevent <<SelectPageTop>> <Shift-Alt-Up>
-## SelectPageBottom {SelectPageBottom key} key
-setevent <<SelectPageBottom>> <Shift-Alt-Down>
-## SelectPageUp {SelectPageUp key} key
-setevent <<SelectPageUp>> <Shift-Prior>
-## SelectPageDown {SelectPageDown key} key
-setevent <<SelectPageDown>> <Shift-Next>
-## SelectWordLeft {SelectWordLeft key} key
-setevent <<SelectWordLeft>> <Shift-Control-Left>
-## SelectWordRight {SelectWordRight key} key
-setevent <<SelectWordRight>> <Shift-Control-Right>
-## SelectParaUp {SelectParaUp key} key
-setevent <<SelectParaUp>> <Shift-Control-Up>
-## SelectParaDown {SelectParaDown key} key
-setevent <<SelectParaDown>> <Shift-Control-Down>
-
-## ---- Scroll ----
-## ScrollPageUp {ScrollPageUp key} key
-setevent <<ScrollPageUp>> <Control-Prior> <Control-Alt-Up>
-## ScrollPageDown {ScrollPageDown key} key
-setevent <<ScrollPageDown>> <Control-Next> <Control-Alt-Down>
-
-## ---- Table ----
-## TableUp {Table Up key} key
-setevent <<TableUp>> <Control-Up>
-## TableDown {Table Down key} key
-setevent <<TableDown>> <Control-Down>
-## TableLeft {Table Left key} key
-setevent <<TableLeft>> <Control-Left>
-## TableRight {Table Right key} key
-setevent <<TableRight>> <Control-Right>
-## SelectTableUp {Table Up Select key} key
-setevent <<SelectTableUp>> <Control-Shift-Up>
-## SelectTableDown {Table Down Select key} key
-setevent <<SelectTableDown>> <Control-Shift-Down>
-## SelectTableLeft {Table Left Select key} key
-setevent <<SelectTableLeft>> <Control-Shift-Left>
-## SelectTableRight {Table Right Select key} key
-setevent <<SelectTableRight>> <Control-Shift-Right>
+Classy::configkey Select {
+	SelectAll <<SelectAll>> <Alt-a> {SelectAll key}
+	SelectNone <<SelectNone>> <Alt-z> {SelectNone key}
+	StartSelect <<StartSelect>> <Control-space> {StartSelect key}
+	EndSelect <<EndSelect>> <Control-Shift-space> {EndSelect key}
+}
+Classy::configkey File {
+	Load <<Load>> <Alt-o> {Load key}
+	LoadNext <<LoadNext>> <Control-Alt-o> {LoadNext key}
+	Save <<Save>> <Alt-s> {Save key}
+	SaveAs <<SaveAs>> <Alt-S> {SaveAs key}
+	Quit <<Quit>> <Alt-Q> {Quit key}
+	Close <<Close>> <Alt-q> {Close key}
+	Reopen <<Reopen>> <Alt-r> {Reopen key}
+	Macro <<Macro>> <Alt-m> {Macro key}
+}
+Classy::configkey Find {
+	Goto <<Goto>> <Alt-j> {Goto key}
+	Find <<Find>> <Alt-F> {Find key}
+	FindNext <<FindNext>> <Alt-f> {FindNext key}
+	FindPrev <<FindPrev>> <Alt-b> {FindPrev key}
+	ReplaceFindNext <<ReplaceFindNext>> <Alt-g> {ReplaceFindNext key}
+	FindFunction <<FindFunction>> <Control-Alt-f> {FindFunction key}
+}
+Classy::configkey Control {
+	Escape <<Escape>> <Escape> {Escape key}
+	Return <<Return>> <Return> {Return key}
+	Invoke <<Invoke>> <space> {Invoke key}
+	KeyMenu <<KeyMenu>> <Alt-m> {KeyMenu key}
+	Default <<Default>> <Alt-d> {Default key}
+	#Complete <<CompleteTab>> <Control-Shift-v> {Complete key}
+	FocusNext <<FocusNext>> {<Tab> <Control-Tab>} {FocusNext key}
+	FocusPrev <<FocusPrev>> <ISO_Left_Tab> {FocusPrev key}
+	SpecialFocusNext <<SpecialFocusNext>> <Control-Tab> {TextFocusNext key}
+	SpecialFocusPrev <<SpecialFocusPrev>> <ISO_Left_Tab> {TextFocusPrev key}
+}
+Classy::configkey Misc {
+	Help <<Help>> <F1> {Help key}
+	Format <<Format>> <Control-Alt-j> {Format key}
+	Print <<Print>> <Control-p> {Print key}
+	MarkerSet <<MarkerSet>> <Alt-w> {MarkerSet key}
+	MarkerSelect <<MarkerSelect>> <Alt-Shift-w> {MarkerSelect key}
+	MarkerCurrent <<MarkerCurrent>> <Control-w> {MarkerCurrent key}
+	MarkerPrev <<MarkerPrev>> <Control-Shift-w> {MarkerPrev key}
+	IndentIn <<IndentIn>> <Alt-i> {IndentIn key}
+	IndentOut <<IndentOut>> <Alt-I> {IndentOut key}
+	Connect <<Connect>> <Control-c> {Connect key}
+	{Execute command} <<ExecuteCmd>> <Alt-e> {Execute command key}
+	HistoryUp <<HistoryUp>> <Alt-Up> {HistoryUp key}
+	HistoryDown <<HistoryDown>> <Alt-Down> {HistoryDown key}
+}
+Classy::configkey Movement {
+	Up <<Up>> <Up> {Up key}
+	Down <<Down>> <Down> {Down key}
+	Left <<Left>> <Left> {Left key}
+	Right <<Right>> <Right> {Right key}
+	Home <<Home>> {<Home> <Alt-Left>} {Home key}
+	End <<End>> {<End> <Alt-Right>} {End key}
+	Top <<Top>> <Control-Home> {Top key}
+	Bottom <<Bottom>> <Control-End> {Bottom key}
+	PageTop <<PageTop>> <Alt-Up> {PageTop key}
+	PageBottom <<PageBottom>> <Alt-Down> {PageBottom key}
+	PageUp <<PageUp>> <Prior> {PageUp key}
+	PageDown <<PageDown>> <Next> {PageDown key}
+	WordLeft <<WordLeft>> <Control-Left> {WordLeft key}
+	WordRight <<WordRight>> <Control-Right> {WordRight key}
+	ParaUp <<ParaUp>> <Control-Up> {ParaUp key}
+	ParaDown <<ParaDown>> <Control-Down> {ParaDown key}
+}
+Classy::configkey {Movement with selection} {
+	SelectUp <<SelectUp>> <Shift-Up> {SelectUp key}
+	SelectDown <<SelectDown>> <Shift-Down> {SelectDown key}
+	SelectLeft <<SelectLeft>> <Shift-Left> {SelectLeft key}
+	SelectRight <<SelectRight>> <Shift-Right> {SelectRight key}
+	SelectHome <<SelectHome>> {<Shift-Home> <Shift-Alt-Left>} {SelectHome key}
+	SelectEnd <<SelectEnd>> {<Shift-End> <Shift-Alt-Right>} {SelectEnd key}
+	SelectTop <<SelectTop>> <Shift-Control-Home> {SelectTop key}
+	SelectBottom <<SelectBottom>> <Shift-Control-End> {SelectBottom key}
+	SelectPageTop <<SelectPageTop>> <Shift-Alt-Up> {SelectPageTop key}
+	SelectPageBottom <<SelectPageBottom>> <Shift-Alt-Down> {SelectPageBottom key}
+	SelectPageUp <<SelectPageUp>> <Shift-Prior> {SelectPageUp key}
+	SelectPageDown <<SelectPageDown>> <Shift-Next> {SelectPageDown key}
+	SelectWordLeft <<SelectWordLeft>> <Shift-Control-Left> {SelectWordLeft key}
+	SelectWordRight <<SelectWordRight>> <Shift-Control-Right> {SelectWordRight key}
+	SelectParaUp <<SelectParaUp>> <Shift-Control-Up> {SelectParaUp key}
+	SelectParaDown <<SelectParaDown>> <Shift-Control-Down> {SelectParaDown key}
+}
+Classy::configkey Scroll {
+	ScrollPageUp <<ScrollPageUp>> {<Control-Prior> <Control-Alt-Up>} {ScrollPageUp key}
+	ScrollPageDown <<ScrollPageDown>> {<Control-Next> <Control-Alt-Down>} {ScrollPageDown key}
+}
+Classy::configkey Table {
+	TableUp <<TableUp>> <Control-Up> {Table Up key}
+	TableDown <<TableDown>> <Control-Down> {Table Down key}
+	TableLeft <<TableLeft>> <Control-Left> {Table Left key}
+	TableRight <<TableRight>> <Control-Right> {Table Right key}
+	SelectTableUp <<SelectTableUp>> <Control-Shift-Up> {Table Up Select key}
+	SelectTableDown <<SelectTableDown>> <Control-Shift-Down> {Table Down Select key}
+	SelectTableLeft <<SelectTableLeft>> <Control-Shift-Left> {Table Left Select key}
+	SelectTableRight <<SelectTableRight>> <Control-Shift-Right> {Table Right Select key}
+}

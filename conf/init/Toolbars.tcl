@@ -1,6 +1,8 @@
-## {Editor Toolbar} {Editor toolbar} tool
-Classy::setoption *Classy::Editor.Toolbar {
-	action floppy "Save" {%W save}
+#ClassyTcl tool configuration file
+
+Classy::configtool Classy::Editor {Editor toolbar} {
+	nodisplay
+	action save "Save" {%W save}
 	action open "Open" {eval %W load [Classy::selectfile -title Open -selectmode persistent]}
 	action undo "Undo" {%W undo}
 	action redo "redo" {%W redo}
@@ -8,10 +10,7 @@ Classy::setoption *Classy::Editor.Toolbar {
 	action print "Print" {%W insert insert "Print: %W"}
 	action open "Open next" {%W next}
 }
-## {Show Help Toolbar} {Do you want ClassyTcl Help to have toolbars} {select 0 1}
-Classy::setoption *Classy::Help.ShowTool 1
-## {Help Toolbar} {Help toolbar} tool
-Classy::setoption *Classy::Help.Toolbar {
+Classy::configtool Classy::Help {Help toolbar} {
 	action reload "Reload" {%W reload}
 	action back "Back" {%W back}
 	action forward "Forward" {%W forward}
@@ -22,3 +21,25 @@ Classy::setoption *Classy::Help.Toolbar {
 	radio Infile "Find in file" {-variable ::Classy::helpfind -value grep}
 }
 
+Classy::configtool Classy::Builder {toolbar used in the ClassyTcl Builder} {
+	action newfile "New file" {%W new file}
+	action newdialog "New Dialog" {%W new dialog}
+	action newtoplevel "New Toplevel" {%W new toplevel}
+	action newfunction "New function" {%W new function}
+	action save "Save" {%W save}
+	separator
+	action copy "Copy" {%W copy}
+	action cut "Cut" {%W cut}
+	action paste "Paste" {%W paste}
+	separator
+}
+
+Classy::configtool Classy::WindowBuilder {toolbar used in the ClassyTcl WindowBuilder} {
+	action cut "Delete" {%W delete}
+	separator
+	action edit "Edit" {%W edit}
+	action test "Test" {%W restore}
+	action recreate "Recreate Dialog" {%W recreate}
+	separator
+	action close "Close" {destroy %W}
+}

@@ -55,13 +55,9 @@ Classy::Editor classmethod init {args} {
 	# replace default cmdw commands to make Editor cmdw instead of Editor.edit
 	bind $object <FocusIn> "Classy::DynaMenu cmdw .classy__editormenu $object"
 	bind $object <Enter> "Classy::DynaMenu cmdw .classy__editormenu $object"
-	if {[option get $object showTool ShowTool]} {
-		Classy::DynaTool maketool Classy::Editor $object.tool $object
-		grid $object.tool - -sticky we
-		grid rowconfigure $object 1 -weight 1
-	} else {
-		grid rowconfigure $object 0 -weight 1
-	}
+	Classy::DynaTool maketool Classy::Editor $object.tool $object
+	grid $object.tool - -sticky we
+	grid rowconfigure $object 1 -weight 1
 	if {"[option get $object scrollSide ScrollSide]"=="left"} {
 		grid $object.vbar $object.edit -sticky nswe
 		grid $object.hbar -column 1 -sticky nswe
@@ -100,6 +96,10 @@ Classy::Editor chainoptions {$object.edit}
 #doc {Editor options -loadcommand} option {-loadcommand loadCommand LoadCommand} descr {
 #}
 Classy::Editor addoption -loadcommand {loadCommand LoadCommand {}}
+
+#doc {Editor options -savecommand} option {-savecommand saveCommand SaveCommand} descr {
+#}
+Classy::Editor addoption -savecommand {saveCommand SaveCommand {}}
 
 #doc {Editor options -icon} option {-icon icon Icon} descr {
 #}
@@ -230,15 +230,19 @@ Classy::Editor method findfunction {args} {
 #} descr {
 #}
 Classy::Editor method save {} {
-	private $object curfile
+	private $object curfile options
 	set temp [$object get 1.0 "end-1c"]
-	set f [open $curfile w]
-	puts -nonewline $f $temp
-	close $f
-	$object textchanged 0
-	catch {wm title [winfo toplevel $object] "$curfile"}
-	foreach w [$object.edit link] {
-		catch {wm title [winfo toplevel $w] "$curfile"}
+	if {"$options(-savecommand)" != ""} {
+		uplevel #0 {$options(-savecommand) $temp}
+	} else {
+		set f [open $curfile w]
+		puts -nonewline $f $temp
+		close $f
+		$object textchanged 0
+		catch {wm title [winfo toplevel $object] "$curfile"}
+		foreach w [$object.edit link] {
+			catch {wm title [winfo toplevel $w] "$curfile"}
+		}
 	}
 }
 
@@ -247,6 +251,9 @@ Classy::Editor method save {} {
 #} descr {
 #}
 Classy::Editor method saveas {file} {
+	if {"$options(-savecommand)" != ""} {
+		return -code error "\"Save as\" not supported from this editorwindow"
+	}
 	if ![Classyoverwriteyn $file 0] return
 	private $object curfile reopenlist
 	$object unlink
@@ -611,7 +618,7 @@ Classy::Editor method finddialog {} {
 		$w.options.find.entry select range 0 end
 	}
 	focus $w.options.find.entry
-	$w.options.find.entry select range 0 end
+#	$w.options.find.entry select range 0 end
 }
 
 #doc {Editor command indentedcr} cmd {
@@ -655,9 +662,12 @@ Classy::Editor method indent {number} {
 
 proc Classy::trace {var command} {
 	lshift command
-	if {[info level] == 1} {
-		lappend $var "\$object $command"
+	if {[info level] == 2} {
+		if {"[lindex $command 0]" != "trace"} {
+			lappend $var "\$object $command"
+		}
 	}
+	puts [set $var]
 }
 
 #doc {Editor command macro} cmd {
@@ -688,9 +698,7 @@ Classy::Editor method macro {} {
 		$stop configure -state disabled
 		$object trace {}
 		$object.edit trace {}
-		set text [set [privatevar $object macro]]
-		set len [llength $text]
-		$object.macro.options.text insert end [join [lrange $text 0 [expr $len-3]] "\n"]
+		$object.macro.options.text insert end [join [set [privatevar $object macro]] "\n"]
 		catch {unset [privatevar $object macro]}
 	}]
 	$stop configure -state disabled
@@ -1116,18 +1124,11 @@ Classy::Editor method _reconfigure {} {
 	}
 	[::Classy::window $object] configure -highlightthickness 0 -borderwidth 0
 	eval grid forget [winfo children $object]
-	if {[option get $object showTool ShowTool]} {
-		catch {Classy::Configurator _reconfigure $object.tool}
-		set row 1
-		grid $object.tool -row 0 -column 0 -columnspan 2 -sticky we
-		grid rowconfigure $object 0 -weight 0
-		grid rowconfigure $object 1 -weight 1
-	} else {
-		set row 0
-		grid rowconfigure $object 0 -weight 1
-		grid rowconfigure $object 1 -weight 0
-		grid rowconfigure $object 2 -weight 0
-	}
+	catch {Classy::Configurator _reconfigure $object.tool}
+	set row 1
+	grid $object.tool -row 0 -column 0 -columnspan 2 -sticky we
+	grid rowconfigure $object 0 -weight 0
+	grid rowconfigure $object 1 -weight 1
 	if {"[option get $object scrollSide ScrollSide]"=="left"} {
 		grid $object.vbar -row $row -column 0 -sticky ns
 		grid $object.edit -row $row -column 1 -sticky nswe

@@ -1,5 +1,4 @@
-## Editor {menu used in the ClassyTcl Editor} menu
-Classy::setoption *Classy::Editor.Menu {
+Classy::configmenu Classy::Editor {menu used in the ClassyTcl Editor} {
 menu file "File" {
 	action Load "Open file" {eval %W load [Classy::selectfile -title Open -selectmode persistent]}
 	action LoadNext "Open next" "%W loadnext"

@@ -126,14 +126,14 @@ Classy::Table component book {$object.book}
 # gives the number of columns in the table
 #}
 Classy::Table addoption -cols {cols cols 5} {
-	if {$value < 1} {set value 1}
+	if {$value < 1} {return -code error "-cols must be larger than 1"}
 	Classy::todo $object _redraw
 }
 #doc {Table options -rows} option {-rows rows rows} descr {
 # gives the number of rows in the table
 #}
 Classy::Table addoption -rows {rows Rows 20} {
-	if {$value < 1} {set value 1}
+	if {$value < 1} {return -code error "-rows must be larger than 1"}
 	Classy::todo $object _redraw
 }
 #doc {Table options -colsize} option {-colsize colsize colsize} descr {
@@ -893,7 +893,7 @@ Classy::Table method _refreshtable {} {
 }
 
 #doc {Table command xview} cmd {
-#pathname yview args
+#pathname xview args
 #} descr {
 #}
 Classy::Table method xview {args} {
