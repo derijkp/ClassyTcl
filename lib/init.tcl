@@ -7,10 +7,10 @@
 #
 # =============================================================
 package require Tcl 8.0
-# $Format: "set ::Class::version 0.$ProjectMajorVersion$"$
-set ::Class::version 0.4
+# $Format: "set ::Class::version 1.$ProjectMajorVersion$"$
+set ::Class::version 1.0
 # $Format: "set ::Class::patchlevel $ProjectMinorVersion$"$
-set ::Class::patchlevel 2
+set ::Class::patchlevel 1
 package provide Class $::Class::version
 
 proc ::Class::init {name testcmd} {

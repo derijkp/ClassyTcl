@@ -894,7 +894,7 @@ Class classmethod trace {command} {
 	regsub "^.*# class trace done\n" $temp {} temp
 	if {"$command" != ""} {
 		set temp {
-			@command@ [eval list {@class@ [list $cmd]} $args]
+			uplevel 1 [list @command@ [eval list {@class@ [list $cmd]} $args]]
 			# class trace done
 		}
 		regsub -all {@command@} $temp $command temp
@@ -909,7 +909,7 @@ Class method trace {command} {
 	regsub "^.*# object trace done\n" $temp {} temp
 	if {"$command" != ""} {
 		set temp {
-			@command@ [eval list {@object@ [list $cmd]} $args]
+			uplevel 1 [list @command@ [eval list {@object@ [list $cmd]} $args]]
 			# object trace done
 		}
 		regsub -all {@command@} $temp $command temp

@@ -48,7 +48,7 @@ Use
 
 The ClassyTcl object systen can be used by putting the directories (after
 unpacking) somewhere appropriate and using the command
-package require ClassyTcl
+package require Class
 This will add one command (and a namespace) named Class, that forms the 
 basis of ClassyTcl.
 
@@ -88,7 +88,7 @@ web: http://rrna.uia.ac.be/~peter/personal/peter.html
 
 Legalities
 
-ClassyTcl is Copyright Peter De Rijk, University of Antwerp (UIA), 1995 The
+ClassyTcl is Copyright Peter De Rijk, University of Antwerp (UIA), 2000. The
 following terms apply to all files associated with the software unless
 explicitly disclaimed in individual files.
 

@@ -1,13 +1,13 @@
 Summary:	Object system for Tcl
 Name:		classytcl
-Version:	0.4.1
+Version:	1.0.0
 Release:	1
 Copyright:	BSD
 Group:	Development/Languages/Tcl
-Source:	ClassyTcl-0.4.1.src.tar.gz
+Source:	ClassyTcl-1.0.0.src.tar.gz
 URL: http://rrna.uia.ac.be/classytcl
 Packager: Peter De Rijk <derijkp@uia.ua.ac.be>
-Requires: tcl >= 8.0.4 extral >= 1.1.19
+Requires: tcl >= 8.3.2 extral >= 2.0.0
 Prefix: /usr/lib /usr/bin
 %description
 ClassyTcl is a dynamically loadable object system for Tcl. A 
@@ -27,7 +27,8 @@ changed and debugged at runtime.
 %setup -n ClassyTcl
 %build
 cd build
-./configure --prefix=/usr --disable-stubs
+./configure --prefix=/usr
+make clean
 make
 
 %install
@@ -35,10 +36,10 @@ cd build
 make install
 rm -rf /usr/doc/classytcl-$RPM_PACKAGE_VERSION
 mkdir /usr/doc/classytcl-$RPM_PACKAGE_VERSION
-ln -s /usr/lib/Class0.4/help /usr/doc/classytcl-$RPM_PACKAGE_VERSION/help
-ln -s /usr/lib/Class0.4/README /usr/doc/classytcl-$RPM_PACKAGE_VERSION/README
+ln -s /usr/lib/Class1.0/help /usr/doc/classytcl-$RPM_PACKAGE_VERSION/help
+ln -s /usr/lib/Class1.0/README /usr/doc/classytcl-$RPM_PACKAGE_VERSION/README
 
 %files
-/usr/lib/libClass0.4.so
-/usr/lib/Class0.4
-/usr/doc/classytcl-0.4.1
+/usr/lib/libClass1.0.so
+/usr/lib/Class1.0
+/usr/doc/classytcl-1.0.0

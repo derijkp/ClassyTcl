@@ -1134,6 +1134,20 @@ test class {trace object} {
 	set ::try
 } {{try info class} {try trace {}}}
 
+test class {trace object level} {
+	clean
+	catch {rename try {}}
+	Base new try
+	set ::try ""
+	proc trytrace args {lappend ::try [info level] $args}
+	try trace trytrace
+	try info class
+	try trace {}
+	try info class
+	rename trytrace {}
+	set ::try
+} {3 {{try info class}} 3 {{try trace {}}}}
+
 test class {trace class} {
 	clean
 	set ::try ""
@@ -1143,6 +1157,18 @@ test class {trace class} {
 	Base info class
 	set ::try
 } {{Base info class} {Base trace {}}}
+
+test class {trace class level} {
+	clean
+	set ::try ""
+	proc trytrace args {lappend ::try [info level] $args}
+	Base trace trytrace
+	Base info class
+	Base trace {}
+	Base info class
+	rename trytrace {}
+	set ::try
+} {3 {{Base info class}} 3 {{Base trace {}}}}
 
 test class {namespace of init} {
 	clean

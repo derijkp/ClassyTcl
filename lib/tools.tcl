@@ -62,6 +62,7 @@ proc Class::auto_mkindex {dir args} {
 						classmethod {
 							set c [auto_qualify $c ::]
 							if ![info exists definedhere($c)] {
+								set c [string trimleft $c :]
 								set name ::Class::${c},,cm,$name
 								append index "set [list auto_index($name)] \[list source \[file join \$dir [list $file]\]\]\n"
 							}
@@ -69,6 +70,7 @@ proc Class::auto_mkindex {dir args} {
 						method {
 							set c [auto_qualify $c ::]
 							if ![info exists definedhere($c)] {
+								set c [string trimleft $c :]
 								set name ::Class::${c},,m,$name
 								append index "set [list auto_index($name)] \[list source \[file join \$dir [list $file]\]\]\n"
 							}

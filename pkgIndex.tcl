@@ -7,8 +7,8 @@
 # script is sourced, the variable $dir must contain the
 # full path name of this file's directory.
 
-# $Format: "package ifneeded Class 0.$ProjectMajorVersion$ \\"$
-package ifneeded Class 0.4 \
+# $Format: "package ifneeded Class 1.$ProjectMajorVersion$ \\"$
+package ifneeded Class 1.0 \
 	"[list namespace eval ::Class {}] ; [list set ::Class::execdir $dir] ; \
 	if \[[list file exists [file join $dir lib init.tcl]]\] \
 		\{[list source [file join $dir lib init.tcl]]\} \
