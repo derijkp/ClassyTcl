@@ -22,6 +22,24 @@
 #  Widget creation
 # ------------------------------------------------------------------
 
+option add *Classy::FileEntry.highlightThickness 0 widgetDefault
+option add *Classy::FileEntry*Frame.highlightThickness 0 widgetDefault
+option add *Classy::FileEntry*Frame.borderWidth 0 widgetDefault
+option add *Classy::FileEntry.label.anchor w widgetDefault
+option add *Classy::FileEntry.label.highlightThickness 0 widgetDefault
+option add *Classy::FileEntry.label.borderWidth 0 widgetDefault
+option add *Classy::FileEntry.frame.entry.highlightThickness 0 widgetDefault
+option add *Classy::FileEntry.frame.entry.borderWidth 1 widgetDefault
+option add *Classy::FileEntry.frame.entry.relief sunken widgetDefault
+option add *Classy::FileEntry.entry.width 5 widgetDefault
+option add *Classy::FileEntry.entry.relief flat widgetDefault
+option add *Classy::FileEntry.entry.borderWidth 0 widgetDefault
+option add *Classy::FileEntry.entry.highlightThickness 1 widgetDefault
+option add *Classy::FileEntry.defaults.combo.borderWidth 1 widgetDefault
+option add *Classy::FileEntry.defaults.combo.relief raised widgetDefault
+option add *Classy::FileEntry.defaults.combo.list.relief sunken widgetDefault
+option add *Classy::FileEntry.defaults.combo.list.borderWidth 1 widgetDefault
+
 Classy::Entry subclass Classy::FileEntry
 
 Classy::FileEntry method init {args} {

@@ -545,15 +545,15 @@ Classy::WindowBuilder method code {{function {}}} {
 	}
 	append body "\treturn \$object\n"
 	append body "\}"
-	foreach option $data(options) {
-		append body "\n\n"
-		append body [list $data(function) addoption $option [list $data(options,$option,name) $data(options,$option,class) $data(options,$option,def)] $data(options,$option,code)]
-	}
-	foreach method $data(methods) {
-		if {"$method" == "init"} continue
-		append body "\n\n"
-		append body [list $data(function) method $method $data(methods,$method,args) $data(methods,$method,code)]
-	}
+#	foreach option $data(options) {
+#		append body "\n\n"
+#		append body [list $data(function) addoption $option [list $data(options,$option,name) $data(options,$option,class) $data(options,$option,def)] $data(options,$option,code)]
+#	}
+#	foreach method $data(methods) {
+#		if {"$method" == "init"} continue
+#		append body "\n\n"
+#		append body [list $data(function) method $method $data(methods,$method,args) $data(methods,$method,code)]
+#	}
 	catch {$object select $keep}
 	return $body
 }
@@ -579,34 +579,36 @@ Classy::WindowBuilder method open {file} {
 	catch {unset data}
 	catch {unset border}
 	set data(tags) [list Classy::WindowBuilder [Classy::DynaMenu bindtag Classy::WindowBuilder]]
-	set data(options) ""
-	set data(methods) ""
+#	set data(options) ""
+#	set data(methods) ""
 	set data(opt) 1
 	set data(param) {}
 	set pos [lsearch -glob $c [list $function method init *]]
 	set code [lindex $c $pos]
-	set poss [list_find -glob $c [list $function addoption *]]
-	foreach line [list_sub $c $poss] {
-		set option [lindex $line 2]
-		lappend data(options) $option
-		set temp [lindex $line 3]
-		set data(options,$option,def) [lindex $temp 2]
-		set data(options,$option,name) [lindex $temp 0]
-		set data(options,$option,class) [lindex $temp 1]
-		set data(options,$option,code) [lindex $line 4]
-	}
-	catch {$object.code.book.options.options configure -content $data(options)}
-	set poss [list_find -glob $c [list $function method *]]
-	foreach line [list_sub $c $poss] {
-		set method [lindex $line 2]
-		if {"$method" == "init"} continue
-		lappend data(methods) $method
-		set data(methods,$method,args) [lindex $line 3]
-		set data(methods,$method,code) [lindex $line 4]
-	}
-	catch {$object.code.book.methods.methods configure -content $data(methods)}
+#	set poss [list_find -glob $c [list $function addoption *]]
+#	foreach line [list_sub $c $poss] {
+#		set option [lindex $line 2]
+#		lappend data(options) $option
+#		set temp [lindex $line 3]
+#		set data(options,$option,def) [lindex $temp 2]
+#		set data(options,$option,name) [lindex $temp 0]
+#		set data(options,$option,class) [lindex $temp 1]
+#		set data(options,$option,code) [lindex $line 4]
+#	}
+#	catch {$object.code.book.options.options configure -content $data(options)}
+#	set poss [list_find -glob $c [list $function method *]]
+#	foreach line [list_sub $c $poss] {
+#		set method [lindex $line 2]
+#		if {"$method" == "init"} continue
+#		lappend data(methods) $method
+#		set data(methods,$method,args) [lindex $line 3]
+#		set data(methods,$method,code) [lindex $line 4]
+#	}
+#	catch {$object.code.book.methods.methods configure -content $data(methods)}
 	set data(function) $function
 	set data(file) $file
+	catch {rename $function {}}
+	uplevel #0 source $file
 	set data(code) $code
 	catch {uplevel #0 $type subclass $function}
 	catch {uplevel #0 $code}
@@ -1125,7 +1127,26 @@ Classy::WindowBuilder method save {{file {}}} {
 		error "error: generated code not complete (contains unmatched braces, parentheses, ...)"
 	}
 	uplevel #0 $code
-	file_write $file "Classy::$type subclass $function\n$code"
+#	file_write $file "Classy::$type subclass $function\n$code"
+	set c [cmd_split [file_read $file]]
+	set pos [lsearch -glob $c [list $function method init *]]
+	if {$pos == -1} {
+		error "dialog \"$function\" not in file \"$file\""
+	}
+	set c [lreplace $c $pos $pos $code]
+	catch {file copy -force $file $file~}
+	set f [open $file w]
+	set space 0
+	foreach line $c {
+		if ![string length $line] {
+			if $space continue
+			set space 1
+		} else {
+			set space 0
+		}
+		puts $f $line
+	}
+	close $f
 	set result $function
 	Classy::auto_mkindex [file dir $file]
 	return $result
@@ -2113,188 +2134,188 @@ Classy::WindowBuilder method _place {w parent col row} {
 	grid $w -column $col -row $row -in $parent -columnspan $colspan -rowspan $rowspan -sticky $sticky
 }
 
-Classy::WindowBuilder method _dialogoption {option} {
-	private $object data
-	if ![regexp ^- $option] {set option "-$option"}
-	if {[lsearch $data(options) $option] != -1} return
-	lappend data(options) $option
-	set data(options,$option,def) {}
-	set data(options,$option,name) [string range $option 1 end]
-	set data(options,$option,class) [string toupper [string index $option 1]][string range $option 2 end]
-	set data(options,$option,code) {}
-	$object.code.book.options.options configure -content $data(options)
-	$object.code.book.options.options selection set end
-	$object.code.book.options.options activate end
-}
-
-Classy::WindowBuilder method _dialogoptiondelete {option} {
-	private $object data
-	if ![regexp ^- $option] {set option "-$option"}
-	set data(options) [list_remove $data(options) $option]
-	catch {unset data(options,$option,def)}
-	catch {unset data(options,$option,name)}
-	catch {unset data(options,$option,class)}
-	catch {unset data(options,$option,code)}
-	$object.code.book.options.options configure -content $data(options)
-}
-
-Classy::WindowBuilder method _optionbrowse {value} {
-	private $object data
-	set window $object.code
-	$window.book.options.edit.default configure \
-		-textvariable [privatevar $object data(options,$value,def)]
-	$window.book.options.edit.name configure \
-		-textvariable [privatevar $object data(options,$value,name)]
-	$window.book.options.edit.class configure \
-		-textvariable [privatevar $object data(options,$value,class)]
-	$window.book.options.edit.code configure \
-		-variable [privatevar $object data(options,$value,code)]
-}
-
-Classy::WindowBuilder method _dialogmethod {method} {
-	private $object data
-	if {[lsearch $data(methods) $method] != -1} return
-	lappend data(methods) $method
-	set data(methods,$method,args) {}
-	set data(methods,$method,code) {}
-	$object.code.book.methods.methods configure -content $data(methods)
-	$object.code.book.methods.methods selection set end
-	$object.code.book.methods.methods activate end
-}
-
-Classy::WindowBuilder method _dialogmethoddelete {method} {
-	private $object data
-	set data(methods) [list_remove $data(methods) $method]
-	catch {unset data(methods,$method,args)}
-	catch {unset data(methods,$method,code)}
-	$object.code.book.methods.methods configure -content $data(methods)
-}
-
-Classy::WindowBuilder method _methodbrowse {value} {
-puts [list $object _methodbrowse $value]
-	private $object data
-	set window $object.code
-	$window.book.methods.edit.args configure \
-		-textvariable [privatevar $object data(methods,$value,args)]
-	$window.book.methods.edit.code configure \
-		-variable [privatevar $object data(methods,$value,code)]
-}
+#Classy::WindowBuilder method _dialogoption {option} {
+#	private $object data
+#	if ![regexp ^- $option] {set option "-$option"}
+#	if {[lsearch $data(options) $option] != -1} return
+#	lappend data(options) $option
+#	set data(options,$option,def) {}
+#	set data(options,$option,name) [string range $option 1 end]
+#	set data(options,$option,class) [string toupper [string index $option 1]][string range $option 2 end]
+#	set data(options,$option,code) {}
+#	$object.code.book.options.options configure -content $data(options)
+#	$object.code.book.options.options selection set end
+#	$object.code.book.options.options activate end
+#}
+#
+#Classy::WindowBuilder method _dialogoptiondelete {option} {
+#	private $object data
+#	if ![regexp ^- $option] {set option "-$option"}
+#	set data(options) [list_remove $data(options) $option]
+#	catch {unset data(options,$option,def)}
+#	catch {unset data(options,$option,name)}
+#	catch {unset data(options,$option,class)}
+#	catch {unset data(options,$option,code)}
+#	$object.code.book.options.options configure -content $data(options)
+#}
+#
+#Classy::WindowBuilder method _optionbrowse {value} {
+#	private $object data
+#	set window $object.code
+#	$window.book.options.edit.default configure \
+#		-textvariable [privatevar $object data(options,$value,def)]
+#	$window.book.options.edit.name configure \
+#		-textvariable [privatevar $object data(options,$value,name)]
+#	$window.book.options.edit.class configure \
+#		-textvariable [privatevar $object data(options,$value,class)]
+#	$window.book.options.edit.code configure \
+#		-variable [privatevar $object data(options,$value,code)]
+#}
+#
+#Classy::WindowBuilder method _dialogmethod {method} {
+#	private $object data
+#	if {[lsearch $data(methods) $method] != -1} return
+#	lappend data(methods) $method
+#	set data(methods,$method,args) {}
+#	set data(methods,$method,code) {}
+#	$object.code.book.methods.methods configure -content $data(methods)
+#	$object.code.book.methods.methods selection set end
+#	$object.code.book.methods.methods activate end
+#}
+#
+#Classy::WindowBuilder method _dialogmethoddelete {method} {
+#	private $object data
+#	set data(methods) [list_remove $data(methods) $method]
+#	catch {unset data(methods,$method,args)}
+#	catch {unset data(methods,$method,code)}
+#	$object.code.book.methods.methods configure -content $data(methods)
+#}
+#
+#Classy::WindowBuilder method _methodbrowse {value} {
+#puts [list $object _methodbrowse $value]
+#	private $object data
+#	set window $object.code
+#	$window.book.methods.edit.args configure \
+#		-textvariable [privatevar $object data(methods,$value,args)]
+#	$window.book.methods.edit.code configure \
+#		-variable [privatevar $object data(methods,$value,code)]
+#}
 
 Classy::WindowBuilder method _createcode {window} {
 	private $object data
 	frame $window
 	Classy::NoteBook $window.book 
 	grid $window.book -row 0 -column 0 -sticky nesw
-	# Options
-	# -------
-	frame $window.book.options
-	grid $window.book.options -row 0 -column 0 -in $window.book.book -sticky nesw
-	Classy::Paned $window.book.options.paned1 \
-		-window $window.book.options.options
-	grid $window.book.options.paned1 -row 1 -column 2 -sticky nesw
-	frame $window.book.options.buttons  \
-		-borderwidth 2 \
-		-height 10 \
-		-relief groove \
-		-width 10
-	grid $window.book.options.buttons -row 0 -column 0 -columnspan 4 -sticky nesw
-	button $window.book.options.buttons.delete \
-		-command "$object _dialogoptiondelete \[$window.book.options.options get\]" \
-		-text {Delete Option}
-	grid $window.book.options.buttons.delete -row 1 -column 1 -sticky nesw
-	Classy::Entry $window.book.options.buttons.new \
-		-command [list $object _dialogoption] \
-		-label {New Option} \
-		-highlightthickness 1 \
-		-width 4
-	grid $window.book.options.buttons.new -row 1 -column 0 -sticky nesw
-	grid columnconfigure $window.book.options.buttons 0 -weight 1
-	frame $window.book.options.edit  \
-		-borderwidth 2 \
-		-relief groove
-	grid $window.book.options.edit -row 1 -column 3 -sticky nesw
-	Classy::Entry $window.book.options.edit.default \
-		-label {Default value} \
-		-labelwidth 12
-	grid $window.book.options.edit.default -row 2 -column 3 -sticky nesw
-	Classy::Entry $window.book.options.edit.name \
-		-label {Database Name} \
-		-labelwidth 12
-	grid $window.book.options.edit.name -row 3 -column 3 -sticky nesw
-	Classy::Entry $window.book.options.edit.class \
-		-label {Database Class} \
-		-labelwidth 12
-	grid $window.book.options.edit.class -row 4 -column 3 -sticky nesw
-	Classy::Selector $window.book.options.edit.code \
-		-label {Option code} \
-		-orient vertical \
-		-type text \
-		-width 4
-	grid $window.book.options.edit.code -row 5 -column 3 -sticky news
-	grid columnconfigure $window.book.options.edit 3 -weight 1
-	grid rowconfigure $window.book.options.edit 5 -weight 1
-	Classy::ListBox $window.book.options.options
-	$window.book.options.options configure \
-		-browsecommand [list $object _optionbrowse] \
-		-width 10
-	grid $window.book.options.options -row 1 -column 0 -sticky nesw
-	grid columnconfigure $window.book.options 3 -weight 1
-	grid rowconfigure $window.book.options 1 -weight 1
-	# Methods
-	# -------
-	frame $window.book.methods
-	grid $window.book.methods -row 0 -column 0 -in $window.book.book -sticky nesw
-	Classy::Paned $window.book.methods.paned1 \
-		-window $window.book.methods.methods
-	grid $window.book.methods.paned1 -row 1 -column 2 -sticky nesw
-	frame $window.book.methods.buttons  \
-		-borderwidth 2 \
-		-height 10 \
-		-relief groove \
-		-width 10
-	grid $window.book.methods.buttons -row 0 -column 0 -columnspan 4 -sticky nesw
-	button $window.book.methods.buttons.delete \
-		-command "$object _dialogmethoddelete \[$window.book.methods.methods get\]" \
-		-text {Delete Method}
-	grid $window.book.methods.buttons.delete -row 1 -column 1 -sticky nesw
-	Classy::Entry $window.book.methods.buttons.new \
-		-command [list $object _dialogmethod] \
-		-label {New Method} \
-		-highlightthickness 1 \
-		-width 4
-	grid $window.book.methods.buttons.new -row 1 -column 0 -sticky nesw
-	grid columnconfigure $window.book.methods.buttons 0 -weight 1
-	frame $window.book.methods.edit  \
-		-borderwidth 2 \
-		-relief groove
-	grid $window.book.methods.edit -row 1 -column 3 -sticky nesw
-	Classy::Entry $window.book.methods.edit.args \
-		-label {Arguments}
-	grid $window.book.methods.edit.args -row 2 -column 3 -sticky nesw
-	Classy::Selector $window.book.methods.edit.code \
-		-label {Code} \
-		-orient vertical \
-		-type text \
-		-width 4
-	grid $window.book.methods.edit.code -row 3 -column 3 -sticky news
-	grid columnconfigure $window.book.methods.edit 3 -weight 1
-	grid rowconfigure $window.book.methods.edit 3 -weight 1
-	Classy::ListBox $window.book.methods.methods
-	$window.book.methods.methods configure \
-		-browsecommand [list $object _methodbrowse] \
-		-width 10
-	grid $window.book.methods.methods -row 1 -column 0 -sticky nesw
-	grid columnconfigure $window.book.methods 3 -weight 1
-	grid rowconfigure $window.book.methods 1 -weight 1
+#	# Options
+#	# -------
+#	frame $window.book.options
+#	grid $window.book.options -row 0 -column 0 -in $window.book.book -sticky nesw
+#	Classy::Paned $window.book.options.paned1 \
+#		-window $window.book.options.options
+#	grid $window.book.options.paned1 -row 1 -column 2 -sticky nesw
+#	frame $window.book.options.buttons  \
+#		-borderwidth 2 \
+#		-height 10 \
+#		-relief groove \
+#		-width 10
+#	grid $window.book.options.buttons -row 0 -column 0 -columnspan 4 -sticky nesw
+#	button $window.book.options.buttons.delete \
+#		-command "$object _dialogoptiondelete \[$window.book.options.options get\]" \
+#		-text {Delete Option}
+#	grid $window.book.options.buttons.delete -row 1 -column 1 -sticky nesw
+#	Classy::Entry $window.book.options.buttons.new \
+#		-command [list $object _dialogoption] \
+#		-label {New Option} \
+#		-highlightthickness 1 \
+#		-width 4
+#	grid $window.book.options.buttons.new -row 1 -column 0 -sticky nesw
+#	grid columnconfigure $window.book.options.buttons 0 -weight 1
+#	frame $window.book.options.edit  \
+#		-borderwidth 2 \
+#		-relief groove
+#	grid $window.book.options.edit -row 1 -column 3 -sticky nesw
+#	Classy::Entry $window.book.options.edit.default \
+#		-label {Default value} \
+#		-labelwidth 12
+#	grid $window.book.options.edit.default -row 2 -column 3 -sticky nesw
+#	Classy::Entry $window.book.options.edit.name \
+#		-label {Database Name} \
+#		-labelwidth 12
+#	grid $window.book.options.edit.name -row 3 -column 3 -sticky nesw
+#	Classy::Entry $window.book.options.edit.class \
+#		-label {Database Class} \
+#		-labelwidth 12
+#	grid $window.book.options.edit.class -row 4 -column 3 -sticky nesw
+#	Classy::Selector $window.book.options.edit.code \
+#		-label {Option code} \
+#		-orient vertical \
+#		-type text \
+#		-width 4
+#	grid $window.book.options.edit.code -row 5 -column 3 -sticky news
+#	grid columnconfigure $window.book.options.edit 3 -weight 1
+#	grid rowconfigure $window.book.options.edit 5 -weight 1
+#	Classy::ListBox $window.book.options.options
+#	$window.book.options.options configure \
+#		-browsecommand [list $object _optionbrowse] \
+#		-width 10
+#	grid $window.book.options.options -row 1 -column 0 -sticky nesw
+#	grid columnconfigure $window.book.options 3 -weight 1
+#	grid rowconfigure $window.book.options 1 -weight 1
+#	# Methods
+#	# -------
+#	frame $window.book.methods
+#	grid $window.book.methods -row 0 -column 0 -in $window.book.book -sticky nesw
+#	Classy::Paned $window.book.methods.paned1 \
+#		-window $window.book.methods.methods
+#	grid $window.book.methods.paned1 -row 1 -column 2 -sticky nesw
+#	frame $window.book.methods.buttons  \
+#		-borderwidth 2 \
+#		-height 10 \
+#		-relief groove \
+#		-width 10
+#	grid $window.book.methods.buttons -row 0 -column 0 -columnspan 4 -sticky nesw
+#	button $window.book.methods.buttons.delete \
+#		-command "$object _dialogmethoddelete \[$window.book.methods.methods get\]" \
+#		-text {Delete Method}
+#	grid $window.book.methods.buttons.delete -row 1 -column 1 -sticky nesw
+#	Classy::Entry $window.book.methods.buttons.new \
+#		-command [list $object _dialogmethod] \
+#		-label {New Method} \
+#		-highlightthickness 1 \
+#		-width 4
+#	grid $window.book.methods.buttons.new -row 1 -column 0 -sticky nesw
+#	grid columnconfigure $window.book.methods.buttons 0 -weight 1
+#	frame $window.book.methods.edit  \
+#		-borderwidth 2 \
+#		-relief groove
+#	grid $window.book.methods.edit -row 1 -column 3 -sticky nesw
+#	Classy::Entry $window.book.methods.edit.args \
+#		-label {Arguments}
+#	grid $window.book.methods.edit.args -row 2 -column 3 -sticky nesw
+#	Classy::Selector $window.book.methods.edit.code \
+#		-label {Code} \
+#		-orient vertical \
+#		-type text \
+#		-width 4
+#	grid $window.book.methods.edit.code -row 3 -column 3 -sticky news
+#	grid columnconfigure $window.book.methods.edit 3 -weight 1
+#	grid rowconfigure $window.book.methods.edit 3 -weight 1
+#	Classy::ListBox $window.book.methods.methods
+#	$window.book.methods.methods configure \
+#		-browsecommand [list $object _methodbrowse] \
+#		-width 10
+#	grid $window.book.methods.methods -row 1 -column 0 -sticky nesw
+#	grid columnconfigure $window.book.methods 3 -weight 1
+#	grid rowconfigure $window.book.methods 1 -weight 1
 	# Finalise
 	# --------
-	frame $window.book.f3 
+	frame $window.book.f3
 	Classy::Selector $window.book.f3.finalise  \
 		-type text -label Finalise
 	grid $window.book.f3.finalise -row 0 -column 0 -sticky nesw
 	grid columnconfigure $window.book.f3 0 -weight 1
 	grid rowconfigure $window.book.f3 0 -weight 1
-	frame $window.book.f2 
+	frame $window.book.f2
 	# Initialise	
 	# ----------
 	Classy::Selector $window.book.f2.initialise  \
@@ -2302,14 +2323,14 @@ Classy::WindowBuilder method _createcode {window} {
 	grid $window.book.f2.initialise -row 0 -column 0 -sticky nesw
 	grid columnconfigure $window.book.f2 0 -weight 1
 	grid rowconfigure $window.book.f2 0 -weight 1
-	$window.book manage Options $window.book.options
-	$window.book manage Methods $window.book.methods
+#	$window.book manage Options $window.book.options
+#	$window.book manage Methods $window.book.methods
 	$window.book manage Initialise $window.book.f2
 	$window.book manage Finalise $window.book.f3
 	$window.book select Finalise
 	grid columnconfigure $window 0 -weight 1
 	grid rowconfigure $window 0 -weight 1
-	$window.book select Methods
+	$window.book select Finalise
 }
 
 proc Classy::WindowBuilder_win {w} {

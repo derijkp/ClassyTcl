@@ -12,7 +12,6 @@ package require Class 0.3
 package provide ClassyTcl $::class::version
 
 lappend auto_path [file join ${::class::dir} widgets] [file join ${::class::dir} dialogs]
-
 namespace eval ::Classy {}
 
 #----------------------------------------------------------------------

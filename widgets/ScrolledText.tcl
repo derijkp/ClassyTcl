@@ -20,7 +20,7 @@
 
 option add *Classy::ScrolledText.highlightThickness 0 widgetDefault
 catch {auto_load Classy::Text}
-bind Classy::ScrolledText <Configure> {Classy::todo %W redraw}
+bind Classy::ScrolledText <Configure> {Classy::todo [Classy::mainw %W] redraw}
 
 # ------------------------------------------------------------------
 #  Widget creation
@@ -89,7 +89,7 @@ Classy::ScrolledText method redraw {} {
 	}
 	bind Classy::ScrolledText <Configure> {}
 	update idletasks
-	bind Classy::ScrolledText <Configure> {Classy::todo %W redraw}
+	bind Classy::ScrolledText <Configure> {Classy::todo [Classy::mainw %W] redraw}
 	set redraw 0
 }
 

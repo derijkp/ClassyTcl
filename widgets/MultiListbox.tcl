@@ -21,19 +21,19 @@
 #	MultiListbox specific methods
 #}
 
-bind Classy::MultiListbox <<Action>> {%W select [%W nearest %y]}
-bind Classy::MultiListbox <<Action-Motion>> {%W select [%W nearest %y]}
-bind Classy::MultiListbox <<MExecute>> {%W command}
-bind Classy::MultiListbox <<Return>> {%W command}
+bind Classy::MultiListbox <<Action>> {[Classy::mainw %W] select [[Classy::mainw %W] nearest %y]}
+bind Classy::MultiListbox <<Action-Motion>> {[Classy::mainw %W] select [[Classy::mainw %W] nearest %y]}
+bind Classy::MultiListbox <<MExecute>> {[Classy::mainw %W] command}
+bind Classy::MultiListbox <<Return>> {[Classy::mainw %W] command}
 bind Classy::MultiListbox <<Up>> {
-	set sel [%W curselection]
+	set sel [[Classy::mainw %W] curselection]
 	incr sel -1
-	%W select $sel
+	[Classy::mainw %W] select $sel
 }
 bind Classy::MultiListbox <<Down>> {
-	set sel [%W curselection]
+	set sel [[Classy::mainw %W] curselection]
 	incr sel 1
-	%W select $sel
+	[Classy::mainw %W] select $sel
 }
 
 # ------------------------------------------------------------------

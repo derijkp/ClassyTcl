@@ -34,3 +34,4 @@ set auto_index(::Classy::config_destroy) [list source [file join $dir ConfigDial
 set auto_index(Classy_config) [list source [file join $dir Classy_config.tcl]]
 set auto_index(Classy_configedit) [list source [file join $dir Classy_configedit.tcl]]
 set auto_index(Classy_printdialog) [list source [file join $dir Classy_printdialog.tcl]]
+set auto_index(Classy_menueditor) [list source [file join $dir Classy_menueditor.tcl]]

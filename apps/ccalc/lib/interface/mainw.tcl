@@ -149,9 +149,9 @@ mainw method init args {
 		-text exit
 	grid $object.opt.button3 -row 0 -column 2 -sticky nesw
 	grid columnconfigure $object.opt 0 -weight 1
-	Classy::NumEntry $object.numentry1 \
+	Classy::NumEntry $object.entry \
 		-width 4
-	grid $object.numentry1 -row 0 -column 0 -columnspan 5 -sticky nesw
+	grid $object.entry -row 0 -column 0 -columnspan 5 -sticky nesw
 
 	if {"$args" == "___Classy::Builder__create"} {return $object}
 # ClassyTcl Initialise
@@ -237,12 +237,12 @@ set ::work 0
 		-background [Classy::realcolor darkBackground]
 	$object.log configure \
 		-background [Classy::realcolor darkBackground]
-	$object.numentry1 configure \
+	$object.entry configure \
 		-command [varsubst object {setval $object}]
-	bind $object.numentry1 <FocusIn> {focus .classy__.builder.dedit.work.numentry1.entry}
 	# Configure initial arguments
 	if {"$args" != ""} {eval $object configure $args}
 # ClassyTcl Finalise
+global data
 foreach w [winfo children $object] {
 	if ![inlist [list $object.entry $object.label $object.opt] $w] {
 		$w configure -command [list buttonpress $w]
@@ -250,5 +250,11 @@ foreach w [winfo children $object] {
 }
 $object.entry set 0
 set data(new) 1
+set data(level) 0
+set data(t,0) plus
+set data(new) 0
+set data(mem) 0
+set data(units) deg
+set data(inv) 0
 	return $object
 }

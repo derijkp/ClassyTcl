@@ -101,6 +101,7 @@ proc Classy::conf_buildcache {files} {
 			}
 			if {"[string index $type 0]" == "#"} continue
 			set conf($type,$key) $line
+			lappend conftype($type) $type,$key
 		}
 		close $f
 	}
@@ -119,12 +120,14 @@ proc Classy::conf_buildcache {files} {
 			append result [list option add $key [Classy::realcolor $option] widgetDefault]\n
 		}
 	}
-	foreach option [lsort [array names conf color,*]] {
+	foreach option $conftype(color) {
+		if ![info exists conf($option)] continue
 		foreach {type key value} $conf($option) {}
 		option add $key [Classy::realcolor $value] widgetDefault
 		append result [list option add $key [Classy::realcolor $value] widgetDefault]\n
 		unset conf($option)
 	}
+	unset conftype(color)
 	foreach option {Font BoldFont ItalicFont BoldItalicFont NonPropFont} {
 		if [info exists conf(font,*$option)] {
 			foreach {type key value} $conf(font,*$option) {}
@@ -136,18 +139,22 @@ proc Classy::conf_buildcache {files} {
 			append result [list option add $key [Classy::realfont $option] widgetDefault]\n
 		}
 	}
-	foreach option [lsort [array names conf font,*]] {
+	foreach option $conftype(font) {
+		if ![info exists conf($option)] continue
 		foreach {type key value} $conf($option) {}
 		option add $key [Classy::realfont $value] widgetDefault
 		append result [list option add $key [Classy::realfont $value] widgetDefault]\n
 		unset conf($option)
 	}
-	foreach option [lsort [array names conf key,*]] {
+	unset conftype(font)
+	foreach option $conftype(key) {
+		if ![info exists conf($option)] continue
 		foreach {type key value} $conf($option) {}
 		eval {event add $key} $value
 		append result [concat [list event add $key] $value]\n
 		unset conf($option)
 	}
+	unset conftype(key)
 	# Mouse button bindings
 	# Which mousebutton does what?
 	# Action = select, invoke button, ...
@@ -181,28 +188,36 @@ proc Classy::conf_buildcache {files} {
 			append result [list event add <<$name-$combo>> <${pre}B$num-$combo>]\n
 		}
 	}
-	foreach option [lsort [array names conf mouse,*]] {
+	foreach option $conftype(mouse) {
+		if ![info exists conf($option)] continue
 		foreach {type key value} $conf($option) {}
 		eval {event add $key} $value
 		append result [concat [list event add $key] $value]\n
 		unset conf($option)
 	}
-	foreach option [lsort [array names conf menu,*]] {
+	unset conftype(mouse)
+	foreach option $conftype(menu) {
+		if ![info exists conf($option)] continue
 		foreach {type key value} $conf($option) {}
 		set ::Classy::configmenu($key) $value
 		append result [list set ::Classy::configmenu($key) $value]\n
 		unset conf($option)
 	}
-	foreach option [lsort [array names conf toolbar,*]] {
+	unset conftype(menu)
+	foreach option $conftype(toolbar) {
+		if ![info exists conf($option)] continue
 		foreach {type key value} $conf($option) {}
 		set ::Classy::configtoolbar($key) $value
 		append result [list set ::Classy::configtoolbar($key) $value]\n
 		unset conf($option)
 	}
-	foreach option [lsort [array names conf]] {
-		foreach {type key value} $conf($option) {}
-		option add $key $value widgetDefault
-		append result [list option add $key $value widgetDefault]\n
+	unset conftype(toolbar)
+	foreach conft [array names conftype] { 
+		foreach option $conftype($conft) {
+			foreach {type key value} $conf($option) {}
+			option add $key $value widgetDefault
+			append result [list option add $key $value widgetDefault]\n
+		}
 	}
 	return $result
 }

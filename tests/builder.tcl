@@ -7,3 +7,8 @@ catch {destroy .classy__.error}
 set object .builder
 catch {Classy::Builder destroy}
 Classy::Builder .builder
+
+bindtags .builder
+bindtags .builder.browse
+bindtags .builder.browse
+bindtags .builder.browse.c

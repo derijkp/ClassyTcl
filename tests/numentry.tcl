@@ -83,5 +83,14 @@ test Classy::NumEntry {int} {
 	set ::try
 } {10}
 
+test Classy::NumEntry {with combo} {
+	classyclean
+	destroy .try
+	Classy::NumEntry .try
+	pack .try
+	.try configure -label test -combo 10
+	.try cget -label
+} {test}
+
 testsummarize
 

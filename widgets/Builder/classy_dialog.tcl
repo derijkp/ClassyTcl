@@ -43,7 +43,8 @@ proc ::Classy::WindowBuilder::generate_Classy::Dialog {object base} {
 	private $object current data
 	set outw [$object outw $base]
 	set body ""
-	set opt [eval $object getoptions $base -menu $data(options)]
+#	set opt [eval $object getoptions $base -menu $data(options)]
+	set opt [$object getoptions $base -menu]
 	if [llength $opt] {
 		append data(parse) "\t\$object configure $opt\n"
 	}

@@ -58,7 +58,8 @@ proc ::Classy::WindowBuilder::generate_Classy::Toplevel {object base} {
 	private $object current data
 	set body ""
 	set outw [$object outw $base]
-	set opt [eval $object getoptions $base -menu -destroycommand $data(options)]
+#	set opt [eval $object getoptions $base -menu -destroycommand $data(options)]
+	set opt [$object getoptions $base -menu -destroycommand]
 	if [llength $opt] {
 		append data(parse) "\t\$object configure $opt\n"
 	}

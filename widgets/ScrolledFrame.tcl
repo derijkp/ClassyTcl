@@ -21,7 +21,7 @@
 #	ScrolledFrame specific methods
 #}
 
-bind Classy::ScrolledFrame <Configure> {Classy::todo %W redraw}
+bind Classy::ScrolledFrame <Configure> {Classy::todo [Classy::mainw %W] redraw}
 
 # ------------------------------------------------------------------
 #  Widget creation
@@ -99,7 +99,7 @@ Classy::ScrolledFrame method redraw {} {
 	grid rowconfigure $object.view 0 -weight 1
 	bind Classy::ScrolledFrame <Configure> {}
 	update idletasks
-	bind Classy::ScrolledFrame <Configure> {Classy::todo %W redraw}
+	bind Classy::ScrolledFrame <Configure> {Classy::todo [Classy::mainw %W] redraw}
 	$object _sethbar
 	$object _setvbar
 }

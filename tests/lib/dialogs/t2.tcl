@@ -27,10 +27,22 @@ t2 method init args {
 	# Parse this
 	$object.paned1 configure \
 		-window [varsubst object {$object.text1}]
-	bind $object.entry1 <FocusIn> {focus .wbuilder.work.entry1.entry}
+	$object.button1 configure \
+		-command [varsubst object {$object try [$object.entry1 get]}]
 	# Configure initial arguments
 	if {"$args" != ""} {eval $object configure $args}
+# ClassyTcl Finalise
+puts ok
 	return $object
 }
 
-t2 method test {a b} {putsvars a b}
+t2 addoption -try {try Try {}} {}
+
+t2 method try a {
+puts $a
+}
+
+t2 method try2 a {
+puts try2:$a
+}
+

@@ -34,30 +34,45 @@
 option add *Classy::Entry.highlightThickness 0 widgetDefault
 option add *Classy::Entry*Frame.highlightThickness 0 widgetDefault
 option add *Classy::Entry*Frame.borderWidth 0 widgetDefault
-option add *Classy::Entry.entry.relief sunken widgetDefault
 option add *Classy::Entry.label.anchor w widgetDefault
+option add *Classy::Entry.label.highlightThickness 0 widgetDefault
+option add *Classy::Entry.label.borderWidth 0 widgetDefault
+option add *Classy::Entry.frame.entry.highlightThickness 0 widgetDefault
+option add *Classy::Entry.frame.entry.borderWidth 1 widgetDefault
+option add *Classy::Entry.frame.entry.relief sunken widgetDefault
 option add *Classy::Entry.entry.width 5 widgetDefault
+option add *Classy::Entry.entry.relief flat widgetDefault
+option add *Classy::Entry.entry.borderWidth 0 widgetDefault
+option add *Classy::Entry.entry.highlightThickness 1 widgetDefault
+option add *Classy::Entry.defaults.combo.borderWidth 1 widgetDefault
+option add *Classy::Entry.defaults.combo.relief raised widgetDefault
+option add *Classy::Entry.defaults.combo.list.relief sunken widgetDefault
+option add *Classy::Entry.defaults.combo.list.borderWidth 1 widgetDefault
 
 bind Classy::Entry <Key-Return> {
-	%W constrain
-	if [%W command] break
+	[Classy::mainw %W] constrain
+	if [[Classy::mainw %W] command] break
+}
+
+bind Classy::Entry <Key-Down> {
+	[Classy::mainw %W] combo_draw
 }
 
 bind Classy::Entry <<Empty>> {
-	%W nocmdset ""
+	[Classy::mainw %W] nocmdset ""
 }
 bind Classy::Entry <<Default>> {
-	if [winfo exists %W.defaults] {%W.defaults menu}
+	if [winfo exists [Classy::mainw %W].defaults] {[Classy::mainw %W].defaults menu}
 }
 bind Classy::Entry <<Drop>> {
-	%W insert insert [Classy::DragDrop get]
+	[Classy::mainw %W] insert insert [Classy::DragDrop get]
 }
 bind Classy::Entry <<Drag-Motion>> {
-	tkEntryButton1 %W %x
+	tkEntryButton1 [Classy::mainw %W] %x
 }
-bind Classy::Entry <<MXPaste>> {%W paste;break}
-bind Classy::Entry <Any-KeyRelease> {%W constrain}
-bind Classy::Entry <Any-ButtonRelease> {%W constrain}
+bind Classy::Entry <<MXPaste>> {[Classy::mainw %W] paste;break}
+bind Classy::Entry <Any-KeyRelease> {[Classy::mainw %W] constrain}
+bind Classy::Entry <Any-ButtonRelease> {[Classy::mainw %W] constrain}
 
 # ------------------------------------------------------------------
 #  Widget creation
@@ -68,7 +83,7 @@ Classy::Entry method init {args} {
 	# REM Create object
 	# -----------------
 	set w [super init]
-	$w configure -highlightthickness 0
+	$w configure
 	frame $object.frame
 	frame $object.frame.entry
 	pack $object.frame -expand yes -fill x -side left
@@ -94,6 +109,36 @@ Classy::Entry chainoptions {$object.entry}
 Classy::Entry chainoption -background {$object} -background {$object.entry} -background
 Classy::Entry chainoption -highlightbackground {$object} -highlightbackground {$object.entry} -highlightbackground
 Classy::Entry chainoption -highlightcolor {$object} -highlightcolor {$object.entry} -highlightcolor
+Classy::Entry chainoption -borderwidth {$object.frame.entry} -borderwidth
+Classy::Entry chainoption -relief {$object.frame.entry} -relief
+
+#doc {Entry options -state} option {-state state State} descr {
+# Specifies  one of three states for the entry:  normal,
+# disabled or combo.  If the entry  is  disabled  then  the
+# value  may not be changed using widget commands and
+# no insertion cursor will be displayed, even if  the
+# input focus is in the widget. The combo state allows
+# changes using the combo list, but not by editing.
+#}
+Classy::Entry addoption -state {state State normal} {
+	private $object options
+	if ![inlist {normal disabled combo} $value] {
+		return -code error "bad state value \"$value\": must be normal, disabled or combo"
+	}
+	switch $value {
+		combo {
+			if [string_equal $options(-combo) ""] {
+				return -code error "state \"combo\" not allowed on entry without combo"
+			}
+			$object.entry configure -state disabled
+			catch {$object.defaults configure -state normal}
+		}
+		default {
+			$object.entry configure -state $value
+			catch {$object.defaults configure -state $value}
+		}
+	}
+}
 
 #doc {Entry options -orient} option {-orient orient Orient} descr {
 # determines the position of the label relative to the entry: horizontal or vertical
@@ -101,6 +146,56 @@ Classy::Entry chainoption -highlightcolor {$object} -highlightcolor {$object.ent
 Classy::Entry addoption -orient {orient Orient horizontal} {
 	set value [Classy::orient $value]
 	Classy::todo $object _redrawentry
+}
+
+#doc {Entry options -combosize} option {-combosize comboSize ComboSize} descr {
+# max size of list to choose from (if larger use scrollbar)
+#}
+Classy::Entry addoption -combosize {comboSize ComboSize 10} {
+}
+
+#doc {Entry options -combo} option {-combo combo Combo} descr {
+# make entry into a combo box, The value of -combo can be a number, in which case it gives
+# the number of previous values in the entry are kept as choice, or a Tcl command. If
+# the value is not a number, it will be used as a Tcl command that will be executed
+# upon invocation of the combo button. The resulting list will be offered as choice in
+# the combo list.
+#}
+Classy::Entry addoption -combo {combo Combo {}} {
+	private $object options
+	if ![string_equal $options(-default) ""] {
+		return -code error "-combo and default options cannot be combined"
+	}
+	set w $object.defaults
+	if {("$value"=="")&&([winfo exists $w])} {
+		destroy $w
+		return $value
+	} elseif ![winfo exists $w] {
+		button $w -image [Classy::geticon combo]
+		pack $object.defaults -in $object.frame.entry -side right -fill both
+	}
+	$w configure -command [list $object combo_draw]
+	set w $object.defaults.combo
+	toplevel $w
+	listbox $w.list \
+		-selectmode browse \
+		-background [$object cget -bg] \
+		-yscrollcommand [list $w.vsb set] \
+		-exportselection false \
+		-borderwidth 0 \
+		-width 1
+	scrollbar $w.vsb \
+		-highlightthickness 0 \
+		-command [list $w.list yview]
+	pack $w.list -side left -fill both -expand yes
+	pack $w.vsb -side left -fill y
+	wm overrideredirect $w 1
+	wm transient $w [winfo toplevel $object]
+	wm group $w [winfo parent $object]
+	wm resizable $w 0 0
+	wm withdraw $w
+	bind $w.list <FocusOut> [list $object _combo_remove]
+	bind $w.list <<Escape>> [list $object _combo_remove]
 }
 
 #doc {Entry options -default} option {-default default Default} descr {
@@ -111,6 +206,10 @@ Classy::Entry addoption -orient {orient Orient horizontal} {
 # setting values.
 #}
 Classy::Entry addoption -default {default Default {}} {
+	private $object options
+	if ![string_equal $options(-combo) ""] {
+		return -code error "-combo and default options cannot be combined"
+	}
 	set w $object.defaults
 	if {("$value"=="")&&([winfo exists $w])} {
 		destroy $w
@@ -125,7 +224,6 @@ Classy::Entry addoption -default {default Default {}} {
 	return $value
 }
 
-
 #doc {Entry options -label} option {-label label Label} descr {
 # text to be displayed in the entry label. If this is empty, no label will bne displayed.
 #}
@@ -134,11 +232,11 @@ Classy::Entry addoption -label {label Label {}} {
 	catch {destroy $object.label}
 	if {"$value" != ""} {
 		label $object.label -bg $options(-labelbg)
-		pack $object.label -before $object.frame -side left
+		pack $object.label -before $object.frame -side left -fill both
 		$object.label configure -text $value
 		if {"$options(-orient)"!="horizontal"} {
-			pack $object.label -side top -fill x
-			pack $object.frame -side bottom -expand yes -fill x
+			pack $object.label -side top -fill both
+			pack $object.frame -side bottom -expand yes -fill both
 		}
 	} else {
 		catch {destroy $object.label}
@@ -204,7 +302,6 @@ Classy::Entry chainallmethods {$object.entry} entry
 # set the entry to value without invoking the command associated with the entry
 #}
 Classy::Entry method nocmdset {val} {
-	private $object previous
 	$object.entry delete 0 end
 	$object.entry insert 0 $val
 	$object.entry xview end
@@ -236,8 +333,17 @@ Classy::Entry method get {} {
 # invoke the command associated with the entry
 #}
 Classy::Entry method command {} {
+	private $object options
+	if [isint $options(-combo)] {
+		set history [Classy::Default get app combo,$object]
+		set value [$object.entry get]
+		set history [list_remove $history $value]
+		list_unshift history $value
+		set history [lrange $history 0 $options(-combo)]
+		Classy::Default set app combo,$object $history
+	}
 	set command [getprivate $object options(-command)]
-	if {"$command" != ""} {
+	if ![string_equal $command ""] {
 		uplevel #0 $command [list [$object.entry get]]
 		return 1
 	} else {
@@ -280,7 +386,7 @@ Classy::Entry method constrain {} {
 			unset previouscol
 		}
 	} else {
-		if {$warn==0} {
+		if {$warn == 0} {
 			$object nocmdset $previous
 		} elseif ![info exists previouscol] {
 			set previouscol [$object.entry cget -fg]
@@ -313,3 +419,78 @@ Classy::Entry method paste {} {
 Classy::Entry method previous {} {
 	return [getprivate $object previous]
 }
+
+Classy::Entry method _combo_remove {args} {
+	set w $object.defaults.combo
+	wm withdraw $w
+	focus $object.entry
+	return
+}
+
+Classy::Entry method _combo_action {args} {
+	private $object options
+	set w $object.defaults.combo
+	$object.entry configure -state normal
+	$object set [$w.list get active]
+	if [string_equal $options(-state) combo] {
+		$object.entry configure -state disabled
+	} else {
+		$object.entry configure -state $options(-state)
+	}
+	$object _combo_remove
+}
+
+Classy::Entry method combo_draw {args} {
+	private $object options
+	if [string_equal $options(-combo) ""] {
+		return
+	} elseif [isint $options(-combo)] {
+		set history [Classy::Default get app combo,$object]
+		set list $history
+	} else {
+		set list [uplevel #0 $options(-combo) $object]
+	}
+	set w $object.defaults.combo
+	if [winfo ismapped $w] {
+		wm withdraw $w
+		focus $object.entry
+		return
+	}
+	$w.list delete 0 end
+	eval $w.list insert end $list
+	set mainw $object.frame.entry
+	set xpos [winfo rootx $mainw]
+	set ypos [expr {[winfo rooty $mainw] + [winfo height $mainw]}]
+	set width [winfo width $mainw]
+	set maxheight [expr {[winfo screenheight $mainw] - $ypos}]
+	set noscroll 0
+	if [isint $options(-combosize)] {
+		set size $options(-combosize)
+		if {[llength $list] < $size} {
+			set size [llength $list]
+			set noscroll 1
+		}
+		$w.list configure -height $size
+		set h [winfo reqheight $w.list]
+		if {$h < $maxheight} {
+			set maxheight $h
+			if $noscroll {set noscroll 2}
+		}
+	}
+	if {$noscroll == 2} {
+		pack forget $w.vsb
+	} else {
+		pack $w.vsb -side left -fill y
+	}
+	bind $w.list <<Invoke>> [list $object _combo_action]
+	bind $w.list <<Action-Motion>> [list $w.list activate @%x,%y]
+	bind $w.list <<Action>> [list $w.list activate @%x,%y]
+	bind $w.list <<Action-ButtonRelease>> [list $object _combo_action]
+	bind $w.list <<Return>> [list $object _combo_action]
+	wm geometry $w ${width}x$maxheight+$xpos+$ypos
+	wm deiconify $w
+	raise $w
+	focus $w.list
+	$w.list activate 0
+}
+

@@ -69,7 +69,6 @@ Classy::DynaMenu classmethod attachmainmenu {menutype cmdw {menuroot {}}} {
 	} else {
 		[Classy::window $root] configure -menu $menu
 	}
-	return {}
 }
 
 #doc {DynaMenu attachmenu} cmd {
@@ -103,7 +102,7 @@ Classy::DynaMenu classmethod attachmenu {menutype cmdw} {
 Classy::DynaMenu classmethod cmdw {menutype {cmdw {}}} {
 	private $class cmdws
 	if {"$cmdw"==""} {
-		return $cmdws($menutype)
+		return [Classy::mainw $cmdws($menutype)]
 	} else {
 		if {"$cmdws($menutype)"=="$cmdw"} {return $cmdw}
 		set cmdws($menutype) $cmdw
@@ -113,7 +112,7 @@ Classy::DynaMenu classmethod cmdw {menutype {cmdw {}}} {
 			regsub -all {%%} $command % command
 			eval $command
 		}
-		return $cmdw
+		return [Classy::mainw $cmdw]
 	}
 }
 
@@ -325,7 +324,6 @@ Classy::DynaMenu classmethod makepopup {menutype menu curmenu data cmdw bindtag}
 			bind $bindtag $binding {}
 		}
 	}
-	set actives($menutype) ""
 	$curmenu delete 0 end
 	set bindings($curmenu) ""
 	set num 1
@@ -338,10 +336,6 @@ Classy::DynaMenu classmethod makepopup {menutype menu curmenu data cmdw bindtag}
 			set shortcut [lindex $current 3]
 			if {"$shortcut"!=""} {
 				bind $bindtag $shortcut "tk_popup $curmenu.b$num %X %Y 1;break"
-				if [regexp {^<<} $shortcut] {
-					set shortcut [event info $shortcut]
-				}
-				regexp {<(.*)>} $shortcut temp shortcut
 			}
 			$curmenu add cascade -label $text -menu $curmenu.b$num -accelerator [::Classy::shrink_accelerator $shortcut]
 			incr num
@@ -357,10 +351,6 @@ Classy::DynaMenu classmethod makepopup {menutype menu curmenu data cmdw bindtag}
 			set shortcut [lindex $current 3]
 			if {"$shortcut"!=""} {
 				bind $bindtag $shortcut "tk_popup $curmenu.b$num %X %Y 1;break"
-				if [regexp {^<<} $shortcut] {
-					set shortcut [event info $shortcut]
-				}
-				regexp {<(.*)>} $shortcut temp shortcut
 			}
 			$curmenu add cascade -label $text -menu $curmenu.b$num -accelerator [::Classy::shrink_accelerator $shortcut]
 			lappend actives($menutype) $curmenu.b$num
@@ -373,12 +363,8 @@ Classy::DynaMenu classmethod makepopup {menutype menu curmenu data cmdw bindtag}
 			set shortcut [lindex $current 3]
 			regsub -all {%W} $command "\[$class cmdw $menutype\]" command
 			regsub -all {%%} $command % command
-			if {"$shortcut"!=""} {
+			if [string length $shortcut] {
 				bind $bindtag $shortcut "$class invoke $curmenu $num;break"
-				if [regexp {^<<} $shortcut] {
-					set shortcut [event info $shortcut]
-				}
-				regexp {<(.*)>} $shortcut temp shortcut
 			}
 			$curmenu add command -label $text -command [list Classy::check $command] -accelerator [::Classy::shrink_accelerator $shortcut]
 			incr num
@@ -389,12 +375,8 @@ Classy::DynaMenu classmethod makepopup {menutype menu curmenu data cmdw bindtag}
 			regsub -all {%%} $temp % temp
 			if {"$shortcut"!=""} {
 				bind $bindtag $shortcut "$class invoke $curmenu $num;break"
-				if [regexp {^<<} $shortcut] {
-					set shortcut [event info $shortcut]
-				}
-				regexp {<(.*)>} $shortcut temp shortcut
 			}
-			eval {$curmenu add check -label $text -accelerator $shortcut} $temp
+			eval {$curmenu add check -label $text -accelerator [::Classy::shrink_accelerator $shortcut]} $temp
 			append checks($menutype) "$curmenu entryconfigure [$curmenu index last] $command\n"
 			incr num
 		} elseif {"$type"=="radio"} {
@@ -404,12 +386,8 @@ Classy::DynaMenu classmethod makepopup {menutype menu curmenu data cmdw bindtag}
 			regsub -all {%%} $temp % temp
 			if {"$shortcut"!=""} {
 				bind $bindtag $shortcut "$class invoke $curmenu $num;break"
-				if [regexp {^<<} $shortcut] {
-					set shortcut [event info $shortcut]
-				}
-				regexp {<(.*)>} $shortcut temp shortcut
 			}
-			eval {$curmenu add radio -label $text -accelerator $shortcut} $temp
+			eval {$curmenu add radio -label $text -accelerator [::Classy::shrink_accelerator $shortcut]} $temp
 			append checks($menutype) "$curmenu entryconfigure [$curmenu index last] $command\n"
 			incr num
 		} elseif [regexp ^# $type] {
@@ -434,6 +412,10 @@ Classy::DynaMenu classmethod _activemenu {menutype menu curmenu key command} {
 Classy::DynaMenu classmethod updateactive {menutype} {
 	private $class actives
 	foreach active $actives($menutype) {
-		uplevel #0 [$active cget -postcommand]
+		if [winfo exists $active] {
+			uplevel #0 [$active cget -postcommand]
+		} else {
+			set actives($menutype) [list_remove $actives($menutype) $active]
+		}
 	}
 }

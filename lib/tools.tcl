@@ -44,48 +44,30 @@ proc ::Classy::handletodo {object} {
 }
 
 # This function creates a conversion table used in the following function
-foreach {key sym} "\
-\[ bracketleft \] bracketright \( parenleft \) parenright \
-, comma . period = equal < less > greater ? question \# numbersign" {
-	lappend ::Classy::keytable(keys) $key
-	lappend ::Classy::keytable(syms) $sym
+array set ::Classy::keytablepresyms {
+	Control- C- Alt- A- Shift- S-
+	Control-Alt- CA- Shift-Alt- SA- Control-Shift-Alt- CSA-  Control-Shift- CS-
+}
+foreach name [array names ::Classy::keytablepresyms] {
+	set ::Classy::keytablepresyms(${name}Key-) $::Classy::keytablepresyms($name)
+}
+set ::Classy::keytablepresyms(Key-) {}
+array set ::Classy::keytablesyms {
+	bracketleft [ bracketright ] parenleft ( parenright )
+	comma , period . equal = less < greater > question ? numbersign #
 }
 
 proc Classy::shrink_accelerator {sym} {
-	regsub -all {[<>]} $sym {} sym
-	regsub -all {Key-} $sym {} sym
+	if [regexp {^<<} $sym] {
+		set sym [event info $sym]
+	}
 	set sym [lindex $sym 0]
-	set pre ""
-	set post $sym
-	regexp {^(.*-)([^-]+)$} $sym temp pre post
-	regsub {Control-} $pre {C-} pre
-	regsub {Alt-} $pre {A-} pre
-
-	if ![regexp {^[a-zA-Z0-9]$} $post] {
-		set pos [lsearch -exact $::Classy::keytable(syms) $post]
-		if {$pos!=-1} {
-			set post [lindex $::Classy::keytable(keys) $pos]
-		}
+	regsub -all {[<>]} $sym {} sym
+	if [regexp {^(.*-)([^-]+)$} $sym temp pre sym] {
+		set sym [get ::Classy::keytablepresyms($pre) $pre][get ::Classy::keytablesyms($sym) $sym]
+	} else {
+		set sym [get ::Classy::keytablesyms($sym) $sym]
 	}
-	return "${pre}$post"
-}
-
-# Expands something like "C-A-g" to "Control-Alt-g"
-proc Classy::expand_accelerator {sym} {
-	if {"[string index $sym 1]" == "<"} return($sym)
-	set pre ""
-	set post $sym
-	regexp {^(.*-)([^-]+)$} $sym temp pre post
-	regsub {C-} $pre {Control-} pre
-	regsub {A-} $pre {Alt-} pre
-
-	if ![regexp {^[a-zA-Z0-9]$} $post] {
-		set pos [lsearch -exact $::Classy::keytable(keys) $post]
-		if {$pos!=-1} {
-			set post [lindex $::Classy::keytable(syms) $pos]
-		}
-	}
-	return "${pre}$post"
 }
 
 proc Classy::check {command} {

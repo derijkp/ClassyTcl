@@ -10,7 +10,7 @@ package require Tcl 8.0
 # $Format: "set ::class::version 0.$ProjectMajorVersion$"$
 set ::class::version 0.3
 # $Format: "set ::class::patchlevel $ProjectMinorVersion$"$
-set ::class::patchlevel 10
+set ::class::patchlevel 16
 package provide Class $::class::version
 
 
@@ -39,6 +39,6 @@ if [file exists [file join ${::class::dir} classy[info sharedlibextension]]] {
 # these functions will be loaded on demand. 
 proc tm {args} {puts "[string range $args 0 20]: [uplevel 1 [list time $args]]"}
 
-lappend auto_path [file join ${::class::dir} lib] [file join ${::class::dir} classes]
+lappend auto_path [file join ${::class::dir} lib]
 
 source [file join $::class::dir lib Class.tcl]

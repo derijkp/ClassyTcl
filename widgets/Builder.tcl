@@ -103,11 +103,19 @@ Classy::Builder method destroy {} {
 #  Methods
 # ------------------------------------------------------------------
 
+Classy::Builder chainallmethods {$object.browse} Classy::TreeWidget
+
 Classy::Builder method new {type {name {}}} {
 	global auto_index
 	private $object browse options defdir
 	if {("$type" == "function")&&(![inlist {file function} $browse(type)])} {
-		error "You can only add function to a tcl file"
+		error "You can only add a function to a tcl file"
+	}
+	if {("$type" == "option")&&(![inlist {dialog toplevel frame option method} $browse(type)])} {
+		error "You can only add an option to a dialog, toplevel or frame"
+	}
+	if {("$type" == "method")&&(![inlist {dialog toplevel frame option method} $browse(type)])} {
+		error "You can only add a method to a dialog, toplevel or frame"
 	}
 	if {"$name" == ""} {
 		catch {destroy $object.temp}
@@ -164,9 +172,20 @@ Classy::Builder method new {type {name {}}} {
 			$object.browse addnode [list $dir {} dir] $base \
 				-type end -text $name -image [Classy::geticon new[string tolower $cmd]]
 		}
-		$object.browse selection set $base
 		return
-	} else {
+	} elseif [string_equal $type option] {
+		if ![regexp ^- $name] {set name -$name}
+		if [inlist [$object infile ls $file] $name] {
+			error "\"$name\" exists in file \"$file\"!"
+		}
+	} elseif [string_equal $type method] {
+		if [string_equal $name init] {
+			error "init method is reserved"
+		}
+		if [inlist [$object infile ls $file] $name] {
+			error "\"$name\" exists in file \"$file\"!"
+		}
+	} elseif [string_equal $type function] {
 		if [inlist [$object infile ls $file] $name] {
 			error "\"$name\" exists in file \"$file\"!"
 		}
@@ -175,20 +194,43 @@ Classy::Builder method new {type {name {}}} {
 			if ![Classy::yorn "function \"$name\" probably exists in file \"$file\"! continue anyway?"] return
 		}
 		if [file isdir $file] {return -code error "please select a file instead of a directory"}
+	} else {
+		error "unknown typr \"$type\""
 	}
 	switch $type {
 		function {
 			set f [open $file a]
 			puts $f "\nproc [list $name] \{\} \{\}"
 			close $f
+			set pnode [list $file {} file]
 		}
-		dialog {set cmd Dialog}
-		toplevel {set cmd Toplevel}
-		frame {set cmd Topframe}
+		option {
+			foreach {ptype pname} [$object filetype $file] break
+			regsub ^- $name {} name1
+			set name2 "[string toupper [string index $name1 0]][string range $name1 1 end]"
+			set f [open $file a]
+			set line "\n$pname addoption [list $name] [list [list $name1 $name2 {}]] \{\}"
+			uplevel #0 $line
+			puts $f $line
+			close $f
+			set pnode [list $file $pname $ptype]
+		}
+		method {
+			foreach {ptype pname} [$object filetype $file] break
+			set f [open $file a]
+			set line "\n$pname method [list $name] \{\} \{\}"
+			uplevel #0 $line
+			puts $f $line
+			close $f
+			set pnode [list $file $pname $ptype]
+		}
+		dialog {set typecmd Dialog}
+		toplevel {set typecmd Toplevel}
+		frame {set typecmd Topframe}
 		default {error "unkown type: \"$type\"}
 	}
-	if {"$type" != "function"} {
-		set create \n[list Classy::$cmd subclass [list $name]]
+	if [info exists typecmd] {
+		set create \n[list Classy::$typecmd subclass [list $name]]
 		set code "\n[list $name] method init {args} \{"
 		append code \n\t[list super init]
 		append code "\n\tset window \$object"
@@ -201,12 +243,12 @@ Classy::Builder method new {type {name {}}} {
 		puts $f \n$create
 		puts $f $code
 		close $f
+		set pnode [list $file {} file]
 	}
 	set base [list $file $name $type]
-	set pnode [list $file {} file]
 	$object.browse addnode $pnode $base -type end -text $name -image [Classy::geticon new$type]
 	update idletasks
-	$object.browse selection set $base
+	$object selectnode $base
 }
 
 Classy::Builder method _creatededit {w} {
@@ -242,6 +284,14 @@ Classy::Builder method open {file function type} {
 		file {
 			if ![file isdir $file] {Classy::edit $file}
 		}
+		option {
+			set filetype [$object filetype $file]
+			$object optionedit $object.optionedit $file [lindex $filetype 1] $function $type
+		}
+		method {
+			set filetype [$object filetype $file]
+			$object methodedit $object.methodedit $file [lindex $filetype 1] $function $type
+		}
 		function {
 			$object fedit $object.fedit $file $function $type
 		}
@@ -257,55 +307,77 @@ Classy::Builder method infile {cmd file args} {
 			set pos [lsearch -glob $c [list proc $function *]]
 			if {$pos != -1} {
 				return [lindex $c $pos]\n
-			} else {
-				set pos [lsearch -glob $c [list * subclass $function]]
-				if {$pos == -1} {
-					error "\"$function\" not found in file \"$file\""
-				}
+			}
+			set pos [lsearch -glob $c [list * subclass $function]]
+			if {$pos != -1} {
 				set result [lindex $c $pos]\n
-				set poss [list_find -glob $c [list $function addoption *]]
-				foreach pos $poss {
-					append result [lindex $c $pos]\n
-				}
-				set poss [list_find -glob $c [list $function method *]]
-				foreach pos $poss {
-					append result [lindex $c $pos]\n
-				}
+				set pos [lsearch -glob $c [list $function method init *]]
+				append result [lindex $c $pos]\n
 				return $result
 			}
+			set pos [lsearch -glob $c [list * addoption $function *]]
+			if {$pos != -1} {
+				return [lindex $c $pos]\n
+			}
+			set pos [lsearch -glob $c [list * method $function *]]
+			if {$pos != -1} {
+				return [lindex $c $pos]\n
+			}
+			error "\"$function\" not found in file \"$file\""
 		}
 		set {
 			set function [lindex $args 0]
 			set code [lindex $args 1]
 			set done 0
 			set c [cmd_split [file_read $file]]
-			if [string match "proc *" $code] {
-				uplevel #0 $code
-				set pos [lsearch -glob $c [list proc $function *]]
-				if {$pos == -1} {
-					lappend c {} $code
-				} else {
-					set c [lreplace $c $pos $pos $code]
-				}
-			} else {
-				set pos1 [lsearch -glob $c [list * subclass $function]]
-				if {$pos1 == -1} {
+			switch -glob -- $code [list \
+				"proc *" {
 					uplevel #0 $code
-					lappend c {} $code
-				} else {
+					set pos [lsearch -glob $c [list proc $function *]]
+					if {$pos == -1} {
+						lappend c {} $code
+					} else {
+						set c [lreplace $c $pos $pos $code]
+					}
+					$object infile _save $file $function $c
+					catch {rename $function {}}
+				} \
+				"* subclass *" {
 					regsub "^\[^\n\]+subclass $function\n" $code {} temp
 					uplevel #0 $temp
-					set poss [list_find -glob $c [list $function addoption *]]
-					set c [list_sub $c -exclude $poss]
-					set poss [list_find -glob $c [list $function method *]]
-					set c [list_sub $c -exclude $poss]
-					set c [lreplace $c $pos1 $pos1 $code]
-				}
-			}
-			$object infile _save $file $function $c
-			if [string match "proc *" $code] {
-				catch {rename $function {}}
-			}
+					set pos [lsearch -glob $c [list $function method init *]]
+					set c [lreplace $c $pos $pos]
+					set pos [lsearch -glob $c [list * subclass $function]]
+					if {$pos == -1} {
+						error "dialog \"$function\" not in file \"$file\""
+					}
+					set c [lreplace $c $pos $pos $code]
+					$object infile _save $file $function $c
+				} \
+				"* addoption $function *" {
+					uplevel #0 $code
+					set pos [lsearch -glob $c "* addoption $function *"]
+					if {$pos == -1} {
+						lappend c {} $code
+					} else {
+						set c [lreplace $c $pos $pos $code]
+					}
+					$object infile _save $file $function $c
+				} \
+				"* method $function *" {
+					uplevel #0 $code
+					set pos [lsearch -glob $c "* method $function *"]
+					if {$pos == -1} {
+						lappend c {} $code
+					} else {
+						set c [lreplace $c $pos $pos $code]
+					}
+					$object infile _save $file $function $c
+				} \
+				default {
+					error "Cannot save: unkown type"
+				} \
+			]
 		}
 		_save {
 			catch {file copy -force $file $file~}
@@ -327,12 +399,23 @@ Classy::Builder method infile {cmd file args} {
 			set ::auto_index($function) [list source $file]
 		}
 		ls {
+			if [llength $args] {
+				upvar [lindex $args 0] types
+				set types ""
+			}
 			set c [cmd_split [file_read $file]]
 			set result ""
 			foreach line $c {
 				if {"[lindex $line 0]" == "proc"} {
+					lappend types function
 					lappend result [lindex $line 1]
-				} elseif {"[lindex $line 1]" == "subclass"} {
+				} elseif {"[lindex $line 1]" == "method"} {
+					set name [lindex $line 2]
+					if [string_equal $name init] continue
+					lappend types method
+					lappend result $name
+				} elseif {"[lindex $line 1]" == "addoption"} {
+					lappend types option
 					lappend result [lindex $line 2]
 				}
 			}
@@ -344,20 +427,37 @@ Classy::Builder method infile {cmd file args} {
 			set pos [lsearch -glob $c [list proc $function *]]
 			if {$pos != -1} {
 				set c [lreplace $c $pos $pos]
-			} else {
-				set pos [lsearch -glob $c [list * subclass $function]]
-				if {$pos == -1} {
-					error "\"$function\" not found in file \"$file\""
-				}
+				$object infile _save $file $function $c
+				catch {rename $function {}}
+				catch {unset ::auto_index($function)}
+				return {}
+			}
+			set pos [lsearch -glob $c [list * subclass $function]]
+			if {$pos != -1} {
 				set c [lreplace $c $pos $pos]
 				set poss [list_find -glob $c [list $function addoption *]]
 				set c [list_sub $c -exclude $poss]
 				set poss [list_find -glob $c [list $function method *]]
 				set c [list_sub $c -exclude $poss]
+				$object infile _save $file $function $c
+				catch {rename $function {}}
+				catch {unset ::auto_index($function)}
+				return {}
 			}
-			$object infile _save $file $function $c
-			catch {rename $function {}}
-			catch {unset ::auto_index($function)}
+			set pos [lsearch -glob $c [list * method $function *]]
+			if {$pos != -1} {
+				set c [lreplace $c $pos $pos]
+				$object infile _save $file $function $c
+				catch {[lindex [lindex $c $pos] 0] deletemethod $function}
+				return {}
+			}
+			set pos [lsearch -glob $c [list * addoption $function *]]
+			if {$pos != -1} {
+				set c [lreplace $c $pos $pos]
+				$object infile _save $file $function $c
+				return {}
+			}
+			error "\"$function\" not found in file \"$file\""
 		}
 		rename {
 			set function [lindex $args 0]
@@ -375,11 +475,13 @@ Classy::Builder method infile {cmd file args} {
 				regsub "^proc $function" [lindex $c $pos] "proc $newfunction" line
 				set c [lreplace $c $pos $pos $line]
 				uplevel #0 $line
-			} else {
-				set pos [lsearch -glob $c [list * subclass $function]]
-				if {$pos == -1} {
-					error "\"$function\" not found in file \"$file\""
-				}
+				$object infile _save $file $function $c
+				catch {rename $function {}}
+				catch {unset ::auto_index($function)}
+				return $newfunction
+			}
+			set pos [lsearch -glob $c [list * subclass $function]]
+			if {$pos != -1} {
 				regsub "subclass $function\$" [lindex $c $pos] "subclass $newfunction" line
 				set c [lreplace $c $pos $pos $line]
 				uplevel #0 $line
@@ -392,10 +494,27 @@ Classy::Builder method infile {cmd file args} {
 					set c [lreplace $c $pos $pos $line]
 					uplevel #0 $line
 				}
+				$object infile _save $file $function $c
+				catch {rename $function {}}
+				catch {unset ::auto_index($function)}
+				return $newfunction
 			}
-			$object infile _save $file $function $c
-			catch {rename $function {}}
-			catch {unset ::auto_index($function)}
+			set pos [lsearch -glob $c [list * method $function *]]
+			if {$pos != -1} {
+				regsub "method $function" [lindex $c $pos] "method $newfunction" line
+				set c [lreplace $c $pos $pos $line]
+				$object infile _save $file $function $c
+				catch {[lindex [lindex $c $pos] 0] deletemethod $function}
+				return {}
+			}
+			set pos [lsearch -glob $c [list * addoption $function *]]
+			if {$pos != -1} {
+				regsub "addoption $function" [lindex $c $pos] "addoption $newfunction" line
+				set c [lreplace $c $pos $pos $line]
+				$object infile _save $file $function $c
+				return {}
+			}
+			error "\"$function\" not found in file \"$file\""
 		}
 		add {
 			set code [lindex $args 0]
@@ -410,23 +529,29 @@ Classy::Builder method infile {cmd file args} {
 				set num 1
 				while {[lsearch $funcs $function#$num] != -1} {incr num}
 				set newfunction $function#$num
-				if [string match "proc *" $code] {
-					regsub "^proc $function" $code "proc $newfunction" code
-				} else {
-					set newcode ""
-					foreach line $split {
-						regsub "subclass $function\$" $line "subclass $newfunction" line
-						regsub "^$function " $line "$newfunction " line
-						append newcode $line\n
+				switch -glob -- $code {
+					"proc *" {
+						regsub "^proc $function" $code "proc $newfunction" code
 					}
-					set code $newcode
+					"* subclass *" {
+						set newcode ""
+						foreach line $split {
+							regsub "subclass $function\$" $line "subclass $newfunction" line
+							regsub "^$function " $line "$newfunction " line
+							append newcode $line\n
+						}
+						set code $newcode
+					}
+					"* addoption *" {
+						regsub " addoption $function" $code " addoption $newfunction" code
+					}
+					"* method *" {
+						regsub " method $function" $code " method $newfunction" code
+					}
 				}
 				set function $newfunction
 			}
 			$object infile set $file $function $code
-			set pnode [list $file {} file]
-			$object closenode $pnode
-			$object opennode $pnode
 		}
 	}
 }
@@ -440,29 +565,31 @@ Classy::Builder method delete {} {
 	global auto_index
 	private $object options browse
 	set file $browse(file)
+	set pnode [$object.browse parentnode $browse(base)]
 	switch $browse(type) {
 		file - dialog - toplevel - topframe {
 			file copy -force $file $file~
 			file delete $file
 			$object.browse deletenode $browse(base)
 			catch {Classy::auto_mkindex [file dirname $file] *.tcl}
-			return $file
 		}
 		dir - color - font - misc - key - mouse - menu - tool {
 			set function $browse(name)
 			$object infile delete $file $function
-			$object.browse selection set [list $browse(file) {} file]
 			$object.browse deletenode $browse(base)
-			return $function
+		}
+		{option method} {
+			set function $browse(name)
+			$object infile delete $file $function
+			$object.browse deletenode $browse(base)
 		}
 		default {
 			set function $browse(name)
 			$object infile delete $file $function
 			$object.browse deletenode $browse(base)
-			$object.browse selection set [list $browse(file) {} file]
-			return $function
 		}
 	}
+	$object selectnode $pnode
 }
 
 Classy::Builder method copy {} {
@@ -559,7 +686,14 @@ Classy::Builder method paste {{file {}}} {
 	} elseif {"$browse(clipbf)" != ""} {
 		error "Can only paste file in directory"
 	} else {
+		set node $browse(base)
+		set pnode [$object.browse parentnode $browse(base)]
 		$object infile add $file $browse(clipb)
+		if [inlist {file toplevel dialog frame} $browse(type)] {
+			set pnode $node
+		}
+		$object closenode $pnode
+		$object opennode $pnode
 	}
 }
 
@@ -604,6 +738,32 @@ Classy::Builder method closenode {base} {
 	$object.browse selection set $base
 }
 
+Classy::Builder method filetype {file} {
+	if [file isdir $file] {
+		return dir
+	} elseif [regexp {~$} $file]  {
+		return ignore
+	} elseif {"[file tail $file]" == "tclIndex"}  {
+		return ignore
+	} else {
+		set f [open $file]
+		set line ""
+		while {![eof $f] && ![string length $line]} {set line [gets $f]}
+		close $f
+		if [regexp {^Classy::Toplevel subclass (.+)$} $line temp func] {
+			return [list toplevel $func]
+		} elseif [regexp {^Classy::Dialog subclass (.+)$} $line temp func] {
+			return [list dialog $func]
+		} elseif [regexp {^Classy::Topframe subclass (.+)$} $line temp func] {
+			return [list frame $func]
+		} elseif {"[file extension $file]" == ".tcl"} {
+			return tcl
+		} else {
+			return other
+		}
+	}
+}
+
 Classy::Builder method opennode {args} {
 	private $object browse
 	if {[llength $args] == 1} {
@@ -622,27 +782,18 @@ Classy::Builder method opennode {args} {
 		set list ""
 		set olist ""
 		foreach file [glob -nocomplain [file join $browse(file) *]] {
-			if [file isdir $file] {
-				$object.browse addnode $root [list $file {} dir] -text [file tail $file]
-			} elseif [regexp {~$} $file]  {
-			} elseif {"[file tail $file]" == "tclIndex"}  {
-			} else {
-				set f [open $file]
-				set line ""
-				while {![eof $f] && ![string length $line]} {set line [gets $f]}
-				close $f
-				if [regexp {^Classy::Toplevel subclass (.+)$} $line temp func] {
-					$object.browse addnode $root [list $file $func toplevel] \
-						-type end -text $func -image [Classy::geticon newtoplevel]
-				} elseif [regexp {^Classy::Dialog subclass (.+)$} $line temp func] {
-					$object.browse addnode $root [list $file $func dialog] \
-						-type end -text $func -image [Classy::geticon newdialog]
-				} elseif [regexp {^Classy::Topframe subclass (.+)$} $line temp func] {
-					$object.browse addnode $root [list $file $func frame] \
-						-type end -text $func -image [Classy::geticon newframe]
-				} elseif {"[file extension $file]" == ".tcl"} {
+			foreach {type func} [$object filetype $file] {break}
+			switch $type {
+				dir {$object.browse addnode $root [list $file {} dir] -text [file tail $file]}
+				ignore {}
+				toplevel - dialog - frame {
+					$object.browse addnode $root [list $file $func $type] \
+						-text $func -image [Classy::geticon new$type]
+				}
+				tcl {
 					lappend list $file
-				} else {
+				}
+				other {
 					lappend olist $file
 				}
 			}
@@ -656,8 +807,9 @@ Classy::Builder method opennode {args} {
 			$object.browse addnode $root [list $file {} file] -text [file tail $file] -type end -image [Classy::geticon newfile]
 		}
 	} else {
-		foreach func [$object infile ls $browse(file)] {
-				$object.browse addnode $root [list $browse(file) $func function] -type end -text $func -image [Classy::geticon newfunction]
+		set funcs [$object infile ls $browse(file) types]
+		foreach func $funcs type $types {
+			$object.browse addnode $root [list $browse(file) $func $type] -type end -text $func -image [Classy::geticon new$type]
 		}
 	}
 	$object.browse selection set $base
@@ -673,7 +825,7 @@ Classy::Builder method _drawtree {} {
 	$object.browse redraw
 	update idletasks
 	set select [lindex [$object.browse children {}] 0]
-	$object opennode $select
+	catch {$object opennode $select}
 }
 
 Classy::Builder method fedit {w file function type} {
@@ -702,6 +854,71 @@ Classy::Builder method savefunction {w file function code} {
 	$object infile set $file $function $def
 	$w.edit textchanged 0
 	$w configure -title $function
+}
+
+Classy::Builder method methodedit {w file parent function type} {
+	set num 1
+	while 1 {
+		if ![winfo exists $object.methodedit$num] break
+		incr num
+	}
+	set w $object.methodedit$num
+	Classy::Toplevel $w -keepgeometry all -resize {2 2}
+	Classy::Entry $w.args -label "$function arguments"
+	Classy::Editor $w.edit -closecommand [list destroy $w]
+	pack $w.args -side top -fill both
+	pack $w.edit -side top -fill both -expand yes
+	set code [$object infile get $file $function]
+	$w.args set [lindex $code 3]
+	$w.edit set [string trimright [string trimleft [lindex $code 4] "\n"] "\n"]
+	$w configure -title "$parent method $function"
+	$w.edit textchanged 0
+	$w.edit configure -savecommand [list $object savemethod $w $file $parent $function]
+}
+
+Classy::Builder method savemethod {w file parent function code} {
+	set def "\n$parent method [list $function] [list [$w.args get]] \{\n$code\n\}"
+	uplevel #0 $def
+	$object infile set $file $function $def
+	$w.edit textchanged 0
+	$w configure -title "$parent option $function"
+}
+
+Classy::Builder method optionedit {w file parent function type} {
+	set num 1
+	while 1 {
+		if ![winfo exists $object.fedit$num] break
+		incr num
+	}
+	set w $object.fedit$num
+	Classy::Toplevel $w -keepgeometry all -resize {2 2}
+	Classy::Entry $w.name -label "Name"
+	Classy::Entry $w.class -label "Class"
+	Classy::Entry $w.default -label "Default"
+	Classy::Editor $w.edit -closecommand [list destroy $w]
+	grid $w.name $w.class $w.default -sticky we
+	grid $w.edit -columnspan 3 -sticky nswe
+	grid rowconfigure $w 1 -weight 1
+	grid columnconfigure $w 0 -weight 1
+	grid columnconfigure $w 1 -weight 1
+	grid columnconfigure $w 2 -weight 1
+	set code [$object infile get $file $function]
+	set temp [lindex $code 3]
+	$w.name set [lindex $temp 0]
+	$w.class set [lindex $temp 1]
+	$w.default set [lindex $temp 2]
+	$w.edit set [string trimright [string trimleft [lindex $code 4] "\n"] "\n"]
+	$w configure -title "$parent option $function"
+	$w.edit textchanged 0
+	$w.edit configure -savecommand [list $object saveoption $w $file $parent $function]
+}
+
+Classy::Builder method saveoption {w file parent function code} {
+	set def "\n$parent addoption [list $function] [list [list [$w.name get] [$w.class get] [$w.default get]]] \{\n$code\n\}"
+	uplevel #0 $def
+	$object infile set $file $function $def
+	$w.edit textchanged 0
+	$w configure -title "$parent option $function"
 }
 
 Classy::Builder method rename {args} {

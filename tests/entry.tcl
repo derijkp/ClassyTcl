@@ -106,11 +106,40 @@ test Classy::Entry {textvariable set before} {
 	.try get
 } {t}
 
+test Classy::Entry {combo} {
+	classyclean
+	set ::try t
+	Classy::Entry .try -textvariable try -combo 10
+	pack .try
+	.try set test
+	.try set test2
+	.try.defaults invoke
+	.try.defaults.combo.list get 0
+} {test2}
+
+test Classy::Entry {combo with command} {
+	classyclean
+	proc t object {return [list $object try it now]}
+	set ::try t
+	Classy::Entry .try -textvariable try -combo t
+	pack .try
+	.try.defaults invoke
+	.try.defaults.combo.list get 0
+} {.try}
+
 test Classy::FileEntry {create and configure} {
 	classyclean
 	Classy::FileEntry .try
 	pack .try
 	.try configure -label test
+	.try cget -label
+} {test}
+
+test Classy::FileEntry {with combo} {
+	classyclean
+	Classy::FileEntry .try
+	pack .try
+	.try configure -label test -combo 10
 	.try cget -label
 } {test}
 

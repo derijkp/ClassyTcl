@@ -23,12 +23,30 @@
 #	NumEntry specific methods
 #}
 
+#option add *Classy::NumEntry.highlightThickness 0 widgetDefault
+#option add *Classy::NumEntry*Frame.highlightThickness 0 widgetDefault
+#option add *Classy::NumEntry*Frame.borderWidth 0 widgetDefault
+#option add *Classy::NumEntry.entry.relief sunken widgetDefault
+#option add *Classy::NumEntry.label.anchor w widgetDefault
+#option add *Classy::NumEntry.entry.width 5 widgetDefault
 option add *Classy::NumEntry.highlightThickness 0 widgetDefault
 option add *Classy::NumEntry*Frame.highlightThickness 0 widgetDefault
 option add *Classy::NumEntry*Frame.borderWidth 0 widgetDefault
-option add *Classy::NumEntry.entry.relief sunken widgetDefault
 option add *Classy::NumEntry.label.anchor w widgetDefault
+option add *Classy::NumEntry.label.highlightThickness 0 widgetDefault
+option add *Classy::NumEntry.label.borderWidth 0 widgetDefault
+option add *Classy::NumEntry.frame.entry.highlightThickness 0 widgetDefault
+option add *Classy::NumEntry.frame.entry.borderWidth 1 widgetDefault
+option add *Classy::NumEntry.frame.entry.relief sunken widgetDefault
 option add *Classy::NumEntry.entry.width 5 widgetDefault
+option add *Classy::NumEntry.entry.relief flat widgetDefault
+option add *Classy::NumEntry.entry.borderWidth 0 widgetDefault
+option add *Classy::NumEntry.entry.highlightThickness 1 widgetDefault
+option add *Classy::NumEntry.defaults.combo.borderWidth 1 widgetDefault
+option add *Classy::NumEntry.defaults.combo.relief raised widgetDefault
+option add *Classy::NumEntry.defaults.combo.list.relief sunken widgetDefault
+option add *Classy::NumEntry.defaults.combo.list.borderWidth 1 widgetDefault
+
 
 # ------------------------------------------------------------------
 #  Creation
@@ -88,10 +106,28 @@ Classy::NumEntry addoption -constraint {constraint Constraint all} {}
 
 #doc {NumEntry options -state} option {-state state State} descr {
 #}
-Classy::NumEntry addoption -state {state State {}} {
-	$object.entry configure -state $value
-	$object.controls.incr configure -state $value
-	$object.controls.decr configure -state $value
+Classy::Entry addoption -state {state State normal} {
+	private $object options
+	if ![inlist {normal disabled combo} $value] {
+		return -code error "bad state value \"$value\": must be normal, disabled or combo"
+	}
+	switch $value {
+		combo {
+			if [string_equal $options(-combo) ""] {
+				return -code error "state \"combo\" not allowed on entry without combo"
+			}
+			$object.entry configure -state disabled
+			$object.controls.incr configure -state disabled
+			$object.controls.decr configure -state disabled
+			catch {$object.defaults configure -state normal}
+		}
+		default {
+			$object.entry configure -state $value
+			$object.controls.incr configure -state $value
+			$object.controls.decr configure -state $value
+			catch {$object.defaults configure -state $value}
+		}
+	}
 }
 
 # ------------------------------------------------------------------

@@ -25,7 +25,8 @@
 
 Widget subclass Classy::Browser
 
-bind Classy::Browser <Configure> {%W redraw}
+bind Classy::Browser <Configure> {[Classy::mainw %W] redraw}
+
 Classy::Browser method init {args} {
 	# REM Create object
 	# -----------------

@@ -46,50 +46,50 @@
 #-------------------------------------------------------------------------
 
 bind Classy::Text <<Empty>> {
-	catch {%W delete 1.0 end}
+	catch {[Classy::mainw %W] delete 1.0 end}
 }
 bind Classy::Text <<Drop>> {
-	catch {%W textinsert [Classy::DragDrop get]}
+	catch {[Classy::mainw %W] textinsert [Classy::DragDrop get]}
 }
 bind Classy::Text <<Drag-Motion>> {
-	%W position [%W index @%x,%y]
+	[Classy::mainw %W] position [[Classy::mainw %W] index @%x,%y]
 }
 
 bind Classy::Text <<Action>> {
-	%W position [%W index @%x,%y]
+	[Classy::mainw %W] position [[Classy::mainw %W] index @%x,%y]
 }
 bind Classy::Text <<Action-Motion>> {
 	set tkPriv(x) %x
 	set tkPriv(y) %y
-	Classy::Text_SelectTo %W %x %y
+	Classy::Text_SelectTo [Classy::mainw %W] %x %y
 }
 bind Classy::Text <<MSelectWord>> {
 	set tkPriv(selectMode) word
-	Classy::Text_SelectTo %W %x %y
-	catch {%W mark set insert sel.first}
+	Classy::Text_SelectTo [Classy::mainw %W] %x %y
+	catch {[Classy::mainw %W] mark set insert sel.first}
 }
 bind Classy::Text <<MSelectLine>> {
 	set tkPriv(selectMode) line
-	Classy::Text_SelectTo %W %x %y
-	catch {%W mark set insert sel.first}
+	Classy::Text_SelectTo [Classy::mainw %W] %x %y
+	catch {[Classy::mainw %W] mark set insert sel.first}
 }
 bind Classy::Text <<MExtend>> {
-	Classy::Text_ResetAnchor %W @%x,%y
+	Classy::Text_ResetAnchor [Classy::mainw %W] @%x,%y
 	set tkPriv(selectMode) char
-	Classy::Text_SelectTo %W %x %y
+	Classy::Text_SelectTo [Classy::mainw %W] %x %y
 }
 bind Classy::Text <<MExtendWord>>	{
 	set tkPriv(selectMode) word
-	Classy::Text_SelectTo %W %x %y
+	Classy::Text_SelectTo [Classy::mainw %W] %x %y
 }
 bind Classy::Text <<MExtendLine>>	{
 	set tkPriv(selectMode) line
-	Classy::Text_SelectTo %W %x %y
+	Classy::Text_SelectTo [Classy::mainw %W] %x %y
 }
 bind Classy::Text <<Action-Leave>> {
 	set tkPriv(x) %x
 	set tkPriv(y) %y
-	Classy::Text_AutoScan %W
+	Classy::Text_AutoScan [Classy::mainw %W]
 }
 bind Classy::Text <<Action-Enter>> {
 	tkCancelRepeat
@@ -98,105 +98,105 @@ bind Classy::Text <<Action-ButtonRelease>> {
 	tkCancelRepeat
 }
 bind Classy::Text <<Control-Action>> {
-	%W mark set insert @%x,%y
+	[Classy::mainw %W] mark set insert @%x,%y
 }
 bind Classy::Text <<MXPaste>> {
-	catch {%W textinsert [selection get -displayof %W]}
+	catch {[Classy::mainw %W] textinsert [selection get -displayof [Classy::mainw %W]]}
 }
 bind Classy::Text <<Left>> {
-	%W move left
+	[Classy::mainw %W] move left
 }
 bind Classy::Text <<Right>> {
-	%W move right
+	[Classy::mainw %W] move right
 }
 bind Classy::Text <<Up>> {
-	%W move up
+	[Classy::mainw %W] move up
 }
 bind Classy::Text <<Down>> {
-	%W move down
+	[Classy::mainw %W] move down
 }
 bind Classy::Text <<SelectLeft>> {
-	%W select left
+	[Classy::mainw %W] select left
 }
 bind Classy::Text <<SelectRight>> {
-	%W select right
+	[Classy::mainw %W] select right
 }
 bind Classy::Text <<SelectUp>> {
-	%W select up
+	[Classy::mainw %W] select up
 }
 bind Classy::Text <<SelectDown>> {
-	%W select down
+	[Classy::mainw %W] select down
 }
 bind Classy::Text <<WordLeft>> {
-	%W move wordstart
+	[Classy::mainw %W] move wordstart
 }
 bind Classy::Text <<WordRight>> {
-	%W move wordend
+	[Classy::mainw %W] move wordend
 }
 bind Classy::Text <<SelectWordLeft>> {
-	%W select wordstart
+	[Classy::mainw %W] select wordstart
 }
 bind Classy::Text <<SelectWordRight>> {
-	%W select wordend
+	[Classy::mainw %W] select wordend
 }
 bind Classy::Text <<ParaUp>> {
-	%W move uppara
+	[Classy::mainw %W] move uppara
 }
 bind Classy::Text <<ParaDown>> {
-	%W move downpara
+	[Classy::mainw %W] move downpara
 }
 bind Classy::Text <<SelectParaUp>> {
-	%W select uppara
+	[Classy::mainw %W] select uppara
 }
 bind Classy::Text <<SelectParaDown>> {
-	%W select downpara
+	[Classy::mainw %W] select downpara
 }
 bind Classy::Text <<PageUp>> {
-	%W move pageup
+	[Classy::mainw %W] move pageup
 }
 bind Classy::Text <<SelectPageUp>> {
-	%W select pageup
+	[Classy::mainw %W] select pageup
 }
 bind Classy::Text <<ScrolPageUp>> {
-	%W xview scroll -1 page
+	[Classy::mainw %W] xview scroll -1 page
 }
 bind Classy::Text <<PageDown>> {
-	%W move pagedown
+	[Classy::mainw %W] move pagedown
 }
 bind Classy::Text <<SelectPageDown>> {
-	%W select pagedown
+	[Classy::mainw %W] select pagedown
 }
 bind Classy::Text <<ScrollPageDown>> {
-	%W xview scroll 1 page
+	[Classy::mainw %W] xview scroll 1 page
 }
 
 bind Classy::Text <<Home>> {
-	%W move linestart
+	[Classy::mainw %W] move linestart
 }
 bind Classy::Text <<SelectHome>> {
-	%W select linestart
+	[Classy::mainw %W] select linestart
 }
 bind Classy::Text <<End>> {
-	%W move lineend
+	[Classy::mainw %W] move lineend
 }
 bind Classy::Text <<SelectEnd>> {
-	%W select lineend
+	[Classy::mainw %W] select lineend
 }
 bind Classy::Text <<Top>> {
-	%W move textstart
+	[Classy::mainw %W] move textstart
 }
 bind Classy::Text <<SelectTop>> {
-	%W select textstart
+	[Classy::mainw %W] select textstart
 }
 bind Classy::Text <<Bottom>> {
-	%W move textend
+	[Classy::mainw %W] move textend
 }
 bind Classy::Text <<SelectBottom>> {
-	%W select textend
+	[Classy::mainw %W] select textend
 }
 
 bind Classy::Text <Tab> {
-	%W textinsert \t
+	[Classy::mainw %W] textinsert \t
 	break
 }
 bind Classy::Text <Shift-Tab> {
@@ -204,64 +204,64 @@ bind Classy::Text <Shift-Tab> {
 	# have to actually do anything.
 }
 bind Classy::Text <<SpecialFocusNext>> {
-	focus [tk_focusNext %W]
+	focus [tk_focusNext [Classy::mainw %W]]
 }
 bind Classy::Text <<SpecialFocusPrev>> {
-	focus [tk_focusPrev %W]
+	focus [tk_focusPrev [Classy::mainw %W]]
 }
 bind Classy::Text <Control-i> {
-	%W textinsert \t
+	[Classy::mainw %W] textinsert \t
 }
 bind Classy::Text <<Return>> {
-	%W textinsert \n
+	[Classy::mainw %W] textinsert \n
 }
 bind Classy::Text <<Delete>> {
-	%W textdelete
+	[Classy::mainw %W] textdelete
 }
 bind Classy::Text <<BackSpace>> {
-	%W backspace
+	[Classy::mainw %W] backspace
 }
 
 bind Classy::Text <<StartSelect>> {
-	%W select start
+	[Classy::mainw %W] select start
 }
 bind Classy::Text <Select> {
-	%W select start
+	[Classy::mainw %W] select start
 }
 bind Classy::Text <<EndSelect>> {
-	%W select end
+	[Classy::mainw %W] select end
 }
 bind Classy::Text <<SelectAll>> {
-	%W select all
+	[Classy::mainw %W] select all
 }
 bind Classy::Text <<SelectNone>> {
-	%W select none
+	[Classy::mainw %W] select none
 }
 bind Classy::Text <Insert> {
-	catch {%W textinsert [selection get -displayof %W]}
+	catch {[Classy::mainw %W] textinsert [selection get -displayof [Classy::mainw %W]]}
 }
 bind Classy::Text <KeyPress> {
 	if {"%A"!="{}"} {
-		%W textinsert %A
+		[Classy::mainw %W] textinsert %A
 	}
 }
 
 # The new bindings
 
 bind Classy::Text <<Copy>> {
-	%W copy			
+	[Classy::mainw %W] copy			
 }												  
 bind Classy::Text <<Cut>> {
-	%W cut
+	[Classy::mainw %W] cut
 }
 bind Classy::Text <<Paste>> {
-	%W paste
+	[Classy::mainw %W] paste
 }
 bind Classy::Text <<Undo>> {
-	%W undo
+	[Classy::mainw %W] undo
 }
 bind Classy::Text <<Redo>> {
-	%W redo
+	[Classy::mainw %W] redo
 }
 
 # Ignore all Alt, Meta, and Control keypresses unless explicitly bound.

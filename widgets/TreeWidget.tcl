@@ -28,9 +28,9 @@
 
 Widget subclass Classy::TreeWidget
 
-bind Classy::TreeWidget <Configure> {%W redraw}
-bind Classy::TreeWidget <<Action>> {%W _action %x %y}
-bind Classy::TreeWidget <<MExecute>> {%W _execute %x %y}
+bind Classy::TreeWidget <Configure> {[Classy::mainw %W] redraw}
+bind Classy::TreeWidget <<Action>> {[Classy::mainw %W] _action %x %y}
+bind Classy::TreeWidget <<MExecute>> {[Classy::mainw %W] _execute %x %y}
 
 Classy::TreeWidget method init {args} {
 	# REM Create object

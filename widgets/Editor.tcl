@@ -652,9 +652,10 @@ Classy::Editor method indent {number} {
 	}
 }
 
-proc Classy::trace {var command} {
-	list_shift command
-	if {[info level] == 1} {
+proc Classy::Editor_trace {object var command} {
+	set w [list_shift command]
+	set level [info level]
+	if {$level == 2} {
 		if {[lsearch {trace index} [lindex $command 0]] == -1} {
 			lappend $var "\$object $command"
 		}
@@ -680,7 +681,7 @@ Classy::Editor method macro {} {
 		$record configure -text "Recording ..." -state disabled
 		$stop configure -state normal
 		focus $object
-		$object trace [list Classy::trace [privatevar $object macro]]
+		$object trace [list Classy::Editor_trace $object [privatevar $object macro]]
 	}]
 	$stop configure -command [varsubst {stop record object} {
 		$record configure -text "Record" -state normal

@@ -18,11 +18,11 @@
 #	ListBox specific methods
 #}
 
-bind Classy::ListBox <Configure> {Classy::todo %W redraw}
-bind Classy::ListBox <Visibility> {Classy::todo %W redraw}
-bind Classy::ListBox <<MExecute>> {%W command}
-bind Classy::ListBox <<Invoke>> {%W command}
-bind Classy::ListBox <<Action>> {%W activate @%x,%y}
+bind Classy::ListBox <Configure> {Classy::todo [Classy::mainw %W] redraw}
+bind Classy::ListBox <Visibility> {Classy::todo [Classy::mainw %W] redraw}
+bind Classy::ListBox <<MExecute>> {[Classy::mainw %W] command}
+bind Classy::ListBox <<Invoke>> {[Classy::mainw %W] command}
+bind Classy::ListBox <<Action>> {[Classy::mainw %W] activate @%x,%y}
 
 # ------------------------------------------------------------------
 #  Widget creation
