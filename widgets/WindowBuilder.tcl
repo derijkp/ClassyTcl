@@ -145,6 +145,7 @@ Classy::WindowBuilder method destroy {} {
 # ------------------------------------------------------------------
 Classy::WindowBuilder method select {w} {
 	private $object current prev data
+	if {"$w" == ""} return
 	if [info exists data(redir,$w)] {set w $data(redir,$w)}
 	set window $data(base)
 	switch -glob -- $w {
@@ -492,57 +493,6 @@ Classy::WindowBuilder method close {} {
 	return 0
 }
 
-#Classy::WindowBuilder method new {type function file} {
-#	global auto_index
-#	if [file isdir $file] {return -code error "please select a file instead of a directory"}
-#	set f [open $file a]
-#	switch $type {
-#		dialog {
-#			puts $f "\nproc $function args \{# ClassyTcl generated Dialog"
-#			puts $f "\tif \[regexp \{^\\.\} \$args] \{"
-#			puts $f "\t\tset window \[lshift args\]"
-#			puts $f "\t\} else \{"
-#			puts $f "\t\tset window .$function"
-#			puts $f "\t\}"
-#			puts $f "\tClassy::parseopt \$args opt {}"
-#			puts $f "\t# Create windows"
-#			puts $f "\tClassy::Dialog \$window \\"
-#			puts $f "\t\t-destroycommand \[list destroy \$window\]"
-#			puts $f "\t# End windows"
-#			puts $f "\}"
-#		}
-#		toplevel {
-#			puts $f "\nproc $function args \{# ClassyTcl generated Toplevel"
-#			puts $f "\tif \[regexp \{^\\.\} \$args] \{"
-#			puts $f "\t\tset window \[lshift args\]"
-#			puts $f "\t\} else \{"
-#			puts $f "\t\tset window .$function"
-#			puts $f "\t\}"
-#			puts $f "\tClassy::parseopt \$args opt {}"
-#			puts $f "\t# Create windows"
-#			puts $f "\tClassy::Toplevel \$window \\"
-#			puts $f "\t\t-destroycommand \[list destroy \$window\]"
-#			puts $f "\t# End windows"
-#			puts $f "\}"
-#		}
-#		frame {
-#			puts $f "\nproc $function args \{# ClassyTcl generated Frame"
-#			puts $f "\tif \[regexp \{^\\.\} \$args] \{"
-#			puts $f "\t\tset window \[lshift args\]"
-#			puts $f "\t\} else \{"
-#			puts $f "\t\tset window .$function"
-#			puts $f "\t\}"
-#			puts $f "\tClassy::parseopt \$args opt {}"
-#			puts $f "\t# Create windows"
-#			puts $f "\tframe \$window \\"
-#			puts $f "\t\t-class Classy::Topframe"
-#			puts $f "\t# End windows"
-#			puts $f "\}"
-#		}
-#	}
-#	close $f
-#}
-
 Classy::WindowBuilder method code {{function {}}} {
 	private $object current data
 	catch {set keep $current(w)}
@@ -597,6 +547,11 @@ Classy::WindowBuilder method code {{function {}}} {
 Classy::WindowBuilder method open {file function} {
 	global auto_index
 	private $object data current border
+	if [info exists data(base)] {
+		if ![Classy::yorn "Are you sure you want to abort the current editing session"] {
+			return 1
+		}
+	}
 	wm title $object $function
 	catch {destroy $object.work}
 	catch {unset current}
@@ -609,37 +564,7 @@ Classy::WindowBuilder method open {file function} {
 	set data(function) $function
 	set data(file) $file
 	set data(code) $code
-	set start [string first "# Create windows" $code]
-	set end [string first "# End windows" $code]
-	incr end -1
-	set wincode [string range $code $start $end]
-	switch -regexp -- $code {
-		{# ClassyTcl generated Dialog}  {
-			set data(type) dialog
-			set window $object.work
-			eval $wincode
-			set data(base) $object.work
-		}
-		{# ClassyTcl generated Toplevel}  {
-			set data(type) toplevel
-			set window $object.work
-			eval $wincode
-			set data(base) $object.work
-		}
-		{# ClassyTcl generated Frame}  {
-			set data(type) frame
-			Classy::Toplevel $object.work -resize {2 2}
-			set window $object.work.frame
-			eval $wincode
-			grid $object.work.frame -row 0 -column 0 -sticky nsew
-			grid columnconfigure $object.work 0 -weight 1
-			grid rowconfigure $object.work 0 -weight 1
-			set data(base) $object.work.frame
-		}
-		default {
-			error "unknown type"
-		}
-	}
+	$object create $code
 	update idletasks
 	set geom [Classy::Default get geometry $object.work.keep]
 	if {"$geom" != ""} {
@@ -657,6 +582,65 @@ Classy::WindowBuilder method open {file function} {
 	$object parsecode $data(code)
 	$object startedit $data(base)
 	Classy::todo select $data(base)
+}
+
+Classy::WindowBuilder method create {code} {
+	private $object data
+	set wincode [lindex $code 3]
+	set start [string first "# Create windows" $code]
+	set wincode [string range $wincode $start end]
+	set exec 1
+	switch -regexp -- $code {
+		{# ClassyTcl generated Dialog}  {
+			set data(type) dialog
+			set window $object.work
+			foreach line [Extral::splitesccomplete $wincode] {
+				if [string match {# ClassyTcl*} $line] {
+					set exec 0
+				} elseif [string match "\t# Parse*" $line] {
+					set exec 1
+				} else {
+					if $exec {catch {eval $line}}
+				}
+			}
+			set data(base) $object.work
+		}
+		{# ClassyTcl generated Toplevel}  {
+			set data(type) toplevel
+			set window $object.work
+			foreach line [Extral::splitesccomplete $wincode] {
+				if [string match {# ClassyTcl*} $line] {
+					set exec 0
+				} elseif [string match "\t# Parse*" $line] {
+					set exec 1
+				} else {
+					if $exec {catch {eval $line}}
+				}
+			}
+			set data(base) $object.work
+		}
+		{# ClassyTcl generated Frame}  {
+			set data(type) frame
+			Classy::Toplevel $object.work -resize {2 2}
+			set window $object.work.frame
+			foreach line [Extral::splitesccomplete $wincode] {
+				if [string match {# ClassyTcl*} $line] {
+					set exec 0
+				} elseif [string match "\t# Parse*" $line] {
+					set exec 1
+				} else {
+					if $exec {catch {eval $line}}
+				}
+			}
+			grid $object.work.frame -row 0 -column 0 -sticky nsew
+			grid columnconfigure $object.work 0 -weight 1
+			grid rowconfigure $object.work 0 -weight 1
+			set data(base) $object.work.frame
+		}
+		default {
+			error "unknown type"
+		}
+	}
 }
 
 Classy::WindowBuilder method parsecode {code {window {}}} {
@@ -903,12 +887,11 @@ Classy::WindowBuilder method current {args} {
 
 Classy::WindowBuilder method drawedit {} {
 	private $object current
-update idletasks
+#update idletasks
 	eval destroy [winfo children $object.edit]
 	Classy::cleargrid $object.edit
 	if ![info exists current(w)] return
 	if {"$current(w)" == ""} return
-puts $current(w)
 	set type [$object itemclass $current(w)]
 	if {"[info commands ::Classy::WindowBuilder::edit_$type]" == ""} {
 		auto_load ::Classy::WindowBuilder::edit_$type
@@ -1447,8 +1430,8 @@ Classy::WindowBuilder method _sticky {action w x y} {
 	} elseif {"$action" == "action"} {
 		if !$current(done) {
 			if {([expr {abs($current(x)-$x)}]>2)||([expr {abs($current(y)-$y)}]>2)} return
-			regexp {n$|s$|e$|w$} $w side
-			if {"$side" != ""} {
+			regexp {([a-z]+)$} $w side
+			foreach side [split $side ""] {
 				if ![info exists current(sticky$side)] return
 				if $current(sticky$side) {
 					set current(sticky$side) 0
@@ -1463,7 +1446,7 @@ Classy::WindowBuilder method _sticky {action w x y} {
 
 Classy::WindowBuilder method geometryset {type {value {}} {pos {}}} {
 	private $object current
-	if {"$type" != "rebuild"} {
+	if ![inlist {rebuild rowweight columnweight} $type] {
 		if ![info exists current(-in)] {
 			return -code error "Not managed by grid"
 		}

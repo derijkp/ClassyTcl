@@ -43,7 +43,7 @@ option add *Classy::Entry.label.anchor w widgetDefault
 option add *Classy::Entry.entry.width 5 widgetDefault
 
 bind Classy::Entry <Key-Return> {
-	%W constrain warn
+	%W constrain
 	if [%W command] break
 }
 
@@ -59,7 +59,7 @@ bind Classy::Entry <<Drop>> {
 bind Classy::Entry <<Drag-Motion>> {
 	tkEntryButton1 %W %x
 }
-bind Classy::Entry <Any-KeyRelease> {%W constrain warn}
+bind Classy::Entry <Any-KeyRelease> {%W constrain}
 
 # ------------------------------------------------------------------
 #  Widget creation
@@ -174,6 +174,15 @@ Classy::Entry addoption -labelwidth {labelWidth LabelWidth {}} {
 	Classy::todo $object _redrawentry
 }
 
+#doc {Entry options -warn} option {-warn warn Warn} descr {
+# The option -warn can be true or false. If it is false (or 0), the entry will
+# never contain a value not matching the constraint. It warn is true, it is possible
+# to enter a value not matching the constraint, but there will be visual warning.
+#}
+Classy::Entry addoption -warn {warn warn 1} {
+	set value [true $value]
+}
+
 # ------------------------------------------------------------------
 #  Methods
 # ------------------------------------------------------------------
@@ -231,16 +240,14 @@ Classy::Entry method command {} {
 #pathname constrain ?warn?
 #} descr {
 # check whether the value matches the regular expression given by the -constraint option
-# The optional parameter warn can be either 1 or 0. If it is 0, the entry will
-# never contain a value not matching the constraint. It warn is 1, it is possible
-# to enter a value not matching the constraint, but there will be visual warning.
 #}
-Classy::Entry method constrain {{warn 0}} {
-	set constraint [getprivate $object options(-constraint)]
+Classy::Entry method constrain {} {
+	private $object options previous previouscol
+	set warn $options(-warn)
+	set constraint $options(-constraint)
 	if {"$constraint" == ""} {
 		return
 	}
-	private $object previous previouscol
 	if [regexp $constraint [$object get]] {
 		set previous [$object get]
 		if [info exists previouscol] {

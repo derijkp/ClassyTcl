@@ -17,7 +17,7 @@ proc savestate {} {
 	Classy::Default save app
 }
 
-proc edit {args} {
+proc edit args {
 	if {"$args"==""} {set args "Newfile"}
 	set w .classy__edit
 	set num 1
@@ -25,17 +25,24 @@ proc edit {args} {
 	set w $w$num
 	catch {destroy $w}
 	toplevel $w -bd 0 -highlightthickness 0
-	wm protocol $w WM_DELETE_WINDOW "destroy $w"
+	wm protocol $w WM_DELETE_WINDOW "end $w"
 	Classy::Editor $w.editor -loadcommand "Classy::title $w" -closecommand "after idle \{end $w\}"
 	pack $w.editor -fill both -expand yes
 	eval $w.editor load $args
 	return $w
 }
 
-proc main {args} {
+proc main args {
 	set state [Classy::Default get app state_$::pwd]
 	if {("$state" == "")||("$args" != "")} {
-		eval edit $args
+		set num 1
+		set w .classy__edit$num
+		catch {destroy $w}
+		toplevel $w -bd 0 -highlightthickness 0
+		wm protocol $w WM_DELETE_WINDOW "end $w"
+		Classy::Editor $w.editor -loadcommand "Classy::title $w" -closecommand "after idle \{end $w\}"
+		pack $w.editor -fill both -expand yes
+		eval $w.editor load $args
 	} else {
 		set num 1
 		foreach {geom files curfile} $state {
@@ -52,3 +59,6 @@ proc main {args} {
 		}
 	}	
 }
+
+
+

@@ -59,4 +59,10 @@ menu tools "Tools" {
 }
 activemenu macros "Macros" {%W getmacromenu}
 activemenu pattern "Pattern" {%W getpatternmenu}
+menu help "Help" {
+	action Help "Editor" {Classy::help classy_editor}
+	separator
+	action HelpClassyTcl "ClassyTcl" {Classy::help ClassyTcl}
+	action HelpHelp "Help" {Classy::help help}
+}
 }

@@ -3,11 +3,11 @@
 Classy::configmenu Classy::Editor {menu used in the ClassyTcl Editor} {
 menu file "File" {
 	action Load "Open file" {eval %W load [Classy::selectfile -title Open -selectmode persistent]}
-	action LoadNext "Open next" "%W loadnext"
-	action Save "Save" "%W save"
-	action SaveAs "Save as" "%W savedialog"
-	action Reopen "Reopen" "%W reopenlist"
-	action Editor "New editor" "edit newfile"
+	action LoadNext "Open next" {%W loadnext}
+	action Save "Save" {%W save}
+	action SaveAs "Save as" {%W savedialog}
+	action Reopen "Reopen" {%W reopenlist}
+	action Editor "New editor" {edit newfile}
 	action Cmd "Command window" {Classy::cmd}
 	separator
 	action Configure "Customise application" {Classy::Config dialog}
@@ -57,6 +57,12 @@ menu tools "Tools" {
 }
 activemenu macros "Macros" {%W getmacromenu}
 activemenu pattern "Pattern" {%W getpatternmenu}
+menu help "Help" {
+	action Help "Editor" {Classy::help classy_editor}
+	separator
+	action HelpClassyTcl "ClassyTcl" {Classy::help ClassyTcl}
+	action HelpHelp "Help" {Classy::help help}
+}
 }
 
 Classy::configmenu Classy::Help {menu used in the ClassyTcl help system} {
@@ -108,6 +114,8 @@ menu sel "File" {
 	action DefaultDir "Application dir" {%W configure -dir {}}
 	action Dir "Select dir" {%W configure -dir [Classy::selectfile -default Classy::Builder]}
 	action Save "Save" {%W save}
+	action Editor "Editor" "edit newfile"
+	action Cmd "Command window" {Classy::cmd}
 	separator
 	action Close "Close" {destroy %W}
 	action Exit "Exit" {exit}
@@ -139,10 +147,12 @@ menu help "Help" {
 
 Classy::configmenu Classy::WindowBuilder {menu used in the ClassyTcl WindowBuilder} {
 menu sel "File" {
-	action New "New" {[Classy::WindowBuilder_win %W] new}
 	action Save "Save" {[Classy::WindowBuilder_win %W] save}
-	action Delete "Delete" {[Classy::WindowBuilder_win %W] delete}
-	action Editor "New editor" "edit newfile"
+	action Test "Test" {[Classy::WindowBuilder_win %W] test}
+	action FastTest "Fast test" {[Classy::WindowBuilder_win %W] ftest}
+	action Recreate "Recreate" {[Classy::WindowBuilder_win %W] recreate}
+	separator
+	action Editor "Editor" "edit newfile"
 	action Cmd "Command window" {Classy::cmd}
 	separator
 	action Close "Close" {[Classy::WindowBuilder_win %W] close}

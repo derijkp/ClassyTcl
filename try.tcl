@@ -1,10 +1,20 @@
-source testapp
-set object .try
+source ccalc
+set object .classy__.builder
 Classy::Builder .try
-set object .try.dedit
-set window .try.dedit.work
+set object .classy__.builder
+set window .classy__.builder.work
 
-.try configure -dir /home/peter/dev/ClassyTcl/widgets/
+proc t {} {
+	global data
+	set level 0
+	while 1 {
+		if ![info exists data(v,$level)] break
+		puts "$level: $data(v,$level) $data(a,$level)"
+		incr level
+	}
+}
+
+#.try configure -dir /home/peter/dev/ClassyTcl/widgets/
 
 #caused segfault
 source tools.tcl

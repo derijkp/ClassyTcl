@@ -93,13 +93,13 @@ Classy::NumEntry addoption -max {max Max {}}
 
 #doc {NumEntry options -constraint} option {-constraint constraint Constraint} descr {
 #}
-Classy::NumEntry addoption -constraint {constraint Constraint ^(-?)[0-9]*(\.?)[0-9]*$} {
+Classy::NumEntry addoption -constraint {constraint Constraint {^(-?)[0-9]*(\.?)[0-9]([Ee][-+])?[0-9]*(\.?)[0-9]*$}} {
 	if [string match $value int] {
 		set value {^(-?)[0-9]*$}
 	} elseif [string match $value float] {
 		set value {^(-?)[0-9]*(\.?)[0-9]*$}
 	} else {
-		set value {^(-?)[0-9]*(\.?)[0-9]*$}
+		set value {^(-?)[0-9]*(\.?)[0-9]([Ee][-+][0-9]*(\.?)[0-9]*)?$}
 	}
 	return $value
 }
@@ -124,15 +124,13 @@ Classy::NumEntry method incr {number} {
 #pathname constrain ?warn?
 #} descr {
 # check whether the value matches the regular expression given by the -constraint option
-# The optional parameter warn can be either 1 or 0. If it is 0, the entry will
-# never contain a value not matching the constraint. It warn is 1, it is possible
-# to enter a value not matching the constraint, but there will be visual warning.
 #}
-Classy::NumEntry method constrain {{warn 0}} {
-	set constraint [getprivate $object options(-constraint)]
+Classy::NumEntry method constrain {} {
+	private $object options previous previouscol
+	set warn $options(-warn)
+	set constraint $options(-constraint)
 	set min [getprivate $object options(-min)]
 	set max [getprivate $object options(-max)]
-	private $object previous previouscol
 	set value [$object get]
 	set error 0
 	if {"$constraint" != ""} {

@@ -2,9 +2,6 @@
 # the next line restarts using wish \
 exec wish8.0 "$0" "$@"
 #
-# ClassyTcl
-# --------- Peter De Rijk
-#
 
 wm withdraw .
 if {"[lindex $argv 0]" == "-builder"} {
@@ -33,8 +30,18 @@ package require ClassyTcl
 set pwd [pwd]
 lappend Classy::help_path [file join $Classy::appdir help]
 lappend auto_path [file join $Classy::appdir lib]
-eval main $argv
+set Classy::starterror [catch {eval main $argv} Classy::result]
+set Classy::starterrorinfo $errorInfo
+if $Classy::starterror {
+	puts $Classy::result
+}
 if [info exists builder] {
 	Classy::Builder .classy__.builder
 	raise .classy__.builder
+	if $Classy::starterror {
+		set errorInfo $Classy::starterrorinfo
+		bgerror $Classy::result
+	}
+} elseif $Classy::starterror {
+	error $Classy::result $Classy::starterrorinfo
 }

@@ -108,36 +108,6 @@ Classy::Builder method destroy {} {
 #  Methods
 # ------------------------------------------------------------------
 
-Classy::Builder method closeedit {} {
-	private $object open
-	if ![info exists open(type)] {return 0}
-	switch $open(type) {
-		dialog - frame - toplevel {
-			if ![winfo exists $object.dedit] {return 0}
-			set code [catch {$object.dedit close} result]
-			return $result
-		}
-		file {}
-		function {
-			catch {
-				if [$object.fedit.edit textchanged] {
-					if ![Classy::yorn "Are you sure you want to abort the current editing session"] {
-						return 1
-					}
-					$object.fedit.edit textchanged 0
-				}
-				$object.fedit hide
-			}
-		}
-		default {
-			if ![winfo exists $object.confedit] {return 0}
-			set code [catch {$object.confedit close} result]
-			return $result
-		}
-	}
-	return 0
-}
-
 Classy::Builder method new {type {name {}}} {
 	global auto_index
 	private $object browse options defdir
@@ -268,7 +238,7 @@ Classy::Builder method _creatededit {w} {
 Classy::Builder method open {file function type} {
 	global auto_index
 	private $object browse open
-	if [$object closeedit] return
+#	if [$object closeedit] return
 	set browse(base) [list $file $function $type]
 	set browse(file) $file
 	set browse(name) $function
@@ -558,22 +528,6 @@ Classy::Builder method paste {{file {}}} {
 	}
 }
 
-Classy::Builder method save {} {
-	global auto_index
-	private $object browse
-	set file $browse(file)
-	switch $browse(type) {
-		dialog - frame - toplevel {
-			set result [$object.dedit save]
-		}
-		function {	
-			$object.fedit.edit save
-			set result $file
-		}
-	}
-	return $result
-}
-
 Classy::Builder method openendnode {base} {
 	private $object browse
 	if {"$base" == ""} return
@@ -712,36 +666,28 @@ Classy::Builder method _drawtree {} {
 }
 
 Classy::Builder method fedit {w file function type} {
-	if ![winfo exists $w] {
-		Classy::Toplevel $w -keepgeometry all -resize {2 2}
-		Classy::Editor $w.edit -closecommand "$w hide"
-		pack $w.edit -fill both -expand yes
-	} else {
-		$w place
+	set num 1
+	while 1 {
+		if ![winfo exists $object.fedit$num] break
+		incr num
 	}
-	$w.edit set [$object infile get $file $function]
+	set w $object.fedit$num
+	Classy::Toplevel $w -keepgeometry all -resize {2 2}
+	Classy::Entry $w.args -label "$function arguments"
+	Classy::Editor $w.edit -closecommand [list destroy $w]
+	pack $w.args -side top -fill both
+	pack $w.edit -side top -fill both -expand yes
+	set code [$object infile get $file $function]
+	$w.args set [lindex $code 2]
+	$w.edit set [string trimright [string trimleft [lindex $code 3] "\n"] "\n"]
 	$w configure -title $function
 	$w.edit textchanged 0
 	$w.edit configure -savecommand [list invoke code [varsubst {object file function w} {
-		uplevel #0 $code
-		$object infile set $file $function $code
-#		uplevel #0 source {$file}
-#		catch {auto_mkindex [file dirname $file] *.tcl}
-#		set ::auto_index($function) [list source $file]
+		uplevel #0 "proc $function [list [$w.args get]] \{\n$code\n\}"
+		$object infile set $file $function "proc $function [list [$w.args get]] \{\n$code\n\}"
 		$w.edit textchanged 0
 		$w configure -title $function
 	}]]
-	if {"$function" != ""} {
-		switch $type {
-			function {set pattern "proc $function "}
-			default {set pattern "Classy::config$type [list $function] "}
-		}
-		set line 1
-		set pos [lindex [split [$w.edit.edit search $pattern 1.0] "."] 0]
-		if {"$pos" == ""} {set pos 1}
-		set base [lindex [split [$w.edit index @0,0] "."] 0]
-		$w.edit yview scroll [expr {$pos-$base}] units
-	}
 }
 
 Classy::Builder method confedit {w file function type} {

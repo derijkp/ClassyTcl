@@ -122,9 +122,10 @@ proc ::Classy::WindowBuilder::attredit_text {object v option title {wide 0}} {
 proc ::Classy::WindowBuilder::attredit_color {object v option title {wide 0}} {
 	set var [privatevar $object attredit($v)]
 	set $var [$object attribute get $option]
+	regexp {\[Classy::realcolor (.+)\]} [set $var] t $var
 	Classy::Selector $v -type color -label $title \
 		-command [varsubst {object v option} {
-			$object attribute setf? $option [$v get]
+			$object attribute setf? $option "\[Classy::realcolor [$v get]\]"
 		}] -variable $var
 }
 

@@ -22,13 +22,13 @@ Classy::configtool Classy::Help {Help toolbar} {
 }
 
 Classy::configtool Classy::Builder {toolbar used in the ClassyTcl Builder} {
-	action newfile "New file" {%W new file}
+	action newfunction "New function" {%W new function}
 	action newtoplevel "New Toplevel" {%W new toplevel}
 	action newdialog "New Dialog" {%W new dialog}
 	action newframe "New Frame" {%W new frame}
-	action newfunction "New function" {%W new function}
-	action save "Save" {%W save}
+	action newfile "New file" {%W new file}
 	separator
+	action save "Save" {%W save}
 	action copy "Copy" {%W copy}
 	action cut "Cut" {%W cut}
 	action paste "Paste" {%W paste}
