@@ -112,6 +112,11 @@ Classy::OptionBox addoption -variable {variable Variable {}} {
 	
 }
 
+#doc {OptionBox options -command} option {-command command Command} descr {
+# associate a command with the OptionBox.
+#}
+Classy::OptionBox addoption -command {command Command {}}
+
 # ------------------------------------------------------------------
 #  Methods
 # ------------------------------------------------------------------
@@ -129,7 +134,7 @@ Classy::OptionBox method add {item text args} {
 	}
 	incr num
 	radiobutton $object.box.b$num -relief flat -anchor w\
-		-variable $varname -text $text -value $item
+		-variable $varname -text $text -value $item -command [list $object _command $object.box.b$num]
 	if {"$options(-orient)" == "vertical"} {
 		pack $object.box.b$num -side top -fill x
 	} else {
@@ -192,5 +197,12 @@ Classy::OptionBox method button {item} {
 		if {"[$b cget -value]" == "$item"} {return $b}
 	}
 	return ""
+}
+
+Classy::OptionBox method _command {w} {
+	private $object options
+	if [llength $options(-command)] {
+		uplevel #0 $options(-command) [$w cget -value]
+	}
 }
 

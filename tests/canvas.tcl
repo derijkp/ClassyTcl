@@ -504,6 +504,35 @@ test Classy::Canvas {redo delete with other actions} {
 	.try find withtag t1
 } {}
 
+test Classy::Canvas {double delete} {
+	classyclean
+	Classy::Canvas .try
+	pack .try -fill both -expand yes
+	.try undo check start
+	set id [.try create text 10 10 -text "A" -tags {t1 try}]
+	.try undo check
+	.try delete $id
+	.try undo check
+	.try delete $id
+	.try undo
+	.try delete $id
+	.try undo
+	.try undo
+	.try find withtag t1
+} {}
+
+test Classy::Canvas {double undo check} {
+	classyclean
+	Classy::Canvas .try
+	pack .try -fill both -expand yes
+	.try undo check start
+	set id [.try create text 10 10 -text "A" -tags {t1 try}]
+	.try undo check stop
+	.try undo check start
+	.try undo check stop
+	set [privatevar .try undo(undo)]
+} {{check {{create 5}}}}
+
 test Classy::Canvas {undo addtag} {
 	classyclean
 	Classy::Canvas .try
@@ -782,8 +811,6 @@ test Classy::Canvas {print dialog} {
 	.try itemconfigure $id -text
 	.try print
 	manualtest
-
-Classy::Builder .classy__.builder -dir ~/dev/ClassyTcl/dialogs
 } {}
 
 test Classy::Canvas {float width} {

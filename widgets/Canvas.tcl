@@ -203,23 +203,30 @@ Classy::Canvas method undo {{action {}} args} {
 			$object _undoone [lindex $undo(undo) $undo(pos)]
 		}
 		check {
-			if {"$args" == "stop"} {
+			if ![string length $args] {
+				if [info exists undo(check)] {
+					set list [lrange $undo(undo) $undo(check) end]
+					if {"$list" == ""} return
+					set undo(undo) [lrange $undo(undo) 0 [expr {$undo(check)-1}]]
+					lappend undo(undo) [list check $list]
+					set list [lrange $undo(redo) $undo(check) end]
+					set undo(redo) [lrange $undo(redo) 0 [expr {$undo(check)-1}]]
+					lappend undo(redo) [list check $list]
+					set undo(check) [llength $undo(undo)]
+				}
+			} elseif {"$args" == "start"} {
+				if [info exists undo(check)] {
+					$object undo check
+				}
+				set undo(check) [llength $undo(undo)]
+			} elseif {"$args" == "stop"} {
 				if ![info exists undo(check)] {
 					error "\"$object undo check start\" must be called first"
 				}
-				set list [lrange $undo(undo) $undo(check) end]
-				if {"$list" == ""} return
-				set undo(undo) [lrange $undo(undo) 0 [expr {$undo(check)-1}]]
-				lappend undo(undo) [list check $list]
-				set list [lrange $undo(redo) $undo(check) end]
-				set undo(redo) [lrange $undo(redo) 0 [expr {$undo(check)-1}]]
-				lappend undo(redo) [list check $list]
+				$object undo check
 				unset undo(check)
 			} else {
-				if [info exists undo(check)] {
-					$object undo check stop
-				}
-				set undo(check) [llength $undo(undo)]
+				error "wrong option \"$args\", must be start or stop (or no option)"
 			}
 		}
 		clear {
@@ -241,7 +248,6 @@ Classy::Canvas method undo {{action {}} args} {
 		}
 		0 -
 		off {
-			$object undo clear
 			set data(undo) 0
 		}
 		1 -
@@ -404,7 +410,7 @@ Classy::Canvas method _undoone {current} {
 		}
 		a {
 			set undo(busy) 1
-			uplevel #0 [lindex $current 0]
+			catch {uplevel #0 [lindex $current 0]}
 			unset undo(busy)
 		}
 		selection {
@@ -544,7 +550,7 @@ Classy::Canvas method _redoone {current} {
 		}
 		a {
 			set undo(busy) 1
-			uplevel #0 [lindex $current 1]
+			catch {uplevel #0 [lindex $current 0]}
 			unset undo(busy)
 		}
 		selection {
@@ -601,10 +607,11 @@ Classy::Canvas method noundo {args} {
 }
 
 proc Classy::tag2items {object w tagOrId} {
+	private $object del
 	if [regexp {^[0-9]+$} $tagOrId] {
+		if [info exists del($tagOrId)] {return ""}
 		return $tagOrId
 	} elseif {"$tagOrId" == "all"} {
-		private $object del
 		set result [$w find withtag all]
 		return [list_lremove $result [array names del]]
 	} else {
@@ -776,11 +783,14 @@ Classy::Canvas method delete {args} {
 		set items [list]
 		foreach tagOrId $args {
 			if [isint $tagOrId] {
-				lappend items $tagOrId
+				if ![info exists del($tagOrId)] {
+					lappend items $tagOrId
+				}
 			} else {
 				eval lappend items [Classy::tag2items $object $w $tagOrId]
 			}
 		}
+		if ![llength $items] {return ""}
 		set poss ""
 		foreach item $items {
 			lappend poss [$w find above $item]

@@ -129,6 +129,18 @@ test Classy::OptionBox {basic} {
 	.try get
 } {t2}
 
+test Classy::OptionBox {command} {
+	classyclean
+	set ::try ""
+	Classy::OptionBox .try -label Try -variable try -orient vertical -command {set ::try}
+	pack .try -fill x
+	.try add t1 "T 1"
+	.try add t2 "T 2"
+	.try add t3 "T 3"
+	.try set t2
+	set ::try
+} {t2}
+
 if {"$::tcl_platform(platform)" != "windows"} {
 test Classy::FontSelector {basic} {
 	classyclean

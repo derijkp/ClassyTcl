@@ -36,7 +36,7 @@ option add *Classy::WindowBuilder_tool.resize.background \
 bind Classy::WindowBuilder_select <<Action-ButtonPress>> "\[Classy::WindowBuilder_win %W\] _sticky start %W %X %Y"
 bind Classy::WindowBuilder_select <<Action-Motion>> "\[Classy::WindowBuilder_win %W\] _sticky motion %W %X %Y"
 bind Classy::WindowBuilder_select <<Action-ButtonRelease>> "\[Classy::WindowBuilder_win %W\] _sticky action %W %X %Y"
-bind Classy::WindowBuilder_tool <<Drop>> "\[Classy::WindowBuilder_win %W\] drop %W"
+bind Classy::WindowBuilder_tool <<Drop>> "\[Classy::WindowBuilder_win %W\] drop %W;break"
 
 bind Classy::WindowBuilder <<Adjust>> "\[Classy::WindowBuilder_win %W\] insertname %W"
 bind Classy::WindowBuilder <<Drag>> "\[Classy::WindowBuilder_win %W\] drag %W %X %Y"
@@ -1897,12 +1897,12 @@ Classy::WindowBuilder method rename {args} {
 	set gridinfo [grid info $old]
 	set code [$object copy $old 0]
 	$object paste $new $code 0
-	if {"[winfo parent $old]" == "[winfo parent $new]"} {
-		eval grid $new $gridinfo
-	} else {
-		set p [winfo parent $new]
-		grid $new -row [$object newpos $p 0] -column 0 -sticky nwse
-	}
+#	if {"[winfo parent $old]" == "[winfo parent $new]"} {
+#		eval grid $new $gridinfo
+#	} else {
+#		set p [winfo parent $new]
+#		grid $new -row [$object newpos $p 0] -column 0 -sticky nwse
+#	}
 	destroy $old
 }
 
@@ -2001,7 +2001,6 @@ Classy::WindowBuilder method drag {w x y} {
 
 Classy::WindowBuilder method drop {dst} {
 	private $object data current
-#	set window $data(base)
 	set border ""
 	if [regexp "^$object.work.classy__(c|r)" $dst temp border] {
 		if {"[winfo class $dst]" != "Classy::WindowBuilder_tool"} {
@@ -2044,8 +2043,7 @@ Classy::WindowBuilder method drop {dst} {
 	}
 	set x [expr {[winfo pointerx $newp]-[winfo rootx $newp]-1}]
 	set y [expr {[winfo pointery $newp]-[winfo rooty $newp]-1}]
-	set col [grid location $newp $x $y]
-	set row [list_pop col]
+	foreach {col row} [grid location $newp $x $y] {}
 	if {"$newp" != "$p"} {
 		regexp {\.([^.]*[^.0-9])[0-9]*$} $src temp base 
 		set num 1
@@ -2324,7 +2322,6 @@ Classy::WindowBuilder method _configure {window} {
 	if {"[info commands ::Classy::WindowBuilder::configure_$class]" != ""} {
 		uplevel #0 ::Classy::WindowBuilder::configure_$class $object $window
 	}
-	Classy::todo $object redraw
 }
 
 Classy::WindowBuilder method class2cmd {type} {
