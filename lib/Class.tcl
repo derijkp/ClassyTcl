@@ -98,9 +98,9 @@
 # The methods defined by Class can be invoked from all objects and classes.
 #}
 proc putsvars {args} {
-	uplevel [list foreach var $args {
-		puts "$var:[set $var]"
-	}]
+	foreach var $args {
+		puts [list set $var [uplevel set $var]]
+	}
 	puts ""
 }
 

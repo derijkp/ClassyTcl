@@ -323,7 +323,10 @@ Classy::Configurator method _createconfw {entrytype} {
 			}
 			select {
 				Classy::OptionMenu $w.${level} -list [concat $args {{}}] \
-					-command [list $object _activateconf]
+					-command [varsubst {object level} {
+						setprivate $object data($level) 1
+						$object _activateconf
+					}]
 				grid $w.$level -row [expr $row+1] -column 0 -columnspan 4 -sticky nwse
 			}
 			default {
@@ -353,6 +356,7 @@ Classy::Configurator method _configureitem {descr} {
 	set key $data(descr__$descr)
 	set data(current) $key
 	set entrytype [lindex $data(entry__$key) 0]
+	set data(entrytype) $entrytype
 	set temp [getprivate $object w].conf_$entrytype
 	if {"$temp" != "$confw"} {
 		if ![winfo exists $temp] {
@@ -458,13 +462,13 @@ Classy::Configurator method _getfield {level} {
 
 Classy::Configurator method _activateconfall {} {
 	private $object data
-	set conftype $data(conftype)
+	set entrytype $data(entrytype)
 	foreach section $data(sections) {
 		foreach description $data(section__$section) {
 			set key $data(descr__$description)
-			if {"$conftype" == "key"} {
+			if {"$entrytype" == "key"} {
 				setevent $key {}
-			} elseif {"$conftype" == "mouse"} {
+			} elseif {"$entrytype" == "mouse"} {
 				setevent $key {}
 			} 
 			foreach level {def user appdef appuser} {
@@ -472,10 +476,10 @@ Classy::Configurator method _activateconfall {} {
 					eval $data(${level}__$key)
 				}
 			}
-			if {"$conftype" == "tool"} {
+			if {"$entrytype" == "tool"} {
 				regexp {([^.*]+)(\.|\*)(T|t)oolbar$} $key temp tooltype
 				Classy::DynaTool define $tooltype
-			} elseif {"$conftype" == "menu"} {
+			} elseif {"$entrytype" == "menu"} {
 				regexp {([^.*]+)(\.|\*)(M|m)enu$} $key temp menutype
 				Classy::DynaMenu define $menutype
 			}
@@ -486,20 +490,21 @@ Classy::Configurator method _activateconfall {} {
 Classy::Configurator method _activateconf {} {
 	private $object data notsaved
 	set conftype $data(conftype)
+	set entrytype $data(entrytype)
 	set w [getprivate $object confw]
 	set key $data(current)
 	set current ""
 	foreach level {def user appdef appuser} {
 		set value [$object _getfield $level]
 		if $data($level) {
-			if {("$conftype" == "key")||("$conftype" == "mouse")} {
+			if {("$entrytype" == "key")||("$entrytype" == "mouse")} {
 				if $data(${level}__rem) {
 					set new "#setevent $key $value"
 				} else {
 					set new "setevent $key $value"
 					set current $value
 				}
-			} elseif {"$conftype" == "font"} {
+			} elseif {"$entrytype" == "font"} {
 				if $data(${level}__rem) {
 					set new "#Classy::setfont $key [list $value]"
 				} else {
@@ -532,15 +537,15 @@ Classy::Configurator method _activateconf {} {
 			}
 		}
 	}
-	if {("$conftype" == "key")||("$conftype" == "mouse")} {
+	if {("$entrytype" == "key")||("$entrytype" == "mouse")} {
 		eval setevent $key $current
-	} elseif {"$conftype" == "font"} {
+	} elseif {"$entrytype" == "font"} {
 		Classy::setfont $key $current
-	} elseif {"$conftype" == "tool"} {
+	} elseif {"$entrytype" == "tool"} {
 		Classy::setoption $key $current
 		regexp {([^.*]+)(\.|\*)(T|t)oolbar$} $key temp tooltype
 		Classy::DynaTool define $tooltype
-	} elseif {"$conftype" == "menu"} {
+	} elseif {"$entrytype" == "menu"} {
 		Classy::setoption $key $current
 		regexp {([^.*]+)(\.|\*)(M|m)enu$} $key temp menutype
 		Classy::DynaMenu define $menutype
@@ -851,3 +856,5 @@ Classy::Configurator method _configuredefault {{name {}}} {
 	$w.defaults.edit delete 1.0 end
 	$w.defaults.edit insert end $list
 }
+
+

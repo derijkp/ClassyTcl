@@ -6,7 +6,8 @@ source tools.tcl
 
 test Classy::Default {set and get} {
 	clean
-	classyinit test [pwd]
+	tk appname test
+	package require ClassyTcl [pwd]
 	Classy::Default set app try 2
 	Classy::Default set app try 1
 	Classy::Default get app try
@@ -14,7 +15,8 @@ test Classy::Default {set and get} {
 
 test Classy::Default {add} {
 	clean
-	classyinit test [pwd]
+	tk appname test
+	package require ClassyTcl [pwd]
 	Classy::Default clear
 	Classy::Default add app try 1
 	Classy::Default add app try {try it}
@@ -23,7 +25,8 @@ test Classy::Default {add} {
 
 test Classy::Default {remove} {
 	clean
-	classyinit test [pwd]
+	tk appname test
+	package require ClassyTcl [pwd]
 	Classy::Default clear
 	Classy::Default set app try {{try it} 1}
 	Classy::Default remove app try {try it}
@@ -32,7 +35,8 @@ test Classy::Default {remove} {
 
 test Classy::DefaultMenu {create and configure} {
 	clean
-	classyinit test [pwd]
+	tk appname test
+	package require ClassyTcl [pwd]
 	entry .e
 	Classy::DefaultMenu .try -key try -command {.e delete 0 end;.e insert 0 [.try get]} -getcommand {.e get}
 	pack .e .try -side left

@@ -359,6 +359,7 @@ Classy::Dialog method place {} {
 		if {$x<0} {set x 0}
 		if {$y<0} {set y 0}
 	}
+	wm geometry $object +1000000+1000000
 	wm deiconify $object
 	raise $object
 	if [true $keepgeometry] {

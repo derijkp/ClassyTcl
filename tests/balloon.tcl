@@ -7,7 +7,8 @@ source tools.tcl
 test Classy::Balloon {create and configure} {
 	clean
 	eval destroy [winfo children .]
-	classyinit test
+	tk appname test
+	package require ClassyTcl
 	button .try -text try
 	button .try2 -text try2
 	pack .try .try2

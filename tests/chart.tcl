@@ -7,7 +7,8 @@ source tools.tcl
 test Classy::ChartGrid {create and configure} {
 	clean
 	eval destroy [winfo children .]
-	classyinit test
+	tk appname test
+	package require ClassyTcl
 	canvas .try
 	pack .try -fill both -expand yes
 	update idletasks
@@ -20,7 +21,8 @@ test Classy::ChartGrid {create and configure} {
 test Classy::BarChart {create and configure} {
 	clean
 	eval destroy [winfo children .]
-	classyinit test
+	tk appname test
+	package require ClassyTcl
 	canvas .try
 	pack .try -fill both -expand yes
 	update idletasks
@@ -52,7 +54,8 @@ test Classy::BarChart {create and configure} {
 test Classy::BarChartBox {create and configure} {
 	clean
 	eval destroy [winfo children .]
-	classyinit test
+	tk appname test
+	package require ClassyTcl
 
 	Classy::BarChartBox .try
 	.try dataset Try {5 6 5 5 4 5 6 7}
@@ -67,7 +70,8 @@ test Classy::BarChartBox {create and configure} {
 test Classy::LineChart {create and configure} {
 	clean
 	eval destroy [winfo children .]
-	classyinit test
+	tk appname test
+	package require ClassyTcl
 	canvas .try
 	pack .try -fill both -expand yes
 	update idletasks
@@ -95,7 +99,8 @@ test Classy::LineChart {create and configure} {
 test Classy::LineChartBox {create and configure} {
 	clean
 	eval destroy [winfo children .]
-	classyinit test
+	tk appname test
+	package require ClassyTcl
 
 	Classy::LineChartBox .try
 	.try dataset Try {1 5 2 6 3 5 4 5 5 4 6 5 7 6 8 7}

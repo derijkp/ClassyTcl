@@ -7,7 +7,8 @@ source tools.tcl
 test Classy::Notebook {create and configure} {
 	clean
 	eval destroy [winfo children .]
-	classyinit test
+	tk appname test
+	package require ClassyTcl
 	Classy::NoteBook .try
 	pack .try -fill both -expand yes
 	text .text
@@ -23,7 +24,8 @@ test Classy::Notebook {create and configure} {
 test Classy::Notebook {propagate} {
 	clean
 	eval destroy [winfo children .]
-	classyinit test
+	tk appname test
+	package require ClassyTcl
 	toplevel .t
 	Classy::NoteBook .t.try
 	pack .t.try -fill both -expand yes

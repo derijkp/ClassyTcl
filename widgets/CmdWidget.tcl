@@ -970,7 +970,7 @@ proc Classy__puts {args} {
 		send $source [list $cmdwidget display $string]
 		return {}
 	} else {
-		return [eval Classykeepputs $args]
+		return [eval Classy__keepputs $args]
 	}
 }
 

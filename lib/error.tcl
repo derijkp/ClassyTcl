@@ -24,6 +24,7 @@ proc bgerror {err} {
 	::Classy::busy remove
 	::Classy::msg {}
 	set info $errorInfo
+	catch {destroy .bgerrorDialog}
 	::Classy::Dialog .bgerrorDialog -title "Error in Tcl Script" -keepgeometry no -closecommand {
 		catch {destroy .bgerrorDialog}
 		catch {destroy .bgerrorTrace}

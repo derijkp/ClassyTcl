@@ -7,7 +7,8 @@ source tools.tcl
 test Classy::Entry {create and configure} {
 	clean
 	eval destroy [winfo children .]
-	classyinit test
+	tk appname test
+	package require ClassyTcl
 	Classy::Entry .try
 	pack .try
 	.try configure -label test
@@ -16,7 +17,8 @@ test Classy::Entry {create and configure} {
 
 test Classy::Entry {create with configuration configure} {
 	clean
-	classyinit test
+	tk appname test
+	package require ClassyTcl
 	Classy::Entry .try -label try
 	pack .try
 	.try cget -label
@@ -24,7 +26,8 @@ test Classy::Entry {create with configuration configure} {
 
 test Classy::Entry {create, destroy, create} {
 	clean
-	classyinit test
+	tk appname test
+	package require ClassyTcl
 	Classy::Entry .try -label try
 	pack .try
 	destroy .try
@@ -35,7 +38,8 @@ test Classy::Entry {create, destroy, create} {
 
 test Classy::Entry {create with configuration configure} {
 	clean
-	classyinit test
+	tk appname test
+	package require ClassyTcl
 	Classy::Entry .try -label try -orient vert
 	pack .try
 	.try cget -orient
@@ -43,7 +47,8 @@ test Classy::Entry {create with configuration configure} {
 
 test Classy::Entry {create with configuration configure} {
 	clean
-	classyinit test
+	tk appname test
+	package require ClassyTcl
 	Classy::Entry .try -label int -constraint {[0-9]}
 	pack .try
 	.try cget -constraint
@@ -51,7 +56,8 @@ test Classy::Entry {create with configuration configure} {
 
 test Classy::Entry {command} {
 	clean
-	classyinit test
+	tk appname test
+	package require ClassyTcl
 	Classy::Entry .try -label try -command {set ::c 1}
 	pack .try
 	set ::c 0
@@ -61,7 +67,8 @@ test Classy::Entry {command} {
 
 test Classy::Entry {constraint} {
 	clean
-	classyinit test
+	tk appname test
+	package require ClassyTcl
 	Classy::Entry .try -label try -constraint {^[a-z]*$}
 	pack .try
 	.try set try
@@ -72,7 +79,8 @@ test Classy::Entry {constraint} {
 test Classy::FileEntry {create and configure} {
 	clean
 	eval destroy [winfo children .]
-	classyinit test
+	tk appname test
+	package require ClassyTcl
 	Classy::FileEntry .try
 	pack .try
 	.try configure -label test

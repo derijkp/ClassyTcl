@@ -7,7 +7,8 @@ source tools.tcl
 test ColorEntry {create and configure} {
 	clean
 	eval destroy [winfo children .]
-	classyinit test
+	tk appname test
+	package require ClassyTcl
 	Classy::ColorEntry .try
 	pack .try
 	.try set green
@@ -17,7 +18,8 @@ test ColorEntry {create and configure} {
 test ColorHSV {create and configure} {
 	clean
 	eval destroy [winfo children .]
-	classyinit test
+	tk appname test
+	package require ClassyTcl
 	Classy::ColorHSV .try
 	pack .try
 	.try set green
@@ -27,7 +29,8 @@ test ColorHSV {create and configure} {
 test ColorHSV {command} {
 	clean
 	eval destroy [winfo children .]
-	classyinit test
+	tk appname test
+	package require ClassyTcl
 	set ::try 0
 	Classy::ColorHSV .try -command {set ::try 1}
 	pack .try
@@ -39,7 +42,8 @@ test ColorHSV {command} {
 test ColorRGB {create and configure} {
 	clean
 	eval destroy [winfo children .]
-	classyinit test
+	tk appname test
+	package require ClassyTcl
 	Classy::ColorRGB .try
 	pack .try
 	.try set green
@@ -49,7 +53,8 @@ test ColorRGB {create and configure} {
 test ColorRGB {command} {
 	clean
 	eval destroy [winfo children .]
-	classyinit test
+	tk appname test
+	package require ClassyTcl
 	set ::try 0
 	Classy::ColorRGB .try -command {set ::try 1}
 	pack .try
@@ -61,7 +66,8 @@ test ColorRGB {command} {
 test ColorSample {create and configure} {
 	clean
 	eval destroy [winfo children .]
-	classyinit test
+	tk appname test
+	package require ClassyTcl
 	Classy::ColorSample .try
 	pack .try
 	.try set green
@@ -71,7 +77,8 @@ test ColorSample {create and configure} {
 test ColorSelect {create and configure} {
 	clean
 	eval destroy [winfo children .]
-	classyinit test
+	tk appname test
+	package require ClassyTcl
 	Classy::ColorSelect .try
 	pack .try -fill both -expand yes
 	.try set green
@@ -81,7 +88,8 @@ test ColorSelect {create and configure} {
 test getcolor {getcolor} {
 	clean
 	eval destroy [winfo children .]
-	classyinit test
+	tk appname test
+	package require ClassyTcl
 	option add *GetColor Peos startupFile
 	Classy::getcolor -initialcolor yellow
 } {#ffff00}

@@ -75,10 +75,11 @@ Classy::Editor classmethod init {args} {
 
 	# REM Initialise options and variables
 	# ------------------------------------
-	private $object curfile reopenlist findwhat marker curmarker prevmarker
+	private $object curfile reopenlist findwhat replace marker curmarker prevmarker
 	set curfile {}
 	set reopenlist {}
 	set findwhat {}
+	set replace {}
 	set marker Mark
 	set curmarker {}
 	set prevmarker {}
@@ -130,8 +131,6 @@ Classy::Editor addoption -menu {menu Menu popup}
 #}
 Classy::Editor addoption -closecommand {closeCommand CloseCommand {}}
 
-Classy::Editor private replace {}
-
 # ------------------------------------------------------------------
 #  destroy
 # ------------------------------------------------------------------
@@ -161,7 +160,7 @@ Classy::Editor chainallmethods {$object.edit} Classy::Text
 #} descr {
 #}
 Classy::Editor method cut {} {
-	private $class replace
+	private $object replace
 	clipboard clear -displayof $object			  
 	catch {									
 		set replace [$object get sel.first sel.last]
@@ -175,7 +174,7 @@ Classy::Editor method cut {} {
 #} descr {
 #}
 Classy::Editor method copy {} {
-	private $class replace
+	private $object replace
 	clipboard clear -displayof $object			  
 	catch {									
 		set replace [$object get sel.first sel.last]
@@ -454,8 +453,7 @@ Classy::Editor method findsel {dir} {
 }
 
 Classy::Editor method replace-find {dir} {
-	private $class replace
-	private $object findwhat
+	private $object findwhat replace
 	if {"[$object tag ranges sel]"==""} {
 		if {"$dir" == "-forwards"} {set index sel.last} else {set index sel.first}
 		set findwhat [$object get sel.first sel.last]
@@ -544,16 +542,16 @@ Classy::Editor method command {command} {
 #} descr {
 #}
 Classy::Editor method replace {args} {
-	private $class options replace searchdir findwhat
+	private $object options replace findwhat
 	if {"$args" == "all"} {
 		set start [$object index insert]
-		if {"$searchdir"=="forwards"} {
+		if {"$options(-searchdir)"=="forwards"} {
 			set stop end
 		} else {
 			set stop 1.0
 		}
 		while 1 {
-			set pos [eval {$object search -count number} -$searchdir -$options(-searchtype) -$options(-searchcase) \
+			set pos [eval {$object search -count number} -$options(-searchdir) -$options(-searchtype) -$options(-searchcase) \
 				-- {$findwhat} $start $stop]
 			if {"$pos"==""} {break}
 			$object delete $pos "$pos + $number c"
@@ -566,7 +564,7 @@ Classy::Editor method replace {args} {
 		catch {set sel [$object get sel.first sel.last]}
 		$object delete sel.first sel.last
 		$object insert insert $replace
-		$object find $findwhat -$searchdir
+		$object find $findwhat -$options(-searchdir)
 	}
 }
 
@@ -575,8 +573,8 @@ Classy::Editor method replace {args} {
 #} descr {
 #}
 Classy::Editor method finddialog {} {
-	private $object searchdir
-	set searchdir forwards
+	private $object options
+	set options(-searchdir) forwards
 	set w $object.find
 	if ![winfo exists $w] {
 		Classy::Dialog $w -cache 1
@@ -586,8 +584,8 @@ Classy::Editor method finddialog {} {
 		$w add repl Replace "$object replace"
 		$w add replall "Replace all" "$object replace all"
 	
-		Classy::Entry $w.options.find -label Find -textvariable [privatevar $object options(-findwhat)]
-		Classy::Entry $w.options.replace -label Replace -textvariable [privatevar $object options(-replace)]
+		Classy::Entry $w.options.find -label Find -textvariable [privatevar $object findwhat]
+		Classy::Entry $w.options.replace -label Replace -textvariable [privatevar $object replace]
 		frame $w.options.frame
 		Classy::OptionBox $w.options.type -label "Type" -orient vertical -variable [privatevar $object options(-searchtype)]
 		$w.options.type add exact Exact
@@ -674,8 +672,8 @@ Classy::Editor method macro {} {
 		$record configure -text "Recording ..." -state disabled
 		$stop configure -state normal
 		focus $object
-		::class::traceobject $object [list append [privatevar $object macro]]
-		::class::traceobject $object.edit [list append [privatevar $object macro]]
+		::class::traceobject $object [list append [privatevar $object macro]] 1
+		::class::traceobject $object.edit [list append [privatevar $object macro]] 1
 	}]
 	$stop configure -command [varsubst {stop record object} {
 		$record configure -text "Record" -state normal
@@ -1072,28 +1070,48 @@ Classy::Editor method _reconfigure {} {
 	eval grid forget [winfo children $object]
 	if {[option get $object showTool ShowTool]} {
 		catch {Classy::Configurator _reconfigure $object.tool}
+		set row 1
 		grid $object.tool -row 0 -column 0 -columnspan 2 -sticky we
 		grid rowconfigure $object 0 -weight 0
 		grid rowconfigure $object 1 -weight 1
 	} else {
+		set row 0
 		grid rowconfigure $object 0 -weight 1
 		grid rowconfigure $object 1 -weight 0
 		grid rowconfigure $object 2 -weight 0
 	}
 	if {"[option get $object scrollSide ScrollSide]"=="left"} {
-		grid $object.vbar -row 1 -column 0 -sticky ns
-		grid $object.edit -row 1 -column 1 -sticky nswe
-		grid $object.hbar -row 2 -column 1 -sticky we
+		grid $object.vbar -row $row -column 0 -sticky ns
+		grid $object.edit -row $row -column 1 -sticky nswe
+		incr row
+		grid $object.hbar -row $row -column 1 -sticky we
 		grid columnconfigure $object 0 -weight 0
 		grid columnconfigure $object 1 -weight 1
 	} else {
-		grid $object.edit -row 1 -column 0 -sticky nswe
-		grid $object.vbar -row 1 -column 1 -sticky ns
-		grid $object.hbar -row 2 -column 0 -sticky we
+		grid $object.edit -row $row -column 0 -sticky nswe
+		grid $object.vbar -row $row -column 1 -sticky ns
+		incr row
+		grid $object.hbar -row $row -column 0 -sticky we
 		grid columnconfigure $object 0 -weight 1
 		grid columnconfigure $object 1 -weight 0
 	}
 	update idletasks
+}
+
+Classy::Editor method cut {} {
+	$object.edit cut
+}
+
+Classy::Editor method paste {} {
+	$object.edit paste
+}
+
+Classy::Editor method undo {} {
+	$object.edit undo
+}
+
+Classy::Editor method redo {} {
+	$object.edit redo
 }
 
 proc Classy::title {w title} {

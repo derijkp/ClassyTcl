@@ -46,20 +46,29 @@ proc Classy::savefile {args} {
 		error "Unknown options \"$remain\""
 	}
 
+	set filter $opt(-filter)
+	if {"$filter"==""} {
+		set dir [::Classy::Default get app Classy__FileSelect__curfilter]
+	}
+	if {"$filter"==""} {
+		set filter *
+	}
+	set dir $opt(-initialdir)
+	if {"$dir"==""} {
+		set dir [::Classy::Default get app Classy__FileSelect__curdir]
+	}
+	if {"$dir"==""} {
+		set dir [pwd]
+	}
 	if {("$tcl_platform(platform)"=="windows")&&("[option get . saveFile SaveFile]"=="Win")} {
+		if {"$opt(-initialfile)"==""} {
+			set opt(-initialfile) $opt(-initialdir)
+		}		
 		return [lindex [Classy::GetSaveFile -defaultextension $opt(-defaultextension) \
-					-filetypes $opt(-filetypes) -initialdir $opt(-initialdir) \
+					-filetypes $opt(-filetypes) -initialdir $dir \
 					-initialfile $opt(-initialfile) -title $opt(-title)] 0]
 	} else {
 		catch {destroy .classy__selectfile}
-		set filter $opt(-filter)
-		set dir $opt(-initialdir)
-		if {"$dir"==""} {
-			set dir [Classy::Default get app Classy__FileSelect__curdir]
-		}
-		if {"$dir"==""} {
-			set dir [pwd]
-		}
 		Classy::FileSelect .classy__selectfile -dir $dir \
 			-title $opt(-title) -command {set ::Classy::selectfile [.classy__selectfile get]} \
 			-filter $filter -default $opt(-default) -help $opt(-help) \

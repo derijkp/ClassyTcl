@@ -1,5 +1,3 @@
-## {Show Editor Toolbar} {Do you want ClassyTcl Editor to have toolbars}
-Classy::setoption *Classy::Editor.ShowTool 1
 ## {Editor Toolbar} {Editor toolbar} tool
 Classy::setoption *Classy::Editor.Toolbar {
 	action floppy "Save" {%W save}
@@ -10,7 +8,7 @@ Classy::setoption *Classy::Editor.Toolbar {
 	action print "Print" {%W insert insert "Print: %W"}
 	action open "Open next" {%W next}
 }
-## {Show Help Toolbar} {Do you want ClassyTcl Help ro have toolbars}
+## {Show Help Toolbar} {Do you want ClassyTcl Help to have toolbars} {select 0 1}
 Classy::setoption *Classy::Help.ShowTool 1
 ## {Help Toolbar} {Help toolbar} tool
 Classy::setoption *Classy::Help.Toolbar {

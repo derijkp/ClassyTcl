@@ -7,7 +7,8 @@ source tools.tcl
 test Classy::Canvas {create and configure} {
 	clean
 	eval destroy [winfo children .]
-	classyinit test
+	tk appname test
+	package require ClassyTcl
 	Classy::Canvas .try
 	pack .try
 	set id [.try create text 10 10 -text "A"]
@@ -17,7 +18,8 @@ test Classy::Canvas {create and configure} {
 test Classy::Canvas {undo} {
 	clean
 	eval destroy [winfo children .]
-	classyinit test
+	tk appname test
+	package require ClassyTcl
 	Classy::Canvas .try
 	pack .try
 	.try create text 10 10 -text "A"

@@ -37,7 +37,7 @@ proc Classy::selectfile {args} {
 		-initialdir {} {}
 		-initialfile {} {}
 		-title {} {Select file}
-		-filter {} *
+		-filter {} {}
 		-selectmode {single browse multiple extended persistent} browse
 		-default {} Classy__fileselect
 		-help {} Classy_file_select
@@ -46,15 +46,29 @@ proc Classy::selectfile {args} {
 		error "Unknown options \"$remain\""
 	}
 
+	set filter $opt(-filter)
+	if {"$filter"==""} {
+		set dir [::Classy::Default get app Classy__FileSelect__curfilter]
+	}
+	if {"$filter"==""} {
+		set filter *
+	}
+	set dir $opt(-initialdir)
+	if {"$dir"==""} {
+		set dir [::Classy::Default get app Classy__FileSelect__curdir]
+	}
+	if {"$dir"==""} {
+		set dir [pwd]
+	}
 	if {("$tcl_platform(platform)"=="windows")&&("[option get . selectFile SelectFile]"=="Win")} {
 		if {"$opt(-selectmode)"=="single"} {
 			set opt(-selectmode) browse
 		}
-		if {"$opt(-initialdir)"==""} {
-			set opt(-initialdir) [Classy::Default get app Classy__FileSelect__curdir]
-		}
+		if {"$opt(-initialfile)"==""} {
+			set opt(-initialfile) $opt(-initialdir)
+		}		
 		set result [Classy::GetOpenFile -defaultextension $opt(-defaultextension) \
-			-filetypes $opt(-filetypes) -initialdir $opt(-initialdir) \
+			-filetypes $opt(-filetypes) -initialdir $dir \
 			-initialfile $opt(-initialfile) -title $opt(-title) \
 			-selectmode $opt(-selectmode)]
 		if {"$opt(-selectmode)"=="browse"} {
@@ -73,20 +87,14 @@ proc Classy::selectfile {args} {
 		}
 	} else {
 		catch {destroy .classy__selectfile}
-		set filter $opt(-filter)
-		set dir $opt(-initialdir)
-		if {"$dir"==""} {
-			set dir [::Classy::Default get app Classy__FileSelect__curdir]
-		}
-		if {"$dir"==""} {
-			set dir [pwd]
-		}
 		Classy::FileSelect .classy__selectfile -dir $dir \
 			-title $opt(-title) -textvariable ::Classy::selectfile \
 			-filter $filter -default $opt(-default) -selectmode $opt(-selectmode) -help $opt(-help) \
 			-closecommand {set ::Classy::selectfile ""}
 		if {"$remain"!=""} {eval .clasy__selectfile configure $remain}
-		.classy__selectfile set $opt(-initialfile)
+		if {"$opt(-initialfile)" != ""} {
+			.classy__selectfile set $opt(-initialfile)
+		}
 		tkwait window .classy__selectfile
 		return $::Classy::selectfile
 	}

@@ -15,7 +15,9 @@ if [info exists env(HOME)] {
 set Classy::dir(def) [file join [set ::class::dir] conf]
 set Classy::dir(user) [file join $homedir .classy]
 set Classy::dir(appdef) [file join [set ::Classy::appdir] conf]
-set Classy::dir(appuser) [file join $homedir .[tk appname]]
+set Classy::appname [tk appname]
+regsub { #[0-9]+$} $Classy::appname {} Classy::appname
+set Classy::dir(appuser) [file join $homedir .$Classy::appname]
 set Classy::dirs [list \
 	$Classy::dir(def) \
 	$Classy::dir(user) \

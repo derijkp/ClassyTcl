@@ -1,5 +1,5 @@
 ## Editor {menu used in the ClassyTcl Editor} menu
-option add *Classy::Editor.Menu {
+Classy::setoption *Classy::Editor.Menu {
 menu file "File" {
 	action Load "Open file" {eval %W load [Classy::selectfile -title Open -selectmode persistent]}
 	action LoadNext "Open next" "%W loadnext"
@@ -53,9 +53,9 @@ menu tools "Tools" {
 	action Format "format" "%W format 76"
 }
 activemenu macros "Macros" {%W getmacromenu}
-} widgetDefault
+}
 ## Help {menu used in the ClassyTcl help system} menu
-option add *Classy::Help.Menu {
+Classy::setoption *Classy::Help.Menu {
 menu file "File" {
 	action Reload "Reload" {%W reload}
 	action Edit "Edit" {%W edit}
@@ -72,10 +72,10 @@ menu go "Go" {
 	action History "History" {%W historymenu}
 }
 activemenu general "General" {%W getgeneralmenu}
-} widgetDefault
+}
 
 ## Filer {menu used in the ClassyTcl Filer} menu
-option add *Classy::Filer.Menu {
+Classy::setoption *Classy::Filer.Menu {
 menu sel "Selection" {
 	action Delete "Delete" {%W deletefiles sel}
 	action Rename "Rename" {%W renamebox} C-r
@@ -95,5 +95,5 @@ menu option "Options" {
 	radio SmallIcons "Small icons" {-variable [privatevar %W view] -value small -command {%W redraw}}
 	radio FullInfo "Full info" {-variable [privatevar %W view] -value full -command {%W redraw}}
 }
-} widgetDefault
+}
 

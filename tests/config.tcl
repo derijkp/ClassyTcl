@@ -7,7 +7,8 @@ source tools.tcl
 test Classy::config {basic} {
 	clean
 	eval destroy [winfo children .]
-	classyinit test
+	tk appname test
+	package require ClassyTcl
 	Classy::Configurator dialog
 	update idletasks
 	manualtest

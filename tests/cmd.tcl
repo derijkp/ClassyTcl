@@ -7,7 +7,8 @@ source tools.tcl
 test Classy::CmdWidget {create and configure} {
 	clean
 	eval destroy [winfo children .]
-	classyinit test
+	tk appname test
+	package require ClassyTcl
 	Classy::CmdWidget .try
 	pack .try
 	.try cget -prompt

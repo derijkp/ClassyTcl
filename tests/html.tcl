@@ -7,7 +7,8 @@ source tools.tcl
 test Classy::HTML {create and configure} {
 	clean
 	destroy .try
-	classyinit test
+	tk appname test
+	package require ClassyTcl
 	Classy::HTML .try -yscrollcommand {.vbar set}
 	scrollbar .vbar -command {.try yview}
 	pack .try -side left -fill both -expand yes
@@ -23,7 +24,8 @@ test Classy::HTML {create and configure} {
 test Classy::help {create and configure} {
 	clean
 	catch {destroy .try}
-	classyinit test
+	tk appname test
+	package require ClassyTcl
 	Classy::Help .try
 	.try gethelp ClassyTcl
 	.try cget -wrap

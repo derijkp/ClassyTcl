@@ -7,7 +7,8 @@ source tools.tcl
 test Classy::DynaTool {text} {
 	clean
 	eval destroy [winfo children .]
-	classyinit test
+	tk appname test
+	package require ClassyTcl
 	Classy::DynaTool define Test {
 		action open "Open" {puts open}
 		action "Test" "Test" {puts test}
@@ -24,7 +25,8 @@ test Classy::DynaTool {text} {
 test Classy::DynaTool {pictures} {
 	clean
 	eval destroy [winfo children .]
-	classyinit test
+	tk appname test
+	package require ClassyTcl
 	Classy::DynaTool define Test {
 		action print "Print" {puts print}
 		action "OK" "OK" {puts OK}
@@ -41,7 +43,8 @@ test Classy::DynaTool {pictures} {
 test Classy::DynaTool {pictures} {
 	clean
 	eval destroy [winfo children .]
-	classyinit test
+	tk appname test
+	package require ClassyTcl
 	Classy::DynaTool maketool Classy::Editor .t .text
 	pack .t -fill x
 	text .text
@@ -52,7 +55,8 @@ test Classy::DynaTool {pictures} {
 test Classy::DynaTool {text} {
 	clean
 	eval destroy [winfo children .]
-	classyinit test
+	tk appname test
+	package require ClassyTcl
 	Classy::DynaTool define Test {
 		action "Test" "Test" {puts test}
 		action "OK" "OK" {puts OK}

@@ -1,54 +1,52 @@
 ## ---- Basic colors ----
 ## Background {Default background color} color
-option add *Background #efefef widgetDefault
+Classy::setoption *Background #d9d9d9
 ## {Dark backgound} {Default dark background color} color
-option add *DarkBackground lightgray widgetDefault
+Classy::setoption *DarkBackground #cacaca
 ## Foreground {Default background color} color
-option add *Foreground black widgetDefault
+Classy::setoption *Foreground black
 ## {Active background} {Default active background color} color
-option add *activeBackground white widgetDefault
+Classy::setoption *activeBackground white
 ## {Active foreground} {Default active foreground color} color
-option add *activeForeground black widgetDefault
+Classy::setoption *activeForeground black
 ## {Disabled foreground} {Default Disabled foreground color} color
-option add *disabledForeground #7f7f7f widgetDefault
+Classy::setoption *disabledForeground #7f7f7f
 ## {Selection background} {Default Selection background color} color
-option add *selectBackground #bfdfff widgetDefault
+Classy::setoption *selectBackground #bfdfff
 ## {Selection foreground} {Default Selection foreground color} color
-option add *selectForeground black widgetDefault
+Classy::setoption *selectForeground black
 ## {Select color} {Default Select color} color
-option add *selectColor orange widgetDefault
+Classy::setoption *selectColor orange
 ## {Highlight background} {Default Highlight background color} color
-option add *HighlightBackground #efefef widgetDefault
+Classy::setoption *HighlightBackground #d9d9d9
 ## {Highlight color} {Default Highlight color} color
-option add *HighlightColor black widgetDefault
+Classy::setoption *HighlightColor black
 ## Colorlist {list of colors as used the getcolor} color
-option add *ColorList {{blue cyan green yellow orange red magenta} {blue3 cyan3 green3 yellow3 orange3 red3 magenta3} {black gray20 gray40 gray50 gray60 gray80 white}} widgetDefault
+Classy::setoption *ColorList {{blue cyan green yellow orange red magenta} {blue3 cyan3 green3 yellow3 orange3 red3 magenta3} {black gray20 gray40 gray50 gray60 gray80 white}}
 
 ## ---- Widget Colors ----
 ## {Entry background} {Entry background color} color
-#option add *Entry.background #efefef widgetDefault
+#Classy::setoption *Entry.background #d9d9d9
 ## {Text background} {Text background color} color
-#option add *Text.background #efefef widgetDefault
+#Classy::setoption *Text.background #d9d9d9
 ## {Listbox background} {Listbox background color} color
-option add *Listbox.background #dfdfdf widgetDefault
+Classy::setoption *Listbox.background #dfdfdf
 ## {Scale foreground} {Scale foreground color} color
-#option add *Scale.foreground black widgetDefault
+#Classy::setoption *Scale.foreground black
 ## {Scale active foreground} {Scale active foreground color} color
-#option add *Scale.activeForeground #efefef widgetDefault
+#Classy::setoption *Scale.activeForeground #d9d9d9
 ## {Scale background} {Scale background color} color
-#option add *Scale.background #efefef widgetDefault
+#Classy::setoption *Scale.background #d9d9d9
 ## {Scale slider foreground} {Scale slider foreground color} color
-#option add *Scale.sliderForeground #efefef widgetDefault
+#Classy::setoption *Scale.sliderForeground #d9d9d9
 ## {Scale slider background} {Scale slider background color} color
-#option add *Scale.sliderBackground #dfdfdf widgetDefault
+#Classy::setoption *Scale.sliderBackground #dfdfdf
 ## {Scrollbar foreground} {Scrollbar foreground color} color
-#option add *Scrollbar.foreground #efefef widgetDefault
+#Classy::setoption *Scrollbar.foreground #d9d9d9
 ## {Scrollbar active foreground} {Scrollbar active foreground color} color
-#option add *Scrollbar.activeForeground #efefef widgetDefault
+#Classy::setoption *Scrollbar.activeForeground #d9d9d9
 ## {Scrollbar background} {Scrollbar background color} color
-#option add *Scrollbar.background #dfdfdf widgetDefault
+#Classy::setoption *Scrollbar.background #dfdfdf
 ## {Label background} {Label background color} color
-option add *Label.background #dfdfdf widgetDefault
-## {label background} {label background color} color
-option add *label.background #dfdfdf widgetDefault
+Classy::setoption *label.background #cacaca
 

@@ -6,7 +6,8 @@ source tools.tcl
 
 test Classy::Editor {Editor and find} {
 	clean
-	classyinit test
+	tk appname test
+	package require ClassyTcl
 	eval destroy [winfo children .]
 	Classy::Editor .try \
 		-loadcommand "wm title . "
@@ -19,7 +20,8 @@ test Classy::Editor {Editor and find} {
 test Classy::Editor {edit and insert} {
 	clean
 	eval destroy [winfo children .]
-	classyinit test
+	tk appname test
+	package require ClassyTcl
 	set w [edit try/try.tcl]
 	wm geometry $w +0+0
 	$w.editor insert end try
@@ -29,7 +31,8 @@ test Classy::Editor {edit and insert} {
 test Classy::Editor {links} {
 	clean
 	eval destroy [winfo children .]
-	classyinit test
+	tk appname test
+	package require ClassyTcl
 	toplevel .t
 	wm geometry .t +0+0
 	Classy::Editor .t.try -width 20 -height 10

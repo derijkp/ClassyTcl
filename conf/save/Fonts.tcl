@@ -1,38 +1,24 @@
-## ---- Basic Font definitions ----
-## Default {defintition for default font} font
-option add *DefaultFont {helvetica 10} widgetDefault
-## {Default bold} {defintition for default bold font} font
-option add *DefaultBoldFont {helvetica 10 bold} widgetDefault
-## {Default italic} {defintition for default italic font} font
-option add *DefaultItalicFont {helvetica 10 italic} widgetDefault
-## {Default bold-italic} {defintition for default bold-italic font} font
-option add *DefaultBoldItalicFont {helvetica 10 bold italic} widgetDefault
-## {Default non proportional} {defintition for default non proportional font} font
-option add *DefaultNonpropFont {courier 10} widgetDefault
-
 ## ---- Basic Fonts ----
-## Font {basic font class} font
-option add *Font DefaultFont widgetDefault
-## font {basic font} font
-option add *font DefaultFont widgetDefault
+## Font {basic font} font
+Classy::setfont *Font {helvetica 10}
 ## BoldFont {basic bold font class} font
-option add *BoldFont DefaultBoldFont widgetDefault
+Classy::setfont *BoldFont {helvetica 10 bold}
 ## ItalicFont {basic italic font class} font
-option add *ItalicFont DefaultItalicFont widgetDefault
+Classy::setfont *ItalicFont {helvetica 10 italic}
 ## BoldItalicFont {basic bold-italic font class} font
-option add *BoldItalicFont DefaultBoldItalicFont widgetDefault
+Classy::setfont *BoldItalicFont {helvetica 10 bold italic}
 ## NonPropFont {basic non-proportional font class} font
-option add *NonPropFont DefaultNonpropFont widgetDefault
+Classy::setfont *NonPropFont {courier 10}
 
 ## ---- Widget Fonts ----
 ## {Button Font} {font used on buttons} font
-option add *Button.font DefaultFont widgetDefault
+Classy::setfont *Button.font Font
 ## {Menu Font} {font used in menus} font
-option add *Menu.font DefaultBoldItalicFont widgetDefault
+Classy::setfont *Menu.font BoldItalicFont
 ## {Menubutton font} {font used in menu buttons} font
-option add *Menubutton.font DefaultBoldItalicFont widgetDefault
+Classy::setfont *Menubutton.font BoldItalicFont
 ## {Scale Font} {font used in scales} font
-option add *Scale.font DefaultBoldItalicFont widgetDefault
+Classy::setfont *Scale.font BoldItalicFont
 ## {Text font} {font used in text widgets} font
-option add *Text.font DefaultNonpropFont widgetDefault
+Classy::setfont *Text.font NonPropFont
 

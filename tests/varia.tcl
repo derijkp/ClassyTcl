@@ -6,7 +6,8 @@ source tools.tcl
 test Classy::Paned {basic} {
 	clean
 	eval destroy [winfo children .]
-	classyinit test
+	tk appname test
+	package require ClassyTcl
 	Classy::Paned .try -window .l1
 	listbox .l1
 	listbox .l2
@@ -19,7 +20,8 @@ test Classy::Paned {basic} {
 test Classy::OptionBox {basic} {
 	clean
 	eval destroy [winfo children .]
-	classyinit test
+	tk appname test
+	package require ClassyTcl
 
 	Classy::OptionBox .try -label Try -variable try -orient vertical
 	pack .try -fill x
@@ -33,7 +35,8 @@ test Classy::OptionBox {basic} {
 test Classy::FontSelector {basic} {
 	clean
 	eval destroy [winfo children .]
-	classyinit test
+	tk appname test
+	package require ClassyTcl
 	Classy::FontSelect .try
 	pack .try -fill both -expand yes
 	.try set {helvetica 16 {bold}}
@@ -43,14 +46,16 @@ test Classy::FontSelector {basic} {
 test Classy::getfont {basic} {
 	clean
 	eval destroy [winfo children .]
-	classyinit test
+	tk appname test
+	package require ClassyTcl
 	Classy::getfont -font {helvetica 16 {bold roman}}
 } {helvetica 16 {bold roman}}
 
 test Classy::RepeatButton {basic} {
 	catch {rename Classy::RepeatButton {}}
 	eval destroy [winfo children .]
-	classyinit test
+	tk appname test
+	package require ClassyTcl
 	Classy::RepeatButton .try -text try -command {puts ok}
 	pack .try
 	manualtest
@@ -60,7 +65,8 @@ test Classy::RepeatButton {basic} {
 test Classy::Progress {basic} {
 	clean
 	eval destroy [winfo children .]
-	classyinit test
+	tk appname test
+	package require ClassyTcl
 	Classy::Progress .try -message "Testing\n Please wait" -ticks 1000 -step 100
 	#.try set 50
 	for {set i 0} {$i<1000} {incr i} {
@@ -72,7 +78,8 @@ test Classy::Progress {basic} {
 test Classy::OptionMenu {basic} {
 	clean
 	eval destroy [winfo children .]
-	classyinit test
+	tk appname test
+	package require ClassyTcl
 	Classy::OptionMenu .try -list {try {try 1} {try 2} {try 3} dfgsd\\1dfg xdg&dfj cfdgdsgh\\gdsf}
 	pack .try -fill x
 	.try set {try 2}
@@ -82,7 +89,8 @@ test Classy::OptionMenu {basic} {
 test Classy::MultiListBox {basic} {
 	clean
 	eval destroy [winfo children .]
-	classyinit test
+	tk appname test
+	package require ClassyTcl
 	Classy::MultiListbox .try -number 2 -command {puts stdout [.try get]}
 	pack .try -fill both -expand yes
 	.try add a b c d e f g h
@@ -94,7 +102,8 @@ d}
 test Classy::Fold {basic} {
 	clean
 	eval destroy [winfo children .]
-	classyinit test
+	tk appname test
+	package require ClassyTcl
 	Classy::Fold .try -title {Fold it} -opencommand {set ::try 1}
 	pack .try -fill both
 	set w [.try component content]
@@ -108,7 +117,8 @@ test Classy::Fold {basic} {
 test Classy::ScrolledFrame {basic} {
 	clean
 	eval destroy [winfo children .]
-	classyinit test
+	tk appname test
+	package require ClassyTcl
 	set w .try.test
 	set w [Classy::ScrolledFrame .try]
 	pack [button $w.b1 -text "Trying an terribly long button with lots of nonsense on it"]
@@ -123,7 +133,8 @@ test Classy::ScrolledFrame {basic} {
 test Classy::Message {basic} {
 	clean
 	eval destroy [winfo children .]
-	classyinit test
+	tk appname test
+	package require ClassyTcl
 	Classy::Message .try -text "Trying it out"
 	pack .try -fill x
 } {1}

@@ -7,7 +7,8 @@ source tools.tcl
 test Classy::Text {create and configure} {
 	clean
 	destroy .try
-	classyinit test
+	tk appname test
+	package require ClassyTcl
 	Classy::Text .try
 	pack .try -fill both -expand yes
 	.try cget -wrap
