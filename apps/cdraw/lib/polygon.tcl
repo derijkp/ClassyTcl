@@ -43,4 +43,3 @@ bindtags $w [list Polygon $w Classy::Menu_MainMenu Classy::Canvas Canvas .mainw 
 set status($w,type) polygon
 }
 
-

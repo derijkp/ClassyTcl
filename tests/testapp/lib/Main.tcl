@@ -1,44 +1,29 @@
-proc main {args} {
-	mainw
+proc main args {
+mainw .mainw
+focus .mainw
 }
 
-
-proc mainw args {# ClassyTcl generated Toplevel
-	if [regexp {^\.} $args] {
-		set window [lshift args]
-	} else {
-		set window .mainw
-	}
-	Classy::parseopt $args opt {}
+Classy::Toplevel subclass mainw
+mainw method init args {
+	super init
 	# Create windows
-	Classy::Toplevel $window 
-	Classy::DynaTool $window.maintool  \
+	Classy::DynaTool $object.maintool  \
 		-width 179 \
 		-type MainTool \
 		-height 21
-	grid $window.maintool -row 0 -column 0 -sticky new
-	button $window.button1 \
-		-text try
-	grid $window.button1 -row 1 -column 0 -sticky nesw
-	Classy::ScrolledText $window.scrolledtext1  \
-		-height 5 \
-		-width 10
-	grid $window.scrolledtext1 -row 2 -column 0 -sticky nesw
-	grid columnconfigure $window 0 -weight 1
-	grid rowconfigure $window 2 -weight 1
-
-	# End windows
+	grid $object.maintool -row 0 -column 0 -sticky new
+	grid columnconfigure $object 0 -weight 1
+	grid rowconfigure $object 1 -weight 1
+	if {"$args" == "___Classy::Builder__create"} {return $object}
 	# Parse this
-	$window configure \
+	$object configure \
 		-destroycommand "exit" \
 		-title [tk appname]
-	$window.maintool configure \
-		-cmdw [varsubst window {$window}]
-	$window.button1 configure \
-		-command [varsubst window {$window.scrolledtext1 insert insert try}]
-	Classy::DynaMenu attachmainmenu MainMenu $window
-	return $window
+	$object.maintool configure \
+		-cmdw [varsubst object {$object}]
+	Classy::DynaMenu attachmainmenu MainMenu $object
+	# Configure initial arguments
+	if {"$args" != ""} {eval $object configure $args}
+	return $object
 }
-
-
 

@@ -41,6 +41,8 @@ proc clean {} {
 	catch {Base destroy}
 	catch {eval destroy [winfo children .]}
 	catch {. configure -menu {}}
+	catch {rename ::Test {}}
+	catch {rename ::try {}}
 	Class subclass Base
 }
 
@@ -48,6 +50,7 @@ proc classyclean {} {
 	catch {Widget destroy}
 	catch {eval destroy [winfo children .]}
 	catch {. configure -menu {}}
+	catch {rename ::try {}}
 	Classy::initconf
 }
 
@@ -95,6 +98,7 @@ proc test {name description script expected {causeerror 0} args} {
 }
 
 proc manualtest {{message {}}} {
+return
 	destroy .manualtest
 	toplevel .manualtest
 	set message "Please test manually\nPress Ok when done\n$message"

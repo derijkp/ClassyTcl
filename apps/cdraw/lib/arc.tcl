@@ -30,4 +30,3 @@ proc arc_abort {w x y} {
 	catch {unset current(cur)}
 }
 
-

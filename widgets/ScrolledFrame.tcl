@@ -31,14 +31,14 @@ bind Classy::ScrolledFrame <Configure> {Classy::todo %W redraw}
 Widget subclass Classy::ScrolledFrame
 Classy::export ScrolledFrame {}
 
-Classy::ScrolledFrame classmethod init {args} {
+Classy::ScrolledFrame method init {args} {
 	# REM Create object
 	# -----------------
 	super init
 	frame $object.view
 	frame $object.view.frame
-	::class::rebind $object.view.frame $object
-	::class::refocus $object $object.view.frame
+	::Classy::rebind $object.view.frame $object
+	::Classy::refocus $object $object.view.frame
 	grid $object.view -column 0 -row 0 -sticky nwse
 	grid $object.view.frame -column 0 -row 0 -sticky nwse
 	# REM Configure initial arguments
@@ -53,7 +53,7 @@ Classy::ScrolledFrame component frame {$object.view.frame}
 #  Widget destroy
 # ------------------------------------------------------------------
 Classy::ScrolledFrame method destroy {} {
-	::class::rebind $object.view.frame {}
+	::Classy::rebind $object.view.frame {}
 }
 
 # ------------------------------------------------------------------

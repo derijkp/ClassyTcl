@@ -43,7 +43,7 @@ auto_load varsubst
 Widget subclass Classy::CmdWidget
 Classy::export CmdWidget {}
 
-Classy::CmdWidget classmethod init {args} {
+Classy::CmdWidget method init {args} {
 	setprivate $object w [super init text $object -setgrid true]
 	$object tag configure prompt -foreground blue
 	bindtags $object [list $object Classy::CmdWidget . all]

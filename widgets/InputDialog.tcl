@@ -31,7 +31,7 @@
 Classy::Dialog subclass Classy::InputDialog
 Classy::export InputDialog {}
 
-Classy::InputDialog classmethod init {args} {
+Classy::InputDialog method init {args} {
 	super init
 	Classy::Entry $object.options.entry -label File
 	grid $object.options.entry -sticky we

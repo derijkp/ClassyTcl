@@ -27,7 +27,7 @@ bind Classy::MultiFrame <Configure> {Classy::todo %W redraw}
 Widget subclass Classy::MultiFrame
 Classy::export MultiFrame {}
 
-Classy::MultiFrame classmethod init {args} {
+Classy::MultiFrame method init {args} {
 	# REM Create object
 	# -----------------
 	super init

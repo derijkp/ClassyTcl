@@ -59,6 +59,11 @@ int Classy_ObjectObjCmd(
 	argv+=2;
 	argc-=2;
 	entry = Tcl_FindHashEntry(&(class->methods), cmd);
+	if (entry == NULL) {
+		error = Tcl_VarEval(interp,"auto_load ::class::",Tcl_GetStringFromObj(class->class,NULL),",,m,",cmd,(char *)NULL);
+		if (error) {return error;}
+		entry = Tcl_FindHashEntry(&(class->methods), cmd);
+	}
 	if (entry != NULL) {
 		Method *method;
 		method = (Method *)Tcl_GetHashValue(entry);

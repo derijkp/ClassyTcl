@@ -43,6 +43,26 @@ test Classy::Entry {create with configuration configure} {
 	.try cget -constraint
 } {^[0-9]*$}
 
+test Classy::Entry {create with configuration configure} {
+	classyclean
+	Classy::Entry .try -label a* -validate {puts ok}
+	pack .try -fill x
+	.try cget -validate
+} {puts ok}
+
+test Classy::Entry {create with configuration configure} {
+	classyclean
+	Classy::Entry .try -label a* -validate {
+		if ![regexp ^a [.try.get]] {error "\"$new\" does not start with an a"}
+		return 1
+	}
+	pack .try -fill x
+	.try cget -validate
+} {
+		if ![regexp ^a [.try.get]] {error "\"$new\" does not start with an a"}
+		return 1
+	}
+
 test Classy::Entry {command} {
 	classyclean
 	Classy::Entry .try -label try -command {set ::c}

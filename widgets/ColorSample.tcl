@@ -33,7 +33,7 @@
 Widget subclass Classy::ColorSample
 Classy::export ColorSample {}
 
-Classy::ColorSample classmethod init {args} {
+Classy::ColorSample method init {args} {
 	# REM Create object
 	# -----------------
 	super init

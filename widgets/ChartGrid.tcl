@@ -51,7 +51,7 @@
 Class subclass Classy::ChartGrid
 Classy::export ChartGrid {}
 
-Classy::ChartGrid classmethod init {args} {
+Classy::ChartGrid method init {args} {
 	super init
 	private $object options
 	array set options {

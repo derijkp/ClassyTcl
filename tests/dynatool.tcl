@@ -83,5 +83,32 @@ test Classy::DynaTool {misc} {
 	manualtest
 } {}
 
+test Classy::DynaTool {%W stress test} {
+	classyclean
+	catch {unset ::copy}
+	catch {unset ::opt}
+	proc tproc {w} {
+		Classy::Entry $w
+		return [list $w configure -command [list invoke {v} {puts %W:$v}]]
+	}
+	Classy::DynaTool define Test {
+		action "Test" "Test" {%W insert end test}
+		action "OK" "OK" {%W insert end OK}
+		label label "Just a label"
+		tool tproc "Proc"
+		widget Entry "Entry" {-command {invoke v {puts %W:$v}}}
+		check copy "Copy" {-variable copy(%W) -command {puts %W:$copy(%W)}}
+		radio opt1 "opt1" {-variable opt -value opt1 -command {puts %W:$opt}}
+		radio opt2 "opt2" {-variable opt -value opt2 -command {puts %W:$opt}}
+	}
+	entry .e
+	Classy::DynaTool .try -cmdw .text
+	.try configure -type Test
+	pack .try -fill x
+	text .text
+	pack .text -side bottom
+	manualtest
+} {}
+
 testsummarize
 

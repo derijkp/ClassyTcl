@@ -39,5 +39,3 @@ set status($w,file) $temp
 writefile $status($w,file) [$w save]
 }
 
-
-

@@ -11,8 +11,8 @@
 # to -g, change the following line:
 CFLAGS = -g -Wall
 
-TCL_SRC=	/home/peter/tcl/tcl8.0
-TK_SRC =	/home/peter/tcl/tk8.0
+TCL_SRC=	/home/peter/tcl/tcl8.0.4
+TK_SRC =	/home/peter/tcl/tk8.0.4
 CC = gcc
 DEFS =  -DHAVE_UNISTD_H=1 -DHAVE_LIMITS_H=1 -DSTDC_HEADERS=1 -DHAVE_SYS_TIME_H=1 -DTIME_WITH_SYS_TIME=1 
 
@@ -24,8 +24,8 @@ SHLIB_SUFFIX = .so
 LD_FLAGS = -fPIC
 X11_INCLUDES = -I/usr/X11R6/include
 X11_LIB_SWITCHES = -L/usr/X11R6/lib -lX11
-TCL_LIB_SPEC = -L/usr/local/lib -ltcl8.0
-TK_LIB_SPEC = -L/usr/local/lib -ltk8.0
+TCL_LIB_SPEC = -L/usr/local/lib -ltcl8.0${TCL_DBGX}
+TK_LIB_SPEC = -L/usr/local/lib -ltk8.0${TK_DBGX}
 
 CC_SWITCHES = $(CFLAGS) $(SHLIB_CFLAGS) $(DEFS) -I$(TCL_SRC)/unix -I$(TCL_SRC)/generic \
 			 -I${TK_SRC}/generic -I${TK_SRC}/xlib/X11 ${X11_INCLUDES}
@@ -46,7 +46,7 @@ classywish: tkAppInit.o $(CLASSYOBJS)
 	$(CC) $(CFLAGS) -o classywish tkAppInit.o $(CLASSYOBJS) ${TCL_LIB_SPEC} ${TK_LIB_SPEC} ${LIBS}
 
 clean:
-	rm -f *.o ../classy$(SHLIB_SUFFIX) ../win/*.csm ../win/tmp/* ../*.dll
+	rm -f *.o ../classy$(SHLIB_SUFFIX) ../win/*.csm ../win/tmp/* ../*.dll classywish classytcl
 
 distclean:
 	rm -f config.cache config.log config.status Makefile

@@ -15,6 +15,7 @@ proc alltest file {
 
 alltest class.tcl
 alltest widget.tcl
+alltest autoload.tcl
 alltest balloon.tcl
 alltest browser.tcl
 alltest canvas.tcl
@@ -39,4 +40,3 @@ alltest toplevel.tcl
 alltest tree.tcl
 alltest treewidget.tcl
 alltest varia.tcl
-

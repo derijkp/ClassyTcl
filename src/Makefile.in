@@ -45,7 +45,7 @@ classywish: tkAppInit.o $(CLASSYOBJS)
 	$(CC) $(CFLAGS) -o classywish tkAppInit.o $(CLASSYOBJS) ${TCL_LIB_SPEC} ${TK_LIB_SPEC} ${LIBS}
 
 clean:
-	rm -f *.o ../classy$(SHLIB_SUFFIX) ../win/*.csm ../win/tmp/* ../*.dll
+	rm -f *.o ../classy$(SHLIB_SUFFIX) ../win/*.csm ../win/tmp/* ../*.dll classywish classytcl
 
 distclean:
 	rm -f config.cache config.log config.status Makefile

@@ -13,10 +13,10 @@ if ![file exists [file join lib Class.tcl]] {
 	puts stderr "ERROR: makedist.tcl must be run in the ClassyTcl developement directory"
 	exit 1
 }
-# $Format: "\tset version 0.$ProjectMajorVersion$"$
-	set version 0.3
+# $Format: "\tset currentversion 0.$ProjectMajorVersion$"$
+	set currentversion 0.3
 # $Format: "\tset patchLevel $ProjectMinorVersion$"$
-	set patchLevel 3
+	set patchLevel 4
 
 lappend auto_path [pwd]
 package require -exact Class $currentversion

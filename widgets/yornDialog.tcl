@@ -27,7 +27,7 @@
 Classy::Dialog subclass Classy::yornDialog
 Classy::export yornDialog {}
 
-Classy::yornDialog classmethod init {args} {
+Classy::yornDialog method init {args} {
 	super init
 	message $object.options.message -width 200 -justify center
 	pack $object.options.message

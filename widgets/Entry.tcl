@@ -16,8 +16,9 @@
 # with a few extras
 #<ul>
 #<li>optional label
-#<li>invoke command upon entry
+#<li>invoke command upon pressing Enter
 #<li>constraints
+#<li>validate command (executed upon each change)
 #<li>a <a href="DefaultMenu.html">DefaultMenu</a> can be added to
 # store and reselecte values easily. These default values are stored
 # by the <a href="Default.html">Default</a> system as type app.
@@ -56,7 +57,9 @@ bind Classy::Entry <<Drop>> {
 bind Classy::Entry <<Drag-Motion>> {
 	tkEntryButton1 %W %x
 }
+bind Classy::Entry <<MXPaste>> {%W paste;break}
 bind Classy::Entry <Any-KeyRelease> {%W constrain}
+bind Classy::Entry <Any-ButtonRelease> {%W constrain}
 
 # ------------------------------------------------------------------
 #  Widget creation
@@ -65,18 +68,19 @@ bind Classy::Entry <Any-KeyRelease> {%W constrain}
 Widget subclass Classy::Entry
 Classy::export Entry {}
 
-Classy::Entry classmethod init {args} {
+Classy::Entry method init {args} {
 	# REM Create object
 	# -----------------
-	super init
+	set w [super init]
+	$w configure -highlightthickness 0
 	frame $object.frame
 	frame $object.frame.entry
 	pack $object.frame -expand yes -fill x -side left
 	pack $object.frame.entry -expand yes -fill x -side left
 	bindtags $object [lreplace [bindtags $object] 2 0 Entry]
 	entry $object.entry
-	::class::rebind $object.entry $object
-	::class::refocus $object $object.entry
+	$object _rebind $object.entry
+	::Classy::refocus $object $object.entry
 	pack $object.entry -in $object.frame.entry -side left -expand yes -fill x
 	# REM Create bindings
 	# -------------------
@@ -93,10 +97,10 @@ Classy::Entry classmethod init {args} {
 #  Widget options
 # ------------------------------------------------------------------
 
-Classy::Entry chainoptions {$object.entry}
-Classy::Entry chainoption -background {$object} -background {$object.entry} -background
-Classy::Entry chainoption -highlightbackground {$object} -highlightbackground {$object.entry} -highlightbackground
-Classy::Entry chainoption -highlightcolor {$object} -highlightcolor {$object.entry} -highlightcolor
+Classy::Entry chainoptions {::Tk::$object.entry}
+Classy::Entry chainoption -background {$object} -background {::Tk::$object.entry} -background
+Classy::Entry chainoption -highlightbackground {$object} -highlightbackground {::Tk::$object.entry} -highlightbackground
+Classy::Entry chainoption -highlightcolor {$object} -highlightcolor {::Tk::$object.entry} -highlightcolor
 
 #doc {Entry options -orient} option {-orient orient Orient} descr {
 # determines the position of the label relative to the entry: horizontal or vertical
@@ -136,7 +140,7 @@ Classy::Entry addoption -label {label Label {}} {
 	private $object options
 	catch {destroy $object.label}
 	if {"$value" != ""} {
-		label $object.label
+		label $object.label -bg $options(-labelbg)
 		pack $object.label -before $object.frame -side left
 		$object.label configure -text $value
 		if {"$options(-orient)"!="horizontal"} {
@@ -147,6 +151,13 @@ Classy::Entry addoption -label {label Label {}} {
 		catch {destroy $object.label}
 	}
 	return $value
+}
+
+#doc {Entry options -labelbg} option {-labelbg labelBg LabelBg} descr {
+# background color of label
+#}
+Classy::Entry addoption -labelbg {labelBg LabelBg gray} {
+	$object.label configure -bg $value
 }
 
 #doc {Entry options -command} option {-command command Command} descr {
@@ -163,6 +174,14 @@ Classy::Entry addoption -command {command Command {}}
 # No constraint is applied when it is set to the empty string.
 #}
 Classy::Entry addoption -constraint {constraint Constraint {}}
+
+#doc {Entry options -validate} option {-validate validate Validate} descr {
+# This is a more general method to do validation of the entered value.
+# the command given in the validate option will be invoked with two parameters:
+# the old and the new value. The command must return 0 if the new value is ok, and
+# 1 if the new value is not ok.
+#}
+Classy::Entry addoption -validate {validate Validate {}}
 
 #doc {Entry options -labelwidth} option {-labelwidth labelWidth LabelWidth} descr {
 # width of the label
@@ -184,7 +203,7 @@ Classy::Entry addoption -warn {warn warn 1} {
 #  Methods
 # ------------------------------------------------------------------
 
-Classy::Entry chainallmethods {$object.entry} entry
+Classy::Entry chainallmethods {::Tk::$object.entry} entry
 
 #doc {Entry command nocmdset} cmd {
 #pathname nocmdset value
@@ -193,10 +212,9 @@ Classy::Entry chainallmethods {$object.entry} entry
 #}
 Classy::Entry method nocmdset {val} {
 	private $object previous
-	$object.entry delete 0 end
-	$object.entry insert 0 $val
-	$object constrain
-	$object.entry xview end
+	::Tk::$object.entry delete 0 end
+	::Tk::$object.entry insert 0 $val
+	::Tk::$object.entry xview end
 }
 
 #doc {Entry command set} cmd {
@@ -206,6 +224,7 @@ Classy::Entry method nocmdset {val} {
 #}
 Classy::Entry method set {val} {
 	$object nocmdset $val
+	$object constrain
 	$object command
 }
 
@@ -215,7 +234,7 @@ Classy::Entry method set {val} {
 # get the current contents of the entry
 #}
 Classy::Entry method get {} {
-	return [$object.entry get]
+	return [::Tk::$object.entry get]
 }
 
 #doc {Entry command command} cmd {
@@ -226,7 +245,7 @@ Classy::Entry method get {} {
 Classy::Entry method command {} {
 	set command [getprivate $object options(-command)]
 	if {"$command" != ""} {
-		uplevel #0 $command [list [$object.entry get]]
+		uplevel #0 $command [list [::Tk::$object.entry get]]
 		return 1
 	} else {
 		return 0
@@ -241,23 +260,40 @@ Classy::Entry method command {} {
 Classy::Entry method constrain {} {
 	private $object options previous previouscol
 	set warn $options(-warn)
-	set constraint $options(-constraint)
-	if {"$constraint" == ""} {
-		return
+	set new [$object get]
+	set ok 1
+	if [llength $options(-validate)] {
+		if [catch {uplevel #0 $options(-validate)} ok] {
+			set error $ok
+			set ok 0
+		}
+		if ![string length $ok] {set ok 1}
+		if [true $ok] {set ok 1}
+		if {$ok == 2} {
+			set warn 1
+			set ok 0
+		}
 	}
-	if [regexp $constraint [$object get]] {
-		set previous [$object get]
+	if {$ok == 1} {
+		set constraint $options(-constraint)
+		if [string length $constraint] {
+			set ok [regexp $constraint $new]
+		}
+	}
+	if $ok {
+		set previous $new
 		if [info exists previouscol] {
-			$object.entry configure -fg $previouscol
+			::Tk::$object.entry configure -fg $previouscol
 			unset previouscol
 		}
 	} else {
 		if {$warn==0} {
 			$object nocmdset $previous
 		} elseif ![info exists previouscol] {
-			set previouscol [$object.entry cget -fg]
-			$object.entry configure -fg red
+			set previouscol [::Tk::$object.entry cget -fg]
+			::Tk::$object.entry configure -fg red
 		}
+		if [info exists error] {error $error}
 	}
 }	
 
@@ -275,5 +311,13 @@ Classy::Entry method _redrawentry {} {
 		pack $object.frame -side bottom -expand yes -fill x
 		return vertical
 	}
+}
+
+Classy::Entry method paste {} {
+	::Tk::$object.entry insert insert [selection get -displayof $object]
+}
+
+Classy::Entry method previous {} {
+	return [getprivate $object previous]
 }
 

@@ -45,7 +45,7 @@
 Classy::CanvasObject subclass Classy::CanvasSeq
 Classy::export CanvasSeq {}
 
-Classy::CanvasSeq classmethod init {args} {
+Classy::CanvasSeq method init {args} {
 	super init
 	private $class actions
 	private $object options id

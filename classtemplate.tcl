@@ -27,7 +27,7 @@ bind Classy::Test <action> {
 Widget subclass Classy::Test
 Classy::export Test {}
 
-Classy::Test classmethod init {args} {
+Classy::Test method init {args} {
 	# REM Create object
 	# -----------------
 	super frame $object

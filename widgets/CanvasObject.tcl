@@ -45,7 +45,7 @@
 Class subclass Classy::CanvasObject
 Classy::export CanvasObject {}
 
-Classy::CanvasObject classmethod init {args} {
+Classy::CanvasObject method init {args} {
 	super init
 	private $class actions
 	private $object options id

@@ -44,25 +44,7 @@ proc bgerror {err} {
 	.bgerrorDialog add break "Break" {
 		set ::Classy::error(action) break
 	}
-	.bgerrorDialog add trace "Stack Trace" {
-		if [catch {
-			set w [edit $::Classy::error(file)]
-			$w.editor.edit set [readfile $::Classy::error(file)]
-			$w.editor.edit textchanged 0
-			wm title $w "Stack Trace"
-		}] {
-			Tk::bgtrace $info
-		}
-			
-		# Be sure to release any grabs that might be present on the
-		# screen, since they could make it impossible for the user
-		# to interact with the stack trace.
-	
-		if {[grab current .] != ""} {
-			grab release [grab current .]
-		}
-		set ::Classy::error(action) ok
-	}
+	.bgerrorDialog add trace "Stack Trace" Classy::stacktrace
 	.bgerrorDialog persistent set {}
     # 2. Fill the top part with bitmap and message (use the option
     # database for -wraplength so that it can be overridden by
@@ -75,6 +57,26 @@ proc bgerror {err} {
 	focus .bgerrorDialog
 	tkwait window .bgerrorDialog
 	return -code $::Classy::error(action)
+}
+
+proc Classy::stacktrace {} {
+	if [catch {
+		set w [edit $::Classy::error(file)]
+		$w.editor.edit set [readfile $::Classy::error(file)]
+		$w.editor.edit textchanged 0
+		wm title $w "Stack Trace"
+	}] {
+		Tk::bgtrace $info
+	}
+		
+	# Be sure to release any grabs that might be present on the
+	# screen, since they could make it impossible for the user
+	# to interact with the stack trace.
+
+	if {[grab current .] != ""} {
+		grab release [grab current .]
+	}
+	set ::Classy::error(action) ok
 }
 
 proc ::Tk::bgtrace info {

@@ -34,7 +34,7 @@
 Widget subclass Classy::Progress
 Classy::export Progress {}
 
-Classy::Progress classmethod init {args} {
+Classy::Progress method init {args} {
 	super init
 	frame $object.frame -relief sunken -height 20
 	frame $object.frame.prog -relief raised -bg green -width 0 -height 20

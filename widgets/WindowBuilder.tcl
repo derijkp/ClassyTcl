@@ -53,7 +53,7 @@ bind Classy::WindowBuilder <Configure> "\[Classy::WindowBuilder_win %W\] _config
 Classy::Toplevel subclass Classy::WindowBuilder
 Classy::export WindowBuilder {}
 
-Classy::WindowBuilder classmethod init {args} {
+Classy::WindowBuilder method init {args} {
 	super init	-keepgeometry all -resize {2 2}
 	private $object current options
 	set current(w) ""
@@ -523,7 +523,7 @@ Classy::WindowBuilder method code {{function {}}} {
 		set function $data(function)
 	}
 	set data(parse) ""
-	set body "$function classmethod init args \{\n"
+	set body "$function method init args \{\n"
 	append body "\tsuper init\n"
 	append body "\t# Create windows\n"
 	append body [$object generate $base]
@@ -538,14 +538,14 @@ Classy::WindowBuilder method code {{function {}}} {
 		append body "\t# Parse this\n"
 		append body $data(parse)
 	}
+	append body "\t# Configure initial arguments\n"
+	append body "\t[list if {"$args" != ""} {eval $object configure $args}]\n"
 	set init [string trimright [$object.code.book.f3.finalise get]]
 	if [string length $init] {
 		append body "# ClassyTcl Finalise\n"
 		append body $init
 		append body "\n"
 	}
-	append body "\t# Configure initial arguments\n"
-	append body "\t[list if {"$args" != ""} {eval $object configure $args}]\n"
 	append body "\treturn \$object\n"
 	append body "\}"
 	foreach option $data(options) {
@@ -553,6 +553,7 @@ Classy::WindowBuilder method code {{function {}}} {
 		append body [list $data(function) addoption $option [list $data(options,$option,name) $data(options,$option,class) $data(options,$option,def)] $data(options,$option,code)]
 	}
 	foreach method $data(methods) {
+		if {"$method" == "init"} continue
 		append body "\n\n"
 		append body [list $data(function) method $method $data(methods,$method,args) $data(methods,$method,code)]
 	}
@@ -582,7 +583,7 @@ putsvars file function
 	set c [splitcomplete [readfile $file]]
 	set pos [lsearch -glob $c [list * subclass $function]]
 	set type [lindex [lindex $c $pos] 0]
-	set pos [lsearch -glob $c [list $function classmethod init *]]
+	set pos [lsearch -glob $c [list $function method init *]]
 	set code [lindex $c $pos]
 	set poss [lfind -glob $c [list $function addoption *]]
 	foreach line [lsub $c $poss] {
@@ -598,6 +599,7 @@ putsvars file function
 	set poss [lfind -glob $c [list $function method *]]
 	foreach line [lsub $c $poss] {
 		set method [lindex $line 2]
+		if {"$method" == "init"} continue
 		lappend data(methods) $method
 		set data(methods,$method,args) [lindex $line 3]
 		set data(methods,$method,code) [lindex $line 4]
@@ -665,9 +667,6 @@ Classy::WindowBuilder method parsecode {code {window {}}} {
 	if {"$window" == ""} {
 		set window $data(base)
 		set list [splitcomplete [lindex $code 4]]
-		set pos [lsearch -regexp $list "^\t# Configure initial arguments"]
-		incr pos -1
-		set list [lrange $list 0 $pos]
 		# initialise
 		set pos [lsearch -regexp $list {^# ClassyTcl Initialise}]
 		set init ""
@@ -688,10 +687,10 @@ Classy::WindowBuilder method parsecode {code {window {}}} {
 		if {$pos != -1} {
 			incr pos
 			set parse [lrange $list $pos end]
-			set pos [lsearch -regexp $parse "^\t?#"]
+			set pos [lsearch -regexp $parse "^\t# Configure initial arguments"]
 			if {$pos != -1} {
 				incr pos -1
-				set parse [lrange $list 0 $pos]
+				set parse [lrange $parse 0 $pos]
 			}
 		} else {
 			set parse ""
@@ -700,6 +699,7 @@ Classy::WindowBuilder method parsecode {code {window {}}} {
 		set pos [lsearch -regexp $list {^# ClassyTcl Finalise}]
 		if {$pos != -1} {
 			set range [lrange $list [expr {$pos+1}] end]
+			set range [lremove $range "\treturn \$object"]
 			$object.code.book.f3.finalise set [join $range \n]
 		} else {
 			$object.code.book.f3.finalise set {}
@@ -820,12 +820,8 @@ Classy::WindowBuilder method getoptions {base args} {
 	set rem ""
 	set type [$object itemclass $base]
 	catch {destroy .classy__.classy_temp}
-	if [info exists ::Classy::cmds($type)] {
-		set cmd [set ::Classy::cmds($type)]
-	} else {
-		if ![regexp ^Classy:: $type] {set type [string tolower $type]}
-		set cmd $type
-	}
+	catch {rename ::class::Tk_.classy__.classy_temp {}}
+	set cmd [$object class2cmd $type]
 	$cmd .classy__.classy_temp
 	foreach defline [.classy__.classy_temp configure] {
 		set defl([lindex $defline 0]) [lindex $defline 4]
@@ -1015,7 +1011,7 @@ Classy::WindowBuilder method delete {{list {}}} {
 
 Classy::WindowBuilder method outw {base} {
 	private $object data
-	return [replace $base [list $data(base) {$object}]]
+	return [string::change $base [list $data(base) {$object}]]
 }
 
 Classy::WindowBuilder method generatebindings {base outw} {
@@ -1043,12 +1039,7 @@ Classy::WindowBuilder method generate {list} {
 		if {"[info commands ::Classy::WindowBuilder::generate_$type]" != ""} {
 			append body [::Classy::WindowBuilder::generate_$type $object $base]
 		} else {
-			if [info exists ::Classy::cmds($type)] {
-				set cmd [set ::Classy::cmds($type)]
-			} else {
-				if ![regexp ^Classy:: $type] {set type [string tolower $type]}
-				set cmd $type
-			}
+			set cmd [$object class2cmd $type]
 			set outw [$object outw $base]
 			append body "\t$cmd $outw[$object getoptions $base]\n"
 			append body "\t[$object gridwconf $base]\n"
@@ -1126,7 +1117,7 @@ Classy::WindowBuilder method save {} {
 #	set c [lsub $c -exclude $poss]
 #	set poss [lfind -glob $c [list $function method *]]
 #	set c [lsub $c -exclude $poss]
-#	set pos [lsearch -glob $c [list $function classmethod init *]]
+#	set pos [lsearch -glob $c [list $function method init *]]
 #	set c [lreplace $c $pos $pos $code]
 #	catch {file copy -force $file $file~}
 #	set f [open $file w]
@@ -1148,7 +1139,7 @@ Classy::WindowBuilder method save {} {
 		frame {set type Topframe}
 		dialog {set type Dialog}
 	}
-	Builder infile set $file $function "Classy::$type subclass $function\n$code"
+	[winfo parent $object] infile set $file $function "Classy::$type subclass $function\n$code"
 	set result $function
 	return $result
 }
@@ -1696,6 +1687,9 @@ Classy::WindowBuilder method attribute {action args} {
 				}
 				laddnew list $type
 			}
+			foreach name [array names current group,*] {
+				set current($name) [lsort $current($name)]
+			}
 			$object.attr.type configure -list [lsort $list]
 			if {[lsearch $list $cgroup] != -1} {
 				$object.attr.type set $cgroup
@@ -1928,7 +1922,6 @@ Classy::WindowBuilder method rename {args} {
 
 Classy::WindowBuilder method copy {{old {}} {clipboard 1}} {
 	private $object data current clipb
-#	set window $data(base)
 	if {"$old" == ""} {
 		set old $current(w)
 	}
@@ -2014,9 +2007,10 @@ Classy::WindowBuilder method drag {w x y} {
 	}
 	set name [string tolower [$object itemclass $rw]]
 	regsub -all : $name _ name
-	if ![catch {set image [Classy::geticon Builder/$name]}] {
-		DragDrop start $x $y [$object outw $rw] -image $image
+	if [catch {set image [Classy::geticon Builder/$name]}] {
+		set image [Classy::geticon unknown]
 	}
+	DragDrop start $x $y [$object outw $rw] -image $image
 }
 
 Classy::WindowBuilder method drop {dst} {
@@ -2192,6 +2186,7 @@ Classy::WindowBuilder method _dialogmethoddelete {method} {
 }
 
 Classy::WindowBuilder method _methodbrowse {value} {
+puts [list $object _methodbrowse $value]
 	private $object data
 	set window $object.code
 	$window.book.methods.edit.args configure \
@@ -2344,6 +2339,19 @@ Classy::WindowBuilder method _configure {window} {
 		uplevel #0 ::Classy::WindowBuilder::configure_$class $object $window
 	}
 	Classy::todo $object redraw
+}
+
+Classy::WindowBuilder method class2cmd {type} {
+	if [info exists ::Classy::cmds($type)] {
+		set cmd [set ::Classy::cmds($type)]
+	} else {
+		if ![regexp ^Classy:: $type] {
+			if ![string length [info commands $type]] {
+				set type [string tolower $type]
+			}
+		}
+		set cmd $type
+	}
 }
 
 #proc cleargi {} {

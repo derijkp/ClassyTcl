@@ -38,7 +38,7 @@ laddnew ::Classy::help_path [file join $Extral::dir docs]
 Classy::Toplevel subclass Classy::Help
 Classy::export Help {}
 
-Classy::Help classmethod init {args} {
+Classy::Help method init {args} {
 	super init
 	Classy::HTML $object.html -yscrollcommand "$object.vbar set" \
 		-state disabled -wrap word -cursor hand2 \

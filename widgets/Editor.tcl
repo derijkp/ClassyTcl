@@ -37,7 +37,7 @@ option add *Classy::Editor.KeyDelComment "Control-Alt-numbersign" widgetDefault
 Widget subclass Classy::Editor
 Classy::export Editor {}
 
-Classy::Editor classmethod init {args} {
+Classy::Editor method init {args} {
 	super init
 	set w [::Classy::window $object]
 	$w configure -highlightthickness 0 -borderwidth 0
@@ -48,8 +48,8 @@ Classy::Editor classmethod init {args} {
 		}]
 	bindtags $object [list $object Classy::Menu_macro Classy::Menu_pattern Classy::Editor Classy::Text all]
 	Classy::DynaMenu attachmainmenu Classy::Editor $object
-	::class::rebind $object.edit $object
-	::class::refocus $object $object.edit
+	::Classy::rebind $object.edit $object
+	::Classy::refocus $object $object.edit
 	scrollbar $object.vbar -orient vertical -command "$object.edit yview"
 	scrollbar $object.hbar -orient horizontal -command "$object.edit xview"
 	Classy::DynaTool $object.tool -type Classy::Editor -cmdw $object

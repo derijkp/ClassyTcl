@@ -35,13 +35,13 @@ bind Classy::TreeWidget <Configure> {%W redraw}
 bind Classy::TreeWidget <<Action>> {%W _action %x %y}
 bind Classy::TreeWidget <<MExecute>> {%W _execute %x %y}
 
-Classy::TreeWidget classmethod init {args} {
+Classy::TreeWidget method init {args} {
 	# REM Create object
 	# -----------------
 	super init
 	canvas $object.c -xscrollcommand [list $object.hbar set] -yscrollcommand [list $object.vbar set]
-	::class::rebind $object.c $object
-	::class::refocus $object $object.c
+	::Classy::rebind $object.c $object
+	::Classy::refocus $object $object.c
 	scrollbar $object.vbar -command [list $object.c yview] -orient vertical
 	scrollbar $object.hbar -command [list $object.c xview] -orient horizontal
 	Classy::Tree $object.tree

@@ -214,4 +214,3 @@ bindtags $w [list Select $w Classy::Menu_MainMenu Classy::Canvas Canvas .mainw a
 set status($w,type) select
 }
 
-

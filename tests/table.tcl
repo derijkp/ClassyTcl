@@ -43,6 +43,7 @@ set ::d(0,0) "abcdefghijklmnopqrstuvwxyz r 0 c 0"
 .try configure -titlerows 1 -roworigin -2
 .try configure -titlecols 1 -colorigin -2
 
+.try tag configure -2, -editable 0
 .try tag configure title -bg {} -font {helvetica 10 bold}
 .try tag configure title -bg gray -font {helvetica 10 bold}
 .try tag configure 10, -bg white

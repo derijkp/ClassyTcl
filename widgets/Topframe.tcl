@@ -11,7 +11,7 @@
 
 Widget subclass Classy::Topframe
 
-Classy::Topframe classmethod init {args} {
+Classy::Topframe method init {args} {
 	super init
 
 	# REM Configure initial arguments

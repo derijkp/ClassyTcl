@@ -24,7 +24,7 @@ catch {\1 destroy}
 
 Widget subclass \1
 
-\1 classmethod init {\2} }
+\1 method init {\2} }
 	regsub "proc Classy(\[^ \]+) \{(.*)\} " $c $replace c
 
 set replace {

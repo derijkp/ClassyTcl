@@ -39,7 +39,7 @@ bind Classy::NoteBook <Configure> {%W redraw}
 Widget subclass Classy::NoteBook
 Classy::export NoteBook {}
 
-Classy::NoteBook classmethod init {args} {
+Classy::NoteBook method init {args} {
 	# REM Create object
 	# -----------------
 	set w [super init]

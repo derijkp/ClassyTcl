@@ -27,7 +27,7 @@
 Classy::Entry subclass Classy::FileEntry
 Classy::export FileEntry {}
 
-Classy::FileEntry classmethod init {args} {
+Classy::FileEntry method init {args} {
 	super init
 	button $object.browse -text "Browse" -command [varsubst object {
 		set ::Classy::current [$object get]

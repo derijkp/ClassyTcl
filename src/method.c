@@ -26,7 +26,7 @@ int Classy_ParseArgs(
 	max = 0;
 	error = Tcl_ListObjGetElements(interp, args, &objc, &objv);
 	if (error != TCL_OK) {return error;}
-	if (objc==0) {
+	if (objc == 0) {
 		min = 0;
 		max = 0;
 	} else {
@@ -231,7 +231,7 @@ int Classy_CreateTclMethod(
 	if (error != TCL_OK) {Tcl_DecrRefCount(createObj);return error;}
 	error = Tcl_ListObjAppendElement(interp,createObj,body);
 	if (error != TCL_OK) {Tcl_DecrRefCount(createObj);return error;}
-	Tcl_EvalObj(interp,createObj);
+	error = Tcl_EvalObj(interp,createObj);
 	Tcl_DecrRefCount(createObj);
 	if (error != TCL_OK) {return error;}
 	error = Classy_ParseArgs(interp,args,&(method->min),&(method->max),method->args);
@@ -450,25 +450,6 @@ int Classy_ClassMethodClassMethod(
 	} else if ((namelen == 6)&&(strncmp(name,"parent",6)==0)) {
 	} else if ((namelen == 8)&&(strncmp(name,"children",8)==0)) {
 	} else if ((namelen == 3)&&(strncmp(name,"new",3)==0)) {
-	} else if ((namelen == 4)&&(strncmp(name,"init",4)==0)) {
-		if (strcmp(classname,"Class")==0) {
-			Tcl_ResetResult(interp);
-			Tcl_AppendResult(interp,"init classmethod of base Class cannot be redefined", (char *)NULL);
-			return TCL_ERROR;
-		}
-		if (class->init != NULL) {
-			Classy_FreeMethod(class->init);
-			Tcl_Free((char *)class->init);
-			class->init = NULL;
-		}
-		method = (Method *)Tcl_Alloc(sizeof(Method));
-		procname = Tcl_NewObj();
-		Tcl_AppendStringsToObj(procname,"::class::",classname,",,init",(char *)NULL);
-		error = Classy_CreateTclMethod(interp,method,procname,argv[1],argv[2],"init");
-		if (error != TCL_OK) {Tcl_Free((char *)method);return error;}
-		class->init=method;
-		Tcl_SetResult(interp,name,TCL_VOLATILE);
-		return TCL_OK;
 	} else if ((namelen == 7)&&(strncmp(name,"destroy",7)==0)) {
 		if (strcmp(classname,"Class")==0) {
 			Tcl_ResetResult(interp);
@@ -674,7 +655,26 @@ int Classy_MethodClassMethod(
 
 	classname = Tcl_GetStringFromObj(class->class,NULL);
 	name = Tcl_GetStringFromObj(argv[0],&namelen);
-	if ((namelen == 7)&&(strncmp(name,"destroy",7)==0)) {
+	if ((namelen == 4)&&(strncmp(name,"init",4)==0)) {
+		if (strcmp(classname,"Class")==0) {
+			Tcl_ResetResult(interp);
+			Tcl_AppendResult(interp,"init method of base Class cannot be redefined", (char *)NULL);
+			return TCL_ERROR;
+		}
+		if (class->init != NULL) {
+			Classy_FreeMethod(class->init);
+			Tcl_Free((char *)class->init);
+			class->init = NULL;
+		}
+		method = (Method *)Tcl_Alloc(sizeof(Method));
+		procname = Tcl_NewObj();
+		Tcl_AppendStringsToObj(procname,"::class::",classname,",,init",(char *)NULL);
+		error = Classy_CreateTclMethod(interp,method,procname,argv[1],argv[2],"init");
+		if (error != TCL_OK) {Tcl_Free((char *)method);return error;}
+		class->init=method;
+		Tcl_SetResult(interp,name,TCL_VOLATILE);
+		return TCL_OK;
+	} else if ((namelen == 7)&&(strncmp(name,"destroy",7)==0)) {
 		if (strcmp(classname,"Class")==0) {
 			Tcl_ResetResult(interp);
 			Tcl_AppendResult(interp,"destroy method of base Class cannot be redefined", (char *)NULL);

@@ -9,7 +9,7 @@
 
 # $Format: "package ifneeded Class 0.$ProjectMajorVersion$ \\"$
 package ifneeded Class 0.3 \
-	"[list namespace eval ::class [list set dir $dir]] ; [list source [file join $dir lib init.tcl]]"
+	"[list namespace eval ::class {}] ; [list set ::class::dir $dir] ; [list source [file join $dir lib init.tcl]]"
 
 # $Format: "package ifneeded ClassyTcl 0.$ProjectMajorVersion$ \\"$
 package ifneeded ClassyTcl 0.3 \

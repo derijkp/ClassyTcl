@@ -54,8 +54,8 @@ Classy::export Default {}
 # type type. If the key does not exists, return notfound.
 #</dl>
 #}
-Classy::Default method get {type {key {}} {notfound {}}} {
-	private $object defaults_$type
+Classy::Default classmethod get {type {key {}} {notfound {}}} {
+	private $class defaults_$type
 	if {"$key"==""} {
 		if [info exists defaults_${type}] {
 			return [array get defaults_${type}]
@@ -73,8 +73,8 @@ Classy::Default method get {type {key {}} {notfound {}}} {
 #} descr {
 # set the defaults list associated with key key of type type to value.
 #}
-Classy::Default method set {type key value} {
-	private $object defaults_$type
+Classy::Default classmethod set {type key value} {
+	private $class defaults_$type
 	set defaults_${type}($key) $value
 }
 
@@ -83,8 +83,8 @@ Classy::Default method set {type key value} {
 #} descr {
 # unset the value associated with key key of type type.
 #}
-Classy::Default method unset {type key} {
-	private $object defaults_$type
+Classy::Default classmethod unset {type key} {
+	private $class defaults_$type
 	unset defaults_${type}($key)
 }
 
@@ -93,8 +93,8 @@ Classy::Default method unset {type key} {
 #} descr {
 # add value to the defaults list associated with key key of type type.
 #}
-Classy::Default method add {type key value} {
-	private $object defaults_$type
+Classy::Default classmethod add {type key value} {
+	private $class defaults_$type
 	if ![info exists defaults_${type}($key)] {
 		set defaults_${type}($key) [list $value]
 	} elseif {[lsearch -exact [set defaults_${type}($key)] $value]==-1} {
@@ -107,8 +107,8 @@ Classy::Default method add {type key value} {
 #} descr {
 # remove value from the defaults list associated with key key of type type.
 #}
-Classy::Default method remove {type key value} {
-	private $object defaults_$type
+Classy::Default classmethod remove {type key value} {
+	private $class defaults_$type
 	if [info exists defaults_${type}($key)] {
 		set defs [set defaults_${type}($key)]
 		set pos [lsearch -exact $defs $value]
@@ -129,13 +129,13 @@ Classy::Default method remove {type key value} {
 # returns a list of all keys of type $type that match $pattern (if given).
 # If type is not given, it returns a list of all types.
 #}
-Classy::Default method names {{type {}} {pattern *}} {
+Classy::Default classmethod names {{type {}} {pattern *}} {
 	if {"$type"!=""} {
-		private $object defaults_$type
+		private $class defaults_$type
 		array names defaults_$type $pattern
 	} else {
 		set types ""
-		foreach var [$object private] {
+		foreach var [$class private] {
 			if [regexp {^defaults_(.*)$} $var temp var] {
 				lappend types $var
 			}
@@ -152,12 +152,12 @@ Classy::Default method names {{type {}} {pattern *}} {
 # If file is specified, the values will be loaded from file rather
 # than the normal loacation.
 #}
-Classy::Default method load {{type {}} {file {}}} {
+Classy::Default classmethod load {{type {}} {file {}}} {
 	if {"$type" == ""} {
 		foreach dir [set ::Classy::dirs] {
 			set dir [file join $dir def]
 			foreach type [dirglob $dir *] {
-				private $object defaults_$type
+				private $class defaults_$type
 				if [file readable [file join $dir $type]] {
 					catch {array set defaults_$type [readfile [file join $dir $type]]}
 				}
@@ -165,10 +165,12 @@ Classy::Default method load {{type {}} {file {}}} {
 		}
 		return {}
 	}
-	private $object defaults_$type
-	if {"$file"==""} {
-		set file $type.def
+	private $class defaults_$type
+	if [string length $file] {
+		array set defaults_$type [readfile $file]
+		return
 	}
+	set file $type.def
 	foreach dir [set ::Classy::dirs] {
 		set dir [file join $dir def]
 		foreach file [dirglob $dir *] {
@@ -187,9 +189,9 @@ Classy::Default method load {{type {}} {file {}}} {
 # If file is specified, the values will be saved to file rather
 # than the normal location.
 #}
-Classy::Default method save {{type {}} {file {}}} {
+Classy::Default classmethod save {{type {}} {file {}}} {
 	if {"$type" == ""} {
-		set todo [$object names]
+		set todo [$class names]
 	} else {
 		set todo $type
 	}
@@ -198,7 +200,7 @@ Classy::Default method save {{type {}} {file {}}} {
 		return "not saved"
 	}
 	foreach type $todo {
-		private $object defaults_$type
+		private $class defaults_$type
 		set f [open [file join $workdir $type] "w"]
 		foreach {name value} [array get defaults_$type] {
 			puts $f "[list $name] [list $value]"
@@ -214,14 +216,14 @@ Classy::Default method save {{type {}} {file {}}} {
 # remove all defaults. If the type argument is given, remove only defaults
 # of type type.
 #}
-Classy::Default method clear {{type {}}} {
+Classy::Default classmethod clear {{type {}}} {
 	if {"$type" == ""} {
-		set todo [$object names]
+		set todo [$class names]
 	} else {
 		set todo $type
 	}
 	foreach type $todo {
-		private $object defaults_$type
+		private $class defaults_$type
 		if [info exists defaults_$type] {unset defaults_$type}
 	}
 }

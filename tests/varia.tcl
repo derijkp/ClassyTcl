@@ -66,6 +66,58 @@ test Classy::Paned {vertical} {
 	manualtest
 } {}
 
+test Classy::Paned {horizontal 3 in frame} {
+	classyclean
+	frame .f -width 20
+	Classy::Paned .f.try -window .f.l1 -gainfrom .f.l2 -snaptoborder 1
+	Classy::Paned .f.try2 -window .f.l2
+	text .f.l1 -width 2
+	text .f.l2 -width 2
+	text .f.l3 -width 2
+	grid .f.l1 .f.try .f.l2 .f.try2 .f.l3 -sticky nwse
+	grid columnconfigure .f 4 -weight 1
+	grid rowconfigure .f 0 -weight 1
+	button .b -text unused
+	grid .f -row 0 -column 0 -sticky nwse
+	grid .b -row 0 -column 1
+	grid columnconfigure . 0 -weight 1
+	grid rowconfigure . 0 -weight 1
+	manualtest
+} {}
+
+test Classy::Paned {vertical 3 in frame} {
+	classyclean
+	frame .f -width 20
+	text .f.l1 -height 2
+	text .f.l2 -height 2
+	text .f.l3 -height 2
+	Classy::Paned .f.try -window .f.l1 -gainfrom .f.l2 -orient vertical
+	Classy::Paned .f.try2 -window .f.l2 -orient vertical
+	foreach w {.f.l1 .f.try .f.l2 .f.try2 .f.l3} {
+		grid $w -sticky nwse
+	}
+	grid columnconfigure .f 0 -weight 1
+	grid rowconfigure .f 4 -weight 1
+	button .b -text unused
+	grid .f -row 0 -column 0 -sticky nwse
+	grid .b -row 0 -column 1
+	grid columnconfigure . 0 -weight 1
+	grid rowconfigure . 0 -weight 1
+	manualtest
+} {}
+
+test Classy::Paned {reverse 3} {
+	classyclean
+	Classy::Paned .try -window .l2
+	Classy::Paned .try2 -window .l3 -gainfrom .l2
+	text .l1 -width 2
+	text .l2 -width 2
+	text .l3 -width 2
+	grid .l1 .try .l2 .try2 .l3 -sticky nwse
+	grid columnconfigure . 0 -weight 1
+	manualtest
+} {}
+
 test Classy::OptionBox {basic} {
 	classyclean
 	Classy::OptionBox .try -label Try -variable try -orient vertical
@@ -187,7 +239,7 @@ test Classy::ListBox {basic} {
 	classyclean
 	Classy::ListBox .try -content {{Trying it out with something long} now a b c d e f g h i j}
 	pack .try -fill both -expand yes
-	.try configure -command {puts}
+	.try configure -command {puts} -browsecommand {invoke value {puts "browse:$value"}}
 } {}
 
 test Classy::MultiFrame {basic} {

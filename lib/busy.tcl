@@ -21,7 +21,7 @@ proc ::Classy::busy {{action {add}} args} {
 					set pattern $p.*,c
 				}
 				set list [lsort -decreasing [array names ::Classy::busy $pattern]]
-				lappend list $p,c
+				laddnew list $p,c
 				foreach w $list {
 					regexp {^(.*),c$} $w temp w
 					if [info exists ::Classy::busy($w,c)] {

@@ -11,7 +11,7 @@ tk appname cbuild
 # $Format: "package require -exact ClassyTcl 0.$ProjectMajorVersion$"$
 package require -exact ClassyTcl 0.3
 
-if {"$argv" != ""} {
+if [llength $argv] {
 	set file [lindex $argv 0]
 	set argv [lrange $argv 1 end]
 	if {"[file pathtype $file]" == "relative"} {

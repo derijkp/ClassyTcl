@@ -10,14 +10,9 @@ package require Tcl 8.0
 # $Format: "set ::class::version 0.$ProjectMajorVersion$"$
 set ::class::version 0.3
 # $Format: "set ::class::patchlevel $ProjectMinorVersion$"$
-set ::class::patchlevel 3
+set ::class::patchlevel 4
 package provide Class $::class::version
 
-# Solve problems with auto_loading from namespaces
-# in patchlevels 0 and 1 of Tcl8.0
-if {("$tcl_patchLevel" == "8.0")||("$tcl_patchLevel" == "8.0p1")} {
-	source [file join $::class::dir patches init.tcl]
-}
 # Load the shared library if present
 # If not, Tcl code will be loaded when necessary
 #

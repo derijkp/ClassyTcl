@@ -131,6 +131,75 @@ proc convrec {src} {
 	}
 }
 
+proc convcode {dir} {
+	set files [glob [file join $dir *.tcl]]
+	foreach file $files {
+		set c [splitcomplete [readfile $file]]
+		set newc ""
+		foreach line $c {
+			if [regexp "^proc \[^ \]+ args \{# ClassyTcl generated (\[^ \n\]+)" $line temp type] {
+				set function [lindex $line 1]
+				set code [lindex $line 3]
+				set code [replace $code {$window $object {varsubst window} {varsubst object}}]
+				set code [splitcomplete $code]
+				set opt [lindex $code 2]
+				set code [lreplace $code 0 2 "\tsuper init"]
+				set code [lreplace $code 2 2]
+				set pos [lsearch -regexp $code {^# ClassyTcl Initialise}]
+				if {$pos == -1} {
+					set pos [lsearch -regexp $code "^\t# Parse this"]
+				}
+				set code [linsert $code $pos \t[list if {"$args" == "___Classy::Builder__create"} {return $object}]]
+				set pos [lsearch -regexp $code {^# ClassyTcl Finalise}]
+				set insert "\t# Configure initial arguments"
+				append insert \n\t[list if {"$args" != ""} {eval $object configure $args}]
+				if {$pos != -1} {
+					set code [linsert $code $pos $insert]
+				} else {
+					lappend code $insert
+				}
+				set code [join $code \n]
+				lappend newc [list Classy::$type subclass $function]
+				lappend newc "[list $function] method init args \{\n$code\}"
+				foreach {option options default} [lindex $opt 3] {
+					if [string length $options] {
+						if {"$options" == "0 1"} {
+							set code {set value [true $value]}
+						} else {
+							set code "\tif \{\[lsearch $options $value\] == -1\} \{\n"
+							append code "\t\terror \"Unkown option(s): \\\"$value\\\"\\nmust be one of: $options\"\n"
+							append code "\t\}\n"
+						}
+					} else {
+						set code {}
+					}
+					lappend newc [list $function addoption $option [list [string range $option 1 end] "[string toupper [string index $option 1]][string range $option 2 end]" $default] $code]
+				}
+			} elseif [regexp "^proc main \{?args\}?" $line] {
+				regsub "(\[\[\n\t \]mainw)(\[\]\t\n \]\[^.\])" $line "\\1 .mainw\\2" line
+				regsub "(\[\n\t \]mainw)(\n)" $line "\\1 .mainw\\2" line
+				lappend newc $line
+			} else {
+				lappend newc $line
+			}
+		}
+		catch {file copy -force $file $file~}
+		set f [open $file w]
+		set space 0
+		foreach line $newc {
+			if ![string length $line] {
+				if $space continue
+				set space 1
+			} else {
+				set space 0
+			}
+			puts $f $line
+		}
+		close $f
+	}
+	catch {Classy::auto_mkindex [file dirname $file] *.tcl}
+}
+
 invoke {file} {
 	if [file isdir $file] {
 		set dir $file
@@ -151,7 +220,9 @@ invoke {file} {
 		catch {file rename $file [file join $dir conf themes [file tail $file]]}
 	}
 	catch {file delete [file join $dir conf opt]}
-	puts "conversion ok"
+	convcode [file join $dir lib]
+	puts "conversion done"
+	puts "WARNING: behaviour has changed a lot between these versions, and you might very well need to change some code"
 } $file
 
 exit

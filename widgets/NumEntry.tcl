@@ -39,7 +39,7 @@ option add *Classy::NumEntry.entry.width 5 widgetDefault
 Classy::Entry subclass Classy::NumEntry
 Classy::export NumEntry {}
 
-Classy::NumEntry classmethod init {args} {
+Classy::NumEntry method init {args} {
 	super init
 	bindtags $object [lreplace [bindtags $object] 2 0 Classy::Entry]
 	bindtags $object.entry [lreplace [bindtags $object.entry] 3 0 Classy::Entry]

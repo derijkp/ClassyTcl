@@ -38,7 +38,7 @@ option add *Classy::Fold.spacer.width 10 widgetDefault
 Widget subclass Classy::Fold
 Classy::export Fold {}
 
-Classy::Fold classmethod init {args} {
+Classy::Fold method init {args} {
 	# REM Create object
 	# -----------------
 	super init

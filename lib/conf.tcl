@@ -5,36 +5,37 @@
 # conf
 # ----------------------------------------------------------------------
 
-global env
-if [info exists env(CLASSYCONFIG)] {
-	set configdir $env(CLASSYCONFIG)
-} elseif {"$tcl_platform(platform)" == "windows"} {
-	set configdir [file join [set ::class::dir] userconf]
-} elseif [info exists env(HOME)] {
-	set configdir $env(HOME)
-} else {
-	set configdir [file join [set ::class::dir] userconf]
-}
-
-set Classy::dir(def) [file join [set ::class::dir] conf]
-set Classy::dir(user) [file join $configdir .classy]
-set Classy::dir(appdef) [file join [set ::Classy::appdir] conf]
-set Classy::appname [tk appname]
-regsub { #[0-9]+$} $Classy::appname {} Classy::appname
-set Classy::dir(appuser) [file join $configdir .classy-apps $Classy::appname]
-set Classy::dirs [list \
-	$Classy::dir(def) \
-	$Classy::dir(user) \
-	$Classy::dir(appdef) \
-	$Classy::dir(appuser)]
-
-foreach type {user appuser} {
-	foreach dir {themes icons def} {
-		set dir [file join $Classy::dir($type) $dir]
-		catch {file mkdir $dir}
+invoke {} {
+	global env tcl_platform
+	if [info exists env(CLASSYCONFIG)] {
+		set configdir $env(CLASSYCONFIG)
+	} elseif {"$tcl_platform(platform)" == "windows"} {
+		set configdir [file join [set ::class::dir] userconf]
+	} elseif [info exists env(HOME)] {
+		set configdir $env(HOME)
+	} else {
+		set configdir [file join [set ::class::dir] userconf]
+	}
+	
+	set ::Classy::dir(def) [file join [set ::class::dir] conf]
+	set ::Classy::dir(user) [file join $configdir .classy]
+	set ::Classy::dir(appdef) [file join [set ::Classy::appdir] conf]
+	set ::Classy::appname [tk appname]
+	regsub { #[0-9]+$} $::Classy::appname {} ::Classy::appname
+	set ::Classy::dir(appuser) [file join $configdir .classy-apps $::Classy::appname]
+	set ::Classy::dirs [list \
+		$::Classy::dir(def) \
+		$::Classy::dir(user) \
+		$::Classy::dir(appdef) \
+		$::Classy::dir(appuser)]
+	
+	foreach type {user appuser} {
+		foreach dir {themes icons def} {
+			set dir [file join $::Classy::dir($type) $dir]
+			catch {file mkdir $dir}
+		}
 	}
 }
-
 proc Classy::realcolor {color} {
 	if {[lsearch {Background darkBackground lightBackground Foreground activeBackground activeForeground disabledForeground selectBackground selectForeground selectColor highlightBackground highlightColor} $color] != -1} {
 		set temp [option get . $color $color]
@@ -325,6 +326,16 @@ proc Classy::Config {option args} {
 		}
 		new {
 			return [eval Classy::newconfig $args]
+		}
+		find {
+			catch {unset result}
+			set pattern [lindex $args 0]
+			foreach dir $::Classy::dirs {
+				foreach file [glob -nocomplain [file join $dir $pattern]] {
+					set result([file tail $file]) $file
+				}
+			}
+			return [array get result]
 		}
 		default {
 			error "Unknown option, should be one of dialog, config or new

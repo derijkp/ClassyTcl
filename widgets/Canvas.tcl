@@ -42,7 +42,7 @@ if ![catch {.classy__.temp create line 10 10 10 10 -activefill red}] {
 Widget subclass Classy::Canvas
 Classy::export Canvas {}
 
-Classy::Canvas classmethod init {args} {
+Classy::Canvas method init {args} {
 	private $object data undo currentname w del
 	setprivate $object data(w) [super init canvas]
 	set w $data(w)
@@ -621,13 +621,13 @@ Classy::Canvas method zoom {{factor {}}} {
 	set rfactor [expr {double($factor)/$data(zoom)}]
 	$w scale all 0 0 $rfactor $rfactor
 	foreach font [array names fonts] {
-		eval font configure {$fonts($font)} [font actual [::Classy::zoomfont $font $factor]]
+		set newfont [font actual [::Classy::zoomfont $font $factor]]
+		eval font configure {$fonts($font)} $newfont
 	}
 	foreach width [array names widths] {
 		set widths($width) [expr {$width*$factor}]
 	}
 	foreach {item value} [array get itemw] {
-puts $item
 		$w itemconfigure $item -width $widths($value)
 	}
 	set data(zoom) $factor
@@ -1001,7 +1001,15 @@ Classy::Canvas method scale {tagOrId xOrigin yOrigin xScale yScale} {
 	return $result
 }
 
-if ![catch {load [file join $class::dir visitors visrotate[info sharedlibextension]]}] {
+if ![info exists ::class::visrotate] {
+	if ![catch {load [file join $class::dir visitors visrotate[info sharedlibextension]]}] {
+		set ::class::visrotate 1
+	} else {
+		set ::class::visrotate 0
+	}
+}
+
+if $::class::visrotate {
 Classy::Canvas method rotate {tagOrId xcenter ycenter angle} {
 	private $object w data
 	if $data(undo) {
@@ -2017,5 +2025,3 @@ Classy::Canvas method wincopy {{tag all}} {
 	error "wincopy not supported"
 }
 }
-
-

@@ -72,6 +72,7 @@ array set ::Classy::WindowBuilder::options {
 	-variable {Code line}
 	-selectimage {Display image}
 	-indicatoron {Display bool}
+	-snaptoborder {Code bool}
 	-activebackground {Colors color}
 	-activeforeground {Colors color}
 	-background {Colors color}

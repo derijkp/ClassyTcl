@@ -7,11 +7,7 @@
 # a script that loads the command.
 
 set auto_index(function) [list source [file join $dir dialogs.tcl]]
-set auto_index(try) [list source [file join $dir dialogs.tcl]]
 set auto_index(plainf) [list source [file join $dir dialogs.tcl]]
-set auto_index(t) [list source [file join $dir dialogs.tcl]]
-set auto_index(geom) [list source [file join $dir dialogs.tcl]]
-set auto_index(draw) [list source [file join $dir dialogs.tcl]]
 set auto_index(ttt) [list source [file join $dir dialogs.tcl]]
 set auto_index(testing) [list source [file join $dir try.tcl]]
 set auto_index(test3) [list source [file join $dir try.tcl]]
@@ -19,3 +15,9 @@ set auto_index(test2) [list source [file join $dir try.tcl]]
 set auto_index(t2) [list source [file join $dir try.tcl]]
 set auto_index(testframe) [list source [file join $dir try.tcl]]
 set auto_index(trfr) [list source [file join $dir try.tcl]]
+
+# Addition of ClassyTcl classes defined in the directory
+set auto_index(try) [list source [file join $dir dialogs.tcl]]
+set auto_index(t) [list source [file join $dir dialogs.tcl]]
+set auto_index(geom) [list source [file join $dir dialogs.tcl]]
+set auto_index(draw) [list source [file join $dir dialogs.tcl]]

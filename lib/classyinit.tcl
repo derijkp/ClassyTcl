@@ -35,7 +35,6 @@ set Classy::appdir [file dir $::Classy::script]
 if {"$tcl_platform(platform)"=="windows"} {
 	load [file join $::class::dir classywin.dll]
 }
-
 # ----------------------------------------------------------------------
 # Change the destroy command
 # ----------------------------------------------------------------------
@@ -63,27 +62,48 @@ if {"[info commands ::Tk::destroy]" == ""} {
 # ----------------------------------------------------------------------
 # Change the bind command
 # ----------------------------------------------------------------------
-if {"[info commands ::Tk::bind]" == ""} {
-	rename bind ::Tk::bind
-	proc bind {args} {
-		switch [llength $args] {
-			1 {
-				return [::Tk::bind [lindex $args 0]]
-			}
-			2 {
-				set result [::Tk::bind [lindex $args 0] [lindex $args 1]]
-				return [replace $result {{[::class::_bind %W]} %W}]
-			}
-			3 {
-				set cmd [replace [lindex $args 2] {%W {[::class::_bind %W]}}]
-				return [::Tk::bind [lindex $args 0] [lindex $args 1] $cmd]
-			}
-			default {
-				return -code error "wrong # args: should be \"bind window ?pattern? ?command?\""
-			}
-		}
-	}
-}
+#if {"[info commands ::Tk::bind]" == ""} {
+#	rename bind ::Tk::bind
+#	proc bind {args} {
+#		switch [llength $args] {
+#			1 {
+#				return [::Tk::bind [lindex $args 0]]
+#			}
+#			2 {
+#				set result [::Tk::bind [lindex $args 0] [lindex $args 1]]
+#				return [string::change $result {{[::Classy::_bind %W]} %W}]
+#			}
+#			3 {
+#				set cmd [string::change [lindex $args 2] {%W {[::Classy::_bind %W]}}]
+#				return [::Tk::bind [lindex $args 0] [lindex $args 1] $cmd]
+#			}
+#			default {
+#				return -code error "wrong # args: should be \"bind window ?pattern? ?command?\""
+#			}
+#		}
+#	}
+#}
+#
+#proc Classy::_bind {w} {
+#	if ![info exists ::Classy::rebind($w)] {
+#		return $w
+#	} else {
+#		return $::Classy::rebind($w)
+#	}
+#}
+#
+#proc Classy::rebind {w bindw} {
+#	if {"$bindw" != ""} {
+#		if [info exists ::Classy::rebind($w)] {
+#			Classy::rebind $::Classy::rebind($w) $bindw
+#			bindtags $::Classy::rebind($w) [lreplace [bindtags $::Classy::rebind($w)] 1 0]
+#		}
+#		set ::Classy::rebind($w) $bindw
+#		bindtags $w [concat $w [bindtags $bindw]]
+#	} else {
+#		unset ::Classy::rebind($w)
+#	}
+#}
 
 if {"[info commands send]" == ""} {
 	proc send {args} {
@@ -100,25 +120,23 @@ if {"[info commands send]" == ""} {
    }
 }
 
-proc class::_bind {w} {
-	if ![info exists ::class::rebind($w)] {
-		return $w
-	} else {
-		return $::class::rebind($w)
-	}
-}
-
-proc class::rebind {w bindw} {
-	if {"$bindw" != ""} {
-		if [info exists ::class::rebind($w)] {
-			class::rebind $::class::rebind($w) $bindw
-			bindtags $::class::rebind($w) [lreplace [bindtags $::class::rebind($w)] 1 0]
+proc Classy::chainw {w cw} {
+	catch {rename ::Tk::$w {}}
+	rename $w ::Tk::$w
+	proc ::$w args [varsubst {w cw} {
+		set error [catch {uplevel ::Tk::$w $args} result]
+		if {($error == 1)&&([string match {bad option *} $result])} {
+			set error2 [catch {uplevel ::$cw $args} result2]
+			if {($error2 == 1)&&([string match {bad option *} $result2])} {
+				return -code $error $result
+			} else {
+				return -code $error2 $result2
+			}
+			
+		} else {
+			return -code $error $result
 		}
-		set ::class::rebind($w) $bindw
-		bindtags $w [concat $w [bindtags $bindw]]
-	} else {
-		unset ::class::rebind($w)
-	}
+	}]
 }
 
 # ----------------------------------------------------------------------
@@ -129,24 +147,24 @@ if {"[info commands ::Tk::focus]" == ""} {
 	proc focus args {
 		if {[llength $args] == 1} {
 			set w [lindex $args 0]
-			if ![info exists ::class::refocus($w)] {
+			if ![info exists ::Classy::refocus($w)] {
 				::Tk::focus $w
 			} else {
-				::Tk::focus $::class::refocus($w)
+				::Tk::focus $::Classy::refocus($w)
 			}
 		} else {
 			eval ::Tk::focus $args
 		}
 	}
-	proc ::class::refocus {w focusw} {
+	proc ::Classy::refocus {w focusw} {
 		if {"$focusw" != ""} {
-			if [info exists ::class::refocus($focusw)] {
-				class::refocus $w $::class::refocus($focusw)
+			if [info exists ::Classy::refocus($focusw)] {
+				Classy::refocus $w $::Classy::refocus($focusw)
 			} else {
-				set ::class::refocus($w) $focusw
+				set ::Classy::refocus($w) $focusw
 			}
 		} else {
-			unset ::class::refocus($w)
+			unset ::Classy::refocus($w)
 		}
 	}
 }

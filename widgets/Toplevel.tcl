@@ -37,7 +37,7 @@ Widget subclass Classy::Toplevel
 
 Classy::export Toplevel {}
 
-Classy::Toplevel classmethod init {args} {
+Classy::Toplevel method init {args} {
 	# REM Create object
 	# -----------------
 	super init toplevel

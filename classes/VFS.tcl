@@ -30,7 +30,7 @@ proc VFS {} {}
 Class subclass class::VFS
 class::export VFS {}
 
-class::VFS classmethod init {args} {
+class::VFS method init {args} {
 	super init
 	private $object cpwd
 	set cpwd [pwd]

@@ -30,7 +30,7 @@ bind Classy::ScrolledText <Configure> {Classy::todo %W redraw}
 Widget subclass Classy::ScrolledText
 Classy::export ScrolledText {}
 
-Classy::ScrolledText classmethod init {args} {
+Classy::ScrolledText method init {args} {
 	# REM Create object
 	# -----------------
 	super init
@@ -40,8 +40,8 @@ Classy::ScrolledText classmethod init {args} {
 	scrollbar $object.xscroll -command "$object.text xview" -orient horizontal
 	scrollbar $object.yscroll -command "$object.text yview" -orient vertical
 	bindtags $object [lreplace [bindtags $object] 2 0 Classy::Text]
-	::class::rebind $object.text $object
-	::class::refocus $object $object.text
+	::Classy::rebind $object.text $object
+	::Classy::refocus $object $object.text
 	grid $object.text -column 0 -row 0 -sticky nwse
 	grid columnconfigure $object 0 -weight 1
 	grid rowconfigure $object 0 -weight 1

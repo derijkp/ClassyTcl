@@ -85,7 +85,6 @@ set auto_index(::Classy::WindowBuilder::menuset) [list source [file join $dir Wi
 set auto_index(::Classy::WindowBuilder::select_menu) [list source [file join $dir WindowBuilderTypes.tcl]]
 set auto_index(::Classy::WindowBuilder::attredit_menu) [list source [file join $dir WindowBuilderTypes.tcl]]
 set auto_index(::Classy::WindowBuilder::defattredit) [list source [file join $dir WindowBuilderTypes.tcl]]
-set auto_index(::Classy::SaveDialog) [list source [file join $dir SaveDialog.tcl]]
 
 # Addition of ClassyTcl classes defined in the directory
 set auto_index(NumEntry) [list source [file join $dir NumEntry.tcl]]

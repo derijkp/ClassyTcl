@@ -427,19 +427,22 @@ proc Classy::auto_mkindex {dir args} {
 							append index "set [list auto_index($name)] \[list source \[file join \$dir [list $file]\]\]\n"
 							set definedhere($name) 1
 						}
-					}			
-#						classmethod {
-#							set c [auto_qualify $c ::]
-#							if ![info exists definedhere($c)] {
+						classmethod {
+							set c [auto_qualify $c ::]
+							if ![info exists definedhere($c)] {
+								set name ::class::${c},,cm,$name
+								append index "set [list auto_index($name)] \[list source \[file join \$dir [list $file]\]\]\n"
 #								append index "set [list ::class::cm_auto_index([list $c $name])] \[list source \[file join \$dir [list $file]\]\]\n"
-#							}
-#						}
-#						method {
-#							set c [auto_qualify $c ::]
-#							if ![info exists definedhere($c)] {
-#								append index "set [list ::class::m_auto_index([list $c $name])] \[list source \[file join \$dir [list $file]\]\]\n"
-#							}
-#						}
+							}
+						}
+						method {
+							set c [auto_qualify $c ::]
+							if ![info exists definedhere($c)] {
+								set name ::class::${c},,m,$name
+								append index "set [list auto_index($name)] \[list source \[file join \$dir [list $file]\]\]\n"
+							}
+						}
+					}			
 				}
 			}
 		} msg]

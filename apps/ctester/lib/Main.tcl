@@ -1,39 +1,33 @@
 proc main args {
 source [file join $::class::dir widgets WindowBuilderTypes.tcl]
-mainw
+mainw .mainw
 }
 
-
-proc mainw args {# ClassyTcl generated Toplevel
-	if [regexp {^\.} $args] {
-		set window [lshift args]
-	} else {
-		set window .mainw
-	}
-	Classy::parseopt $args opt {}
+Classy::Toplevel subclass mainw
+mainw method init args {
+	super init
 	# Create windows
-	Classy::Toplevel $window 
-	frame $window.test  \
+	frame $object.test  \
 		-borderwidth 2 \
 		-height 80 \
 		-relief groove \
 		-width 10
-	grid $window.test -row 0 -column 1 -sticky nesw
-	Classy::Paned $window.paned2 \
+	grid $object.test -row 0 -column 1 -sticky nesw
+	Classy::Paned $object.paned2 \
 		-orient vertical
-	grid $window.paned2 -row 2 -column 0 -columnspan 2 -sticky nesw
-	Classy::CmdWidget $window.cmd \
+	grid $object.paned2 -row 2 -column 0 -columnspan 2 -sticky nesw
+	Classy::CmdWidget $object.cmd \
 		-prompt {[file tail [pwd]] % } \
 		-height 8 \
 		-width 40
-	grid $window.cmd -row 3 -column 1 -sticky nesw
-	frame $window.frame  \
+	grid $object.cmd -row 3 -column 1 -sticky nesw
+	frame $object.frame  \
 		-borderwidth 2 \
 		-height 10 \
 		-relief groove \
 		-width 10
-	grid $window.frame -row 0 -column 0 -rowspan 2 -sticky nesw
-	Classy::ListBox $window.frame.widgets  \
+	grid $object.frame -row 0 -column 0 -rowspan 2 -sticky nesw
+	Classy::ListBox $object.frame.widgets  \
 		-content {frame
 entry
 button
@@ -69,104 +63,99 @@ Classy::DynaTool} \
 		-exportselection 0 \
 		-height 5 \
 		-width 17
-	grid $window.frame.widgets -row 0 -column 0 -columnspan 5 -sticky nesw
-	Classy::ListBox $window.frame.options  \
+	grid $object.frame.widgets -row 0 -column 0 -columnspan 5 -sticky nesw
+	Classy::ListBox $object.frame.options  \
 		-exportselection 0 \
 		-height 4 \
 		-width 10
-	grid $window.frame.options -row 3 -column 0 -columnspan 5 -sticky nesw
-	checkbutton $window.frame.vscroll \
+	grid $object.frame.options -row 3 -column 0 -columnspan 5 -sticky nesw
+	checkbutton $object.frame.vscroll \
 		-indicatoron 0 \
 		-text button \
 		-variable grid(vscroll)
-	grid $window.frame.vscroll -row 2 -column 2 -sticky nesw
-	checkbutton $window.frame.hscroll \
+	grid $object.frame.vscroll -row 2 -column 2 -sticky nesw
+	checkbutton $object.frame.hscroll \
 		-indicatoron 0 \
 		-text button \
 		-variable grid(hscroll)
-	grid $window.frame.hscroll -row 2 -column 3 -sticky nesw
-	checkbutton $window.frame.hresize \
+	grid $object.frame.hscroll -row 2 -column 3 -sticky nesw
+	checkbutton $object.frame.hresize \
 		-indicatoron 0 \
 		-text hor \
 		-variable grid(hor)
-	grid $window.frame.hresize -row 2 -column 1 -sticky nesw
-	checkbutton $window.frame.vresize \
+	grid $object.frame.hresize -row 2 -column 1 -sticky nesw
+	checkbutton $object.frame.vresize \
 		-indicatoron 0 \
 		-text vert \
 		-variable grid(vert)
-	grid $window.frame.vresize -row 2 -column 0 -sticky nesw
-	Classy::Entry $window.frame.entry1 \
+	grid $object.frame.vresize -row 2 -column 0 -sticky nesw
+	Classy::Entry $object.frame.entry1 \
 		-label Other \
 		-width 4
-	grid $window.frame.entry1 -row 1 -column 0 -columnspan 5 -sticky nesw
-	grid columnconfigure $window.frame 4 -weight 1
-	grid rowconfigure $window.frame 0 -weight 1
-	grid rowconfigure $window.frame 3 -weight 1
-	Classy::Selector $window.optionvalue \
+	grid $object.frame.entry1 -row 1 -column 0 -columnspan 5 -sticky nesw
+	grid columnconfigure $object.frame 4 -weight 1
+	grid rowconfigure $object.frame 0 -weight 1
+	grid rowconfigure $object.frame 3 -weight 1
+	Classy::Selector $object.optionvalue \
 		-label Attribute \
 		-type line
-	grid $window.optionvalue -row 1 -column 1 -sticky nesw
-	Classy::ListBox $window.cmds  \
+	grid $object.optionvalue -row 1 -column 1 -sticky nesw
+	Classy::ListBox $object.cmds  \
 		-height 4 \
 		-width 10
-	grid $window.cmds -row 3 -column 0 -sticky nesw
-	grid columnconfigure $window 1 -weight 1
-	grid rowconfigure $window 0 -weight 1
+	grid $object.cmds -row 3 -column 0 -sticky nesw
+	grid columnconfigure $object 1 -weight 1
+	grid rowconfigure $object 0 -weight 1
 
 	# End windows
+	if {"$args" == "___Classy::Builder__create"} {return $object}
 	# Parse this
-	$window configure \
+	$object configure \
 		-destroycommand "exit" \
 		-title [tk appname]
-	$window.paned2 configure \
-		-window [varsubst window {$window.cmd}]
-	$window.frame.widgets configure \
-		-browsecommand [varsubst window {drawwidget $window}]
-	$window.frame.options configure \
-		-browsecommand [varsubst window {selectoption $window}]
-	$window.frame.vscroll configure \
-		-command [varsubst window catch\ \{\n\t\$window.test.widget\ configure\ \\\n\t\t-xscrollcommand\ \{\}\n\tdestroy\ \$window.test.vscroll\n\}\nif\ \$grid(vscroll)\ \{\n\tscrollbar\ \$window.test.vscroll\ -orient\ vertical\ \\\n\t\t-command\ \[list\ \$window.test.widget\ yview\]\n\t\$window.test.widget\ configure\ \\\n\t\t-yscrollcommand\ \[list\ \$window.test.vscroll\ set\]\n\tgrid\ \$window.test.vscroll\ -row\ 0\ -column\ 1\ -sticky\ ns\n\}] \
+	$object.paned2 configure \
+		-window [varsubst object {$object.cmd}]
+	$object.frame.widgets configure \
+		-browsecommand [varsubst object {drawwidget $object}]
+	$object.frame.options configure \
+		-browsecommand [varsubst object {selectoption $object}]
+	$object.frame.vscroll configure \
+		-command [varsubst object catch\ \{\n\t\$object.test.widget\ configure\ \\\n\t\t-xscrollcommand\ \{\}\n\tdestroy\ \$object.test.vscroll\n\}\nif\ \$grid(vscroll)\ \{\n\tscrollbar\ \$object.test.vscroll\ -orient\ vertical\ \\\n\t\t-command\ \[list\ \$object.test.widget\ yview\]\n\t\$object.test.widget\ configure\ \\\n\t\t-yscrollcommand\ \[list\ \$object.test.vscroll\ set\]\n\tgrid\ \$object.test.vscroll\ -row\ 0\ -column\ 1\ -sticky\ ns\n\}] \
 		-image [Classy::geticon Builder/vscroll]
-	$window.frame.hscroll configure \
-		-command [varsubst window catch\ \{\n\t\$window.test.widget\ configure\ \\\n\t\t-xscrollcommand\ \{\}\n\tdestroy\ \$window.test.hscroll\n\}\nif\ \$grid(hscroll)\ \{\n\tscrollbar\ \$window.test.hscroll\ -orient\ horizontal\ \\\n\t\t-command\ \[list\ \$window.test.widget\ xview\]\n\t\$window.test.widget\ configure\ \\\n\t\t-xscrollcommand\ \[list\ \$window.test.hscroll\ set\]\n\tgrid\ \$window.test.hscroll\ -row\ 1\ -column\ 0\ -sticky\ we\n\}] \
+	$object.frame.hscroll configure \
+		-command [varsubst object catch\ \{\n\t\$object.test.widget\ configure\ \\\n\t\t-xscrollcommand\ \{\}\n\tdestroy\ \$object.test.hscroll\n\}\nif\ \$grid(hscroll)\ \{\n\tscrollbar\ \$object.test.hscroll\ -orient\ horizontal\ \\\n\t\t-command\ \[list\ \$object.test.widget\ xview\]\n\t\$object.test.widget\ configure\ \\\n\t\t-xscrollcommand\ \[list\ \$object.test.hscroll\ set\]\n\tgrid\ \$object.test.hscroll\ -row\ 1\ -column\ 0\ -sticky\ we\n\}] \
 		-image [Classy::geticon Builder/hscroll]
-	$window.frame.hresize configure \
-		-command [varsubst window {set sticky nw
+	$object.frame.hresize configure \
+		-command [varsubst object {set sticky nw
 if $grid(hor) {append sticky e}
 if $grid(vert) {append sticky s}
-grid $window.test.widget -row 0 -column 0 -sticky $sticky}] \
+grid $object.test.widget -row 0 -column 0 -sticky $sticky}] \
 		-image [Classy::geticon orient_horizontal]
-	$window.frame.vresize configure \
-		-command [varsubst window {set sticky nw
+	$object.frame.vresize configure \
+		-command [varsubst object {set sticky nw
 if $grid(hor) {append sticky e}
 if $grid(vert) {append sticky s}
-grid $window.test.widget -row 0 -column 0 -sticky $sticky}] \
+grid $object.test.widget -row 0 -column 0 -sticky $sticky}] \
 		-image [Classy::geticon orient_vertical]
-	$window.frame.entry1 configure \
-		-command [varsubst window {drawwidget $window}]
-	$window.optionvalue configure \
-		-command [varsubst window {invoke value {
-	$window.test.widget configure [$window.frame.options get] $value
+	$object.frame.entry1 configure \
+		-command [varsubst object {drawwidget $object}]
+	$object.optionvalue configure \
+		-command [varsubst object {invoke value {
+	$object.test.widget configure [$object.frame.options get] $value
 }}]
-	$window.cmds configure \
-		-browsecommand [varsubst window {invoke value {
-	$window.cmd insert end "\$w $value"
-	focus $window.cmd
+	$object.cmds configure \
+		-browsecommand [varsubst object {invoke value {
+	$object.cmd insert end "\$w $value"
+	focus $object.cmd
 }}]
+	# Configure initial arguments
+	if {"$args" != ""} {eval $object configure $args}
 # ClassyTcl Finalise
 set ::grid(hor) 1
 set ::grid(vert) 1
-	return $window
-	return $window
+	return $object
+	return $object
 }
-
-
-
-
-
-
-
-
 
 proc drawwidget {window type} {
 global grid
@@ -215,21 +204,6 @@ set ::w $window.test.widget
 
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 proc selectoption {window value} {
 set option [$window.frame.options get]
 $window.optionvalue configure -label $option
@@ -240,31 +214,4 @@ if [info exists ::Classy::WindowBuilder::options($option)] {
 }
 $window.optionvalue set [$window.test.widget cget $option]
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

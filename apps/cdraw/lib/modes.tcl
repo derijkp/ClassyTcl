@@ -169,4 +169,3 @@ bind Zoom <<MAdd-Motion>> {zoom_drag %W %x %y}
 bind Zoom <<Escape>> {zoom_abort %W %x %y}
 }
 
-

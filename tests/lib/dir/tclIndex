@@ -8,7 +8,7 @@
 
 set auto_index(test2) [list source [file join $dir try.tcl]]
 set auto_index(test3) [list source [file join $dir try.tcl]]
-set auto_index(ttt) [list source [file join $dir try.tcl]]
-set auto_index(top) [list source [file join $dir try.tcl]]
-set auto_index(t) [list source [file join $dir try.tcl]]
 set auto_index(printdialog) [list source [file join $dir try2.tcl]]
+
+# Addition of ClassyTcl classes defined in the directory
+set auto_index(try) [list source [file join $dir try.tcl]]

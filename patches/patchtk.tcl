@@ -1,365 +1,360 @@
 if ![info exists Classy::patchtk] {
 set Classy::patchtk 1
-bind Button <Button-1> {}
-bind Button <ButtonRelease-1> {}
-bind Button <Key-space> {}
-bind Checkbutton <Button-1> {}
-bind Checkbutton <Key-Return> {}
-bind Checkbutton <Key-space> {}
-bind Entry <B1-Enter> {}
-bind Entry <B1-Leave> {}
-bind Entry <B1-Motion> {}
-bind Entry <B2-Motion> {}
-bind Entry <Button-1> {}
-bind Entry <Button-2> {}
-bind Entry <ButtonRelease-1> {}
-bind Entry <ButtonRelease-2> {}
-bind Entry <Control-Button-1> {}
-bind Entry <Control-Key-Left> {}
-bind Entry <Control-Key-Right> {}
-bind Entry <Control-Key-a> {}
-bind Entry <Control-Key-b> {}
-bind Entry <Control-Key-backslash> {}
-bind Entry <Control-Key-d> {}
-bind Entry <Control-Key-e> {}
-bind Entry <Control-Key-f> {}
-bind Entry <Control-Key-h> {}
-bind Entry <Control-Key-k> {}
-bind Entry <Control-Key-slash> {}
-bind Entry <Control-Key-space> {}
-bind Entry <Control-Key-t> {}
-bind Entry <Control-Shift-Key-Left> {}
-bind Entry <Control-Shift-Key-Right> {}
-bind Entry <Control-Shift-Key-space> {}
-bind Entry <Double-Button-1> {}
-bind Entry <Double-Shift-Button-1> {}
-bind Entry <Key-BackSpace> {}
-bind Entry <Key-Delete> {}
-bind Entry <Key-End> {}
-bind Entry <Key-Escape> {}
-bind Entry <Key-Home> {}
-bind Entry <Key-Insert> {}
-bind Entry <Key-Left> {}
-bind Entry <Key-Return> {}
-bind Entry <Key-Right> {}
-bind Entry <Key-Select> {}
-bind Entry <Meta-Key-BackSpace> {}
-bind Entry <Meta-Key-Delete> {}
-bind Entry <Meta-Key-b> {}
-bind Entry <Meta-Key-d> {}
-bind Entry <Meta-Key-f> {}
-bind Entry <Shift-Button-1> {}
-bind Entry <Shift-Key-End> {}
-bind Entry <Shift-Key-Home> {}
-bind Entry <Shift-Key-Left> {}
-bind Entry <Shift-Key-Right> {}
-bind Entry <Shift-Key-Select> {}
-bind Entry <Triple-Button-1> {}
-bind Entry <Triple-Shift-Button-1> {}
-bind Listbox <B1-Enter> {}
-bind Listbox <B1-Leave> {}
-bind Listbox <B1-Motion> {}
-bind Listbox <B2-Motion> {}
-bind Listbox <Button-1> {}
-bind Listbox <Button-2> {}
-bind Listbox <ButtonRelease-1> {}
-bind Listbox <Control-Button-1> {}
-bind Listbox <Control-Key-End> {}
-bind Listbox <Control-Key-Home> {}
-bind Listbox <Control-Key-Left> {}
-bind Listbox <Control-Key-Next> {}
-bind Listbox <Control-Key-Prior> {}
-bind Listbox <Control-Key-Right> {}
-bind Listbox <Control-Key-backslash> {}
-bind Listbox <Control-Key-slash> {}
-bind Listbox <Control-Shift-Key-End> {}
-bind Listbox <Control-Shift-Key-Home> {}
-bind Listbox <Control-Shift-Key-space> {}
-bind Listbox <Double-Button-1> {}
-bind Listbox <Key-Down> {}
-bind Listbox <Key-End> {}
-bind Listbox <Key-Escape> {}
-bind Listbox <Key-Home> {}
-bind Listbox <Key-Left> {}
-bind Listbox <Key-Next> {}
-bind Listbox <Key-Prior> {}
-bind Listbox <Key-Right> {}
-bind Listbox <Key-Select> {}
-bind Listbox <Key-Up> {}
-bind Listbox <Key-space> {}
-bind Listbox <Shift-Button-1> {}
-bind Listbox <Shift-Key-Down> {}
-bind Listbox <Shift-Key-Select> {}
-bind Listbox <Shift-Key-Up> {}
-bind Menu <Key-Down> {}
-bind Menu <Key-Escape> {}
-bind Menu <Key-Left> {}
-bind Menu <Key-Return> {}
-bind Menu <Key-Right> {}
-bind Menu <Key-Up> {}
-bind Menu <Key-space> {}
-bind Menubutton <B1-Motion> {}
-bind Menubutton <Button-1> {}
-bind Menubutton <ButtonRelease-1> {}
-bind Menubutton <Key-space> {}
-bind Radiobutton <Button-1> {}
-bind Radiobutton <Key-Return> {}
-bind Radiobutton <Key-space> {}
-bind Scale <B1-Enter> {}
-bind Scale <B1-Leave> {}
-bind Scale <B1-Motion> {}
-bind Scale <B2-Enter> {}
-bind Scale <B2-Leave> {}
-bind Scale <B2-Motion> {}
-bind Scale <Button-1> {}
-bind Scale <Button-2> {}
-bind Scale <ButtonRelease-1> {}
-bind Scale <ButtonRelease-2> {}
-bind Scale <Control-Button-1> {}
-bind Scale <Control-Key-Down> {}
-bind Scale <Control-Key-Left> {}
-bind Scale <Control-Key-Right> {}
-bind Scale <Control-Key-Up> {}
-bind Scale <Key-Down> {}
-bind Scale <Key-End> {}
-bind Scale <Key-Home> {}
-bind Scale <Key-Left> {}
-bind Scale <Key-Right> {}
-bind Scale <Key-Up> {}
-bind Scrollbar <B1-B2-Motion> {}
-bind Scrollbar <B1-Button-2> {}
-bind Scrollbar <B1-ButtonRelease-2> {}
-bind Scrollbar <B1-Enter> {}
-bind Scrollbar <B1-Leave> {}
-bind Scrollbar <B1-Motion> {}
-bind Scrollbar <B2-Button-1> {}
-bind Scrollbar <B2-ButtonRelease-1> {}
-bind Scrollbar <B2-Enter> {}
-bind Scrollbar <B2-Leave> {}
-bind Scrollbar <B2-Motion> {}
-bind Scrollbar <Button-1> {}
-bind Scrollbar <Button-2> {}
-bind Scrollbar <ButtonRelease-1> {}
-bind Scrollbar <ButtonRelease-2> {}
-bind Scrollbar <Control-Button-1> {}
-bind Scrollbar <Control-Button-2> {}
-bind Scrollbar <Control-Key-Down> {}
-bind Scrollbar <Control-Key-Left> {}
-bind Scrollbar <Control-Key-Right> {}
-bind Scrollbar <Control-Key-Up> {}
-bind Scrollbar <Key-Down> {}
-bind Scrollbar <Key-End> {}
-bind Scrollbar <Key-Home> {}
-bind Scrollbar <Key-Left> {}
-bind Scrollbar <Key-Next> {}
-bind Scrollbar <Key-Prior> {}
-bind Scrollbar <Key-Right> {}
-bind Scrollbar <Key-Up> {}
-bind Text <B1-Enter> {}
-bind Text <B1-Leave> {}
-bind Text <B1-Motion> {}
-bind Text <B2-Motion> {}
-bind Text <Button-1> {}
-bind Text <Button-2> {}
-bind Text <ButtonRelease-1> {}
-bind Text <ButtonRelease-2> {}
-bind Text <Control-Button-1> {}
-bind Text <Control-Key-Down> {}
-bind Text <Control-Key-End> {}
-bind Text <Control-Key-Home> {}
-bind Text <Control-Key-Left> {}
-bind Text <Control-Key-Next> {}
-bind Text <Control-Key-Prior> {}
-bind Text <Control-Key-Right> {}
-bind Text <Control-Key-Tab> {}
-bind Text <Control-Key-Up> {}
-bind Text <Control-Key-a> {}
-bind Text <Control-Key-b> {}
-bind Text <Control-Key-backslash> {}
-bind Text <Control-Key-d> {}
-bind Text <Control-Key-e> {}
-bind Text <Control-Key-f> {}
-bind Text <Control-Key-h> {}
-bind Text <Control-Key-i> {}
-bind Text <Control-Key-k> {}
-bind Text <Control-Key-n> {}
-bind Text <Control-Key-o> {}
-bind Text <Control-Key-p> {}
-bind Text <Control-Key-slash> {}
-bind Text <Control-Key-space> {}
-bind Text <Control-Key-t> {}
-bind Text <Control-Key-v> {}
-bind Text <Control-Shift-Key-Down> {}
-bind Text <Control-Shift-Key-End> {}
-bind Text <Control-Shift-Key-Home> {}
-bind Text <Control-Shift-Key-Left> {}
-bind Text <Control-Shift-Key-Right> {}
-bind Text <Control-Shift-Key-Tab> {}
-bind Text <Control-Shift-Key-Up> {}
-bind Text <Control-Shift-Key-space> {}
-bind Text <Double-Button-1> {}
-bind Text <Double-Shift-Button-1> {}
-bind Text <Key-BackSpace> {}
-bind Text <Key-Delete> {}
-bind Text <Key-Down> {}
-bind Text <Key-End> {}
-bind Text <Key-Escape> {}
-bind Text <Key-Home> {}
-bind Text <Key-Insert> {}
-bind Text <Key-Left> {}
-bind Text <Key-Next> {}
-bind Text <Key-Prior> {}
-bind Text <Key-Return> {}
-bind Text <Key-Right> {}
-bind Text <Key-Select> {}
-bind Text <Key-Up> {}
-bind Text <Meta-Key-BackSpace> {}
-bind Text <Meta-Key-Delete> {}
-bind Text <Meta-Key-b> {}
-bind Text <Meta-Key-d> {}
-bind Text <Meta-Key-f> {}
-bind Text <Meta-Key-greater> {}
-bind Text <Meta-Key-less> {}
-bind Text <Shift-Button-1> {}
-bind Text <Shift-Key-Down> {}
-bind Text <Shift-Key-End> {}
-bind Text <Shift-Key-Home> {}
-bind Text <Shift-Key-Left> {}
-bind Text <Shift-Key-Next> {}
-bind Text <Shift-Key-Prior> {}
-bind Text <Shift-Key-Right> {}
-bind Text <Shift-Key-Select> {}
-bind Text <Shift-Key-Up> {}
-bind Text <Triple-Button-1> {}
-bind Text <Triple-Shift-Button-1> {}
-bind Button <<Action-ButtonRelease>> {
+::Tk::bind Button <Button-1> {}
+::Tk::bind Button <ButtonRelease-1> {}
+::Tk::bind Button <Key-space> {}
+::Tk::bind Checkbutton <Button-1> {}
+::Tk::bind Checkbutton <Key-Return> {}
+::Tk::bind Checkbutton <Key-space> {}
+::Tk::bind Entry <<PasteSelection>> {}
+::Tk::bind Entry <B1-Enter> {}
+::Tk::bind Entry <B1-Leave> {}
+::Tk::bind Entry <B1-Motion> {}
+::Tk::bind Entry <B2-Motion> {}
+::Tk::bind Entry <Button-1> {}
+::Tk::bind Entry <Button-2> {}
+::Tk::bind Entry <ButtonRelease-1> {}
+::Tk::bind Entry <Control-Button-1> {}
+::Tk::bind Entry <Control-Key-Left> {}
+::Tk::bind Entry <Control-Key-Right> {}
+::Tk::bind Entry <Control-Key-a> {}
+::Tk::bind Entry <Control-Key-b> {}
+::Tk::bind Entry <Control-Key-backslash> {}
+::Tk::bind Entry <Control-Key-d> {}
+::Tk::bind Entry <Control-Key-e> {}
+::Tk::bind Entry <Control-Key-f> {}
+::Tk::bind Entry <Control-Key-h> {}
+::Tk::bind Entry <Control-Key-k> {}
+::Tk::bind Entry <Control-Key-slash> {}
+::Tk::bind Entry <Control-Key-space> {}
+::Tk::bind Entry <Control-Key-t> {}
+::Tk::bind Entry <Control-Shift-Key-Left> {}
+::Tk::bind Entry <Control-Shift-Key-Right> {}
+::Tk::bind Entry <Control-Shift-Key-space> {}
+::Tk::bind Entry <Double-Button-1> {}
+::Tk::bind Entry <Double-Shift-Button-1> {}
+::Tk::bind Entry <Key-BackSpace> {}
+::Tk::bind Entry <Key-Delete> {}
+::Tk::bind Entry <Key-End> {}
+::Tk::bind Entry <Key-Escape> {}
+::Tk::bind Entry <Key-Home> {}
+::Tk::bind Entry <Key-Insert> {}
+::Tk::bind Entry <Key-Left> {}
+::Tk::bind Entry <Key-Return> {}
+::Tk::bind Entry <Key-Right> {}
+::Tk::bind Entry <Key-Select> {}
+::Tk::bind Entry <Meta-Key-BackSpace> {}
+::Tk::bind Entry <Meta-Key-Delete> {}
+::Tk::bind Entry <Meta-Key-b> {}
+::Tk::bind Entry <Meta-Key-d> {}
+::Tk::bind Entry <Meta-Key-f> {}
+::Tk::bind Entry <Shift-Button-1> {}
+::Tk::bind Entry <Shift-Key-End> {}
+::Tk::bind Entry <Shift-Key-Home> {}
+::Tk::bind Entry <Shift-Key-Left> {}
+::Tk::bind Entry <Shift-Key-Right> {}
+::Tk::bind Entry <Shift-Key-Select> {}
+::Tk::bind Entry <Triple-Button-1> {}
+::Tk::bind Entry <Triple-Shift-Button-1> {}
+::Tk::bind Listbox <B1-Enter> {}
+::Tk::bind Listbox <B1-Leave> {}
+::Tk::bind Listbox <B1-Motion> {}
+::Tk::bind Listbox <B2-Motion> {}
+::Tk::bind Listbox <Button-1> {}
+::Tk::bind Listbox <Button-2> {}
+::Tk::bind Listbox <ButtonRelease-1> {}
+::Tk::bind Listbox <Control-Button-1> {}
+::Tk::bind Listbox <Control-Key-End> {}
+::Tk::bind Listbox <Control-Key-Home> {}
+::Tk::bind Listbox <Control-Key-Left> {}
+::Tk::bind Listbox <Control-Key-Next> {}
+::Tk::bind Listbox <Control-Key-Prior> {}
+::Tk::bind Listbox <Control-Key-Right> {}
+::Tk::bind Listbox <Control-Key-backslash> {}
+::Tk::bind Listbox <Control-Key-slash> {}
+::Tk::bind Listbox <Control-Shift-Key-End> {}
+::Tk::bind Listbox <Control-Shift-Key-Home> {}
+::Tk::bind Listbox <Control-Shift-Key-space> {}
+::Tk::bind Listbox <Double-Button-1> {}
+::Tk::bind Listbox <Key-Down> {}
+::Tk::bind Listbox <Key-End> {}
+::Tk::bind Listbox <Key-Escape> {}
+::Tk::bind Listbox <Key-Home> {}
+::Tk::bind Listbox <Key-Left> {}
+::Tk::bind Listbox <Key-Next> {}
+::Tk::bind Listbox <Key-Prior> {}
+::Tk::bind Listbox <Key-Right> {}
+::Tk::bind Listbox <Key-Select> {}
+::Tk::bind Listbox <Key-Up> {}
+::Tk::bind Listbox <Key-space> {}
+::Tk::bind Listbox <Shift-Button-1> {}
+::Tk::bind Listbox <Shift-Key-Down> {}
+::Tk::bind Listbox <Shift-Key-Select> {}
+::Tk::bind Listbox <Shift-Key-Up> {}
+::Tk::bind Menu <Key-Down> {}
+::Tk::bind Menu <Key-Escape> {}
+::Tk::bind Menu <Key-Left> {}
+::Tk::bind Menu <Key-Return> {}
+::Tk::bind Menu <Key-Right> {}
+::Tk::bind Menu <Key-Up> {}
+::Tk::bind Menu <Key-space> {}
+::Tk::bind Menubutton <B1-Motion> {}
+::Tk::bind Menubutton <Button-1> {}
+::Tk::bind Menubutton <ButtonRelease-1> {}
+::Tk::bind Menubutton <Key-space> {}
+::Tk::bind Radiobutton <Button-1> {}
+::Tk::bind Radiobutton <Key-Return> {}
+::Tk::bind Radiobutton <Key-space> {}
+::Tk::bind Scale <B1-Enter> {}
+::Tk::bind Scale <B1-Leave> {}
+::Tk::bind Scale <B1-Motion> {}
+::Tk::bind Scale <B2-Enter> {}
+::Tk::bind Scale <B2-Leave> {}
+::Tk::bind Scale <B2-Motion> {}
+::Tk::bind Scale <Button-1> {}
+::Tk::bind Scale <Button-2> {}
+::Tk::bind Scale <ButtonRelease-1> {}
+::Tk::bind Scale <ButtonRelease-2> {}
+::Tk::bind Scale <Control-Button-1> {}
+::Tk::bind Scale <Control-Key-Down> {}
+::Tk::bind Scale <Control-Key-Left> {}
+::Tk::bind Scale <Control-Key-Right> {}
+::Tk::bind Scale <Control-Key-Up> {}
+::Tk::bind Scale <Key-Down> {}
+::Tk::bind Scale <Key-End> {}
+::Tk::bind Scale <Key-Home> {}
+::Tk::bind Scale <Key-Left> {}
+::Tk::bind Scale <Key-Right> {}
+::Tk::bind Scale <Key-Up> {}
+::Tk::bind Scrollbar <B1-B2-Motion> {}
+::Tk::bind Scrollbar <B1-Button-2> {}
+::Tk::bind Scrollbar <B1-ButtonRelease-2> {}
+::Tk::bind Scrollbar <B1-Enter> {}
+::Tk::bind Scrollbar <B1-Leave> {}
+::Tk::bind Scrollbar <B1-Motion> {}
+::Tk::bind Scrollbar <B2-Button-1> {}
+::Tk::bind Scrollbar <B2-ButtonRelease-1> {}
+::Tk::bind Scrollbar <B2-Enter> {}
+::Tk::bind Scrollbar <B2-Leave> {}
+::Tk::bind Scrollbar <B2-Motion> {}
+::Tk::bind Scrollbar <Button-1> {}
+::Tk::bind Scrollbar <Button-2> {}
+::Tk::bind Scrollbar <ButtonRelease-1> {}
+::Tk::bind Scrollbar <ButtonRelease-2> {}
+::Tk::bind Scrollbar <Control-Button-1> {}
+::Tk::bind Scrollbar <Control-Button-2> {}
+::Tk::bind Scrollbar <Control-Key-Down> {}
+::Tk::bind Scrollbar <Control-Key-Left> {}
+::Tk::bind Scrollbar <Control-Key-Right> {}
+::Tk::bind Scrollbar <Control-Key-Up> {}
+::Tk::bind Scrollbar <Key-Down> {}
+::Tk::bind Scrollbar <Key-End> {}
+::Tk::bind Scrollbar <Key-Home> {}
+::Tk::bind Scrollbar <Key-Left> {}
+::Tk::bind Scrollbar <Key-Next> {}
+::Tk::bind Scrollbar <Key-Prior> {}
+::Tk::bind Scrollbar <Key-Right> {}
+::Tk::bind Scrollbar <Key-Up> {}
+::Tk::bind Text <<PasteSelection>> {}
+::Tk::bind Text <B1-Enter> {}
+::Tk::bind Text <B1-Leave> {}
+::Tk::bind Text <B1-Motion> {}
+::Tk::bind Text <B2-Motion> {}
+::Tk::bind Text <Button-1> {}
+::Tk::bind Text <Button-2> {}
+::Tk::bind Text <ButtonRelease-1> {}
+::Tk::bind Text <Control-Button-1> {}
+::Tk::bind Text <Control-Key-Down> {}
+::Tk::bind Text <Control-Key-End> {}
+::Tk::bind Text <Control-Key-Home> {}
+::Tk::bind Text <Control-Key-Left> {}
+::Tk::bind Text <Control-Key-Next> {}
+::Tk::bind Text <Control-Key-Prior> {}
+::Tk::bind Text <Control-Key-Right> {}
+::Tk::bind Text <Control-Key-Tab> {}
+::Tk::bind Text <Control-Key-Up> {}
+::Tk::bind Text <Control-Key-a> {}
+::Tk::bind Text <Control-Key-b> {}
+::Tk::bind Text <Control-Key-backslash> {}
+::Tk::bind Text <Control-Key-d> {}
+::Tk::bind Text <Control-Key-e> {}
+::Tk::bind Text <Control-Key-f> {}
+::Tk::bind Text <Control-Key-h> {}
+::Tk::bind Text <Control-Key-i> {}
+::Tk::bind Text <Control-Key-k> {}
+::Tk::bind Text <Control-Key-n> {}
+::Tk::bind Text <Control-Key-o> {}
+::Tk::bind Text <Control-Key-p> {}
+::Tk::bind Text <Control-Key-slash> {}
+::Tk::bind Text <Control-Key-space> {}
+::Tk::bind Text <Control-Key-t> {}
+::Tk::bind Text <Control-Key-v> {}
+::Tk::bind Text <Control-Shift-Key-Down> {}
+::Tk::bind Text <Control-Shift-Key-End> {}
+::Tk::bind Text <Control-Shift-Key-Home> {}
+::Tk::bind Text <Control-Shift-Key-Left> {}
+::Tk::bind Text <Control-Shift-Key-Right> {}
+::Tk::bind Text <Control-Shift-Key-Tab> {}
+::Tk::bind Text <Control-Shift-Key-Up> {}
+::Tk::bind Text <Control-Shift-Key-space> {}
+::Tk::bind Text <Double-Button-1> {}
+::Tk::bind Text <Double-Shift-Button-1> {}
+::Tk::bind Text <Key-BackSpace> {}
+::Tk::bind Text <Key-Delete> {}
+::Tk::bind Text <Key-Down> {}
+::Tk::bind Text <Key-End> {}
+::Tk::bind Text <Key-Escape> {}
+::Tk::bind Text <Key-Home> {}
+::Tk::bind Text <Key-Insert> {}
+::Tk::bind Text <Key-Left> {}
+::Tk::bind Text <Key-Next> {}
+::Tk::bind Text <Key-Prior> {}
+::Tk::bind Text <Key-Return> {}
+::Tk::bind Text <Key-Right> {}
+::Tk::bind Text <Key-Select> {}
+::Tk::bind Text <Key-Up> {}
+::Tk::bind Text <Meta-Key-BackSpace> {}
+::Tk::bind Text <Meta-Key-Delete> {}
+::Tk::bind Text <Meta-Key-b> {}
+::Tk::bind Text <Meta-Key-d> {}
+::Tk::bind Text <Meta-Key-f> {}
+::Tk::bind Text <Meta-Key-greater> {}
+::Tk::bind Text <Meta-Key-less> {}
+::Tk::bind Text <Shift-Button-1> {}
+::Tk::bind Text <Shift-Key-Down> {}
+::Tk::bind Text <Shift-Key-End> {}
+::Tk::bind Text <Shift-Key-Home> {}
+::Tk::bind Text <Shift-Key-Left> {}
+::Tk::bind Text <Shift-Key-Next> {}
+::Tk::bind Text <Shift-Key-Prior> {}
+::Tk::bind Text <Shift-Key-Right> {}
+::Tk::bind Text <Shift-Key-Select> {}
+::Tk::bind Text <Shift-Key-Up> {}
+::Tk::bind Text <Triple-Button-1> {}
+::Tk::bind Text <Triple-Shift-Button-1> {}
+::Tk::bind Button <<Action-ButtonRelease>> {
     tkButtonUp %W
 }
-bind Button <<Action>> {
+::Tk::bind Button <<Action>> {
     tkButtonDown %W
 }
-bind Button <<Invoke>> {
+::Tk::bind Button <<Invoke>> {
     tkButtonInvoke %W
 }
-bind Button <Enter> {
+::Tk::bind Button <Enter> {
     tkButtonEnter %W
 }
-bind Button <Leave> {
+::Tk::bind Button <Leave> {
     tkButtonLeave %W
 }
-bind Checkbutton <<Action>> {
+::Tk::bind Checkbutton <<Action>> {
 	tkCheckRadioInvoke %W
     }
-bind Checkbutton <<Invoke>> {
+::Tk::bind Checkbutton <<Invoke>> {
     tkCheckRadioInvoke %W
 }
-bind Checkbutton <<Return>> {
-	if !$tk_strictMotif {
+::Tk::bind Checkbutton <<Return>> {
+	if {!$tk_strictMotif} {
 	    tkCheckRadioInvoke %W
 	}
     }
-bind Checkbutton <Enter> {
+::Tk::bind Checkbutton <Enter> {
 	tkButtonEnter %W
     }
-bind Checkbutton <Leave> {
+::Tk::bind Checkbutton <Leave> {
     tkButtonLeave %W
 }
-bind Entry <<Action-ButtonRelease>> {
+::Tk::bind Entry <<Action-ButtonRelease>> {
     tkCancelRepeat
 }
-bind Entry <<Action-Enter>> {
+::Tk::bind Entry <<Action-Enter>> {
     tkCancelRepeat
 }
-bind Entry <<Action-Leave>> {
+::Tk::bind Entry <<Action-Leave>> {
     set tkPriv(x) %x
     tkEntryAutoScan %W
 }
-bind Entry <<Action-Motion>> {
+::Tk::bind Entry <<Action-Motion>> {
     set tkPriv(x) %x
     tkEntryMouseSelect %W %x
 }
-bind Entry <<Action>> {
+::Tk::bind Entry <<Action>> {
     tkEntryButton1 %W %x
     %W selection clear
 }
-bind Entry <<Adjust-ButtonRelease>> {}
-bind Entry <<BackSpace>> {
+::Tk::bind Entry <<Adjust-ButtonRelease>> {}
+::Tk::bind Entry <<BackSpace>> {
     tkEntryBackspace %W
 }
-bind Entry <<Clear>> {
+::Tk::bind Entry <<Clear>> {
     %W delete sel.first sel.last
 }
-bind Entry <<Copy>> {
-    if {![catch {set data [string range [%W get] [%W index sel.first] [expr [%W index sel.last] - 1]]}]} {
+::Tk::bind Entry <<Copy>> {
+    if {![catch {set data [string range [%W get] [%W index sel.first] [expr {[%W index sel.last] - 1}]]}]} {
 	clipboard clear -displayof %W
 	clipboard append -displayof %W $data
     }
 }
-bind Entry <<Cut>> {
-    if {![catch {set data [string range [%W get] [%W index sel.first] [expr [%W index sel.last] - 1]]}]} {
+::Tk::bind Entry <<Cut>> {
+    if {![catch {set data [string range [%W get] [%W index sel.first] [expr {[%W index sel.last] - 1}]]}]} {
 	clipboard clear -displayof %W
 	clipboard append -displayof %W $data
 	%W delete sel.first sel.last
     }
 }
-bind Entry <<Delete>> {
-    if [%W selection present] {
+::Tk::bind Entry <<Delete>> {
+    if {[%W selection present]} {
 	%W delete sel.first sel.last
     } else {
 	%W delete insert
     }
 }
-bind Entry <<DeleteEnd>> {
-    if !$tk_strictMotif {
+::Tk::bind Entry <<DeleteEnd>> {
+    if {!$tk_strictMotif} {
 	%W delete insert end
     }
 }
-bind Entry <<Empty>> {%W delete 0 end}
-bind Entry <<End>> {
+::Tk::bind Entry <<Empty>> {%W delete 0 end}
+::Tk::bind Entry <<End>> {
     tkEntrySetCursor %W end
 }
-bind Entry <<EndSelect>> {
+::Tk::bind Entry <<EndSelect>> {
     %W selection adjust insert
 }
-bind Entry <<Escape>> {# nothing}
-bind Entry <<Home>> {
+::Tk::bind Entry <<Escape>> {# nothing}
+::Tk::bind Entry <<Home>> {
     tkEntrySetCursor %W 0
 }
-bind Entry <<Left>> {
-    tkEntrySetCursor %W [expr [%W index insert] - 1]
+::Tk::bind Entry <<Left>> {
+    tkEntrySetCursor %W [expr {[%W index insert] - 1}]
 }
-bind Entry <<MAdd>> {
+::Tk::bind Entry <<MAdd>> {
     %W icursor @%x
 }
-bind Entry <<MExtend>> {
+::Tk::bind Entry <<MExtend>> {
     set tkPriv(selectMode) char
     %W selection adjust @%x
 }
-bind Entry <<MExtendLine>> {
+::Tk::bind Entry <<MExtendLine>> {
     set tkPriv(selectMode) line
     tkEntryMouseSelect %W %x
 }
-bind Entry <<MExtendWord>> {
+::Tk::bind Entry <<MExtendWord>> {
     set tkPriv(selectMode) word
     tkEntryMouseSelect %W %x
 }
-bind Entry <<MIcursor>> {}
-bind Entry <<MSelectLine>> {
+::Tk::bind Entry <<MIcursor>> {}
+::Tk::bind Entry <<MSelectLine>> {
     set tkPriv(selectMode) line
     tkEntryMouseSelect %W %x
     %W icursor 0
 }
-bind Entry <<MSelectWord>> {
+::Tk::bind Entry <<MSelectWord>> {
     set tkPriv(selectMode) word
     tkEntryMouseSelect %W %x
     catch {%W icursor sel.first}
 }
-bind Entry <<MXPaste>> {
-    if {!$tkPriv(mouseMoved) || $tk_strictMotif} {
-	tkEntryPaste %W %x
-    }
-}
-bind Entry <<Paste>> {
+::Tk::bind Entry <<Paste>> {
     global tcl_platform
     catch {
 	if {"$tcl_platform(platform)" != "unix"} {
@@ -371,212 +366,212 @@ bind Entry <<Paste>> {
 	tkEntrySeeInsert %W
     }
 }
-bind Entry <<Return>> {# nothing}
-bind Entry <<Right>> {
-    tkEntrySetCursor %W [expr [%W index insert] + 1]
+::Tk::bind Entry <<Return>> {# nothing}
+::Tk::bind Entry <<Right>> {
+    tkEntrySetCursor %W [expr {[%W index insert] + 1}]
 }
-bind Entry <<SelectAll>> {
+::Tk::bind Entry <<SelectAll>> {
     %W selection range 0 end
 }
-bind Entry <<SelectEnd>> {
+::Tk::bind Entry <<SelectEnd>> {
     tkEntryKeySelect %W end
     tkEntrySeeInsert %W
 }
-bind Entry <<SelectHome>> {
+::Tk::bind Entry <<SelectHome>> {
     tkEntryKeySelect %W 0
     tkEntrySeeInsert %W
 }
-bind Entry <<SelectLeft>> {
-    tkEntryKeySelect %W [expr [%W index insert] - 1]
+::Tk::bind Entry <<SelectLeft>> {
+    tkEntryKeySelect %W [expr {[%W index insert] - 1}]
     tkEntrySeeInsert %W
 }
-bind Entry <<SelectNone>> {
+::Tk::bind Entry <<SelectNone>> {
     %W selection clear
 }
-bind Entry <<SelectRight>> {
-    tkEntryKeySelect %W [expr [%W index insert] + 1]
+::Tk::bind Entry <<SelectRight>> {
+    tkEntryKeySelect %W [expr {[%W index insert] + 1}]
     tkEntrySeeInsert %W
 }
-bind Entry <<SelectWordLeft>> {
+::Tk::bind Entry <<SelectWordLeft>> {
     tkEntryKeySelect %W [tkEntryPreviousWord %W insert]
     tkEntrySeeInsert %W
 }
-bind Entry <<SelectWordRight>> {
+::Tk::bind Entry <<SelectWordRight>> {
     tkEntryKeySelect %W [tkEntryNextWord %W insert]
     tkEntrySeeInsert %W
 }
-bind Entry <<StartSelect>> {
+::Tk::bind Entry <<StartSelect>> {
     %W selection from insert
 }
-bind Entry <<Transpose>> {
-    if !$tk_strictMotif {
+::Tk::bind Entry <<Transpose>> {
+    if {!$tk_strictMotif} {
 	tkEntryTranspose %W
     }
 }
-bind Entry <<WordLeft>> {
+::Tk::bind Entry <<WordLeft>> {
     tkEntrySetCursor %W [tkEntryPreviousWord %W insert]
 }
-bind Entry <<WordRight>> {
+::Tk::bind Entry <<WordRight>> {
     tkEntrySetCursor %W [tkEntryNextWord %W insert]
 }
-bind Entry <Alt-Key> {# nothing}
-bind Entry <Control-Key> {# nothing}
-bind Entry <Key-KP_Enter> {# nothing}
-bind Entry <Key-Tab> {# nothing}
-bind Entry <Key> {
+::Tk::bind Entry <Alt-Key> {# nothing}
+::Tk::bind Entry <Control-Key> {# nothing}
+::Tk::bind Entry <Key-KP_Enter> {# nothing}
+::Tk::bind Entry <Key-Tab> {# nothing}
+::Tk::bind Entry <Key> {
     tkEntryInsert %W %A
 }
-bind Entry <Meta-Key> {# nothing}
-bind Listbox <<Action-ButtonRelease>> {
+::Tk::bind Entry <Meta-Key> {# nothing}
+::Tk::bind Listbox <<Action-ButtonRelease>> {
     tkCancelRepeat
     %W activate @%x,%y
 }
-bind Listbox <<Action-Enter>> {
+::Tk::bind Listbox <<Action-Enter>> {
     tkCancelRepeat
 }
-bind Listbox <<Action-Leave>> {
+::Tk::bind Listbox <<Action-Leave>> {
     set tkPriv(x) %x
     set tkPriv(y) %y
     tkListboxAutoScan %W
 }
-bind Listbox <<Action-Motion>> {
+::Tk::bind Listbox <<Action-Motion>> {
     set tkPriv(x) %x
     set tkPriv(y) %y
     tkListboxMotion %W [%W index @%x,%y]
 }
-bind Listbox <<Action>> {
-    if [winfo exists %W] {
+::Tk::bind Listbox <<Action>> {
+    if {[winfo exists %W]} {
 	tkListboxBeginSelect %W [%W index @%x,%y]
     }
 }
-bind Listbox <<Adjust-Motion>> {
+::Tk::bind Listbox <<Adjust-Motion>> {
     %W scan dragto %x %y
 }
-bind Listbox <<Adjust>> {
+::Tk::bind Listbox <<Adjust>> {
     %W scan mark %x %y
 }
-bind Listbox <<Bottom>> {
+::Tk::bind Listbox <<Bottom>> {
     %W activate end
     %W see end
     %W selection clear 0 end
     %W selection set end
 }
-bind Listbox <<Copy>> {
+::Tk::bind Listbox <<Copy>> {
     if {[selection own -displayof %W] == "%W"} {
 	clipboard clear -displayof %W
 	clipboard append -displayof %W [selection get -displayof %W]
     }
 }
-bind Listbox <<Down>> {
+::Tk::bind Listbox <<Down>> {
     tkListboxUpDown %W 1
 }
-bind Listbox <<End>> {
+::Tk::bind Listbox <<End>> {
     %W xview moveto 1
 }
-bind Listbox <<EndSelect>> {
+::Tk::bind Listbox <<EndSelect>> {
     tkListboxBeginExtend %W [%W index active]
 }
-bind Listbox <<Escape>> {
+::Tk::bind Listbox <<Escape>> {
     tkListboxCancel %W
 }
-bind Listbox <<Home>> {
+::Tk::bind Listbox <<Home>> {
     %W xview moveto 0
 }
-bind Listbox <<Invoke>> {
+::Tk::bind Listbox <<Invoke>> {
     tkListboxBeginSelect %W [%W index active]
 }
-bind Listbox <<Left>> {
+::Tk::bind Listbox <<Left>> {
     %W xview scroll -1 units
 }
-bind Listbox <<MAdd>> {
+::Tk::bind Listbox <<MAdd>> {
     tkListboxBeginToggle %W [%W index @%x,%y]
 }
-bind Listbox <<MExtend>> {
+::Tk::bind Listbox <<MExtend>> {
     tkListboxBeginExtend %W [%W index @%x,%y]
 }
-bind Listbox <<MSelectWord>> {
+::Tk::bind Listbox <<MSelectWord>> {
     # Empty script
 }
-bind Listbox <<PageDown>> {
+::Tk::bind Listbox <<PageDown>> {
     %W yview scroll 1 pages
     %W activate @0,0
 }
-bind Listbox <<PageUp>> {
+::Tk::bind Listbox <<PageUp>> {
     %W yview scroll -1 pages
     %W activate @0,0
 }
-bind Listbox <<Right>> {
+::Tk::bind Listbox <<Right>> {
     %W xview scroll 1 units
 }
-bind Listbox <<ScrollPageDown>> {
+::Tk::bind Listbox <<ScrollPageDown>> {
     %W xview scroll 1 pages
 }
-bind Listbox <<ScrollPageUp>> {
+::Tk::bind Listbox <<ScrollPageUp>> {
     %W xview scroll -1 pages
 }
-bind Listbox <<SelectAll>> {
+::Tk::bind Listbox <<SelectAll>> {
     tkListboxSelectAll %W
 }
-bind Listbox <<SelectBottom>> {
+::Tk::bind Listbox <<SelectBottom>> {
     tkListboxDataExtend %W [%W index end]
 }
-bind Listbox <<SelectDown>> {
+::Tk::bind Listbox <<SelectDown>> {
     tkListboxExtendUpDown %W 1
 }
-bind Listbox <<SelectNone>> {
+::Tk::bind Listbox <<SelectNone>> {
     if {[%W cget -selectmode] != "browse"} {
 	%W selection clear 0 end
     }
 }
-bind Listbox <<SelectTop>> {
+::Tk::bind Listbox <<SelectTop>> {
     tkListboxDataExtend %W 0
 }
-bind Listbox <<SelectUp>> {
+::Tk::bind Listbox <<SelectUp>> {
     tkListboxExtendUpDown %W -1
 }
-bind Listbox <<Top>> {
+::Tk::bind Listbox <<Top>> {
     %W activate 0
     %W see 0
     %W selection clear 0 end
     %W selection set 0
 }
-bind Listbox <<Up>> {
+::Tk::bind Listbox <<Up>> {
     tkListboxUpDown %W -1
 }
-bind Listbox <<WordLeft>> {
+::Tk::bind Listbox <<WordLeft>> {
     %W xview scroll -1 pages
 }
-bind Listbox <<WordRight>> {
+::Tk::bind Listbox <<WordRight>> {
     %W xview scroll 1 pages
 }
-bind Menu <<Down>> {
+::Tk::bind Menu <<Down>> {
     tkMenuDownArrow %W
 }
-bind Menu <<Escape>> {
+::Tk::bind Menu <<Escape>> {
     tkMenuEscape %W
 }
-bind Menu <<Invoke>> {
+::Tk::bind Menu <<Invoke>> {
     tkMenuInvoke %W 0
 }
-bind Menu <<Left>> {
+::Tk::bind Menu <<Left>> {
     tkMenuLeftArrow %W
 }
-bind Menu <<Return>> {
+::Tk::bind Menu <<Return>> {
     tkMenuInvoke %W 0
 }
-bind Menu <<Right>> {
+::Tk::bind Menu <<Right>> {
     tkMenuRightArrow %W
 }
-bind Menu <<Up>> {
+::Tk::bind Menu <<Up>> {
     tkMenuUpArrow %W
 }
-bind Menu <Button> {
+::Tk::bind Menu <Button> {
     tkMenuButtonDown %W
 }
-bind Menu <ButtonRelease> {
+::Tk::bind Menu <ButtonRelease> {
    tkMenuInvoke %W 1
 }
-bind Menu <Enter> {
+::Tk::bind Menu <Enter> {
     set tkPriv(window) %W
     if {[%W cget -type] == "tearoff"} {
 	if {"%m" != "NotifyUngrab"} {
@@ -587,262 +582,262 @@ bind Menu <Enter> {
     }
     tkMenuMotion %W %x %y %s
 }
-bind Menu <Key> {
+::Tk::bind Menu <Key> {
     tkTraverseWithinMenu %W %A
 }
-bind Menu <Leave> {
+::Tk::bind Menu <Leave> {
     tkMenuLeave %W %X %Y %s
 }
-bind Menu <Motion> {
+::Tk::bind Menu <Motion> {
     tkMenuMotion %W %x %y %s
 }
-bind Menubutton <<Action-ButtonRelease>> {
+::Tk::bind Menubutton <<Action-ButtonRelease>> {
     tkMbButtonUp %W
 }
-bind Menubutton <<Action-Motion>> {
+::Tk::bind Menubutton <<Action-Motion>> {
     tkMbMotion %W down %X %Y
 }
-bind Menubutton <<Action>> {
+::Tk::bind Menubutton <<Action>> {
     if {$tkPriv(inMenubutton) != ""} {
 	tkMbPost $tkPriv(inMenubutton) %X %Y
     }
 }
-bind Menubutton <<Invoke>> {
+::Tk::bind Menubutton <<Invoke>> {
     tkMbPost %W
     tkMenuFirstEntry [%W cget -menu]
 }
-bind Menubutton <Enter> {
+::Tk::bind Menubutton <Enter> {
     tkMbEnter %W
 }
-bind Menubutton <Leave> {
+::Tk::bind Menubutton <Leave> {
     tkMbLeave %W
 }
-bind Menubutton <Motion> {
+::Tk::bind Menubutton <Motion> {
     tkMbMotion %W up %X %Y
 }
-bind Radiobutton <<Action>> {
+::Tk::bind Radiobutton <<Action>> {
 	tkCheckRadioInvoke %W
     }
-bind Radiobutton <<Invoke>> {
+::Tk::bind Radiobutton <<Invoke>> {
     tkCheckRadioInvoke %W
 }
-bind Radiobutton <<Return>> {
-	if !$tk_strictMotif {
+::Tk::bind Radiobutton <<Return>> {
+	if {!$tk_strictMotif} {
 	    tkCheckRadioInvoke %W
 	}
     }
-bind Radiobutton <Enter> {
+::Tk::bind Radiobutton <Enter> {
 	tkButtonEnter %W
     }
-bind Radiobutton <Leave> {
+::Tk::bind Radiobutton <Leave> {
     tkButtonLeave %W
 }
-bind Scale <<Action-ButtonRelease>> {
+::Tk::bind Scale <<Action-ButtonRelease>> {
     tkCancelRepeat
     tkScaleEndDrag %W
     tkScaleActivate %W %x %y
 }
-bind Scale <<Action-Enter>> { }
-bind Scale <<Action-Leave>> { }
-bind Scale <<Action-Motion>> {
+::Tk::bind Scale <<Action-Enter>> { }
+::Tk::bind Scale <<Action-Leave>> { }
+::Tk::bind Scale <<Action-Motion>> {
     tkScaleDrag %W %x %y
 }
-bind Scale <<Action>> {
+::Tk::bind Scale <<Action>> {
     tkScaleButtonDown %W %x %y
 }
-bind Scale <<Adjust-ButtonRelease>> {}
-bind Scale <<Adjust-Enter>> { }
-bind Scale <<Adjust-Leave>> { }
-bind Scale <<Adjust-Motion>> {
+::Tk::bind Scale <<Adjust-ButtonRelease>> {}
+::Tk::bind Scale <<Adjust-Enter>> { }
+::Tk::bind Scale <<Adjust-Leave>> { }
+::Tk::bind Scale <<Adjust-Motion>> {
     tkScaleDrag %W %x %y
 }
-bind Scale <<Adjust>> {
+::Tk::bind Scale <<Adjust>> {
     tkScaleButton2Down %W %x %y
 }
-bind Scale <<Down>> {
+::Tk::bind Scale <<Down>> {
     tkScaleIncrement %W down little noRepeat
 }
-bind Scale <<End>> {
+::Tk::bind Scale <<End>> {
     %W set [%W cget -to]
 }
-bind Scale <<Home>> {
+::Tk::bind Scale <<Home>> {
     %W set [%W cget -from]
 }
-bind Scale <<Left>> {
+::Tk::bind Scale <<Left>> {
     tkScaleIncrement %W up little noRepeat
 }
-bind Scale <<MAdd>> {
+::Tk::bind Scale <<MAdd>> {
     tkScaleControlPress %W %x %y
 }
-bind Scale <<MXPaste>> {
+::Tk::bind Scale <<MXPaste>> {
     tkCancelRepeat
     tkScaleEndDrag %W
     tkScaleActivate %W %x %y
 }
-bind Scale <<ParaDown>> {
+::Tk::bind Scale <<ParaDown>> {
     tkScaleIncrement %W down big noRepeat
 }
-bind Scale <<ParaUp>> {
+::Tk::bind Scale <<ParaUp>> {
     tkScaleIncrement %W up big noRepeat
 }
-bind Scale <<Right>> {
+::Tk::bind Scale <<Right>> {
     tkScaleIncrement %W down little noRepeat
 }
-bind Scale <<Up>> {
+::Tk::bind Scale <<Up>> {
     tkScaleIncrement %W up little noRepeat
 }
-bind Scale <<WordLeft>> {
+::Tk::bind Scale <<WordLeft>> {
     tkScaleIncrement %W up big noRepeat
 }
-bind Scale <<WordRight>> {
+::Tk::bind Scale <<WordRight>> {
     tkScaleIncrement %W down big noRepeat
 }
-bind Scale <Enter> {
-    if $tk_strictMotif {
+::Tk::bind Scale <Enter> {
+    if {$tk_strictMotif} {
 	set tkPriv(activeBg) [%W cget -activebackground]
 	%W config -activebackground [%W cget -background]
     }
     tkScaleActivate %W %x %y
 }
-bind Scale <Leave> {
-    if $tk_strictMotif {
+::Tk::bind Scale <Leave> {
+    if {$tk_strictMotif} {
 	%W config -activebackground $tkPriv(activeBg)
     }
     if {[%W cget -state] == "active"} {
 	%W configure -state normal
     }
 }
-bind Scale <Motion> {
+::Tk::bind Scale <Motion> {
     tkScaleActivate %W %x %y
 }
-bind Scrollbar <<Action-ButtonRelease>> {
+::Tk::bind Scrollbar <<Action-ButtonRelease>> {
     tkScrollButtonUp %W %x %y
 }
-bind Scrollbar <<Action-Enter>> {
+::Tk::bind Scrollbar <<Action-Enter>> {
     # Prevents <Enter> binding from being invoked.
 }
-bind Scrollbar <<Action-Leave>> {
+::Tk::bind Scrollbar <<Action-Leave>> {
     # Prevents <Leave> binding from being invoked.
 }
-bind Scrollbar <<Action-Motion>> {
+::Tk::bind Scrollbar <<Action-Motion>> {
     tkScrollDrag %W %x %y
 }
-bind Scrollbar <<Action>> {
+::Tk::bind Scrollbar <<Action>> {
     tkScrollButtonDown %W %x %y
 }
-bind Scrollbar <<Adjust-Enter>> {
+::Tk::bind Scrollbar <<Adjust-Enter>> {
     # Prevents <Enter> binding from being invoked.
 }
-bind Scrollbar <<Adjust-Leave>> {
+::Tk::bind Scrollbar <<Adjust-Leave>> {
     # Prevents <Leave> binding from being invoked.
 }
-bind Scrollbar <<Adjust-Motion>> {
+::Tk::bind Scrollbar <<Adjust-Motion>> {
     tkScrollDrag %W %x %y
 }
-bind Scrollbar <<Adjust>> {
+::Tk::bind Scrollbar <<Adjust>> {
     tkScrollButton2Down %W %x %y
 }
-bind Scrollbar <<Down>> {
+::Tk::bind Scrollbar <<Down>> {
     tkScrollByUnits %W v 1
 }
-bind Scrollbar <<End>> {
+::Tk::bind Scrollbar <<End>> {
     tkScrollToPos %W 1
 }
-bind Scrollbar <<Home>> {
+::Tk::bind Scrollbar <<Home>> {
     tkScrollToPos %W 0
 }
-bind Scrollbar <<Left>> {
+::Tk::bind Scrollbar <<Left>> {
     tkScrollByUnits %W h -1
 }
-bind Scrollbar <<MAdd>> {
+::Tk::bind Scrollbar <<MAdd>> {
     tkScrollTopBottom %W %x %y
 }
-bind Scrollbar <<MPosition>> {}
-bind Scrollbar <<MXPaste>> {
+::Tk::bind Scrollbar <<MPosition>> {}
+::Tk::bind Scrollbar <<MXPaste>> {
     tkScrollButtonUp %W %x %y
 }
-bind Scrollbar <<PageDown>> {
+::Tk::bind Scrollbar <<PageDown>> {
     tkScrollByPages %W hv 1
 }
-bind Scrollbar <<PageUp>> {
+::Tk::bind Scrollbar <<PageUp>> {
     tkScrollByPages %W hv -1
 }
-bind Scrollbar <<ParaDown>> {
+::Tk::bind Scrollbar <<ParaDown>> {
     tkScrollByPages %W v 1
 }
-bind Scrollbar <<ParaUp>> {
+::Tk::bind Scrollbar <<ParaUp>> {
     tkScrollByPages %W v -1
 }
-bind Scrollbar <<Right>> {
+::Tk::bind Scrollbar <<Right>> {
     tkScrollByUnits %W h 1
 }
-bind Scrollbar <<Up>> {
+::Tk::bind Scrollbar <<Up>> {
     tkScrollByUnits %W v -1
 }
-bind Scrollbar <<WordLeft>> {
+::Tk::bind Scrollbar <<WordLeft>> {
     tkScrollByPages %W h -1
 }
-bind Scrollbar <<WordRight>> {
+::Tk::bind Scrollbar <<WordRight>> {
     tkScrollByPages %W h 1
 }
-bind Scrollbar <Enter> {
-    if $tk_strictMotif {
+::Tk::bind Scrollbar <Enter> {
+    if {$tk_strictMotif} {
 	set tkPriv(activeBg) [%W cget -activebackground]
 	%W config -activebackground [%W cget -background]
     }
     %W activate [%W identify %x %y]
 }
-bind Scrollbar <Leave> {
+::Tk::bind Scrollbar <Leave> {
     if {$tk_strictMotif && [info exists tkPriv(activeBg)]} {
 	%W config -activebackground $tkPriv(activeBg)
     }
     %W activate {}
 }
-bind Scrollbar <Motion> {
+::Tk::bind Scrollbar <Motion> {
     %W activate [%W identify %x %y]
 }
-bind Text <<Action-ButtonRelease>> {
+::Tk::bind Text <<Action-ButtonRelease>> {
     tkCancelRepeat
 }
-bind Text <<Action-Enter>> {
+::Tk::bind Text <<Action-Enter>> {
     tkCancelRepeat
 }
-bind Text <<Action-Leave>> {
+::Tk::bind Text <<Action-Leave>> {
     set tkPriv(x) %x
     set tkPriv(y) %y
     tkTextAutoScan %W
 }
-bind Text <<Action-Motion>> {
+::Tk::bind Text <<Action-Motion>> {
     set tkPriv(x) %x
     set tkPriv(y) %y
     tkTextSelectTo %W %x %y
 }
-bind Text <<Action>> {
+::Tk::bind Text <<Action>> {
     tkTextButton1 %W %x %y
     %W tag remove sel 0.0 end
 }
-bind Text <<Adjust-ButtonRelease>> {}
-bind Text <<BackSpace>> {
+::Tk::bind Text <<Adjust-ButtonRelease>> {}
+::Tk::bind Text <<BackSpace>> {
     if {[%W tag nextrange sel 1.0 end] != ""} {
 	%W delete sel.first sel.last
-    } elseif [%W compare insert != 1.0] {
+    } elseif {[%W compare insert != 1.0]} {
 	%W delete insert-1c
 	%W see insert
     }
 }
-bind Text <<Bottom>> {
+::Tk::bind Text <<Bottom>> {
     tkTextSetCursor %W {end - 1 char}
 }
-bind Text <<Clear>> {
+::Tk::bind Text <<Clear>> {
     catch {%W delete sel.first sel.last}
 }
-bind Text <<Copy>> {
+::Tk::bind Text <<Copy>> {
     tk_textCopy %W
 }
-bind Text <<Cut>> {
+::Tk::bind Text <<Cut>> {
     tk_textCut %W
 }
-bind Text <<Delete>> {
+::Tk::bind Text <<Delete>> {
     if {[%W tag nextrange sel 1.0 end] != ""} {
 	%W delete sel.first sel.last
     } else {
@@ -850,180 +845,175 @@ bind Text <<Delete>> {
 	%W see insert
     }
 }
-bind Text <<DeleteEnd>> {
-    if !$tk_strictMotif {
-	if [%W compare insert == {insert lineend}] {
+::Tk::bind Text <<DeleteEnd>> {
+    if {!$tk_strictMotif} {
+	if {[%W compare insert == {insert lineend}]} {
 	    %W delete insert
 	} else {
 	    %W delete insert {insert lineend}
 	}
     }
 }
-bind Text <<Down>> {
+::Tk::bind Text <<Down>> {
     tkTextSetCursor %W [tkTextUpDownLine %W 1]
 }
-bind Text <<End>> {
+::Tk::bind Text <<End>> {
     tkTextSetCursor %W {insert lineend}
 }
-bind Text <<EndSelect>> {
+::Tk::bind Text <<EndSelect>> {
     set tkPriv(selectMode) char
     tkTextKeyExtend %W insert
 }
-bind Text <<Escape>> {# nothing}
-bind Text <<Home>> {
+::Tk::bind Text <<Escape>> {# nothing}
+::Tk::bind Text <<Home>> {
     tkTextSetCursor %W {insert linestart}
 }
-bind Text <<Left>> {
+::Tk::bind Text <<Left>> {
     tkTextSetCursor %W insert-1c
 }
-bind Text <<MAdd>> {
+::Tk::bind Text <<MAdd>> {
     %W mark set insert @%x,%y
 }
-bind Text <<MExtend>> {
+::Tk::bind Text <<MExtend>> {
     tkTextResetAnchor %W @%x,%y
     set tkPriv(selectMode) char
     tkTextSelectTo %W %x %y
 }
-bind Text <<MExtendLine>> {
+::Tk::bind Text <<MExtendLine>> {
     set tkPriv(selectMode) line
     tkTextSelectTo %W %x %y
 }
-bind Text <<MExtendWord>> {
+::Tk::bind Text <<MExtendWord>> {
     set tkPriv(selectMode) word
     tkTextSelectTo %W %x %y
 }
-bind Text <<MIcursor>> {}
-bind Text <<MSelectLine>> {
+::Tk::bind Text <<MIcursor>> {}
+::Tk::bind Text <<MSelectLine>> {
     set tkPriv(selectMode) line
     tkTextSelectTo %W %x %y
     catch {%W mark set insert sel.first}
 }
-bind Text <<MSelectWord>> {
+::Tk::bind Text <<MSelectWord>> {
     set tkPriv(selectMode) word
     tkTextSelectTo %W %x %y
     catch {%W mark set insert sel.first}
 }
-bind Text <<MXPaste>> {
-    if {!$tkPriv(mouseMoved) || $tk_strictMotif} {
-	tkTextPaste %W %x %y
-    }
-}
-bind Text <<PageDown>> {
+::Tk::bind Text <<PageDown>> {
     tkTextSetCursor %W [tkTextScrollPages %W 1]
 }
-bind Text <<PageUp>> {
+::Tk::bind Text <<PageUp>> {
     tkTextSetCursor %W [tkTextScrollPages %W -1]
 }
-bind Text <<ParaDown>> {
+::Tk::bind Text <<ParaDown>> {
     tkTextSetCursor %W [tkTextNextPara %W insert]
 }
-bind Text <<ParaUp>> {
+::Tk::bind Text <<ParaUp>> {
     tkTextSetCursor %W [tkTextPrevPara %W insert]
 }
-bind Text <<Paste>> {
+::Tk::bind Text <<Paste>> {
     tk_textPaste %W
 }
-bind Text <<Return>> {
+::Tk::bind Text <<Return>> {
     tkTextInsert %W \n
 }
-bind Text <<Right>> {
+::Tk::bind Text <<Right>> {
     tkTextSetCursor %W insert+1c
 }
-bind Text <<ScrollPageDown>> {
+::Tk::bind Text <<ScrollPageDown>> {
     %W xview scroll 1 page
 }
-bind Text <<ScrollPageUp>> {
+::Tk::bind Text <<ScrollPageUp>> {
     %W xview scroll -1 page
 }
-bind Text <<SelectAll>> {
+::Tk::bind Text <<SelectAll>> {
     %W tag add sel 1.0 end
 }
-bind Text <<SelectBottom>> {
+::Tk::bind Text <<SelectBottom>> {
     tkTextKeySelect %W {end - 1 char}
 }
-bind Text <<SelectDown>> {
+::Tk::bind Text <<SelectDown>> {
     tkTextKeySelect %W [tkTextUpDownLine %W 1]
 }
-bind Text <<SelectEnd>> {
+::Tk::bind Text <<SelectEnd>> {
     tkTextKeySelect %W {insert lineend}
 }
-bind Text <<SelectHome>> {
+::Tk::bind Text <<SelectHome>> {
     tkTextKeySelect %W {insert linestart}
 }
-bind Text <<SelectLeft>> {
+::Tk::bind Text <<SelectLeft>> {
     tkTextKeySelect %W [%W index {insert - 1c}]
 }
-bind Text <<SelectNone>> {
+::Tk::bind Text <<SelectNone>> {
     %W tag remove sel 1.0 end
 }
-bind Text <<SelectPageDown>> {
+::Tk::bind Text <<SelectPageDown>> {
     tkTextKeySelect %W [tkTextScrollPages %W 1]
 }
-bind Text <<SelectPageUp>> {
+::Tk::bind Text <<SelectPageUp>> {
     tkTextKeySelect %W [tkTextScrollPages %W -1]
 }
-bind Text <<SelectParaDown>> {
+::Tk::bind Text <<SelectParaDown>> {
     tkTextKeySelect %W [tkTextNextPara %W insert]
 }
-bind Text <<SelectParaUp>> {
+::Tk::bind Text <<SelectParaUp>> {
     tkTextKeySelect %W [tkTextPrevPara %W insert]
 }
-bind Text <<SelectRight>> {
+::Tk::bind Text <<SelectRight>> {
     tkTextKeySelect %W [%W index {insert + 1c}]
 }
-bind Text <<SelectTop>> {
+::Tk::bind Text <<SelectTop>> {
     tkTextKeySelect %W 1.0
 }
-bind Text <<SelectUp>> {
+::Tk::bind Text <<SelectUp>> {
     tkTextKeySelect %W [tkTextUpDownLine %W -1]
 }
-bind Text <<SelectWordLeft>> {
+::Tk::bind Text <<SelectWordLeft>> {
     tkTextKeySelect %W [tkTextPrevPos %W insert tcl_startOfPreviousWord]
 }
-bind Text <<SelectWordRight>> {
+::Tk::bind Text <<SelectWordRight>> {
     tkTextKeySelect %W [tkTextNextWord %W insert]
 }
-bind Text <<StartSelect>> {
+::Tk::bind Text <<StartSelect>> {
     %W mark set anchor insert
 }
-bind Text <<TextFocusNext>> {
+::Tk::bind Text <<TextFocusNext>> {
     focus [tk_focusNext %W]
 }
-bind Text <<TextFocusPrev>> {
+::Tk::bind Text <<TextFocusPrev>> {
     focus [tk_focusPrev %W]
 }
-bind Text <<Top>> {
+::Tk::bind Text <<Top>> {
     tkTextSetCursor %W 1.0
 }
-bind Text <<Transpose>> {
-    if !$tk_strictMotif {
+::Tk::bind Text <<Transpose>> {
+    if {!$tk_strictMotif} {
 	tkTextTranspose %W
     }
 }
-bind Text <<Up>> {
+::Tk::bind Text <<Up>> {
     tkTextSetCursor %W [tkTextUpDownLine %W -1]
 }
-bind Text <<WordLeft>> {
+::Tk::bind Text <<WordLeft>> {
     tkTextSetCursor %W [tkTextPrevPos %W insert tcl_startOfPreviousWord]
 }
-bind Text <<WordRight>> {
+::Tk::bind Text <<WordRight>> {
     tkTextSetCursor %W [tkTextNextWord %W insert]
 }
-bind Text <Alt-Key> {# nothing }
-bind Text <Control-Key> {# nothing}
-bind Text <Escape> {}
-bind Text <Key-KP_Enter> {# nothing}
-bind Text <Key-Tab> {
+::Tk::bind Text <Alt-Key> {# nothing }
+::Tk::bind Text <Control-Key> {# nothing}
+::Tk::bind Text <Escape> {}
+::Tk::bind Text <Key-KP_Enter> {# nothing}
+::Tk::bind Text <Key-Tab> {
     tkTextInsert %W \t
     focus %W
     break
 }
-bind Text <Key> {
+::Tk::bind Text <Key> {
     tkTextInsert %W %A
 }
-bind Text <Meta-Key> {# nothing}
-bind Text <Return> {}
-bind Text <Shift-Key-Tab> {
+::Tk::bind Text <Meta-Key> {# nothing}
+::Tk::bind Text <Return> {}
+::Tk::bind Text <Shift-Key-Tab> {
     # Needed only to keep <Tab> binding from triggering;  doesn't
     # have to actually do anything.
     break

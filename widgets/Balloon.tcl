@@ -67,8 +67,8 @@ Classy::Balloon classmethod destroy {} {
 #} descr {
 # add $text as help to the given widget
 #}
-Classy::Balloon method add {widget text} {
-	private $object help
+Classy::Balloon classmethod add {widget text} {
+	private $class help
 	if {"$text"==""} {
 		if [info exists help($widget)] {
 			unset help($widget)
@@ -84,8 +84,8 @@ Classy::Balloon method add {widget text} {
 #} descr {
 # display the helptext associated with $widget
 #}
-Classy::Balloon method display {widget} {
-	private $object help
+Classy::Balloon classmethod display {widget} {
+	private $class help
 	if ![winfo exists $widget] return
 	if ![info exists help($widget)] return
 	if ![winfo exists .classy__.balloon] {
@@ -107,8 +107,8 @@ Classy::Balloon method display {widget} {
 #} descr {
 # remove the currently displayed helptext
 #}
-Classy::Balloon method revoke {} {
-	private $object id
+Classy::Balloon classmethod revoke {} {
+	private $class id
 	if [info exists id] {
 		after cancel $id
 		unset id
@@ -116,9 +116,8 @@ Classy::Balloon method revoke {} {
 	catch {wm withdraw .classy__.balloon}
 }
 
-Classy::Balloon method _schedule {widget} {
-	private $object time
-	private $object id
-	set id [after $time "$object display $widget"]
+Classy::Balloon classmethod _schedule {widget} {
+	private $class time id
+	set id [after $time "$class display $widget"]
 }
 

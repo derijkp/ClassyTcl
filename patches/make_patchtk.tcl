@@ -1,3 +1,6 @@
+#!/bin/sh
+# the next line restarts using wish \
+exec wish8.0 "$0" ${1+"$@"}
 package require Tk
 
 set f [open patchtk.tcl w]
@@ -128,13 +131,14 @@ foreach {type old new} {
 
 foreach binding [lsort [array names oldbindings]] {
 	set binding [split $binding ","]
-	puts $f [list bind [lindex $binding 0] [lindex $binding 1] {}]
+	puts $f [list ::Tk::bind [lindex $binding 0] [lindex $binding 1] {}]
 }
 
 foreach binding [lsort [array names newbindings]] {
 	set split [split $binding ","]
-	puts $f [list bind [lindex $split 0] [lindex $split 1] $newbindings($binding)]
+	puts $f [list ::Tk::bind [lindex $split 0] [lindex $split 1] $newbindings($binding)]
 }
 
 puts $f "\}"
 close $f
+exit

@@ -12,18 +12,19 @@
 # a Table ...
 #} descr {
 # subclass of <a href="../basic/Widget.html">Widget</a><br>
-# creates a Table of entries or text fields. This acts much like a spreadsheet. It supports
-# supports scrollbars using the normal methods. The Table must have an associated getcommand 
-# and setcommand. These are used to get the data to display in the Table and te change data when it
-# is edited in the Table. The get and set commands 
-# will be called with the following parameters:<br>
+# creates a Table of entries or text fields. This acts much like a 
+# spreadsheet. It supports scrollbars using the normal methods. The 
+# Table must have an associated command. This is used to get the data 
+# to display in the Table and te change data when it
+# is edited. The table command will be called with the following 
+# parameters:<br>
 # <dl>
-# <dt>getcommand object x y
+# <dt>command object x y ?value?
 # <dd>the parameter object is the name of the Table.<br>
-# The getcommand must return the value to be shown in the given cell.
-# When the getcommand fails, the error message will be shown in the affected cell.
-# <dt>setcommand object x y value
-# <dd>The setcommand takes one extra parameter: the new value of the cell.
+# When no value is given, the command must return the value to be s
+# hown in the given cell.
+# When the command fails, the error message will be shown in the affected cell.
+# <dd>When value is given, it is the new value of the cell.
 # If the setcommand fails, the previous value will be restored.
 # </dl>
 #}
@@ -41,7 +42,6 @@ option add *GridWidth 1 widgetDefault
 proc Classy::Tableobject {w args} {
 	eval [winfo parent $w] $args
 }
-
 bind Classy::Table <Configure> {%W _clear ; %W _redraw;break}
 bind Classy::Table <<Action>> {%W selection clear ; %W activate @%x,%y;break}
 bind Classy::Table <<Action-Motion>> {%W _selectmotion %W %x %y;break}
@@ -63,42 +63,44 @@ bind Classy::Table <<SelectTableRight>> {%W movex 1 select;break}
 bind Classy::Table <<MExtend>> {%W selection anchor ; 	%W activate @%x,%y ;	break}
 bind Classy::Table <<Return>> {%W activate;break}
 
-bind Classy::Table::single <<TableUp>> {[winfo parent %W] movey -1;break}
-bind Classy::Table::single <<TableDown>> {[winfo parent %W] movey 1;break}
-bind Classy::Table::single <<TableLeft>> {[winfo parent %W] movex -1;break}
-bind Classy::Table::single <<TableRight>> {[winfo parent %W] movex 1;break}
-bind Classy::Table::single <<SelectTableUp>> {[winfo parent %W] movey -1 select;break}
-bind Classy::Table::single <<SelectTableDown>> {[winfo parent %W] movey 1 select;break}
-bind Classy::Table::single <<SelectTableLeft>> {[winfo parent %W] movex -1 select;break}
-bind Classy::Table::single <<SelectTableRight>> {[winfo parent %W] movex 1 select;break}
-bind Classy::Table::single <<TableReturn>> {[winfo parent %W] movey 1;break}
-bind Classy::Table::single <<Return>> {[winfo parent %W] movey 1;break}
-bind Classy::Table::single <<PageUp>> {[winfo parent %W] yview scroll -1 pages ;break}
-bind Classy::Table::single <<PageDown>> {[winfo parent %W] yview scroll 1 pages ;break}
-bind Classy::Table::single <<WordLeft>> {[winfo parent %W] xview scroll -1 pages ;break}
-bind Classy::Table::single <<WordRight>> {[winfo parent %W] xview scroll 1 pages ;break}
-bind Classy::Table::single <<Action>> {[winfo parent %W] _selectedit %x %y;break}
-bind Classy::Table::single <<Action-Motion>> {[winfo parent %W] _selectmotion %W %x %y;break}
-bind Classy::Table::single <<Action-Leave>> {tkCancelRepeat;break}
-bind Classy::Table::single <<PasteSpecial>> {[winfo parent %W] pastespecial;break}
+bind Classy::Table::single <<TableUp>> {%W movey -1;break}
+bind Classy::Table::single <<TableDown>> {%W movey 1;break}
+bind Classy::Table::single <<TableLeft>> {%W movex -1;break}
+bind Classy::Table::single <<TableRight>> {%W movex 1;break}
+bind Classy::Table::single <<SelectTableUp>> {%W movey -1 select;break}
+bind Classy::Table::single <<SelectTableDown>> {%W movey 1 select;break}
+bind Classy::Table::single <<SelectTableLeft>> {%W movex -1 select;break}
+bind Classy::Table::single <<SelectTableRight>> {%W movex 1 select;break}
+bind Classy::Table::single <<TableReturn>> {%W movey 1;break}
+bind Classy::Table::single <<Return>> {%W movey 1;break}
+bind Classy::Table::single <<PageUp>> {%W yview scroll -1 pages ;break}
+bind Classy::Table::single <<PageDown>> {%W yview scroll 1 pages ;break}
+bind Classy::Table::single <<WordLeft>> {%W xview scroll -1 pages ;break}
+bind Classy::Table::single <<WordRight>> {%W xview scroll 1 pages ;break}
+bind Classy::Table::single <<Action>> {%W _selectedit %x %y;break}
+bind Classy::Table::single <<Action-Motion>> {%W _selectmotion %W %x %y edit;break}
+bind Classy::Table::single <<Action-ButtonRelease>> {%W _cancelrepeat;break}
+bind Classy::Table::single <<PasteSpecial>> {%W pastespecial;break}
+bind Classy::Table::single <<Escape>> {%W _restore;break}
 
-bind Classy::Table::multi <<mTableUp>> {[winfo parent %W] movey -1;break}
-bind Classy::Table::multi <<mTableDown>> {[winfo parent %W] movey 1;break}
-bind Classy::Table::multi <<mTableLeft>> {[winfo parent %W] movex -1;break}
-bind Classy::Table::multi <<mTableRight>> {[winfo parent %W] movex 1;break}
-bind Classy::Table::multi <<SelectmTableUp>> {[winfo parent %W] movey -1 select;break}
-bind Classy::Table::multi <<SelectmTableDown>> {[winfo parent %W] movey 1 select;break}
-bind Classy::Table::multi <<SelectmTableLeft>> {[winfo parent %W] movex -1 select;break}
-bind Classy::Table::multi <<SelectmTableRight>> {[winfo parent %W] movex 1 select;break}
-bind Classy::Table::multi <<TableReturn>> {[winfo parent %W] movey 1;break}
-bind Classy::Table::multi <<PageUp>> {[winfo parent %W] yview scroll -1 pages ;break}
-bind Classy::Table::multi <<PageDown>> {[winfo parent %W] yview scroll 1 pages ;break}
-bind Classy::Table::multi <<WordLeft>> {[winfo parent %W] xview scroll -1 pages ;break}
-bind Classy::Table::multi <<WordRight>> {[winfo parent %W] xview scroll 1 pages ;break}
-bind Classy::Table::multi <<Action>> {[winfo parent %W] _selectedit %x %y;break}
-bind Classy::Table::multi <<Action-Motion>> {[winfo parent %W] _selectmotion %W %x %y;break}
-bind Classy::Table::multi <<Action-Leave>> {tkCancelRepeat;break}
-bind Classy::Table::multi <<PasteSpecial>> {[winfo parent %W] pastespecial;break}
+bind Classy::Table::multi <<mTableUp>> {%W movey -1;break}
+bind Classy::Table::multi <<mTableDown>> {%W movey 1;break}
+bind Classy::Table::multi <<mTableLeft>> {%W movex -1;break}
+bind Classy::Table::multi <<mTableRight>> {%W movex 1;break}
+bind Classy::Table::multi <<SelectmTableUp>> {%W movey -1 select;break}
+bind Classy::Table::multi <<SelectmTableDown>> {%W movey 1 select;break}
+bind Classy::Table::multi <<SelectmTableLeft>> {%W movex -1 select;break}
+bind Classy::Table::multi <<SelectmTableRight>> {%W movex 1 select;break}
+bind Classy::Table::multi <<TableReturn>> {%W movey 1;break}
+bind Classy::Table::multi <<PageUp>> {%W yview scroll -1 pages ;break}
+bind Classy::Table::multi <<PageDown>> {%W yview scroll 1 pages ;break}
+bind Classy::Table::multi <<WordLeft>> {%W xview scroll -1 pages ;break}
+bind Classy::Table::multi <<WordRight>> {%W xview scroll 1 pages ;break}
+bind Classy::Table::multi <<Action>> {%W _selectedit %x %y;break}
+bind Classy::Table::multi <<Action-Motion>> {%W _selectmotion %W %x %y edit;break}
+bind Classy::Table::single <<Action-ButtonRelease>> {%W _cancelrepeat;break}
+bind Classy::Table::multi <<PasteSpecial>> {%W pastespecial;break}
+bind Classy::Table::single <<Escape>> {%W _restore;break}
 
 # ------------------------------------------------------------------
 #  Widget creation
@@ -107,13 +109,14 @@ bind Classy::Table::multi <<PasteSpecial>> {[winfo parent %W] pastespecial;break
 Widget subclass Classy::Table
 Classy::export Table {}
 
-Classy::Table classmethod init {args} {
+Classy::Table method init {args} {
 	# REM Create object
 	# -----------------
 	private $object canvas data redrawing
 	set canvas [super init canvas]
 	$object configure -width 100 -height 100 -highlightthicknes 0 -bd 0
 	Classy::Text $object.edit -bg white -width 1 -height 1
+	Classy::chainw $object.edit $object
 	bindtags $object.edit [list $object.edit Classy::Table::single Classy::Text . all]
 	set data(edit) [$canvas create window -1000 -1000 -window $object.edit \
 		-width 1 -height 1 -anchor nw]
@@ -158,7 +161,7 @@ Classy::Table classmethod init {args} {
 #	Classy::todo $object _redraw
 }
 
-Classy::Table component book {$object.book}
+Classy::Table chainallmethods {$object.table} Classy::Text
 
 # ------------------------------------------------------------------
 #  Widget options
@@ -203,7 +206,7 @@ Classy::Table addoption -variable {variable Variable {}} {
 #doc {Table options -command} option {-command Command Command} descr {
 # gives the command that will be called to get or set the value of a given cell. It must have the 
 # following format:<br>
-# setcommand object x y ?value?<br>
+# command object x y ?value?<br>
 # The parameters given to the command are the Table objects name, the x and
 # y coordinate in the table.
 # If the parameter value is not given, the command should return thew current value of the cell
@@ -240,7 +243,7 @@ Classy::Table addoption -type {type Type single} {
 # gives the number of columns in the Table
 #}
 Classy::Table addoption -cols {cols Cols 5} {
-	if {$value < 1} {return -code error "-cols must be larger than 1"}
+	if {$value < 1} {return -code error "-cols must be larger than 0"}
 	Classy::todo $object _redraw
 }
 
@@ -248,7 +251,7 @@ Classy::Table addoption -cols {cols Cols 5} {
 # gives the number of rows in the Table
 #}
 Classy::Table addoption -rows {rows Rows 20} {
-	if {$value < 1} {return -code error "-rows must be larger than 1"}
+	if {$value < 1} {return -code error "-rows must be larger than 0"}
 	Classy::todo $object _redraw
 }
 
@@ -510,7 +513,7 @@ Classy::Table method undo {} {
 		if ![string length $value] {
 			set sv {{}}
 		} else {
-			set sv [replace $value [list { } {\ } \{ \\\{ \} \\\} \$ \\\$ \[ \\\[ \] \\\]]]
+			set sv [string::change $value [list { } {\ } \{ \\\{ \} \\\} \$ \\\$ \[ \\\[ \] \\\]]]
 		}
 		set error [catch {uplevel #0 $options(-command) $object $table_x $table_y [list $value]} res]
 		$object refreshcell $table_x $table_y
@@ -544,7 +547,7 @@ Classy::Table method redo {} {
 		if ![string length $value] {
 			set sv {{}}
 		} else {
-			set sv [replace $value [list { } {\ } \{ \\\{ \} \\\} \$ \\\$ \[ \\\[ \] \\\]]]
+			set sv [string::change $value [list { } {\ } \{ \\\{ \} \\\} \$ \\\$ \[ \\\[ \] \\\]]]
 		}
 		set error [catch {uplevel #0 $options(-command) $object $table_x $table_y [list $value]} res]
 		$object refreshcell $table_x $table_y
@@ -576,7 +579,9 @@ Classy::Table method refreshcell {table_x table_y} {
 	set index [list $table_x $table_y]
 	if ![catch {$object _table2canvas $index} x] {
 		set y [lpop x]
-		$canvas itemconfigure $data(fg,$x,$y) -text $new
+		if {($x >= 0)&&($y >= 0)} {
+			$canvas itemconfigure $data(fg,$x,$y) -text $new
+		}
 		if {"$index" == "$data(active)"} {
 			$object.edit delete 1.0 end
 			$object.edit insert end $new
@@ -597,8 +602,8 @@ Classy::Table method _redrawcell {cell} {
 	set style(-fg) $data(fg)
 	set style(-font) $data(font)
 	array set style $data(style,default)
-	if [info exists data(style,,$table_x)] {array set style $data(style,,$table_x)}
-	if [info exists data(style,$table_y,)] {array set style $data(style,$table_y,)}
+	if [info exists data(style,$table_x,)] {array set style $data(style,$table_x,)}
+	if [info exists data(style,,$table_y)] {array set style $data(style,,$table_y)}
 	if {($x < $options(-titlecols))||($y < $options(-titlerows))} {
 		if [info exists data(style,title)] {array set style $data(style,title)}
 	}
@@ -872,6 +877,7 @@ Classy::Table method see {{index {}}} {
 Classy::Table method xview {args} {
 	private $object options data
 	set size [expr {$data(x,num)-$options(-titlecols)}]
+	if {$size <= 0} {return {0 1}}
 	set min $data(xmin)
 	set max $data(xmax)
 	set pos $data(x,start)
@@ -949,6 +955,7 @@ Classy::Table method yview {args} {
 	private $object options data
 	set pos $data(y,start)
 	set size [expr {$data(y,num)-$options(-titlerows)}]
+	if {$size <= 0} {return {0 1}}
 	set min $data(ymin)
 	set max $data(ymax)
 	switch [lindex $args 0] {
@@ -1172,6 +1179,22 @@ Classy::Table method activate {{index {}}} {
 	set data(active) $active
 }
 
+Classy::Table method focus {} {
+	private $object data
+	if [info exists data(editing)] {
+		focus $object.edit
+	} else {
+		focus $object
+	}
+}
+
+Classy::Table method _restore {} {
+	private $object options data canvas
+	if ![info exists data(editing)] return
+	set value [get data(prevvalue) ""]
+	$object set $data(active) $value
+}
+
 Classy::Table method _edit {index} {
 	private $object options data canvas
 	if [info exists data(editing)] {
@@ -1190,9 +1213,19 @@ Classy::Table method _edit {index} {
 		catch {unset data(editheight)}
 		$canvas coords $data(edit) -1000 -1000
 		$canvas itemconfigure $data(edit) -width 1 -height 1
-		focus $object
 	} else {
 		set y [lpop x]
+		array set style $data(style,default)
+		if [info exists data(style,$table_x,)] {array set style $data(style,$table_x,)}
+		if [info exists data(style,,$table_y)] {array set style $data(style,,$table_y)}
+		if {($x < $options(-titlecols))||($y < $options(-titlerows))} {
+			if [info exists data(style,title)] {array set style $data(style,title)}
+		}
+		if [info exists data(style,$table_y,$table_x)] {array set style $data(style,$table_y,$table_x)}
+		if [info exists selection([list $table_x $table_y])] {
+			if [info exists data(style,sel)] {array set style $data(style,sel)}
+		}
+		if [info exists style(-editable)] return
 		set bbox [$canvas coords _bg$x,$y]
 		if {[llength $bbox] != 4} {
 			catch {unset data(editing)}
@@ -1226,7 +1259,6 @@ Classy::Table method _edit {index} {
 		}
 		set data(prevvalue) $new
 		$object.edit insert end $new
-		focus $object.edit
 		if [scan $index @%d,%d x y] {
 			set cx [$canvas coords $data(edit)]
 			set cy [lpop cx]
@@ -1235,7 +1267,6 @@ Classy::Table method _edit {index} {
 			$object _selectedit $x $y
 		}
 		$object.edit clearundo
-		focus $object.edit
 	}
 }
 
@@ -1307,9 +1338,10 @@ Classy::Table method tag {option tag args} {
 					switch -- $option {
 						-foreground {set option -fg}
 						-background {set option -bg}
-						-fg - -bg - -font {}
+						-fg - -bg - -font {} 
+						-editable {if [true $value] {set value ""} else {set value 0}}
 						default {
-							error "Unknown option \"$option\": should be one of: -fg, -bg or -font"
+							error "Unknown option \"$option\": should be one of: -fg, -bg, -font or -editable"
 						}
 					}
 					if [string length $value] {
@@ -1425,73 +1457,6 @@ Classy::Table method rowconfigure {row args} {
 			}
 			eval $object tag configure $row, $todo
 		}
-	}
-	Classy::todo $object _redraw
-}
-
-Classy::Table method columnconfigure {col args} {
-	private $class actions
-	private $object data
-	if {[llength $args] == 1} {
-		set option [lindex $args 0]
-		if [info exists actions($option)] {
-			set part [lindex $actions($option) 0]
-			set option [lindex $actions($option) 1]
-			if [info exists data($part,x$col)] {
-				return [structlget $data($part,x$col) $option]
-			} else {
-				return {}
-			}
-		} elseif {"$option" == "-size"} {
-			if [info exists data(x,s,$col)] {
-				return $data(x,s,$col)
-			} else {
-				return $data(x,s)
-			}
-		} elseif {"$option" == "-resize"} {
-			if [info exists data(x,rs,$col)] {
-				return $data(x,rs,$col)
-			} else {
-				return $data(x,rs)
-			}
-		} else {
-			return -code error "Unknown configuration option \"$option\""
-		}
-	} else {
-		set fg [get data(fg,x$col) ""]
-		set bg [get data(bg,x$col) ""]
-		set grid [get data(grid,x$col) ""]
-		foreach {option value} $args {
-			if [info exists actions($option)] {
-				set part [lindex $actions($option) 0]
-				foreach option [lrange $actions($option) 1 end] {
-					if [string length $value] {
-						set $part [structlset [set $part] $option $value]
-					} else {
-						set $part [structlunset [set $part] $option]
-					}
-				}
-			} elseif {"$option" == "-size"} {
-				if {"$value" == ""} {
-					unset data(x,s,$col)
-				} else {
-					if {$value < 1} {set value 1}
-					set data(x,s,$col) $value
-				}
-			} elseif {"$option" == "-resize"} {
-				if {"$value" == ""} {
-					catch {unset data(x,rs,$col)}
-				} else {
-					set data(x,rs,$col) [true $value]
-				}
-			} else {
-				return -code error "Unknown configuration option \"$option\""
-			}
-		}
-		if [string length $fg] {set data(fg,x$col) $fg} else {catch {unset data(fg,x$col)}}
-		if [string length $bg] {set data(bg,x$col) $bg} else {catch {unset data(bg,x$col)}}
-		if [string length $grid] {set data(grid,x$col) $grid} else {catch {unset data(grid,x$col)}}
-		if ![catch {structlget $grid -width} w] {set data(gridw,x$col) $w} else {catch {unset data(gridw,x$col)}}
 	}
 	Classy::todo $object _redraw
 }
@@ -1651,9 +1616,9 @@ Classy::Table method _redraw {} {
 		update idletasks
 	}
 	set data(xmin) [expr {$options(-colorigin)+$options(-titlecols)}]
-	set data(xmax) [expr {$data(xmin)+$options(-cols)}]
+	set data(xmax) [expr {$options(-colorigin)+$options(-cols)}]
 	set data(ymin) [expr {$options(-roworigin)+$options(-titlerows)}]
-	set data(ymax) [expr {$data(ymin)+$options(-rows)}]
+	set data(ymax) [expr {$options(-roworigin)+$options(-rows)}]
 	set redrawing 1
 	$object _draw $data(x,start) $data(y,start) [winfo width $object] [winfo height $object]
 	$object _drawvalues $data(x,start) $data(y,start)
@@ -1932,8 +1897,8 @@ set ipady 2
 			set style(-fg) $data(fg)
 			set style(-font) $data(font)
 			array set style $data(style,default)
-			if [info exists data(style,,$table_x)] {array set style $data(style,,$table_x)}
-			if [info exists data(style,$table_y,)] {array set style $data(style,$table_y,)}
+			if [info exists data(style,$table_x,)] {array set style $data(style,$table_x,)}
+			if [info exists data(style,,$table_y)] {array set style $data(style,,$table_y)}
 			if {($x < $options(-titlecols))||($y < $options(-titlerows))} {
 				if [info exists data(style,title)] {array set style $data(style,title)}
 			}
@@ -2080,20 +2045,22 @@ Classy::Table method _selectedit {x y} {
 	$object selection clear
 }
 
-Classy::Table method _selectmotion {w x y} {
+Classy::Table method _selectmotion {w x y {edit {}}} {
 	private $object data canvas selection options
 	set cx [$canvas coords $data(edit)]
 	set cy [lpop cx]
-	if {"$w" == "$object"} {
-		set ex [expr {int($x-$cx)}]
-		set ey [expr {int($y-$cy)}]
-	} else {
-		set ex $x
-		set ey $y
+	if [string length $edit] {
 		set x [expr {int($x+$cx)}]
 		set y [expr {int($y+$cy)}]
 	}
 	if [info exists data(editwidth)] {
+		if ![string length $edit] {
+			set ex [expr {int($x-$cx)}]
+			set ey [expr {int($y-$cy)}]
+		} else {
+			set ex $x
+			set ey $y
+		}
 		if {($ex > 0)&&($ex < $data(editwidth))&&($ey > 0)&&($ey < $data(editheight))} {
 			set tkPriv(x) $ex
 			set tkPriv(y) $ey

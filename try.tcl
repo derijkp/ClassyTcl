@@ -1,10 +1,6 @@
-source app.tcl
-Builder .builder
-set object .builder
-set file lib/Main.tcl
-set function mainw
-set object .builder
-private $object data
+set dir test
+package require ClassyTcl
+package require BioDesc
 
 source cdraw.tcl
 Builder .try

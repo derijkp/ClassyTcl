@@ -29,13 +29,13 @@ Widget subclass Classy::Browser
 Classy::export Browser {}
 
 bind Classy::Browser <Configure> {%W redraw}
-Classy::Browser classmethod init {args} {
+Classy::Browser method init {args} {
 	# REM Create object
 	# -----------------
 	super init
 	canvas $object.c -xscrollcommand [list $object.hbar set]
-	::class::rebind $object.c $object
-	::class::refocus $object $object.c
+	::Classy::rebind $object.c $object
+	::Classy::refocus $object $object.c
 	scrollbar $object.vbar -command [list $object _view] -orient vertical
 	scrollbar $object.hbar -command [list $object _view] -orient horizontal
 	grid $object.c -row 0 -sticky nwse
@@ -65,7 +65,7 @@ Classy::Browser component canvas {$object.c}
 #  Widget destroy
 # ------------------------------------------------------------------
 Classy::Browser method destroy {} {
-	::class::rebind $object.c {}
+	::Classy::rebind $object.c {}
 }
 
 # ------------------------------------------------------------------

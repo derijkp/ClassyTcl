@@ -31,7 +31,7 @@
 Widget subclass Classy::ColorRGB
 Classy::export ColorRGB {}
 
-Classy::ColorRGB classmethod init {args} {
+Classy::ColorRGB method init {args} {
 	# REM Create object
 	# -----------------
 	super init

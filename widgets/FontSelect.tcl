@@ -33,7 +33,7 @@ option add *Classy::FontSelect.relief raised widgetDefault
 Widget subclass Classy::FontSelect
 Classy::export FontSelect {}
 
-Classy::FontSelect classmethod init {args} {
+Classy::FontSelect method init {args} {
 	# REM Create object
 	# -----------------
 	super init

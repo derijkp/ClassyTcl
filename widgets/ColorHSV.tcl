@@ -35,7 +35,7 @@
 Widget subclass Classy::ColorHSV
 Classy::export ColorHSV {}
 
-Classy::ColorHSV classmethod init {args} {
+Classy::ColorHSV method init {args} {
 
 	# REM Create object
 	# -----------------

@@ -24,6 +24,7 @@ bind Classy::ListBox <Configure> {Classy::todo %W redraw}
 bind Classy::ListBox <Visibility> {Classy::todo %W redraw}
 bind Classy::ListBox <<MExecute>> {%W command}
 bind Classy::ListBox <<Invoke>> {%W command}
+bind Classy::ListBox <<Action>> {%W activate @%x,%y}
 
 # ------------------------------------------------------------------
 #  Widget creation
@@ -31,7 +32,7 @@ bind Classy::ListBox <<Invoke>> {%W command}
 Widget subclass Classy::ListBox
 Classy::export ListBox {}
 
-Classy::ListBox classmethod init {args} {
+Classy::ListBox method init {args} {
 	# REM Create object
 	# -----------------
 	super init
@@ -42,8 +43,8 @@ Classy::ListBox classmethod init {args} {
 	$object.xscroll set 0.0 1.0
 	$object.yscroll set 0.0 1.0
 	bindtags $object [lreplace [bindtags $object] 2 0 Listbox]
-	::class::rebind $object.list $object
-	::class::refocus $object $object.list
+	::Classy::rebind $object.list $object
+	::Classy::refocus $object $object.list
 	grid $object.list -column 0 -row 0 -sticky nwse
 	grid columnconfigure $object 0 -weight 1
 	grid rowconfigure $object 0 -weight 1

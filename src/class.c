@@ -100,6 +100,11 @@ int Classy_ClassObjCmd(
 		argc--;
 	}
 	entry = Tcl_FindHashEntry(&(class->classmethods), cmd);
+	if (entry == NULL) {
+		error = Tcl_VarEval(interp,"auto_load ::class::",Tcl_GetStringFromObj(class->class,NULL),",,cm,",cmd,(char *)NULL);
+		if (error) {return error;}
+		entry = Tcl_FindHashEntry(&(class->classmethods), cmd);
+	}
 	if (entry != NULL) {
 		Method *method;
 		method = (Method *)Tcl_GetHashValue(entry);
@@ -112,19 +117,6 @@ int Classy_ClassObjCmd(
 			Tcl_DecrRefCount(errorObj);
 		}
 		Tcl_Release((ClientData)class);
-		return error;
-	}
-	entry = Tcl_FindHashEntry(&(class->methods), cmd);
-	if (entry != NULL) {
-		Method *method;
-		method = (Method *)Tcl_GetHashValue(entry);
-		error = Classy_ExecMethod(interp,method,class,NULL,argc,argv);
-		if (error == TCL_ERROR) {
-			Tcl_Obj *errorObj=Tcl_NewStringObj("\nwhile invoking method \"",24);
-			Tcl_AppendStringsToObj(errorObj, cmd, "\" of class \"", Tcl_GetStringFromObj(class->class,NULL), "\"", (char *) NULL);
-			Tcl_AddObjErrorInfo(interp, Tcl_GetStringFromObj(errorObj,NULL), -1);
-			Tcl_DecrRefCount(errorObj);
-		}
 		return error;
 	} else {
 		Tcl_Obj *result, **objv;
@@ -261,11 +253,11 @@ int Classy_SubclassClassMethod(
 	Classy_CopyMethods(&(class->classmethods),&(subclass->classmethods));
 	classname = Tcl_GetStringFromObj(class->class,NULL);
 	error = Tcl_VarEval(interp,"namespace eval class {foreach var [info vars ::class::", classname, ",,v,*] {",
-		"regexp {^::class::", classname, ",,v,(.*)$} $var temp name \n",
+		"regexp {^::class::", classname, ",,v,(.*)$} $var ::class::temp ::class::name \n",
 		"if [array exists $var] {",
-			"array set ::class::", subclassname , ",,v,${name} [array get $var]",
+			"array set ::class::", subclassname , ",,v,${::class::name} [array get $var]",
 		"} else {",
-			"set ::class::", subclassname , ",,v,${name} [set $var]",
+			"set ::class::", subclassname , ",,v,${::class::name} [set $var]",
 		"}}}",(char *)NULL);
 	if (error != TCL_OK) {return error;}
 	Tcl_SetObjResult(interp,name);
@@ -455,6 +447,8 @@ int Classy_CreateClass(interp)
 	Classy_CreateClassMethod(interp,"::Class","deletemethod",Classy_DeleteMethodClassMethod);
 	Classy_CreateClassMethod(interp,"::Class","subclass",Classy_SubclassClassMethod);
 	Classy_CreateClassMethod(interp,"::Class","private",Classy_PrivateClassMethod);
+	Classy_CreateClassMethod(interp,"::Class","info",Classy_InfoMethod);
+	Classy_CreateClassMethod(interp,"::Class","trace",Classy_TraceMethod);
 	Classy_CreateMethod(interp,"::Class","info",Classy_InfoMethod);
 	Classy_CreateMethod(interp,"::Class","private",Classy_PrivateMethod);
 	Classy_CreateMethod(interp,"::Class","trace",Classy_TraceMethod);

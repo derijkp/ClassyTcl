@@ -37,7 +37,7 @@ option add *Classy::OptionBox.box.highlightThickness 0 widgetDefault
 Widget subclass Classy::OptionBox
 Classy::export OptionBox {}
 
-Classy::OptionBox classmethod init {args} {
+Classy::OptionBox method init {args} {
 	super init frame $object -highlightthickness 0 -class Classy::OptionBox
 	label $object.label -text ""
 	frame $object.box
@@ -53,6 +53,7 @@ Classy::OptionBox classmethod init {args} {
 	# REM Configure initial arguments
 	# -------------------------------
 	if {"$args" != ""} {eval $object configure $args}
+	$object.label configure -bg [getprivate $object options(-labelbg)]
 }
 
 # ------------------------------------------------------------------
@@ -63,6 +64,13 @@ Classy::OptionBox classmethod init {args} {
 #}
 Classy::OptionBox addoption -label {label Label {}} {
 	$object.label configure -text $value
+}
+
+#doc {OptionBox options -labelbg} option {-labelbg labelBg LabelBg} descr {
+# background color of label
+#}
+Classy::OptionBox addoption -labelbg {labelBg LabelBg gray} {
+	$object.label configure -bg $value
 }
 
 #doc {OptionBox options -orient} option {-orient orient Orient} descr {

@@ -28,7 +28,7 @@
 Classy::Toplevel subclass Classy::Builder
 Classy::export Builder {}
 
-Classy::Builder classmethod init {args} {
+Classy::Builder method init {args} {
 	super init -keepgeometry all -resize {10 10}
 	set w [Classy::window $object]
 	private $object browse
@@ -39,8 +39,8 @@ Classy::Builder classmethod init {args} {
 		-closecommand "$object closenode" \
 		-endnodecommand "$object selectnode" \
 		-executecommand "$object openendnode"
-	::class::rebind $object.browse $object
-	::class::refocus $object $object.browse
+	::Classy::rebind $object.browse $object
+	::Classy::refocus $object $object.browse
 	Classy::DynaMenu attachmainmenu Classy::Builder $object
 	grid $object.tool -row 0 -columnspan 3 -sticky ew
 	grid rowconfigure $object 0 -weight 0
@@ -170,11 +170,11 @@ Classy::Builder method new {type {name {}}} {
 	}
 	if {"$type" != "function"} {
 		set create \n[list Classy::$cmd subclass [list $name]]
-		set code "\n[list $name] classmethod init {args} \{"
+		set code "\n[list $name] method init {args} \{"
 		append code \n\t[list super init]
 		append code "\n\tset window \$object"
 		append code \n\t[list if {"$args" == "___Classy::Builder__create"} {return $window}]
-		append code \n\t[list # Configure initial arguments]
+		append code \n\t[list # Configure initial "\[$object cmdw\]"]
 		append code \n\t[list if {"$args" != ""} {eval $window configure $args}]
 		append code "\n\treturn \$window"
 		append code \n\}
@@ -244,7 +244,7 @@ Classy::Builder method infile {cmd file args} {
 					error "\"$function\" not found in file \"$file\""
 				}
 				set result [lindex $c $pos]\n
-				set pos [lsearch -glob $c [list $function classmethod init *]]
+				set pos [lsearch -glob $c [list $function method init *]]
 				append result [lindex $c $pos]\n
 				set poss [lfind -glob $c [list $function addoption *]]
 				foreach pos $poss {
@@ -278,16 +278,12 @@ Classy::Builder method infile {cmd file args} {
 				} else {
 					regsub "^\[^\n\]+subclass $function\n" $code {} temp
 					uplevel #0 $temp
-					set pos [lsearch -glob $c [list $function classmethod init *]]
+					set pos [lsearch -glob $c [list $function method init *]]
 					set c [lreplace $c $pos $pos]
 					set poss [lfind -glob $c [list $function addoption *]]
-					foreach pos $poss {
-						set c [lreplace $c $pos $pos]
-					}
+					set c [lsub $c -exclude $poss]
 					set poss [lfind -glob $c [list $function method *]]
-					foreach pos $poss {
-						set c [lreplace $c $pos $pos]
-					}
+					set c [lsub $c -exclude $poss]
 					set c [lreplace $c $pos1 $pos1 $code]
 				}
 			}
@@ -338,7 +334,7 @@ Classy::Builder method infile {cmd file args} {
 					error "\"$function\" not found in file \"$file\""
 				}
 				set c [lreplace $c $pos $pos]
-				set pos [lsearch -glob $c [list $function classmethod init *]]
+				set pos [lsearch -glob $c [list $function method init *]]
 				set c [lreplace $c $pos $pos]
 				set poss [lfind -glob $c [list $function addoption *]]
 				set c [lsub $c -exclude $poss]
@@ -373,7 +369,7 @@ Classy::Builder method infile {cmd file args} {
 				regsub "subclass $function\$" [lindex $c $pos] "subclass $newfunction" line
 				set c [lreplace $c $pos $pos $line]
 				uplevel #0 $line
-				set pos [lsearch -glob $c [list $function classmethod init *]]
+				set pos [lsearch -glob $c [list $function method init *]]
 				regsub "^$function " [lindex $c $pos] "$newfunction " line
 				set c [lreplace $c $pos $pos $line]
 				uplevel #0 $line
@@ -665,12 +661,16 @@ Classy::Builder method fedit {w file function type} {
 	$w.edit set [string trimright [string trimleft [lindex $code 3] "\n"] "\n"]
 	$w configure -title $function
 	$w.edit textchanged 0
-	$w.edit configure -savecommand [list invoke code [varsubst {object file function w} {
-		uplevel #0 "proc $function [list [$w.args get]] \{\n$code\n\}"
-		$object infile set $file $function "proc $function [list [$w.args get]] \{\n$code\n\}"
-		$w.edit textchanged 0
-		$w configure -title $function
-	}]]
+	$w.edit configure -savecommand [list $object savefunction $w $file $function]
+}
+
+Classy::Builder method savefunction {w file function code} {
+putsvars object w file function code
+	set def "proc $function [list [$w.args get]] \{\n$code\n\}"
+	uplevel #0 $def
+	$object infile set $file $function $def
+	$w.edit textchanged 0
+	$w configure -title $function
 }
 
 Classy::Builder method rename {args} {

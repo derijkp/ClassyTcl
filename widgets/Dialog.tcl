@@ -74,7 +74,7 @@ Classy::Toplevel subclass Classy::Dialog
 
 Classy::export Dialog {}
 
-Classy::Dialog classmethod init {args} {
+Classy::Dialog method init {args} {
 	# REM Create object
 	# -----------------
 	super init

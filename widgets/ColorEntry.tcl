@@ -34,7 +34,7 @@ option add *Classy::ColorEntry.entry.width 5 widgetDefault
 Classy::Entry subclass Classy::ColorEntry
 Classy::export ColorEntry {}
 
-Classy::ColorEntry classmethod init {args} {
+Classy::ColorEntry method init {args} {
 	super init
 	bindtags $object [lreplace [bindtags $object] 2 0 Classy::Entry]
 	bindtags $object.entry [lreplace [bindtags $object.entry] 3 0 Classy::Entry]

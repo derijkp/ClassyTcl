@@ -33,7 +33,7 @@ option add *Classy::Selector.highlightThickness 0 widgetDefault
 Widget subclass Classy::Selector
 Classy::export Selector {}
 
-Classy::Selector classmethod init {args} {
+Classy::Selector method init {args} {
 	super init
 	
 	# REM Initialise variables

@@ -92,9 +92,6 @@ $w selection set {}
 bindtags $w [list Zoom $w Classy::Menu_MainMenu Classy::Canvas Canvas .mainw all]
 set status($w,type) zoom
 catch {destroy .zoomdialog}
-zoomdialog
+zoomdialog .zoomdialog
 }
-
-
-
 

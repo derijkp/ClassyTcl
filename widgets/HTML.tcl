@@ -66,7 +66,7 @@ array set ::html::events {
 Widget subclass Classy::HTML
 Classy::export HTML {}
 
-Classy::HTML classmethod init {args} {
+Classy::HTML method init {args} {
 	super init text
 	bindtags $object [list $object Classy::HTML . all]
 	set w [Classy::window $object]

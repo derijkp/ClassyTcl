@@ -1,6 +1,6 @@
 proc main args {
 	global data 
-	mainw
+	mainw .mainw
 	set data(level) 0
 	set data(t,0) plus
 	set data(new) 0
@@ -11,262 +11,260 @@ proc main args {
 
 }
 
-proc mainw args {# ClassyTcl generated Toplevel
-	if [regexp {^\.} $args] {
-		set window [lshift args]
-	} else {
-		set window .mainw
-	}
-	Classy::parseopt $args opt {}
+Classy::Toplevel subclass mainw
+mainw method init args {
+	super init
 	# Create windows
-	Classy::Toplevel $window 
-	button $window.button33 \
+	button $object.button33 \
 		-text button
 	
-	Classy::NumEntry $window.entry \
+	Classy::NumEntry $object.entry \
 		-command {invoke value {setval [expr $value]}} \
 		-width 4
-	grid $window.entry -row 0 -column 0 -columnspan 5 -sticky nesw
-	button $window.n0 \
+	grid $object.entry -row 0 -column 0 -columnspan 5 -sticky nesw
+	button $object.n0 \
 		-text 0
-	grid $window.n0 -row 9 -column 1 -sticky nesw
-	button $window.n1 \
+	grid $object.n0 -row 9 -column 1 -sticky nesw
+	button $object.n1 \
 		-text 1
-	grid $window.n1 -row 8 -column 1 -sticky nesw
-	button $window.n4 \
+	grid $object.n1 -row 8 -column 1 -sticky nesw
+	button $object.n4 \
 		-text 4
-	grid $window.n4 -row 7 -column 1 -sticky nesw
-	button $window.n7 \
+	grid $object.n4 -row 7 -column 1 -sticky nesw
+	button $object.n7 \
 		-text 7
-	grid $window.n7 -row 6 -column 1 -sticky nesw
-	button $window.is \
+	grid $object.n7 -row 6 -column 1 -sticky nesw
+	button $object.is \
 		-command {buttonpress =} \
 		-text =
-	grid $window.is -row 9 -column 4 -sticky nesw
-	button $window.plusminus \
+	grid $object.is -row 9 -column 4 -sticky nesw
+	button $object.plusminus \
 		-text +/-
-	grid $window.plusminus -row 9 -column 3 -sticky nesw
-	button $window.dec \
+	grid $object.plusminus -row 9 -column 3 -sticky nesw
+	button $object.dec \
 		-text .
-	grid $window.dec -row 9 -column 2 -sticky nesw
-	button $window.n2 \
+	grid $object.dec -row 9 -column 2 -sticky nesw
+	button $object.n2 \
 		-text 2
-	grid $window.n2 -row 8 -column 2 -sticky nesw
-	button $window.n3 \
+	grid $object.n2 -row 8 -column 2 -sticky nesw
+	button $object.n3 \
 		-text 3
-	grid $window.n3 -row 8 -column 3 -sticky nesw
-	button $window.n5 \
+	grid $object.n3 -row 8 -column 3 -sticky nesw
+	button $object.n5 \
 		-text 5
-	grid $window.n5 -row 7 -column 2 -sticky nesw
-	button $window.n6 \
+	grid $object.n5 -row 7 -column 2 -sticky nesw
+	button $object.n6 \
 		-text 6
-	grid $window.n6 -row 7 -column 3 -sticky nesw
-	button $window.n8 \
+	grid $object.n6 -row 7 -column 3 -sticky nesw
+	button $object.n8 \
 		-text 8
-	grid $window.n8 -row 6 -column 2 -sticky nesw
-	button $window.n9 \
+	grid $object.n8 -row 6 -column 2 -sticky nesw
+	button $object.n9 \
 		-text 9
-	grid $window.n9 -row 6 -column 3 -sticky nesw
-	button $window.plus \
+	grid $object.n9 -row 6 -column 3 -sticky nesw
+	button $object.plus \
 		-text +
-	grid $window.plus -row 8 -column 4 -sticky nesw
-	button $window.minus \
+	grid $object.plus -row 8 -column 4 -sticky nesw
+	button $object.minus \
 		-text -
-	grid $window.minus -row 7 -column 4 -sticky nesw
-	button $window.times \
+	grid $object.minus -row 7 -column 4 -sticky nesw
+	button $object.times \
 		-text *
-	grid $window.times -row 6 -column 4 -sticky nesw
-	button $window.div \
+	grid $object.times -row 6 -column 4 -sticky nesw
+	button $object.div \
 		-text /
-	grid $window.div -row 5 -column 4 -sticky nesw
-	button $window.parenr \
+	grid $object.div -row 5 -column 4 -sticky nesw
+	button $object.parenr \
 		-text )
-	grid $window.parenr -row 5 -column 3 -sticky nesw
-	button $window.tan \
+	grid $object.parenr -row 5 -column 3 -sticky nesw
+	button $object.tan \
 		-text tan
-	grid $window.tan -row 3 -column 3 -sticky nesw
-	button $window.cec \
+	grid $object.tan -row 3 -column 3 -sticky nesw
+	button $object.cec \
 		-text CE/C
-	grid $window.cec -row 2 -column 3 -sticky nesw
-	button $window.ac \
+	grid $object.cec -row 2 -column 3 -sticky nesw
+	button $object.ac \
 		-text AC
-	grid $window.ac -row 2 -column 4 -sticky nesw
-	button $window.drg \
+	grid $object.ac -row 2 -column 4 -sticky nesw
+	button $object.drg \
 		-text DRG
-	grid $window.drg -row 3 -column 4 -sticky nesw
-	button $window.pow \
+	grid $object.drg -row 3 -column 4 -sticky nesw
+	button $object.pow \
 		-text y^x
-	grid $window.pow -row 4 -column 4 -sticky nesw
-	button $window.parenl \
+	grid $object.pow -row 4 -column 4 -sticky nesw
+	button $object.parenl \
 		-text (
-	grid $window.parenl -row 5 -column 2 -sticky nesw
-	button $window.cos \
+	grid $object.parenl -row 5 -column 2 -sticky nesw
+	button $object.cos \
 		-text cos
-	grid $window.cos -row 3 -column 2 -sticky nesw
-	button $window.sqrt \
+	grid $object.cos -row 3 -column 2 -sticky nesw
+	button $object.sqrt \
 		-text SQRT
-	grid $window.sqrt -row 2 -column 2 -sticky nesw
-	button $window.pow2 \
+	grid $object.sqrt -row 2 -column 2 -sticky nesw
+	button $object.pow2 \
 		-text x^2
-	grid $window.pow2 -row 2 -column 1 -sticky nesw
-	button $window.sin \
+	grid $object.pow2 -row 2 -column 1 -sticky nesw
+	button $object.sin \
 		-text sin
-	grid $window.sin -row 3 -column 1 -sticky nesw
-	button $window.ee \
+	grid $object.sin -row 3 -column 1 -sticky nesw
+	button $object.ee \
 		-text EE
-	grid $window.ee -row 4 -column 1 -sticky nesw
-	button $window.fac \
+	grid $object.ee -row 4 -column 1 -sticky nesw
+	button $object.fac \
 		-text x!
-	grid $window.fac -row 5 -column 1 -sticky nesw
-	button $window.over \
+	grid $object.fac -row 5 -column 1 -sticky nesw
+	button $object.over \
 		-text 1/x
-	grid $window.over -row 2 -column 0 -sticky nesw
-	button $window.inv \
+	grid $object.over -row 2 -column 0 -sticky nesw
+	button $object.inv \
 		-text INV
-	grid $window.inv -row 3 -column 0 -sticky nesw
-	button $window.e \
+	grid $object.inv -row 3 -column 0 -sticky nesw
+	button $object.e \
 		-text e
-	grid $window.e -row 4 -column 0 -sticky nesw
-	button $window.pi \
+	grid $object.e -row 4 -column 0 -sticky nesw
+	button $object.pi \
 		-text PI
-	grid $window.pi -row 5 -column 0 -sticky nesw
-	button $window.sto \
+	grid $object.pi -row 5 -column 0 -sticky nesw
+	button $object.sto \
 		-text STO
-	grid $window.sto -row 6 -column 0 -sticky nesw
-	button $window.rcl \
+	grid $object.sto -row 6 -column 0 -sticky nesw
+	button $object.rcl \
 		-text RCL
-	grid $window.rcl -row 7 -column 0 -sticky nesw
-	button $window.sum \
+	grid $object.rcl -row 7 -column 0 -sticky nesw
+	button $object.sum \
 		-text SUM
-	grid $window.sum -row 8 -column 0 -sticky nesw
-	button $window.exc \
+	grid $object.sum -row 8 -column 0 -sticky nesw
+	button $object.exc \
 		-text EXC
-	grid $window.exc -row 9 -column 0 -sticky nesw
-	button $window.log10 \
+	grid $object.exc -row 9 -column 0 -sticky nesw
+	button $object.log10 \
 		-text log
-	grid $window.log10 -row 4 -column 2 -sticky nesw
-	button $window.log \
+	grid $object.log10 -row 4 -column 2 -sticky nesw
+	button $object.log \
 		-text ln
-	grid $window.log -row 4 -column 3 -sticky nesw
-	frame $window.opt  \
+	grid $object.log -row 4 -column 3 -sticky nesw
+	frame $object.opt  \
 		-borderwidth 2 \
 		-height 10 \
 		-relief groove \
 		-width 10
-	grid $window.opt -row 1 -column 0 -columnspan 5 -sticky nesw
-	label $window.opt.label \
+	grid $object.opt -row 1 -column 0 -columnspan 5 -sticky nesw
+	label $object.opt.label \
 		-anchor w \
 		-font {courier 10} \
 		-text {    DEG}
-	grid $window.opt.label -row 0 -column 0 -sticky nesw
-	button $window.opt.button1 \
+	grid $object.opt.label -row 0 -column 0 -sticky nesw
+	button $object.opt.button1 \
 		-text button
 	
-	button $window.opt.button2 \
+	button $object.opt.button2 \
 		-command {Classy::Config dialog} \
 		-text cnf
-	grid $window.opt.button2 -row 0 -column 1 -sticky nesw
-	button $window.opt.button3 \
+	grid $object.opt.button2 -row 0 -column 1 -sticky nesw
+	button $object.opt.button3 \
 		-command exit \
 		-text exit
-	grid $window.opt.button3 -row 0 -column 2 -sticky nesw
-	grid columnconfigure $window.opt 0 -weight 1
+	grid $object.opt.button3 -row 0 -column 2 -sticky nesw
+	grid columnconfigure $object.opt 0 -weight 1
 
 	# End windows
+	if {"$args" == "___Classy::Builder__create"} {return $object}
 # ClassyTcl Initialise
 set ::work 0
 	# Parse this
-	$window configure \
+	$object configure \
 		-destroycommand "exit"
-	$window.n0 configure \
+	$object.n0 configure \
 		-background [Classy::realcolor lightBackground]
-	$window.n1 configure \
+	$object.n1 configure \
 		-background [Classy::realcolor lightBackground]
-	$window.n4 configure \
+	$object.n4 configure \
 		-background [Classy::realcolor lightBackground]
-	$window.n7 configure \
+	$object.n7 configure \
 		-background [Classy::realcolor lightBackground]
-	$window.is configure \
+	$object.is configure \
 		-background [Classy::realcolor darkBackground]
-	$window.plusminus configure \
+	$object.plusminus configure \
 		-background [Classy::realcolor darkBackground]
-	$window.dec configure \
+	$object.dec configure \
 		-background [Classy::realcolor lightBackground]
-	$window.n2 configure \
+	$object.n2 configure \
 		-background [Classy::realcolor lightBackground]
-	$window.n3 configure \
+	$object.n3 configure \
 		-background [Classy::realcolor lightBackground]
-	$window.n5 configure \
+	$object.n5 configure \
 		-background [Classy::realcolor lightBackground]
-	$window.n6 configure \
+	$object.n6 configure \
 		-background [Classy::realcolor lightBackground]
-	$window.n8 configure \
+	$object.n8 configure \
 		-background [Classy::realcolor lightBackground]
-	$window.n9 configure \
+	$object.n9 configure \
 		-background [Classy::realcolor lightBackground]
-	$window.plus configure \
+	$object.plus configure \
 		-background [Classy::realcolor darkBackground]
-	$window.minus configure \
+	$object.minus configure \
 		-background [Classy::realcolor darkBackground]
-	$window.times configure \
+	$object.times configure \
 		-background [Classy::realcolor darkBackground]
-	$window.div configure \
+	$object.div configure \
 		-background [Classy::realcolor darkBackground]
-	$window.parenr configure \
+	$object.parenr configure \
 		-background [Classy::realcolor darkBackground]
-	$window.tan configure \
+	$object.tan configure \
 		-background [Classy::realcolor darkBackground]
-	$window.cec configure \
+	$object.cec configure \
 		-background [Classy::realcolor orange]
-	$window.ac configure \
+	$object.ac configure \
 		-background [Classy::realcolor orange]
-	$window.drg configure \
+	$object.drg configure \
 		-background [Classy::realcolor darkBackground]
-	$window.pow configure \
+	$object.pow configure \
 		-background [Classy::realcolor darkBackground]
-	$window.parenl configure \
+	$object.parenl configure \
 		-background [Classy::realcolor darkBackground]
-	$window.cos configure \
+	$object.cos configure \
 		-background [Classy::realcolor darkBackground]
-	$window.sqrt configure \
+	$object.sqrt configure \
 		-background [Classy::realcolor darkBackground]
-	$window.pow2 configure \
+	$object.pow2 configure \
 		-background [Classy::realcolor darkBackground]
-	$window.sin configure \
+	$object.sin configure \
 		-background [Classy::realcolor darkBackground]
-	$window.ee configure \
+	$object.ee configure \
 		-background [Classy::realcolor darkBackground]
-	$window.fac configure \
+	$object.fac configure \
 		-background [Classy::realcolor darkBackground]
-	$window.over configure \
+	$object.over configure \
 		-background [Classy::realcolor darkBackground]
-	$window.inv configure \
+	$object.inv configure \
 		-background [Classy::realcolor darkBackground]
-	$window.e configure \
+	$object.e configure \
 		-background [Classy::realcolor darkBackground]
-	$window.pi configure \
+	$object.pi configure \
 		-background [Classy::realcolor darkBackground]
-	$window.sto configure \
+	$object.sto configure \
 		-background [Classy::realcolor darkBackground]
-	$window.rcl configure \
+	$object.rcl configure \
 		-background [Classy::realcolor darkBackground]
-	$window.sum configure \
+	$object.sum configure \
 		-background [Classy::realcolor darkBackground]
-	$window.exc configure \
+	$object.exc configure \
 		-background [Classy::realcolor darkBackground]
-	$window.log10 configure \
+	$object.log10 configure \
 		-background [Classy::realcolor darkBackground]
-	$window.log configure \
+	$object.log configure \
 		-background [Classy::realcolor darkBackground]
+	# Configure initial arguments
+	if {"$args" != ""} {eval $object configure $args}
 # ClassyTcl Finalise
-foreach w [winfo children $window] {
-	if ![inlist [list $window.entry $window.label $window.opt] $w] {
+foreach w [winfo children $object] {
+	if ![inlist [list $object.entry $object.label $object.opt] $w] {
 		$w configure -command [list buttonpress $w]
 	}
 }
-$window.entry set 0
+$object.entry set 0
 set data(new) 1
-	return $window
+	return $object
 }
 
 proc buttonpress w {
@@ -621,6 +619,4 @@ regsub {0+$} $value {} value
 regsub {\.$} $value {} value
 .mainw.entry nocmdset $value
 }
-
-
 

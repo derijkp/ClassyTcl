@@ -146,12 +146,12 @@ namespace eval ::class {
 
 Class subclass Widget
 
-#doc {Widget classmethod init} cmd {
+#doc {Widget method init} cmd {
 # init
 #} descr {
-# The Widget init classmethod will normally be called using the "super init"
+# The Widget init method will normally be called using the "super init"
 # command in the init classmethod of one of its subclasses.
-# By default the Widget init classmethod will create an object
+# By default the Widget init method will create an object
 # with a frame as Tk base widget.<br>
 # If one argument is given, it will be used as the type of the base
 # widget of the new object, where the class (if possible) or bindtags
@@ -160,7 +160,7 @@ Class subclass Widget
 # create the base widget of the object. In this case getting the class
 # and bindtags of the Tk widget right is the resonsability of the caller.
 #}
-Widget classmethod init {args} {
+Widget method init {args} {
 	if [regexp :: $object] {
 		return -code error "no :: allowed in widget path \"$object\""
 	}
@@ -190,6 +190,7 @@ Widget classmethod init {args} {
 		rename ::class::tempcmd $object
 		return -code error $result
 	}
+	catch {rename ::class::Tk_$object {}}
 	rename $object ::class::Tk_$object
 	rename ::class::tempcmd ::$object
 	# set options
@@ -352,27 +353,52 @@ Widget method cget {option} {
 # If <u>componentname</u> and <u>widget</u> are given, <u>widget</u> 
 # will be associated as a component with <u>componentname</u>.
 #}
-Widget method component {args} {
-		set len [llength $args]
-		if {$len == 0} {
-			set vars [info vars [privatevar $class _comp_*]]
-			if {"$vars" == ""} {
-				return ""
-			} else {
-				regsub -all [privatevar $class _comp_] $vars {} vars
-				return $vars
-			}
-		} elseif {$len == 1} {
-			set name _comp_[lindex $args 0]
-			private $class $name
-			if [info exists $name] {
-				return [subst [set $name]]
-			} else {
-				error "$object does not have component \"[lindex $args 0]\""
-			}
+Widget classmethod component {args} {
+	set len [llength $args]
+	if {$len == 0} {
+		set vars [info vars [privatevar $class _comp_*]]
+		if {"$vars" == ""} {
+			return ""
 		} else {
-			::$class private _comp_[lindex $args 0] [lindex $args 1]
+			regsub -all [privatevar $class _comp_] $vars {} vars
+			return $vars
 		}
+	} elseif {$len == 1} {
+		set name _comp_[lindex $args 0]
+		private $class $name
+		if [info exists $name] {
+			return [subst [set $name]]
+		} else {
+			error "$class does not have component \"[lindex $args 0]\""
+		}
+	} elseif {$len == 2} {
+		::$class private _comp_[lindex $args 0] [lindex $args 1]
+	} else {
+		error "wrong # args: should be \"$class component ?componentname? ?component?\""
+	}
+}
+
+Widget method component {args} {
+	set len [llength $args]
+	if {$len == 0} {
+		set vars [info vars [privatevar $class _comp_*]]
+		if {"$vars" == ""} {
+			return ""
+		} else {
+			regsub -all [privatevar $class _comp_] $vars {} vars
+			return $vars
+		}
+	} elseif {$len == 1} {
+		set name _comp_[lindex $args 0]
+		private $class $name
+		if [info exists $name] {
+			return [subst [set $name]]
+		} else {
+			error "$object does not have component \"[lindex $args 0]\""
+		}
+	} else {
+		error "wrong # args: should be \"$class component ?componentname?\""
+	}
 }
 
 #doc {Widget classmethod chainmethods} cmd {
@@ -515,14 +541,18 @@ Widget method destroy {} {
 		exit
 	}
 	Classy::cleartodo $object
-	foreach name [array names ::class::rebind $object.*] {
-		unset ::class::rebind($name)
+	private $object rebind
+	foreach name $rebind {
+		$object _unrebind $name
 	}
-	catch {unset ::class::rebind($object)}
-	foreach name [array names ::class::refocus $object.*] {
-		unset ::class::refocus($name)
+#	foreach name [array names ::Classy::rebind $object.*] {
+#		unset ::Classy::rebind($name)
+#	}
+#	catch {unset ::Classy::rebind($object)}
+	foreach name [array names ::Classy::refocus $object.*] {
+		unset ::Classy::refocus($name)
 	}
-	catch {unset ::class::refocus($object)}
+	catch {unset ::Classy::refocus($object)}
 	foreach c [info commands ::class::Tk_$object.*] {
 		regexp {^::class::Tk_(.*)$} $c temp child
 		catch {$child destroy}
@@ -530,3 +560,18 @@ Widget method destroy {} {
 	catch {::Tk::destroy $object}
 }
 
+Widget method _rebind {name} {
+	private $object rebind
+	bindtags $name [bindtags $object]
+	catch {rename ::Tk::$name {}}
+	rename $name ::Tk::$name
+	uplevel #0 [list proc $name args "eval $object \[string::change \$args \{$name $object\}\]"]
+	lappend rebind $name
+}
+
+Widget method _unrebind {name} {
+	private $object rebind
+	uplevel #0 [list rename $name {}]
+	catch {rename ::Tk::$name {}}
+	set rebind [lremove $rebind $name]
+}

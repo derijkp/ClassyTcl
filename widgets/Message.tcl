@@ -35,7 +35,7 @@ bind Classy::Message <Configure> {
 Widget subclass Classy::Message
 Classy::export Message {}
 
-Classy::Message classmethod init {args} {
+Classy::Message method init {args} {
 	super init message
 	if {"$args" != ""} {eval $object configure $args}
 }

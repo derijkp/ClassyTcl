@@ -31,7 +31,7 @@
 Classy::Dialog subclass ::Classy::LineChartDialog
 Classy::export LineChartDialog {}
 
-::Classy::LineChartDialog classmethod init {args} {
+::Classy::LineChartDialog method init {args} {
 	super init -resize {1 1}
 	set w $object.options
 	$object add print "Print" [list $object print]
@@ -503,7 +503,7 @@ Classy::LineChartDialog method print {} {
 
 Classy::LineChartDialog method _autoscale	{} {
 	private $object options
-	if ![winfo exists [$object component chart]] return
+	if ![string length [info commands $object.options.chart]] return
 	if $options(-autoscale) {
 		Classy::todo $object _fill
 	}

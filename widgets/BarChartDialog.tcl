@@ -22,6 +22,8 @@
 # These will be added to tclIndex by Classy::auto_mkindex
 #auto_index BarChartDialog
 
+bind Classy::BarChartDialog <Configure> [list %W _autoscale]
+
 # ------------------------------------------------------------------
 #  Widget creation
 # ------------------------------------------------------------------
@@ -29,7 +31,7 @@
 Classy::Dialog subclass ::Classy::BarChartDialog
 Classy::export BarChartDialog {}
 
-Classy::BarChartDialog classmethod init {args} {
+Classy::BarChartDialog method init {args} {
 	super init -resize {1 1}
 	set w $object.options
 	$object add print "Print" "$object print"
@@ -325,25 +327,25 @@ Classy::BarChartDialog method rangeconfigure {} {
 
 Classy::BarChartDialog method _autoscale	{} {
 	private $object options
-	if ![winfo exists [$object component chart]] return
+	if ![string length [info commands $object.options.chart]] return
 	if $options(-autoscale) {
 		Classy::todo $object _fill
 	}
 }
 
 Classy::BarChartDialog method _fill	{{w {}}} {
-		set area [[$object component chart] configure -area]
-		set x [lindex $area 0]
-		set y [lindex $area 1]
-		set mx [expr {[winfo width [$object component canvas]]-$x}]
-		set my [expr {[winfo height [$object component canvas]]-$y-25}]
-		if {"$w" != ""} {
-			$w.area.xmax nocmdset $mx
-			$w.area.ymax nocmdset $my
-		}
-		$object chartconfigure -area [list $x $y $mx $my]
-		$object.options.canvas raise Classy::BarChart
-		$object _setscroll
+	set area [$object.options.chart configure -area]
+	set x [lindex $area 0]
+	set y [lindex $area 1]
+	set mx [expr {[winfo width $object.options.canvas]-$x}]
+	set my [expr {[winfo height $object.options.canvas]-$y-25}]
+	if {"$w" != ""} {
+		$w.area.xmax nocmdset $mx
+		$w.area.ymax nocmdset $my
+	}
+	$object chartconfigure -area [list $x $y $mx $my]
+	$object.options.canvas raise Classy::BarChart
+	$object _setscroll
 }
 
 #doc {BarChartDialog command chartconfigure} cmd {

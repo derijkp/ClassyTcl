@@ -46,7 +46,7 @@ bind Classy::DynaTool <Configure> "%W redraw"
 Widget subclass Classy::DynaTool
 Classy::export DynaTool {}
 
-Classy::DynaTool classmethod init {args} {
+Classy::DynaTool method init {args} {
 	# REM Create object
 	# -----------------
 	super init
@@ -105,8 +105,7 @@ Classy::DynaTool addoption -type {type Type {}} {
 		set help [lshift current]
 		if {"$type"=="action"} {
 			set command [lshift current]
-			regsub -all {%W} $command "\[$object cmdw\]" command
-			regsub -all {%%} $command % command
+			set command [string::change $command [list %% % %W "\[$object cmdw\]"]]
 			if ![catch {set image [Classy::geticon $id reload]}] {
 				button $object.$key -image $image -highlightthickness 0 -command [list Classy::check $command]
 			} else {
@@ -115,19 +114,20 @@ Classy::DynaTool addoption -type {type Type {}} {
 			lappend data(slaves) $object.$key
 		} elseif {"$type"=="check"} {
 			set command [lshift current]
-			regsub -all {%W} $command $cmdw tempcmd
-			regsub -all {%%} $tempcmd % tempcmd
 			if ![catch {set image [Classy::geticon $id reload]}] {
-				eval {checkbutton $object.$key -image $image -indicatoron 0 -highlightthickness 0} $tempcmd
+				checkbutton $object.$key -image $image -indicatoron 0 -highlightthickness 0
 			} else {
-				eval {checkbutton $object.$key -text $id -highlightthickness 0} $tempcmd
+				checkbutton $object.$key -text $id -highlightthickness 0
+			}
+			set tempcmd [string::change $command [list %% % %W $cmdw]]
+			if [string length $cmdw] {
+				eval $object.$key configure $tempcmd
 			}
 			append data(checks) "$object.$key configure $command\n"
 			lappend data(slaves) $object.$key
 		} elseif {"$type"=="radio"} {
 			set command [lshift current]
-			regsub -all {%W} $command $cmdw tempcmd
-			regsub -all {%%} $tempcmd % tempcmd
+			set tempcmd [string::change $command [list %% % %W $cmdw]]
 			if ![catch {set image [Classy::geticon $id reload]}] {
 				eval {radiobutton $object.$key -image $image -indicatoron 0 -highlightthickness 0} $tempcmd
 			} else {
@@ -138,8 +138,7 @@ Classy::DynaTool addoption -type {type Type {}} {
 		} elseif {"$type"=="widget"} {
 			$id $object.$key
 			set command [lshift current]
-			regsub -all {%W} $command $cmdw tempcmd
-			regsub -all {%%} $tempcmd % tempcmd
+			set tempcmd [string::change $command [list %% % %W $cmdw]]
 			eval $object.$key configure $tempcmd
 			append data(checks) "$object.$key configure $command\n"
 			update idletasks
@@ -147,7 +146,7 @@ Classy::DynaTool addoption -type {type Type {}} {
 		} elseif {"$type"=="tool"} {
 			set cmd [$id $object.$key]
 			if {"$cmdw" != ""} {
-				eval [replace $cmd [list %% % %W $cmdw]]
+				eval [string::change $cmd [list %% % %W $cmdw]]
 			}
 			append data(checks) "$cmd\n"
 			update idletasks
@@ -325,9 +324,10 @@ Classy::DynaTool method cmdw {{cmdw {}}} {
 		}
 		set data(cmdw) $cmdw
 		if [info exists data(checks)] {
-			regsub -all {%W} $data(checks) $cmdw command
-			regsub -all {%%} $command % command
-			eval $command
+			if [string length $cmdw] {
+				set command [string::change $data(checks) [list %% % %W $cmdw]]
+				eval $command
+			}
 		}
 		set options(-cmdw) $cmdw
 		return $cmdw

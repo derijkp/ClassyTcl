@@ -5,7 +5,7 @@
 # Misc patches to Tk
 # -----------------------------------------------------------------
 # Do the Xcopy at the insert and not at the current mouse position
-bind Text <<MXPaste>> {
+::Tk::bind Text <<MXPaste>> {
 	if !$tkPriv(mouseMoved) {
 		catch {
 			%W insert insert [selection get -displayof %W]
@@ -14,11 +14,11 @@ bind Text <<MXPaste>> {
 }
 
 # Second mouse button also works
-bind Button <<Adjust>> {
+::Tk::bind Button <<Adjust>> {
 	tkButtonDown %W
 }
 
-bind Button <<Adjust-ButtonRelease>> {
+::Tk::bind Button <<Adjust-ButtonRelease>> {
 	tkButtonUp %W
 }
 
@@ -26,7 +26,7 @@ bind Button <<Adjust-ButtonRelease>> {
 # These patches define the extra selectmode persistent which 
 # does things the way I like it.
 
-bind Listbox <<Top>> {
+::Tk::bind Listbox <<Top>> {
 	%W activate 0
 	%W see 0
 	if {[%W cget -selectmode]  != "persistent"} {
@@ -34,7 +34,7 @@ bind Listbox <<Top>> {
 		%W selection set 0
 	}
 }
-bind Listbox <<Bottom>> {
+::Tk::bind Listbox <<Bottom>> {
 	%W activate end
 	%W see end
 	if {[%W cget -selectmode]  != "persistent"} {

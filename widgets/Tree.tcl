@@ -49,7 +49,7 @@
 Class subclass Classy::Tree
 Classy::export Tree {}
 
-Classy::Tree classmethod init {args} {
+Classy::Tree method init {args} {
 	super init
 	private $object options data
 	array set options {

@@ -27,6 +27,13 @@ if 0 {
 	.try selection add withtag try
 }
 
+test Classy::Canvas {create and destroy canvas} {
+	classyclean
+	Classy::Canvas .try
+	catch {Canvas destroy}
+	Classy::Canvas .try
+} {}
+
 test Classy::Canvas {create and configure} {
 	classyclean
 	Classy::Canvas .try

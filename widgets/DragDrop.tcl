@@ -47,7 +47,7 @@ Classy::export DragDrop {}
 # ------------------------------------------------------------------
 
 Classy::DragDrop classmethod destroy {} {
-	$object abort
+	$class abort
 }
 # ------------------------------------------------------------------
 #  Methods
@@ -65,14 +65,14 @@ Classy::DragDrop classmethod destroy {} {
 # Classy::DragDrop start x y value ?option value ...?<br>
 #} descr {
 # starts a drag. It clears all previously changed drag and drop settings to their
-# default values or the ones supplied as options to the start method.
+# default values or the ones supplied as options to the start classmethod.
 # x and y must be the x and y position of the pointer on the screen: you can
 # use %X and %Y in the event command to get these.
 # $value is the default value given for the drop if no type is specified.
-# the options are the same as for the Classy::DragDrop configure method.
+# the options are the same as for the Classy::DragDrop configure classmethod.
 #}
-Classy::DragDrop method start {x y value args} {
-	private $object data types ftypes
+Classy::DragDrop classmethod start {x y value args} {
+	private $class data types ftypes
 	set from [winfo containing $x $y]
 	if [info exists data(from)] {
 		bindtags $data(from) $data(bindtags)
@@ -121,7 +121,7 @@ Classy::DragDrop method start {x y value args} {
 	    raise $w
 	}
 	$from configure -cursor hand2
-	eval $object configure $args
+	eval $class configure $args
 	bindtags $from {Classy::DragDrop_extra Classy::DragDrop}
     foreach app [lremove [winfo interps] [tk appname]] {
 		send -async -- $app ::class::setprivate Classy::DragDrop data(prev) {{}}
@@ -149,15 +149,15 @@ Classy::DragDrop method start {x y value args} {
 #<dd> dragged image
 #</dl>
 #}
-Classy::DragDrop method configure {args} {
-	private $object data types ftypes
+Classy::DragDrop classmethod configure {args} {
+	private $class data types ftypes
 	if [info exists data(remote)] {
 		send -async -- $data(remote) Classy::DragDrop configure $args
 	} else {
 		if {[llength $args] == 0} {
 			set list {}
 			foreach option {-types -ftypes -transfer -cursor -image} {
-				lappend list $option [$object configure $option]
+				lappend list $option [$class configure $option]
 			}
 			return $list
 		} elseif {[llength $args] == 1} {
@@ -258,8 +258,8 @@ Classy::DragDrop method configure {args} {
 # returns a list of all types supported by the current drag; optionally only those
 # matching $pattern are returned
 #}
-Classy::DragDrop method types {{pattern *}} {
-	private $object data types ftypes
+Classy::DragDrop classmethod types {{pattern *}} {
+	private $class data types ftypes
 	if [info exists data(remote)] {
 		return [send -- $data(remote) Classy::DragDrop types $pattern]
 	} else {
@@ -279,10 +279,10 @@ Classy::DragDrop method types {{pattern *}} {
 # Classy::DragDrop get ?type?<br>
 #} descr {
 # returns the data associated with with the type $type of the current drag.
-# If no type is given, the default value is returned (the data given to the start method.)
+# If no type is given, the default value is returned (the data given to the start classmethod.)
 #}
-Classy::DragDrop method get {{type {}}} {
-	private $object data types ftypes
+Classy::DragDrop classmethod get {{type {}}} {
+	private $class data types ftypes
 	if [info exists data(remote)] {
 		return [send -- $data(remote) Classy::DragDrop get $type]
 	} else {
@@ -303,16 +303,16 @@ Classy::DragDrop method get {{type {}}} {
 #doc {DragDrop command bind} cmd {
 # Classy::DragDrop bind event ?command?
 #} descr {
-# with this method, bindings can be added to the current drag, eg. to change the transfer type
+# with this classmethod, bindings can be added to the current drag, eg. to change the transfer type
 # in response to a keypress. Note that the command must come after the drag was
-# started with the start method.
+# started with the start classmethod.
 #}
-Classy::DragDrop method bind {args} {
+Classy::DragDrop classmethod bind {args} {
 	eval ::Tk::bind Classy::DragDrop_extra $args
 }
 
-Classy::DragDrop method _events {app x y} {
-	private $object data
+Classy::DragDrop classmethod _events {app x y} {
+	private $class data
 	set dropw [winfo containing $x $y]
 	if {"$data(prev)" != ""} {
 		if {"$data(prev)" != "$dropw"} {
@@ -339,8 +339,8 @@ Classy::DragDrop method _events {app x y} {
 #} descr {
 # abort the current drag.
 #}
-Classy::DragDrop method abort {} {
-	private $object data
+Classy::DragDrop classmethod abort {} {
+	private $class data
 	if [info exists data(from)] {
 		bindtags $data(from) $data(bindtags)
 		$data(from) configure -cursor $data(cursor)
@@ -354,11 +354,11 @@ Classy::DragDrop method abort {} {
 #doc {DragDrop command drop} cmd {
 # Classy::DragDrop stop<br>
 #} descr {
-# make the drop. The user normally does not have to call this method, as it is
+# make the drop. The user normally does not have to call this classmethod, as it is
 # usually called by the bindings of DragDrop.
 #}
-Classy::DragDrop method drop {} {
-	private $object data
+Classy::DragDrop classmethod drop {} {
+	private $class data
 	if ![info exists data(from)] return
 	bindtags $data(from) $data(bindtags)
 	$data(from) configure -cursor $data(cursor)
@@ -387,14 +387,14 @@ Classy::DragDrop method drop {} {
 #doc {DragDrop command move} cmd {
 # Classy::DragDrop move<br>
 #} descr {
-# This method is called while dragging. It updates the dragged window, and generates
-# the Drag events. The user normally does not have to call this method, as it is
+# This classmethod is called while dragging. It updates the dragged window, and generates
+# the Drag events. The user normally does not have to call this classmethod, as it is
 # usually called by the bindings of DragDrop.
 #}
-Classy::DragDrop method move {} {
-	private $object data
+Classy::DragDrop classmethod move {} {
+	private $class data
 	if ![info exists data(prev)] {
-		$object abort
+		$class abort
 	}
 	set w .classy__.dragdrop
 	set x [winfo pointerx $w]

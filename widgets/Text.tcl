@@ -39,7 +39,7 @@ update idletasks
 Widget subclass Classy::Text
 Classy::export Text {}
 
-Classy::Text classmethod init {args} {
+Classy::Text method init {args} {
 	super init text
 	# REM Initialise options and variables
 	# ------------------------------------

@@ -15,13 +15,13 @@ proc d {} {
 	.d add go "Go" {puts go} default
 }
 
-set object .try
+set object .builder
 set base .d
 catch {destroy .d}
 catch {Classy::Builder destroy}
-Classy::Builder .try
+Classy::Builder .builder
 #d
-#.try edit .d
+#.builder edit .d
 
 #test Classy::Builder {} {
 #} {}

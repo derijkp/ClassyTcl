@@ -34,7 +34,7 @@
 Widget subclass Classy::ColorSelect
 Classy::export ColorSelect {}
 
-Classy::ColorSelect classmethod init {args} {
+Classy::ColorSelect method init {args} {
 	# REM Create object
 	# -----------------
 	super init

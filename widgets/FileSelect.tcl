@@ -34,7 +34,7 @@ if {"[Classy::Default get app Classy__FileSelect__curdir]"==""} {
 Classy::Dialog subclass Classy::FileSelect
 Classy::export FileSelect {}
 
-Classy::FileSelect classmethod init {args} {
+Classy::FileSelect method init {args} {
 	super init
 	$object add go "Select" [list $object _command] default
 	set w $object.options
@@ -47,13 +47,14 @@ Classy::FileSelect classmethod init {args} {
 	scrollbar $w.filesbar -orient vertical -command "$w.files yview" -takefocus 0
 	Classy::Entry $w.file -label "File" -orient horizontal \
 		-command [list invoke {value} [varsubst object {
-		if [file isdir $value] {
-			$object configure -dir $value
-		} else {
-			$object invoke go
-			$object destroy
-		}
-	}]]
+			if [file isdir $value] {
+				$object configure -dir $value
+			} else {
+				$object invoke go
+				$object destroy
+			}
+		}]] \
+		-validate [list $w.files selection clear 0 end]
 	frame $w.extra
 	Classy::Paned $w.pane -window $w.dirs
 	grid $w.filter - - - - -sticky we
@@ -217,6 +218,7 @@ Classy::FileSelect method refresh {} {
 #} descr {
 #}
 Classy::FileSelect method get {} {
+	$object dirset
 	set file [$object.options.file get]
 	if {"[file pathtype $file]"=="absolute"} {
 		return $file 
@@ -259,7 +261,7 @@ Classy::FileSelect method dirset {{file {}}} {
 			lappend temp [file join $options(-dir) $file]
 		}
 	}
-	$object.options.file nocmdset $temp
+	if [llength $temp] {$object.options.file nocmdset $temp}
 }
 
 

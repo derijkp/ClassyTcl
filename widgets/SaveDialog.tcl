@@ -38,7 +38,7 @@ proc Classy::SaveDialog {args} {
 # ---------------------------------------------------------------------------
 Classy::Dialog subclass Classy::SaveDialog
 
-Classy::SaveDialog classmethod init {args} {
+Classy::SaveDialog method init {args} {
 	super init
 	global iconpool
 	label $object.options.icon -image $iconpool(file:__xxx)

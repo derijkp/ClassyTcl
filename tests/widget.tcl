@@ -61,7 +61,7 @@ test Widget {init entry} {
 	classyclean
 	destroy .try
 	Widget subclass Test
-	Test classmethod init {} {
+	Test method init {} {
 		super init entry
 	}
 	Test .try
@@ -71,7 +71,7 @@ test Widget {init entry with args} {
 	classyclean
 	destroy .try
 	Widget subclass Test
-	Test classmethod init {} {
+	Test method init {} {
 		super init entry $object -textvariable try
 	}
 	[Test .try] cget -textvariable
@@ -81,7 +81,7 @@ test Widget {pass args in init} {
 	classyclean
 	destroy .try
 	Widget subclass Test
-	Test classmethod init {args} {
+	Test method init {args} {
 		super init
 		set ::c $args
 	}

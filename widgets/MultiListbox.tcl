@@ -45,13 +45,13 @@ bind Classy::MultiListbox <<Down>> {
 Widget subclass Classy::MultiListbox
 Classy::export MultiListbox {}
 
-Classy::MultiListbox classmethod init {args} {
+Classy::MultiListbox method init {args} {
 	# REM Create object
 	# -----------------
 	super init
 	listbox $object.list -yscroll "$object.vbar set" -exportselection no -selectmode browse
-	::class::rebind $object.list $object
-	::class::refocus $object $object.list
+	::Classy::rebind $object.list $object
+	::Classy::refocus $object $object.list
 	bindtags $object.list "$object.list Classy::MultiListbox . all"
 	scrollbar $object.vbar -orient vertical -command "$object.list yview" -takefocus 0
 	pack $object.vbar -side right -fill y

@@ -4,27 +4,26 @@ focus .mainw
 }
 
 Classy::Toplevel subclass mainw
-mainw classmethod init args {
+mainw method init args {
 	super init
-	set window $object
 	# Create windows
-	Classy::DynaTool $window.maintool  \
+	Classy::DynaTool $object.maintool  \
 		-width 179 \
 		-type MainTool \
 		-height 21
-	grid $window.maintool -row 0 -column 0 -sticky new
-	grid columnconfigure $window 0 -weight 1
-	grid rowconfigure $window 1 -weight 1
-	if {"$args" == "___Classy::Builder__create"} {return $window}
+	grid $object.maintool -row 0 -column 0 -sticky new
+	grid columnconfigure $object 0 -weight 1
+	grid rowconfigure $object 1 -weight 1
+	if {"$args" == "___Classy::Builder__create"} {return $object}
 	# Parse this
-	$window configure \
+	$object configure \
 		-destroycommand "exit" \
 		-title [tk appname]
-	$window.maintool configure \
-		-cmdw [varsubst window {$window}]
-	Classy::DynaMenu attachmainmenu MainMenu $window
+	$object.maintool configure \
+		-cmdw [varsubst object {$object}]
+	Classy::DynaMenu attachmainmenu MainMenu $object
 	# Configure initial arguments
-	if {"$args" != ""} {eval $window configure $args}
-	return $window
+	if {"$args" != ""} {eval $object configure $args}
+	return $object
 }
 
