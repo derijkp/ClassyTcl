@@ -411,8 +411,8 @@ Classy::Table method selection {option args} {
 						set w $object.base.e$row,$col
 						if [winfo exists $w] {
 							set selection($name) [list [$w cget -bg] [$w cget -fg]]
-							$w configure -bg [option get $w selectBackground Foreground] \
-										-fg [option get $w selectForeground Background]
+							$w configure -bg [Classy::optionget $w selectBackground Foreground] \
+										-fg [Classy::optionget $w selectForeground Background]
 						} else {
 							set selection($name) {}
 						}
@@ -528,8 +528,8 @@ Classy::Table method refreshcell {rrow rcol} {
 		}
 	}
 	if [info exists selection([list $rrow $rcol])] {
-		$w configure -bg [option get $w selectBackground Foreground] \
-				-fg [option get $w selectForeground Background]
+		$w configure -bg [Classy::optionget $w selectBackground Foreground] \
+				-fg [Classy::optionget $w selectForeground Background]
 	}
 }
 

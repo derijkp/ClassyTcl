@@ -38,7 +38,6 @@ proc ::Classy::WindowBuilder::attr_Classy::Toplevel_-destroycommand {object w ar
 }
 
 proc ::Classy::WindowBuilder::edit_Classy::Toplevel {object w} {
-putsvars object w
 	set c [$object current]
 	eval destroy [winfo children $w]
 	frame $w.general

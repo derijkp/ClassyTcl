@@ -39,7 +39,7 @@ Classy::ColorSample classmethod init {args} {
 	# REM Create object
 	# -----------------
 	super init
-	set Classycolors [option get $object colorList ColorList]
+	set Classycolors [Classy::optionget $object colorList ColorList]
 	set row 0
 	set len 0
 	foreach rowcolors $Classycolors {

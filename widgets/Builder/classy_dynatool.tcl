@@ -45,7 +45,6 @@ proc ::Classy::WindowBuilder::attr_Classy::DynaTool_-type {object w args} {
 }
 
 proc ::Classy::WindowBuilder::edit_Classy::DynaTool {object w} {
-putsvars object w
 	set c [$object current]
 	eval destroy [winfo children $w]
 	frame $w.general

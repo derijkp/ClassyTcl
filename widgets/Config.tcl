@@ -319,7 +319,7 @@ Classy::Config method reconfigure {var} {
 	}
 }
 
-Classy::Config method use {var} {
+Classy::Config method test {var} {
 	upvar #0 $var data
 	set body [$object getbody $var]
 	uplevel #0 $body

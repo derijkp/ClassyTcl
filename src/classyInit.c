@@ -3,13 +3,6 @@
 #include <time.h>
 #include <math.h>
 
-extern int Classy_GetOpenFileCmd _ANSI_ARGS_((ClientData clientData,
-	Tcl_Interp *interp, int argc, char *argv[]));
-extern int Classy_GetSaveFileCmd _ANSI_ARGS_((ClientData clientData,
-	Tcl_Interp *interp, int argc, char *argv[]));
-extern int Classy_GetFontCmd _ANSI_ARGS_((ClientData clientData,
-	Tcl_Interp *interp, int argc, char *argv[]));
-
 extern int Classy_ReinitObjCmd _ANSI_ARGS_((ClientData clientData,
 	Tcl_Interp *interp, int argc, char *argv[]));
 extern int Classy_SuperObjCmd _ANSI_ARGS_((ClientData clientData,
@@ -27,14 +20,6 @@ int
 Classy_Init(interp)
 	Tcl_Interp *interp;		/* Interpreter to add extra commands */
 {
-#ifdef BORLAND32
-	Tcl_CreateCommand(interp, "Classy::GetOpenFile", Classy_GetOpenFileCmd,
-		(ClientData) Tk_MainWindow(interp), (Tcl_CmdDeleteProc *)NULL);
-	Tcl_CreateCommand(interp, "Classy::GetSaveFile", Classy_GetSaveFileCmd,
-		(ClientData) Tk_MainWindow(interp), (Tcl_CmdDeleteProc *)NULL);
-	Tcl_CreateCommand(interp, "Classy::GetFont", Classy_GetFontCmd,
-		(ClientData) Tk_MainWindow(interp), (Tcl_CmdDeleteProc *)NULL);
-#endif
 	Tcl_CreateObjCommand(interp,"::class::reinit",(Tcl_ObjCmdProc *)Classy_ReinitObjCmd,
 		(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
 	Classy_InitSuper();

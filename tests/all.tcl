@@ -17,7 +17,7 @@ alltest class.tcl
 alltest widget.tcl
 alltest balloon.tcl
 alltest browser.tcl
-#alltest canvas.tcl
+alltest canvas.tcl
 alltest chart.tcl
 alltest cmd.tcl
 alltest color.tcl

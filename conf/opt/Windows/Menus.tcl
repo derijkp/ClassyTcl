@@ -1,222 +1,254 @@
 #ClassyTcl menu configuration file
 
 Classy::configmenu Classy::Editor {menu used in the ClassyTcl Editor} {
-menu file "File" {
-	action Load "Open file" {eval %W load [Classy::selectfile -title Open -selectmode persistent]}
-	action LoadNext "Open next" "%W loadnext"
-	action Save "Save" "%W save"
-	action SaveAs "Save as" "%W savebox"
-	action Reopen "Reopen" "%W reopenlist"
-	action Editor "New editor" "edit newfile"
-	action Cmd "Command window" {Classy::cmd}
+menu "File" {
+	action "Open file" {eval %W load [Classy::selectfile -title Open -selectmode persistent]} <<Load>>
+	action "Open next" {%W loadnext} <<LoadNext>>
+	action "Save" {%W save} <<Save>>
+	action "Save as" {%W savedialog} <<SaveAs>>
+	action "Reopen" {%W reopenlist} <<Reopen>>
+	action "New editor" {edit newfile} <<New>>
+	action "Command window" {Classy::cmd} <<Cmd>>
 	separator
-	action Configure "Customise application" {Classy::Configurator dialog}
-	action Close "Close" "%W close"
+	action "Customise application" {Classy::Config dialog} <<Customise>>
+	action "Customise menu" {Classy::Config config menu Classy::Editor} <<CustomiseMenu>>
+	action "Customise toolbar" {Classy::Config config tool Classy::Editor} <<CustomiseTool>>
+	action "Close" "%W close" <<Close>>
 }
-menu edit "Edit" {
-	action Cut "Cut" "%W cut"
-	action Copy "Copy" "%W copy"
-	action Paste "Paste" "%W paste"
-	action Undo "Undo" "%W undo"
-	action Redo "Redo" "%W redo"
-	action ClearUndo "Clear undo buffer" "%W clearundo"
+menu "Edit" {
+	action "Cut" "%W cut" <<Cut>>
+	action "Copy" "%W copy" <<Copy>>
+	action "Paste" "%W paste" <<Paste>>
+	action "Undo" "%W undo" <<Undo>>
+	action "Redo" "%W redo" <<Redo>>
+	action "Clear undo buffer" "%W clearundo" <<ClearUndo>>
 }
-menu find "Find" {
-	action Goto "Goto line" {Classy::InputBox %W.goto -label "Goto line" -title Goto -buttontext Goto -command {%W gotoline [%W.goto get]}}
-	action Find "Find" "%W finddialog"
-	action FindNext "Find next" "%W findsel -forwards"
-	action ReplaceFindNext "Replace & Find next" "%W replace-find -forwards"
-	action FindPrev "Find prev" "%W findsel -backwards"
-	action ReplaceFindPrev "Replace & Find prev" "%W replace-find -backwards"
-	check SearchReopen "Search Reopen" {-variable [privatevar %W options(-searchreopen)]}
-	action FindFunction "Find Tcl function" "%W findfunction"
+menu "Find" {
+	action "Goto line" {Classy::InputDialog %W.goto -label "Goto line" -title Goto -buttontext Goto -command {%W gotoline}} <<Goto>>
+	action "Find" "%W finddialog" <<Find>>
+	action "Find next" "%W findsel -forwards" <<FindNext>>
+	action "Replace & Find next" "%W replace-find -forwards" <<ReplaceFindNext>>
+	action "Find prev" "%W findsel -backwards" <<FindPrev>>
+	action "Replace & Find prev" "%W replace-find -backwards" <<ReplaceFindPrev>>
+	check "Search Reopen" {-variable [privatevar %W options(-searchreopen)]} <<SearchReopen>>
+	action "Find Tcl function" "%W findfunction" <<FindFunction>>
 }
-menu select "Select" {
-	action SelectAll "Select all" "%W select all"
-	action SelectNone "Select none" "%W select none"
-	action MatchingBrackets "Matching Brackets" "%W matchingbrackets" Alt-bracketleft
+menu "Select" {
+	action "Select all" "%W select all" <<SelectAll>>
+	action "Select none" "%W select none" <<SelectNone>>
+	action "Matching Brackets" "%W matchingbrackets" Alt-bracketleft <<MatchingBrackets>>
 	separator
-	action MarkerSelect "Marker Box" "%W marker select"
-	action MarkerSet "Marker set" "%W marker set"
-	action MarkerCurrent "Current Marker" "%W marker current"
-	action MarkerPrev "Previous Marker" "%W marker previous"
+	action "Marker Box" "%W marker select" <<MarkerSelect>>
+	action "Marker set" "%W marker set" <<MarkerSet>>
+	action "Current Marker" "%W marker current" <<MarkerCurrent>>
+	action "Previous Marker" "%W marker previous" <<MarkerPrev>>
 }
-menu tools "Tools" {
-	action IndentCr "Indented Return" "%W indentedcr"
-	action IndentIn "Indent in" "%W indent 1"
-	action IndentOut "Indent out" "%W indent -1"
-	action Comment "Comment" "%W comment add" Alt-numbersign
-	action DelComment "Remove comment" "%W comment remove" Control-Alt-numbersign
-	action SetTabs "Set tab stops" {Classy::InputBox %W.tabstops -label "Tab stops" -title Tabstops -buttontext Set -command {%W configure -tabs [%W.tabstops get]}}
+menu "Tools" {
+	action "Indented Return" "%W indentedcr" <<IndentCr>>
+	action "Indent in" "%W indent 1" <<IndentIn>>
+	action "Indent out" "%W indent -1" <<IndentOut>>
+	action "Comment" "%W comment add" <Alt-numbersign>
+	action "Remove comment" "%W comment remove" <Control-Alt-numbersign>
+	action "Set tab stops" {Classy::InputDialog %W.tabstops -label "Tab stops" -title Tabstops -buttontext Set -command {%W configure -tabs}} <<SetTabs>>
 	separator
-	action Connect "Connect to" "%W connectto"
-	action ExecuteCmd "Execute Tcl command" "%W execute"
-	action Format "format" "%W format 76"
+	action "Connect to" "%W connectto" <<Connect>>
+	action "Execute Tcl command" "%W execute" <<ExecuteCmd>>
+	action "format" "%W format 76" <<Format>>
 }
-activemenu macros "Macros" {%W getmacromenu}
-activemenu pattern "Pattern" {%W getpatternmenu}
+activemenu "Macros" {%W getmacromenu}
+activemenu "Pattern" {%W getpatternmenu}
+menu "Help" {
+	action "Editor" {Classy::help classy_editor} <<Help>>
+	separator
+	action "ClassyTcl" {Classy::help ClassyTcl} <<HelpClassyTcl>>
+	action "Help" {Classy::help help} <<HelpHelp>>
+}
 }
 
 Classy::configmenu Classy::Help {menu used in the ClassyTcl help system} {
-menu file "File" {
-	action Reload "Reload" {%W reload}
-	action Edit "Edit" {%W edit}
-	action Save "Save source" {%W save [Classy::selectfile]}
-	action SaveText "Save as text" {%W save [Classy::selectfile] text}
-	action Configure "Configure" {Configurator dialog}
+menu "File" {
+	action "Reload" {%W reload} <<Reload>>
+	action "Edit" {%W edit} <<Edit>>
+	action "Save source" {%W save [Classy::selectfile]} <<Save>>
+	action "Save as text" {%W save [Classy::selectfile] text} <<SaveText>>
+	action "Editor" {edit newfile} <<Editor>>
+	action "Command window" {Classy::cmd} <<Cmd>>
 	separator
-	action Close "Close" {destroy %W}
+	action "Customise application" {Classy::Config dialog} <<Customise>>
+	action "Customise menu" {Classy::Config config menu Classy::Help} <<CustomiseMenu>>
+	action "Customise toolbar" {Classy::Config config tool Classy::Help} <<CustomiseTool>>
+	action "Close" {destroy %W} <<Close>>
 }
-activemenu contents "Contents" {%W getcontentsmenu}
-menu go "Go" {
-	action Back "Back" {%W back}
-	action Forward "Forward" {%W forward} C-r
-	action History "History" {%W historymenu}
+activemenu "Contents" {%W getcontentsmenu}
+menu "Go" {
+	action "Back" {%W back} <<Back>>
+	action "Forward" {%W forward} C-r <<Forward>>
+	action "History" {%W historymenu} <<History>>
 }
-activemenu general "General" {%W getgeneralmenu}
+activemenu "General" {%W getgeneralmenu}
 }
 
 Classy::configmenu Classy::Filer {menu used in the ClassyTcl Filer} {
-menu sel "Selection" {
-	action Delete "Delete" {%W deletefiles sel}
-	action Rename "Rename" {%W renamebox} C-r
-	action Copy "Copy" {%W copybox}
+menu "Selection" {
+	action "Delete" {%W deletefiles sel} <<Delete>>
+	action "Rename" {%W renamebox} C-r <<Rename>>
+	action "Copy" {%W copybox} <<Copy>>
 }
-menu option "Options" {
-	check HiddenFiles "Hidden files" {-variable [privatevar %W hidden] -onvalue yes -offvalue no -command {%W refresh}}
-	action Filter "Filter" "%W filterbox" C-f
+menu "Options" {
+	check "Hidden files" {-variable [privatevar %W hidden] -onvalue yes -offvalue no -command {%W refresh}} <<HiddenFiles>>
+	action "Filter" "%W filterbox" C-f <<Filter>>
 	separator
-	radio SortExt "Sort by extension" {-variable [privatevar %W order] -value extension -command {%W refresh}}
-	radio SortTime "Sort by time" {-variable [privatevar %W order] -value time -command {%W refresh}}
-	radio SortAccess "Sort by access" {-variable [privatevar %W order] -value accesstime -command {%W refresh}}
-	radio SortSize "Sort by size" {-variable [privatevar %W order] -value size -command {%W refresh}}
-	radio Unsorted "Unsorted (as on disk)" {-variable [privatevar %W order] -value disk -command {%W refresh}}
+	radio "Sort by extension" {-variable [privatevar %W order] -value extension -command {%W refresh}} <<SortExt>>
+	radio "Sort by time" {-variable [privatevar %W order] -value time -command {%W refresh}} <<SortTime>>
+	radio "Sort by access" {-variable [privatevar %W order] -value accesstime -command {%W refresh}} <<SortAccess>>
+	radio "Sort by size" {-variable [privatevar %W order] -value size -command {%W refresh}} <<SortSize>>
+	radio "Unsorted (as on disk)" {-variable [privatevar %W order] -value disk -command {%W refresh}} <<Unsorted>>
 	separator
-	radio NormalIcons "Normal icons" {-variable [privatevar %W view] -value normal -command {%W redraw}}
-	radio SmallIcons "Small icons" {-variable [privatevar %W view] -value small -command {%W redraw}}
-	radio FullInfo "Full info" {-variable [privatevar %W view] -value full -command {%W redraw}}
+	radio "Normal icons" {-variable [privatevar %W view] -value normal -command {%W redraw}} <<NormalIcons>>
+	radio "Small icons" {-variable [privatevar %W view] -value small -command {%W redraw}} <<SmallIcons>>
+	radio "Full info" {-variable [privatevar %W view] -value full -command {%W redraw}} <<FullInfo>>
 }
 }
 
 Classy::configmenu Classy::Builder {menu used in the ClassyTcl Builder} {
-menu sel "File" {
-	action newfile "New file" {%W new file}
-	action newtoplevel "New Toplevel" {%W new toplevel}
-	action newdialog "New Dialog" {%W new dialog}
-	action newframe "New Frame" {%W new frame}
-	action newfunction "New function" {%W new function}
+menu "File" {
+	action "Code dir" {%W configure -dir code} <<CodeDir>>
+	action "Configuration dir" {%W configure -dir config} <<ConfDir>>
+	action "Help dir" {%W configure -dir help} <<HelpDir>>
+	action "Application dir" {%W configure -dir {}} <<AppDir>>
+	action "Select dir" {%W configure -dir [Classy::selectfile -default Classy::Builder]} <<Dir>>
+	action "Save" {%W save} <<Save>>
+	action "Editor" "edit newfile" <<Editor>>
+	action "Command window" {Classy::cmd} <<Cmd>>
 	separator
-	action DefaultDir "Application dir" {%W configure -dir {}}
-	action Dir "Select dir" {%W configure -dir [Classy::selectfile -default Classy::Builder]}
-	action Save "Save" {%W save}
+	action "Close" {destroy %W} <<Close>>
+	action "Exit" {exit} <<Exit>>
 }
-menu edit "Edit" {
-	action Edit "Edit" {%W openendnode [lindex [%W.browse selection] 0]}
-	action Rename "Rename" {%W rename}
-	separator
-	action Copy "Copy" {%W copy}
-	action Cut "Cut" {%W cut}
-	action Delete "Delete" {%W cut}
-	action Paste "Paste" {%W paste}
+menu "Add" {
+	action "New file" {%W new file} <<newfile>>
+	action "New Toplevel" {%W new toplevel} <<newtoplevel>>
+	action "New Dialog" {%W new dialog} <<newdialog>>
+	action "New Frame" {%W new frame} <<newframe>>
+	action "New function" {%W new function} <<newfunction>>
+	action "New configuration" {%W new config} <<newfile>>
 }
-menu help "Help" {
-	action Help "Builder" {Classy::help widgets/Builder}
+menu "Edit" {
+	action "Edit" {%W openendnode [lindex [%W.browse selection] 0]} <<Edit>>
+	action "Rename" {%W rename} <<Rename>>
 	separator
-	action HelpClassyTcl "ClassyTcl" {Classy::help ClassyTcl}
-	action HelpHelp "Help" {Classy::help help}
+	action "Copy" {%W copy} <<Copy>>
+	action "Cut" {%W cut} <<Cut>>
+	action "Delete" {%W delete} <<Delete>>
+	action "Paste" {%W paste} <<Paste>>
+}
+menu "Help" {
+	action "Builder" {Classy::help classy_builder} <<Help>>
+	separator
+	action "ClassyTcl" {Classy::help ClassyTcl} <<HelpClassyTcl>>
+	action "Help" {Classy::help help} <<HelpHelp>>
 }
 }
 
 Classy::configmenu Classy::WindowBuilder {menu used in the ClassyTcl WindowBuilder} {
-menu sel "File" {
-	action New "New" {[Classy::WindowBuilder_win %W] new}
-	action Save "Save" {[Classy::WindowBuilder_win %W] save}
-	action Delete "Delete" {[Classy::WindowBuilder_win %W] delete}
-	action Close "Close" {[Classy::WindowBuilder_win %W] close}
-}
-menu edit "Edit" {
-	action Copy "Copy" {[Classy::WindowBuilder_win %W] copy}
-	action Cut "Cut" {[Classy::WindowBuilder_win %W] cut}
-	action Delete "Delete" {[Classy::WindowBuilder_win %W] delete}
-	action Paste "Paste" {[Classy::WindowBuilder_win %W] paste}
+menu "File" {
+	action "Save" {[Classy::WindowBuilder_win %W] save} <<Save>>
+	action "Test" {[Classy::WindowBuilder_win %W] test} <<Test>>
+	action "Fast test" {[Classy::WindowBuilder_win %W] ftest} <<FastTest>>
+	action "Recreate" {[Classy::WindowBuilder_win %W] recreate} <<Recreate>>
 	separator
-	action Up "Move up" {[Classy::WindowBuilder_win %W] geometryset up}
-	action Down "Move down" {[Classy::WindowBuilder_win %W] geometryset down}
-	action Left "Move left" {[Classy::WindowBuilder_win %W] geometryset left}
-	action Right "Move right" {[Classy::WindowBuilder_win %W] geometryset right}
-}
-menu tk "Tk" {
-	action AddFrame Frame {[Classy::WindowBuilder_win %W] add frame}
-	action AddEntry Entry {[Classy::WindowBuilder_win %W] add entry}
-	action AddLabel Label {[Classy::WindowBuilder_win %W] add label}
-	action AddButton Button {[Classy::WindowBuilder_win %W] add button}
-	action AddCheckbutton {Check button} {[Classy::WindowBuilder_win %W] add checkbutton}
-	action AddRadiobutton {Radio button} {[Classy::WindowBuilder_win %W] add radiobutton}
-	action AddMessage Message {[Classy::WindowBuilder_win %W] add message}
-	action AddVScroll "Vertical Scrollbar" {[Classy::WindowBuilder_win %W] add scrollbar -orient vertical}
-	action AddHScroll "Horizontal Scrollbar" {[Classy::WindowBuilder_win %W] add scrollbar -orient horizontal}
-	action AddListbox Listbox {[Classy::WindowBuilder_win %W] add listbox}
-	action AddText Text {[Classy::WindowBuilder_win %W] add text}
-	action AddCanvas Canvas {[Classy::WindowBuilder_win %W] add canvas}
-	action AddScale Scale {[Classy::WindowBuilder_win %W] add scale}
-}
-menu classytcl "ClassyTcl" {
-	action AddClassy::dynamenu {Main Menu} {[Classy::WindowBuilder_win %W] add Classy::DynaMenu}
-	action AddClassy::dynatool {Toolbar} {%W add Classy::DynaTool}
-	action AddClassy::entry {Entry} {[Classy::WindowBuilder_win %W] add Classy::Entry}
-	action AddClassy::numentry {Numerical Entry} {[Classy::WindowBuilder_win %W] add Classy::NumEntry}
-	action AddClassy::listbox {ListBox} {[Classy::WindowBuilder_win %W] add Classy::ListBox}
-	action AddClassy::scrolledtext {scrolled Text} {[Classy::WindowBuilder_win %W] add Classy::ScrolledText}
-	action AddClassy::message "Message" {%W add Classy::Message}
-	action AddClassy::text {Text} {[Classy::WindowBuilder_win %W] add Classy::Text}
-	action AddClassy::canvas {Canvas} {[Classy::WindowBuilder_win %W] add Classy::Canvas}
-	action AddClassy::notebook {Notebook with tabs} {[Classy::WindowBuilder_win %W] add Classy::NoteBook}
-	action AddClassy::optionbox {OptionBox} {[Classy::WindowBuilder_win %W] add Classy::OptionBox}
-	action AddClassy::optionmenu {OptionMenu} {[Classy::WindowBuilder_win %W] add Classy::OptionMenu}
-	action AddClassy::paned {Paned} {[Classy::WindowBuilder_win %W] add Classy::Paned}
-	action AddClassy::progress {Progress bar} {[Classy::WindowBuilder_win %W] add Classy::Progress}
-	action AddClassy::scrolledframe {Scrolled frame} {[Classy::WindowBuilder_win %W] add Classy::ScrolledFrame}
-	action AddClassy::table {Table} {[Classy::WindowBuilder_win %W] add Classy::Table}
-	action AddClassy::fold {Fold} {[Classy::WindowBuilder_win %W] add Classy::Fold}
-	action AddClassy::fontselect {Font select} {[Classy::WindowBuilder_win %W] add button -text "Select font" -command {set font [Classy::getfont]}}
-	action AddClassy::colorselect {Color select} {[Classy::WindowBuilder_win %W] add button -text "Select color" -command {set color [Classy::getcolor]}}
-	action AddClassy::treewidget {Tree widget} {[Classy::WindowBuilder_win %W] add Classy::TreeWidget}
-	action AddClassy::browser {Browser} {[Classy::WindowBuilder_win %W] add Classy::Browser}
-}
-menu help "Help" {
-	action Help "Window Builder" {Classy::help widgets/WindowBuilder}
-	action HelpBuilder "Builder" {Classy::help widgets/Builder}
+	action "Editor" "edit newfile" <<Editor>>
+	action "Command window" {Classy::cmd} <<Cmd>>
 	separator
-	action HelpClassyTcl "ClassyTcl" {Classy::help ClassyTcl}
-	action HelpHelp "Help" {Classy::help help}
+	action "Close" {[Classy::WindowBuilder_win %W] close} <<Close>>
+}
+menu "Edit" {
+	action "Copy" {[Classy::WindowBuilder_win %W] copy} <<Copy>>
+	action "Cut" {[Classy::WindowBuilder_win %W] cut} <<Cut>>
+	action "Delete" {[Classy::WindowBuilder_win %W] delete} <<Delete>>
+	action "Paste" {[Classy::WindowBuilder_win %W] paste} <<Paste>>
+	separator
+	action "Move up" {[Classy::WindowBuilder_win %W] geometryset up} <<Up>>
+	action "Move down" {[Classy::WindowBuilder_win %W] geometryset down} <<Down>>
+	action "Move left" {[Classy::WindowBuilder_win %W] geometryset left} <<Left>>
+	action "Move right" {[Classy::WindowBuilder_win %W] geometryset right} <<Right>>
+	action "Rowspan smaller" {[Classy::WindowBuilder_win %W] geometryset spanup} <<SelectUp>>
+	action "Rowspan larger" {[Classy::WindowBuilder_win %W] geometryset spandown} <<SelectDown>>
+	action "Columnspan smaller" {[Classy::WindowBuilder_win %W] geometryset spanleft} <<SelectLeft>>
+	action "Columnspan larger" {[Classy::WindowBuilder_win %W] geometryset spanright} <<SelectRight>>
+}
+menu "Tk" {
+	action Frame {[Classy::WindowBuilder_win %W] add frame}
+	action Entry {[Classy::WindowBuilder_win %W] add entry}
+	action Label {[Classy::WindowBuilder_win %W] add label}
+	action Button {[Classy::WindowBuilder_win %W] add button}
+	action "Check button" {[Classy::WindowBuilder_win %W] add checkbutton}
+	action "Radio button" {[Classy::WindowBuilder_win %W] add radiobutton}
+	action Message {[Classy::WindowBuilder_win %W] add message}
+	action "Vertical Scrollbar" {[Classy::WindowBuilder_win %W] add scrollbar -orient vertical}
+	action "Horizontal Scrollbar" {[Classy::WindowBuilder_win %W] add scrollbar -orient horizontal}
+	action Listbox {[Classy::WindowBuilder_win %W] add listbox}
+	action Text {[Classy::WindowBuilder_win %W] add text}
+	action Canvas {[Classy::WindowBuilder_win %W] add canvas}
+	action Scale {[Classy::WindowBuilder_win %W] add scale}
+}
+menu "ClassyTcl" {
+	action "Main Menu" {[Classy::WindowBuilder_win %W] add Classy::DynaMenu}
+	action "Toolbar" {%W add Classy::DynaTool}
+	action "Entry" {[Classy::WindowBuilder_win %W] add Classy::Entry}
+	action "Numerical Entry" {[Classy::WindowBuilder_win %W] add Classy::NumEntry}
+	action "ListBox" {[Classy::WindowBuilder_win %W] add Classy::ListBox}
+	action "scrolled Text" {[Classy::WindowBuilder_win %W] add Classy::ScrolledText}
+	action "Message" {%W add Classy::Message}
+	action "Text" {[Classy::WindowBuilder_win %W] add Classy::Text}
+	action "Canvas" {[Classy::WindowBuilder_win %W] add Classy::Canvas}
+	action "Notebook with tabs" {[Classy::WindowBuilder_win %W] add Classy::NoteBook}
+	action "OptionBox" {[Classy::WindowBuilder_win %W] add Classy::OptionBox}
+	action "OptionMenu" {[Classy::WindowBuilder_win %W] add Classy::OptionMenu}
+	action "Paned" {[Classy::WindowBuilder_win %W] add Classy::Paned}
+	action "Progress bar" {[Classy::WindowBuilder_win %W] add Classy::Progress}
+	action "Scrolled frame" {[Classy::WindowBuilder_win %W] add Classy::ScrolledFrame}
+	action "Table" {[Classy::WindowBuilder_win %W] add Classy::Table}
+	action "Fold" {[Classy::WindowBuilder_win %W] add Classy::Fold}
+	action "Font select" {[Classy::WindowBuilder_win %W] add button -text "Select font" -command {set font [Classy::getfont]}}
+	action "Color select" {[Classy::WindowBuilder_win %W] add button -text "Select color" -command {set color [Classy::getcolor]}}
+	action "Tree widget" {[Classy::WindowBuilder_win %W] add Classy::TreeWidget}
+	action "Browser" {[Classy::WindowBuilder_win %W] add Classy::Browser}
+	action "CmdWidget" {[Classy::WindowBuilder_win %W] add Classy::CmdWidget}
+}
+menu "Help" {
+	action "Window Builder" {Classy::help classy_windowbuilder} <<Help>>
+	action "Builder" {Classy::help classy_builder} <<HelpBuilder>>
+	separator
+	action "ClassyTcl" {Classy::help ClassyTcl} <<HelpClassyTcl>>
+	action "Help" {Classy::help help} <<HelpHelp>>
 }
 }
 
 Classy::configmenu Classy::Dummy {menu used in the Builder as a dummy} {
-menu sel "Menu" {
+menu "Menu" {
 }
 }
 
 Classy::configmenu Classy::Test {menu used for testing} {
-	menu file "File" {
-		action Load "Open file" {%W insert insert "Open: %W"}
-		action LoadNext "Open next" {%W insert insert "Open next: %W"}
-		action Try "Test" {%W insert insert "Test: %W"}
-		menu trying "Trying" {
-			action Try "Trying" {%W insert insert "submenu: %W"} Alt-d
+	menu "File" {
+		action "Open file" {%W insert insert "Open: %W"} <<Load>>
+		action "Open next" {%W insert insert "Open next: %W"} <<LoadNext>>
+		action "Test" {%W insert insert "Test: %W"} <<Try>>
+		menu "Trying" {
+			action "Trying" {%W insert insert "submenu: %W"} Alt-d
 		}
-		action Save Save {puts save}
-		radio Radio1 "Radio try" {-variable test -value try}
-		radio Radio2 "Radio try2" {-variable test -value try2}
+		action Save {puts save} Save
+		radio "Radio try" {-variable test -value try} <<Radio1>>
+		radio "Radio try2" {-variable test -value try2} <<Radio2>>
 	} Alt-f
 	# The find menu
-	menu find "Find" {
-		action Goto "Goto line" {puts "Goto line"}
-		action Find "Find" {%W insert end find}
+	menu "Find" {
+		action "Goto line" {puts "Goto line"} <<Goto>>
+		action "Find" {%W insert end find} <<Find>>
 		separator
-		action ReplaceFindNext "Replace & Find next" {%W insert end replace}
-		check SearchReopen "Search Reopen" {-variable test%W -onvalue yes -offvalue no}
+		action "Replace & Find next" {%W insert end replace} <<ReplaceFindNext>>
+		check "Search Reopen" {-variable test%W -onvalue yes -offvalue no} <<SearchReopen>>
 	}
-	action Trytop "Test" {%W insert insert "Test: %W"} Alt-t
+	action "Test" {%W insert insert "Test: %W"} Alt-t
 }
 

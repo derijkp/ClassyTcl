@@ -28,7 +28,7 @@ proc ::Classy::NoteBook {} {}
 proc NoteBook {} {}
 }
 
-option add *Classy::NoteBook.Background [option get . darkBackground DarkBackground] widgetDefault
+catch {option add *Classy::NoteBook.Background [Classy::realcolor darkBackground] widgetDefault}
 #option add *Classy::NoteBook.book.borderWidth 2 widgetDefault
 #option add *Classy::NoteBook.Button.borderWidth 2 widgetDefault
 option add *Classy::NoteBook.borderWidth 0 widgetDefault

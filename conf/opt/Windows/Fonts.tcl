@@ -1,11 +1,11 @@
 #ClassyTcl font configuration file
 
 Classy::configfont {Basic Fonts} {
-	Font *Font {helvetica 10} {basic font}
-	BoldFont *BoldFont {helvetica 10 bold} {basic bold font class}
-	ItalicFont *ItalicFont {helvetica 10 italic} {basic italic font class}
-	BoldItalicFont *BoldItalicFont {helvetica 10 bold italic} {basic bold-italic font class}
-	NonPropFont *NonPropFont {courier 10} {basic non-proportional font class}
+	#Font *Font {helvetica 10} {basic font}
+	#BoldFont *BoldFont {helvetica 10 bold} {basic bold font class}
+	#ItalicFont *ItalicFont {helvetica 10 italic} {basic italic font class}
+	#BoldItalicFont *BoldItalicFont {helvetica 10 bold italic} {basic bold-italic font class}
+	#NonPropFont *NonPropFont {courier 10} {basic non-proportional font class}
 }
 
 Classy::configfont {Widget Fonts} {

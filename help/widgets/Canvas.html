@@ -60,18 +60,6 @@ pathname find tag searchCommand ?arg ...?
 <dt>andtags<dd> all items with all of the given tags
  </dl>
 <b><dt>
-pathname selection ?action? ?args?
-</b><dd>
- Change the current selection of canvas objects; has the following subcommands:
-<dl>
-<dt>set<dd>set the current selection: args are the itemnumbers or tags of the items that must be selected
-<dt>get<dd>get itemnames of all canvas items in the selection
-<dt>add<dd>add items corresponding to the given itemnumbers or tags
-<dt>clear<dd>clear the selection
-<dt>remove<dd>remve items corresponding to the given itemnumbers or tags
-<dt>redraw<dd>redraw the selection
-</dl>
-<b><dt>
 pathname current ?item?
 </b><dd>
  returns the current item. If current is given, it chabges the
@@ -101,5 +89,9 @@ pathname copy ?tagOrId?
 pathname paste
 </b><dd>
  creates new objects from a description put on the clipboard by the copy or cut method
+<b><dt>
+pathname print
+</b><dd>
+ pops up a print dialog
 
 </body>

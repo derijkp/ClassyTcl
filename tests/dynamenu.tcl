@@ -52,7 +52,7 @@ test Classy::DynaMenu {activemenu} {
 	text .t -width 10 -height 5
 	pack .t -side left -fill both -expand yes
 	proc p {} {
-		return {{action OK {puts ok} Alt-a} Test_active}
+		return {{action OK {puts ok} <Alt-a>} Test_active}
 	}
 	Classy::DynaMenu define Test {
 		activemenu "Active" p
@@ -61,7 +61,7 @@ test Classy::DynaMenu {activemenu} {
 	bindtags .t "Test_active [bindtags .t]"
 	update
 	proc p {} {
-		return {{action OK {puts ok} Alt-b} Test_active}
+		return {{action OK {puts ok} <Alt-b>} Test_active}
 	}
 	Classy::DynaMenu updateactive Test
 	bind Test_active

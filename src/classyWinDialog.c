@@ -144,7 +144,7 @@ static int Classy_GetFileName(clientData, interp, argc, argv, isOpen)
 	 OPENFILENAME openFileName, *ofnPtr;
 	 int tclCode = TCL_OK;
 	 int winCode, oldMode;
-	 OpenFileData * custData = NULL;
+	 OpenFileData *custData = NULL;
     char buffer[MAX_PATH+1024+1];
 
 	 ofnPtr = &openFileName;

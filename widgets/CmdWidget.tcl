@@ -42,6 +42,11 @@ auto_load varsubst
 #  Widget creation
 # ------------------------------------------------------------------
 
+if {"[info commands send]" == ""} {
+	proc send {app args} {
+   	eval uplevel #0 $args
+   }
+}
 Widget subclass Classy::CmdWidget
 Classy::export CmdWidget {}
 

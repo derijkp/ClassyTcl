@@ -506,7 +506,7 @@ test Classy::Canvas {selection} {
 	for {set i 0} {$i<1000} {incr i 10} {
 		.try create text $i $i -text $i -tags "t$i"
 	}
-	.try selection add t20 t30 t40 t50
+	.try selection add {t20 t30 t40 t50}
 	.try selection clear
 	.try selection get
 	.try selection redraw
@@ -519,8 +519,8 @@ test Classy::Canvas {selection undo} {
 	for {set i 0} {$i<1000} {incr i 10} {
 		.try create text $i $i -text $i -tags "t$i"
 	}
-	.try selection add t20 t30 
-	.try selection add t40 t50
+	.try selection add {t20 t30}
+	.try selection add {t40 t50}
 	.try undo
 	.try mitemcget _sel -text
 } {20 30}
@@ -649,6 +649,5 @@ test Classy::Canvas {print dialog} {
 	.try print
 	manualtest
 } {}
-
 
 testsummarize

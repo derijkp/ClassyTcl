@@ -971,7 +971,7 @@ test class {test super calling non-existing classmethod} {
 		return [list [super try $a] $b]
 	}
 	SubClass try 1 2
-} {No method "try" defined for super of SubClass (at class "Base")} 1
+} {No classmethod "try" defined for super of SubClass (at class "Base")} 1
 
 test class {class info error} {
 	clean

@@ -41,7 +41,7 @@ proc Classy::configkey {name map} {
 proc Classy::doconfigkey {} {
 	foreach {event keys} [array get ::Classy::configkey] {
 		event delete $event
-		eval event add $event $keys
+		catch {eval event add $event $keys}
 	}
 }
 
@@ -66,7 +66,7 @@ proc Classy::configmouse {name map} {
 proc Classy::doconfigmouse {} {
 	foreach {event keys} [array get ::Classy::configmouse] {
 		event delete $event
-		eval event add $event $keys
+		catch {eval event add $event $keys}
 	}
 	set list ""
 	foreach {name pre num} {Action {} 1 Adjust {} 2 Menu {} 3 MAdd Control- 1 MExtend Shift- 1} {
@@ -85,43 +85,52 @@ proc Classy::doconfigmouse {} {
 	}
 }
 
-#proc Classy::doconfigmouse {} {
-#	foreach {event keys} [array get ::Classy::configmouse] {
-#		event delete $event
-#		eval event add $event $keys
-#	}
-#	set list ""
-#	foreach {name num} {Action 1 Adjust 2 Menu 3} {
-#		regexp {[0-9]+} [event info <<$name>>] num
-#		lappend list $name $num
-#	}
-#	foreach {name key} $list {
-#		foreach combo {ButtonRelease ButtonPress} {
-#			if {"[event info <<$combo-$name>>]" == ""} {
-#				setevent <<$combo-$name>> <$combo-$key>
-#			}
-#		}
-#		
-#		foreach combo {
-#			Motion Leave Enter ButtonRelease ButtonPress
-#		} {
-#			if {"[event info <<$name-$combo>>]" == ""} {
-#				setevent <<$name-$combo>> <B$key-$combo>
-#			}
-#		}
-#	}
-#}
-#
 proc Classy::realcolor {color} {
-	if {[lsearch {Background DarkBackground LightBackground Foreground activeBackground activeForeground disabledForeground selectBackground selectForeground selectColor HighlightBackground HighlightColor} $color] != -1} {
-		set color [option get . $color $color]
+	if {[lsearch {Background darkBackground lightBackground Foreground activeBackground activeForeground disabledForeground selectBackground selectForeground selectColor highlightBackground highlightColor} $color] != -1} {
+		set temp [option get . $color $color]
+		if {"$temp" != ""} {
+			set color $temp
+		} else {
+			set opt [structlget {
+				Background bg darkBackground bg lightBackground bg
+				Foreground fg activeBackground bg activeForeground fg
+				disabledForeground fg selectBackground selectbackground selectForeground selectforeground
+				selectColor bg highlightBackground highlightbackground highlightColor highlightcolor
+			} $color]
+			set color [.classy__.dummy cget -$opt]
+		}
 	}
+	if {"$color" == ""} {error "could not convert color"}
 	return $color
 }
 
+proc Classy::optionget {w name class {def {}}} {
+	set result [::option get $w $name $class]
+	if {"$result" == ""} {
+		if [catch {lindex [$w configure	-[string tolower $class]] 3} result] {
+			if [catch {lindex [$w configure	-[string tolower $class]] 3} result] {
+				set result $def
+			}
+		}
+	}
+	return $result
+}
+
 proc Classy::realfont {font} {
-	if [regexp {^Font$|^BoldFont$|^ItalicFont$|^BoldItalicFont$|^NonPropFont$} $font] {
-		set font [option get . $font $font]
+	if [inlist {Font BoldFont ItalicFont BoldItalicFont NonPropFont} $font] {
+		set temp [option get . $font $font]
+		if {"$temp" != ""} {
+			set font $temp
+		} else {
+			set temp [font actual [.classy__.dummy cget -font]]
+			switch $font {
+				Font {set font $temp}
+				BoldFont {set font [structlset $temp -weight bold]}
+				ItalicFont {set font [structlset $temp -slant italic]}
+				BoldItalicFont {set font [structlset $temp -weight bold -slant italic]}
+				NonPropFont {set font [structlset $temp -family courier]}
+			}
+		}
 	}
 	return $font
 }
@@ -136,7 +145,7 @@ proc Classy::configcolor {name map} {
 
 proc Classy::doconfigcolor {} {
 	set list [set ::Classy::configcolor()]
-	set common [lcommon {Background DarkBackground LightBackground Foreground activeBackground activeForeground disabledForeground selectBackground selectForeground selectColor HighlightBackground HighlightColor} $list]
+	set common [lcommon {Background darkBackground lightBackground Foreground activeBackground activeForeground disabledForeground selectBackground selectForeground selectColor highlightBackground highlightColor} $list]
 	foreach option $common {
 		set value [set ::Classy::configcolor($option)]
 		option add $option [Classy::realcolor $value] widgetDefault
@@ -161,11 +170,17 @@ proc Classy::doconfigfont {} {
 	set common [lcommon {Font BoldFont ItalicFont BoldItalicFont NonPropFont} $list]
 	foreach option $common {
 		set value [set ::Classy::configfont($option)]
-		option add $option [Classy::realfont $value] widgetDefault
+		set font [Classy::realfont $value]
+		if ![catch {font actual $font}] {
+			option add $option $font widgetDefault
+		}
 	}
 	foreach option [lremove $list $common] {
 		set value [set ::Classy::configfont($option)]
-		option add $option [Classy::realfont $value] widgetDefault
+		set font [Classy::realfont $value]
+		if ![catch {font actual $font}] {
+			option add $option $font widgetDefault
+		}
 	}
 }
 

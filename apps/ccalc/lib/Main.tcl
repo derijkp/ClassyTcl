@@ -25,7 +25,6 @@ proc mainw args {# ClassyTcl generated Toplevel
 	
 	Classy::NumEntry $window.entry \
 		-command {invoke value {setval [expr $value]}} \
-		-label label \
 		-width 4
 	grid $window.entry -row 0 -column 0 -columnspan 5 -sticky nesw
 	button $window.n0 \
@@ -180,85 +179,85 @@ set ::work 0
 	$window configure \
 		-destroycommand "exit"
 	$window.n0 configure \
-		-background [Classy::realcolor LightBackground]
+		-background [Classy::realcolor lightBackground]
 	$window.n1 configure \
-		-background [Classy::realcolor LightBackground]
+		-background [Classy::realcolor lightBackground]
 	$window.n4 configure \
-		-background [Classy::realcolor LightBackground]
+		-background [Classy::realcolor lightBackground]
 	$window.n7 configure \
-		-background [Classy::realcolor LightBackground]
+		-background [Classy::realcolor lightBackground]
 	$window.is configure \
-		-background [Classy::realcolor DarkBackground]
+		-background [Classy::realcolor darkBackground]
 	$window.plusminus configure \
-		-background [Classy::realcolor DarkBackground]
+		-background [Classy::realcolor darkBackground]
 	$window.dec configure \
-		-background [Classy::realcolor LightBackground]
+		-background [Classy::realcolor lightBackground]
 	$window.n2 configure \
-		-background [Classy::realcolor LightBackground]
+		-background [Classy::realcolor lightBackground]
 	$window.n3 configure \
-		-background [Classy::realcolor LightBackground]
+		-background [Classy::realcolor lightBackground]
 	$window.n5 configure \
-		-background [Classy::realcolor LightBackground]
+		-background [Classy::realcolor lightBackground]
 	$window.n6 configure \
-		-background [Classy::realcolor LightBackground]
+		-background [Classy::realcolor lightBackground]
 	$window.n8 configure \
-		-background [Classy::realcolor LightBackground]
+		-background [Classy::realcolor lightBackground]
 	$window.n9 configure \
-		-background [Classy::realcolor LightBackground]
+		-background [Classy::realcolor lightBackground]
 	$window.plus configure \
-		-background [Classy::realcolor DarkBackground]
+		-background [Classy::realcolor darkBackground]
 	$window.minus configure \
-		-background [Classy::realcolor DarkBackground]
+		-background [Classy::realcolor darkBackground]
 	$window.times configure \
-		-background [Classy::realcolor DarkBackground]
+		-background [Classy::realcolor darkBackground]
 	$window.div configure \
-		-background [Classy::realcolor DarkBackground]
+		-background [Classy::realcolor darkBackground]
 	$window.parenr configure \
-		-background [Classy::realcolor DarkBackground]
+		-background [Classy::realcolor darkBackground]
 	$window.tan configure \
-		-background [Classy::realcolor DarkBackground]
+		-background [Classy::realcolor darkBackground]
 	$window.cec configure \
 		-background [Classy::realcolor orange]
 	$window.ac configure \
 		-background [Classy::realcolor orange]
 	$window.drg configure \
-		-background [Classy::realcolor DarkBackground]
+		-background [Classy::realcolor darkBackground]
 	$window.pow configure \
-		-background [Classy::realcolor DarkBackground]
+		-background [Classy::realcolor darkBackground]
 	$window.parenl configure \
-		-background [Classy::realcolor DarkBackground]
+		-background [Classy::realcolor darkBackground]
 	$window.cos configure \
-		-background [Classy::realcolor DarkBackground]
+		-background [Classy::realcolor darkBackground]
 	$window.sqrt configure \
-		-background [Classy::realcolor DarkBackground]
+		-background [Classy::realcolor darkBackground]
 	$window.pow2 configure \
-		-background [Classy::realcolor DarkBackground]
+		-background [Classy::realcolor darkBackground]
 	$window.sin configure \
-		-background [Classy::realcolor DarkBackground]
+		-background [Classy::realcolor darkBackground]
 	$window.ee configure \
-		-background [Classy::realcolor DarkBackground]
+		-background [Classy::realcolor darkBackground]
 	$window.fac configure \
-		-background [Classy::realcolor DarkBackground]
+		-background [Classy::realcolor darkBackground]
 	$window.over configure \
-		-background [Classy::realcolor DarkBackground]
+		-background [Classy::realcolor darkBackground]
 	$window.inv configure \
-		-background [Classy::realcolor DarkBackground]
+		-background [Classy::realcolor darkBackground]
 	$window.e configure \
-		-background [Classy::realcolor DarkBackground]
+		-background [Classy::realcolor darkBackground]
 	$window.pi configure \
-		-background [Classy::realcolor DarkBackground]
+		-background [Classy::realcolor darkBackground]
 	$window.sto configure \
-		-background [Classy::realcolor DarkBackground]
+		-background [Classy::realcolor darkBackground]
 	$window.rcl configure \
-		-background [Classy::realcolor DarkBackground]
+		-background [Classy::realcolor darkBackground]
 	$window.sum configure \
-		-background [Classy::realcolor DarkBackground]
+		-background [Classy::realcolor darkBackground]
 	$window.exc configure \
-		-background [Classy::realcolor DarkBackground]
+		-background [Classy::realcolor darkBackground]
 	$window.log10 configure \
-		-background [Classy::realcolor DarkBackground]
+		-background [Classy::realcolor darkBackground]
 	$window.log configure \
-		-background [Classy::realcolor DarkBackground]
+		-background [Classy::realcolor darkBackground]
 # ClassyTcl Finalise
 foreach w [winfo children $window] {
 	if ![inlist [list $window.entry $window.label $window.opt] $w] {
@@ -267,6 +266,7 @@ foreach w [winfo children $window] {
 }
 $window.entry set 0
 set data(new) 1
+	return $window
 	return $window
 	return $window
 	return $window
@@ -629,4 +629,5 @@ regsub {0+$} $value {} value
 regsub {\.$} $value {} value
 .mainw.entry nocmdset $value
 }
+
 

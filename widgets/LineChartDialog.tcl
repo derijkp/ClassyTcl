@@ -372,8 +372,6 @@ Classy::LineChartDialog method chartconfigure {args} {
 #} descr {
 #}
 Classy::LineChartDialog method xview {args} {
-puts xview
-putsvars args
 	private $object options
 	set chartxrange [$object.options.chart configure -xrange]
 	set xrange $options(-xrange)

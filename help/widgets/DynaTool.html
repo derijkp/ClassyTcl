@@ -11,14 +11,14 @@ DynaTool
  subclass of <a href="../basic/Widget.html">Widget</a><br>
  The DynaTool widgets are toolbars, for which the contents are managed by
  the DynaTool class in an easy and dynamic way.
- DynaTool can handle several toolbar types.
+ DynaTool can handle several tooltypes.
 <p>
- Each toolbar type is defined by a <a href="../classy_dynatool.html">toolbar definition</a>. 
+ Each tooltype is defined by a <a href="../classy_dynatool.html">definition in a simple format</a>. 
  DynaTool can create one or more toolbars for each
- toolbar type. When the definition of the toolbar type is changed
+ tooltype. When the definition of the tooltype is changed
  all toolbars of that type will be changed accordingly.
 <p>
- Toolbar definitions for toolbar type are usually controlled from the
+ Toolbar definitions for tooltype are usually controlled from the
  Toolbars part of the <a href="../classy_configure.html">configuration 
  system</a>.
 <p>
@@ -28,30 +28,30 @@ DynaTool
  changed at any time.
 
 <dl><b><dt>
-pathname define toolbartype ?data?
+pathname define tooltype ?data?
 </b><dd>
  set the <a href="../classy_dynatool.html">definition describing the tools</a> that will be generated 
- for $toolbartype.
- If data is not given, the toolbar definition for $toolbartype will be returned.
+ for $tooltype.
+ If data is not given, the toolbar definition for $tooltype will be returned.
  Definition of toolbars is usually done in the
  <a href="../classy_configure.html">configuration system</a>.
  You will usually not invoke this method, as the definition of 
- toolbartype that isn't managed yet will be automatically fetched and defined
+ tooltype that isn't managed yet will be automatically fetched and defined
  when creating a new toolbar.
 
 <b><dt>
-pathname redraw toolbartype
+pathname redraw tooltype
 </b><dd>
- redraw toolbars of type $toolbartype
+ redraw toolbars of type $tooltype
 
 <b><dt>
 pathname types ?pattern? 
 </b><dd>
 
 <b><dt>
-pathname get toolbartype
+pathname get tooltype
 </b><dd>
- returns the definition of $toolbartype
+ returns the definition of $tooltype
 
 <b><dt>
 pathname deletetool tool
@@ -59,9 +59,9 @@ pathname deletetool tool
  delete $tool managed by DynaTool
 
 <b><dt>
-pathname delete toolbartype
+pathname delete tooltype
 </b><dd>
- delete the definition and all toolbars of type $toolbartype
+ delete the definition and all toolbars of $tooltype
 
 <b><dt>
 pathname cmdw tool {cmdw {}}

@@ -9,7 +9,6 @@
 package require Extral 0.96
 package require Class 0.1
 lappend auto_path [file join ${::class::dir} widgets] [file join ${::class::dir} dialogs]
-option add *ColorList {{blue cyan green yellow orange red magenta} {blue3 cyan3 green3 yellow3 orange3 red3 magenta3} {black gray20 gray40 gray50 gray60 gray80 white}} widgetDefault
 
 namespace eval ::Classy {}
 
@@ -29,6 +28,10 @@ if {"$tcl_platform(platform)"=="unix"} {
 	}
 }
 set Classy::appdir [file dir $::Classy::script]
+
+if {"$tcl_platform(platform)"=="windows"} {
+	load [file join $::class::dir classywin.dll]
+}
 
 # ----------------------------------------------------------------------
 # Change the destroy command
@@ -134,8 +137,10 @@ if {"[info commands ::Tk::focus]" == ""} {
 # Initialise
 #----------------------------------------------------------------------
 frame .classy__
+entry .classy__.dummy
 source [file join [set ::class::dir] lib conf.tcl]
 source [file join [set ::class::dir] lib tools.tcl]
+option add *ColorList {{blue cyan green yellow orange red magenta} {blue3 cyan3 green3 yellow3 orange3 red3 magenta3} {black gray20 gray40 gray50 gray60 gray80 white}} widgetDefault
 Classy::initconf
 
 if {[option get . patchTk PatchTk]==1} {

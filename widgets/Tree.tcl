@@ -169,7 +169,7 @@ Classy::Tree method _drawnode {node} {
 	set pady $options(-pady)
 	set padtext $options(-padtext)
 	if {"$options(-font)" == ""} {
-		set font [option get . treeFont TreeFont]
+		set font [option get . treeFont Font]
 	} else {
 		set font $options(-font)
 	}
@@ -234,7 +234,7 @@ Classy::Tree method _redraw {} {
 		set data() [structlset $data() i $i]
 	} else {
 		if {"$options(-font)" == ""} {
-			set font [option get . treeFont TreeFont]
+			set font [option get . treeFont Font]
 		} else {
 			set font $options(-font)
 		}
@@ -249,8 +249,9 @@ Classy::Tree method _redraw {} {
 		set width [expr {[lindex $bbox 2]-[lindex $bbox 0]}]
 		set ti [$canvas create text \
 				[expr {$options(-startx) + $width/2 + $options(-padtext)}] $options(-starty) \
-				-text $options(-roottext) -anchor w -font $font\
+				-text $options(-roottext) -anchor w \
 				-tags [list $options(-tag) classy::Tree {}]]
+   	if {"$font" != ""} {$canvas itemconfigure $ti -font $font}
 		set data() [structlset $data() i $i ti $ti]
 	}
 	$object _drawnode {}
@@ -264,10 +265,10 @@ Classy::Tree method _redraw {} {
 		set x2 [lindex $bbox 2]
 		set y2 [lindex $bbox 3]
 		if {"$bbox" != ""} {
+			set bg [Classy::realcolor [Classy::optionget $canvas selectBackground SelectBackground selectBackground]]
 			$canvas create rectangle $x1 $y1 $x2 $y2 \
 				-tags [list $options(-tag) $options(-tag)_selection] \
-				-fill [option get $canvas selectBackground SelectBackground] \
-				-outline [option get $canvas selectBackground SelectBackground]
+				-fill $bg -outline $bg
 			}
 	}
 	$canvas lower $options(-tag)_selection

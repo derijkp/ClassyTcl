@@ -93,7 +93,7 @@ Classy::configtool Classy::Dummy {toolbar used as a dummy in the ClassyTcl Windo
 Classy::configtool Classy::Config {} {
 	action save {Save} {::Classy::Config save %W}
 	action SaveAs {Save as} {::Classy::Config saveas %W}
-	action Use {Use} {::Classy::Config use %W}
+	action Test {Test} {::Classy::Config test %W}
 	action Select {Select} {::Classy::Config select %W %W}
 	action Clear {Clear} {::Classy::Config clear %W}
 	action Reconfigure {Reconfigure} {::Classy::Config reconfigure %W}

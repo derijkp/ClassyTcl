@@ -40,8 +40,8 @@ test Classy::Table {create and configure} {
 			set ::d($row,$col) "r $row c $col"
 		}
 	}
-#	manualtest
+	manualtest
 } {}
 
 
-#testsummarize
+testsummarize

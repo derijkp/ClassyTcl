@@ -2,7 +2,6 @@
 
 proc text_action {w x y} {
 puts text_action
-putsvars w x y
 global current
 $w select clear
 set x [$w canvasx $x]

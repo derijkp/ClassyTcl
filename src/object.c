@@ -31,7 +31,7 @@ int Classy_ObjectObjCmd(
 	ClientData clientdata,
 	Tcl_Interp *interp,
 	int argc,
-	Tcl_Obj *CONST argv[])
+	Tcl_Obj *argv[])
 {
 	Class *class;
 	Object *object;

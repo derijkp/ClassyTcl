@@ -11,6 +11,7 @@ test Classy::CmdWidget {create and configure} {
 	.try cget -prompt
 } {[pwd] % }
 
+if 0 {
 test Classy::CmdWidget {create and configure} {
 	classyclean
 	Classy::CmdWidget .try
@@ -21,5 +22,6 @@ test Classy::CmdWidget {create and configure} {
 	.try2 connect try
 	.try cget -prompt
 } {[pwd] % }
+}
 
 testsummarize

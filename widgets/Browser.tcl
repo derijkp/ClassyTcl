@@ -53,8 +53,10 @@ Classy::Browser classmethod init {args} {
 
 	# REM Initialise variables
 	# ------------------------
-	private $object curpos
+	private $object curpos display
 	set curpos 0
+	set display(font) [Classy::realfont [Classy::optionget $object.c font Font BoldFont]]
+	set display(datafont) [Classy::realfont [Classy::optionget $object.c dataFont Font Font]]
 
 	# REM Configure initial arguments
 	# -------------------------------
@@ -99,15 +101,21 @@ Classy::Browser addoption -padtext {padText PadText 4} {
 }
 
 Classy::Browser addoption -font {font Font {}} {
+	private display
 	if {"$value" == ""} {
-		set value [option get $object.c font Font]
+		set display(font) [Classy::realfont [Classy::optionget $object.c font Font BoldFont]]
+	} else {
+		set display(font) [Classy::realfont $value]
 	}
 	Classy::todo $object redraw
 }
 
 Classy::Browser addoption -datafont {dataFont Font {}} {
+	private display
 	if {"$value" == ""} {
-		set value [option get $object.c font Font]
+		set display(datafont) [Classy::realfont [Classy::optionget $object.c dataFont Font BoldFont]]
+	} else {
+		set display(datafont) [Classy::realfont $value]
 	}
 	Classy::todo $object redraw
 }
@@ -185,7 +193,7 @@ Classy::Browser method redraw {} {
 }
 
 Classy::Browser method _redrawrow {} {
-	private $object options curpos endpos step dline
+	private $object options curpos endpos step dline display
 	set minx $options(-minx)
 	set miny $options(-miny)
 	set padx $options(-padx)
@@ -234,7 +242,7 @@ Classy::Browser method _redrawrow {} {
 		}
 		set id [$w create text [expr {$x+$padtext}] [expr {$y+$height+$padtext}] \
 			-anchor nw -justify center -text $text \
-			-tags [list _$name text text_$name t] -font $options(-font)]
+			-tags [list _$name text text_$name t] -font $display(font)]
 		set bbox [$w bbox $id]
 		set temp [expr {$y + $height + [expr {[lindex $bbox 3]-[lindex $bbox 1]}] + $padtext + $pady}]
 		if {$temp > $ny} {set ny $temp}
@@ -269,7 +277,7 @@ Classy::Browser method _redrawrow {} {
 }
 
 Classy::Browser method _redrawcolumn {} {
-	private $object options curpos endpos step sel dline
+	private $object options curpos endpos step sel dline display
 	set minx $options(-minx)
 	set miny $options(-miny)
 	set padx $options(-padx)
@@ -289,8 +297,8 @@ Classy::Browser method _redrawcolumn {} {
 	set notfirst 0
 	set endpos $curpos
 	set step 0
-	set selfg [option get $object selectForeground Background]
-	set selbg [option get $object selectBackground Foreground]
+	set selfg [Classy::optionget $object selectForeground Background gray]
+	set selbg [Classy::optionget $object selectBackground Foreground gray]
 	catch {unset dline}
 	set dline(num) 0
 	foreach name $list {
@@ -320,7 +328,7 @@ Classy::Browser method _redrawcolumn {} {
 		}
 		set id [$w create text [expr {$x+$width+$padtext}] [expr {$y+$height/2}] \
 			-anchor w -text $text \
-			-tags [list _$name text text_$name t] -font $options(-font)]
+			-tags [list _$name text text_$name t] -font $display(font)]
 		set bbox [$w bbox $id]
 		set temp [expr {$x + $width + [expr {[lindex $bbox 2]-[lindex $bbox 0]}] + $padtext + $padx}]
 		if {$temp > $nx} {set nx $temp}
@@ -406,7 +414,7 @@ Classy::Browser method _paneremove {w x y} {
 }
 
 Classy::Browser method _redrawlist {} {
-	private $object options curpos endpos step psize sel
+	private $object options curpos endpos step psize sel display
 	set minx $options(-minx)
 	set miny $options(-miny)
 	set padx $options(-padx)
@@ -429,7 +437,7 @@ Classy::Browser method _redrawlist {} {
 	if !$options(-dataunder) {
 		set id [$w create text $x $y \
 			-anchor w -text name \
-			-tags [list {} label_text] -font $options(-font)]
+			-tags [list {} label_text] -font $display(font)]
 		set bbox [$w bbox $id]
 		set height [expr {[lindex $bbox 3]-[lindex $bbox 1]}]
 		set width [expr {[lindex $bbox 2]-[lindex $bbox 0]}]
@@ -438,7 +446,7 @@ Classy::Browser method _redrawlist {} {
 			-tags [list {} pane_name pane] -width 2]
 		if [info exists psize(name)] {$object.c itemconfigure $id -fill red}
 		foreach dt $options(-data) {
-			$w create text 0 $y -anchor e -text $dt -tags [list {} label_$dt d$dt] -font $options(-font)
+			$w create text 0 $y -anchor e -text $dt -tags [list {} label_$dt d$dt] -font $display(font)
 			set id [$w create line 0 [expr $y-$hh] $padtext [expr $y-$hh] $padtext [expr $y+$hh] \
 				-tags [list {} pane_$dt pane] -width 2]
 			if [info exists psize($dt)] {$object.c itemconfigure $id -fill red}
@@ -484,7 +492,7 @@ Classy::Browser method _redrawlist {} {
 		set ty [expr {$y+$height/2}]
 		set id [$w create text [expr {$x+$width+$padtext}] $ty \
 			-anchor w -text $text \
-			-tags [list _$name text name text_$name t] -font $options(-font)]
+			-tags [list _$name text name text_$name t] -font $display(font)]
 		lappend items $id
 		set bbox [$w bbox $id]
 		set temp [expr {$x + $width + [expr {[lindex $bbox 2]-[lindex $bbox 0]}] + $padtext + $padtext}]
@@ -492,7 +500,7 @@ Classy::Browser method _redrawlist {} {
 		if !$options(-dataunder) {
 			foreach dt $options(-data) d $data {
 				$w create text 0 $ty \
-					-anchor e -text $d -tags [list _$name d$dt ${dt}_$name t] -font $options(-datafont)
+					-anchor e -text $d -tags [list _$name d$dt ${dt}_$name t] -font $display(datafont)
 			}
 		}
 		set y [expr {$y + $height + $pady}]
@@ -561,7 +569,7 @@ Classy::Browser method _redrawlist {} {
 }
 
 Classy::Browser method _drawdataunder {nx ny name id} {
-	private $object options
+	private $object options display
 	set padx $options(-padx)
 	set pady $options(-pady)
 	set padtext $options(-padtext)
@@ -576,7 +584,7 @@ Classy::Browser method _drawdataunder {nx ny name id} {
 	}
 	foreach dt $options(-data) d $data {
 		set tempid [$w create text $tempx $tempy \
-			-anchor nw -text $d -tags [list _$name d$dt ${dt}_$name t] -font $options(-datafont)]
+			-anchor nw -text $d -tags [list _$name d$dt ${dt}_$name t] -font $display(datafont)]
 		set bbox [$w bbox $tempid]
 		set tempy [lindex $bbox 3]
 		set temp [expr {$tempx + [expr {[lindex $bbox 2]-[lindex $bbox 0]}] + $padx}]
@@ -591,8 +599,8 @@ Classy::Browser method _drawselection {} {
 	private $object options curpos endpos sel
 	$object.c delete selection
 	set sw [winfo width $object.c]
-	set selfg [option get $object selectForeground Background]
-	set selbg [option get $object selectBackground Foreground]
+	set selfg [Classy::optionget $object selectForeground Background gray]
+	set selbg [Classy::optionget $object selectBackground Foreground gray]
 	$object.c itemconfigure t -fill black
 	foreach name [lrange $options(-list) $curpos $endpos] {
 		if [info exists sel($name)] {
@@ -621,7 +629,7 @@ Classy::Browser method _drawselection {} {
 }
 
 Classy::Browser method _drawdata {nx names items} {
-	private $object options
+	private $object options display
 	set padx $options(-padx)
 	set pady $options(-pady)
 	set padtext $options(-padtext)
@@ -640,7 +648,7 @@ Classy::Browser method _drawdata {nx names items} {
 			set d [lindex $data $i]
 			set y [lindex [$object.c coords $item] 1]
 			set id [$w create text $cx $y \
-				-anchor w -text $d -tags [list _$name d$dt ${dt}_$name t] -font $options(-datafont)]
+				-anchor w -text $d -tags [list _$name d$dt ${dt}_$name t] -font $display(datafont)]
 			set bbox [$w bbox $id]
 			lappend nitems $id
 			set temp [expr {$cx + [expr {[lindex $bbox 2]-[lindex $bbox 0]}]}]
@@ -818,7 +826,7 @@ Classy::Browser method selection {option args} {
 }
 
 Classy::Browser method edit {name type command} {
-	private $object edit options id
+	private $object edit options id display
 	if ![winfo exists $object.e] {
 		entry $object.e -textvariable [privatevar $object edit] -relief sunken -bd 1
 	}
@@ -837,9 +845,9 @@ Classy::Browser method edit {name type command} {
 	set y [lindex $bbox 1]
 	set h [expr {[lindex $bbox 3]-[lindex $bbox 1]+2}]
 	if {"$type" == "text"} {
-		$object.e configure -font $options(-font)
+		$object.e configure -font $display(font)
 	} else {
-		$object.e configure -font $options(-datafont)
+		$object.e configure -font $display(datafont)
 	}
 	switch $options(-order) {
 		list {
@@ -850,7 +858,7 @@ Classy::Browser method edit {name type command} {
 				} else {
 					set coords [$object.c coords bg_$type]
 					set w [expr {[lindex $coords 2]-[lindex $coords 0]}]
-					$object.e configure -font $options(-datafont)
+					$object.e configure -font $display(datafont)
 				}
 			} else {
 				set w [expr {[winfo width $object.c]-$x-5}]

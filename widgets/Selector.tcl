@@ -372,7 +372,6 @@ Classy::Selector method redraw {} {
 }
 
 Classy::Selector method _stickyset {args} {
-putsvars args
 	private $object sticky
 	if {"$args" == ""} {
 		set value ""

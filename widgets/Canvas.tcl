@@ -111,7 +111,24 @@ Classy::Canvas	addoption -papersize {papeSize PaperSize {}} {
 		set orient p
 		set p $value
 		regexp {^(.+)(-l|-p)$} $value temp p orient
-		set c [structlget [option get $object paperSizes PaperSizes] $p]
+		set c [structlget [Classy::optionget $object paperSizes PaperSizes {
+User      "595p 842p"
+Letter    "612p 792p"
+Tabloid   "792p 1224p"
+Ledger    "1224p 792p"
+Legal     "612p 1008p"
+Statement "396p 612p"
+Executive "540p 720p"
+A0        "2380p 3368p"
+A1        "1684p 2380p"
+A2        "1190p 1684p"
+A3        "842p 1190p"
+A4        "595p 842p"
+A5        "420p 595p"
+B4        "729p 1032p"
+B5        "516p 729p"
+Folio     "612p 936p"
+Quarto    "610p 780p"}] $p]
 		if {"$orient" == "-l"} {
 			set temp [list [lindex $c 1] [lindex $c 0]]
 			set c $temp
@@ -325,7 +342,7 @@ Classy::Canvas method _undoone {current} {
 		scale {
 			foreach {tagOrId xOrigin yOrigin xScale yScale} $current {
 				set data(undo) 0
-				$object scale $tagOrId $xOrigin $yOrigin [expr {1/$xScale}] [expr {1/$yScale}]
+				$object scale $tagOrId $xOrigin $yOrigin [expr {1.0/$xScale}] [expr {1.0/$yScale}]
 				set data(undo) 1
 			}
 		}
@@ -639,7 +656,7 @@ proc Classy::Canvas_create_text {object w arg extra} {
 	private $object fonts
 	set pos [lsearch -exact $arg -font]
 	if {$pos == -1} {
-		set font [option get $object font Font]
+		set font [Classy::optionget $object font Font helvetica]
 	} else {
 		incr pos
 		set font [lindex $arg $pos]

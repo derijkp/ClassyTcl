@@ -194,7 +194,6 @@ Classy::DynaTool addoption -width {width Width 0} {
 # when creating a new toolbar.
 #}
 Classy::DynaTool classmethod define {tooltype {data {}}} {
-#putsvars tooltype data
 	private $class tooldata keep
 	if [info exists tooldata($tooltype)] {
 		set keep $tooldata($tooltype)

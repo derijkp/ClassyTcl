@@ -28,7 +28,7 @@ option add *Classy::Paned.hcursor sb_h_double_arrow widgetDefault
 option add *Classy::Paned.vcursor sb_v_double_arrow widgetDefault
 option add *Classy::Paned.width 3 widgetDefault
 option add *Classy::Paned.height 3 widgetDefault
-option add *Classy::Paned.background [option get . foreground Foreground] widgetDefault
+catch {option add *Classy::Paned.background [Classy::realcolor Foreground] widgetDefault}
 option add *Classy::Paned.relief raised widgetDefault
 option add *Classy::Paned.highlightThickness 0 widgetDefault
 

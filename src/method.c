@@ -251,7 +251,7 @@ void Classy_CopyMethods(
 	entry = Tcl_FirstHashEntry(src, &search);
 	while(1) {
 		if (entry == NULL) break;
-		srcmethod = Tcl_GetHashValue(entry);
+		srcmethod = (Method *)Tcl_GetHashValue(entry);
 		key = Tcl_GetHashKey(src, entry);
 		entry = Tcl_CreateHashEntry(dst,key,&new);
 		if (new == 1) {
@@ -284,7 +284,7 @@ int Classy_CopyMethod(
 
 	entry = Tcl_FindHashEntry(src, name);
 	if (entry == NULL) {return 0;}
-	srcmethod = Tcl_GetHashValue(entry);
+	srcmethod = (Method *)Tcl_GetHashValue(entry);
 	entry = Tcl_CreateHashEntry(dst,name,&new);
 	if (new == 1) {
 		method = (Method *)Tcl_Alloc(sizeof(Method));
@@ -356,7 +356,7 @@ int Classy_PropagateDeleteMethod(
 			mentry = Tcl_FindHashEntry(&(subclass->classmethods),name);
 		}
 		if (mentry != NULL) {
-			method = Tcl_GetHashValue(mentry);
+			method = (Method *)Tcl_GetHashValue(mentry);
 			if (method->copy != 0) {
 				error = Classy_PropagateDeleteMethod(interp,subclass,type,name);
 				if (error != TCL_OK) {return error;}

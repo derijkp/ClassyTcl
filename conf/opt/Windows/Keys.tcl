@@ -21,6 +21,7 @@ Classy::configkey Select {
 	StartSelect <<StartSelect>> <Control-space> {StartSelect key}
 	EndSelect <<EndSelect>> <Control-Shift-space> {EndSelect key}
 }
+
 Classy::configkey File {
 	Load <<Load>> <Control-o> {Load key}
 	LoadNext <<LoadNext>> <Control-Alt-o> {LoadNext key}
@@ -31,6 +32,7 @@ Classy::configkey File {
 	Reopen <<Reopen>> <Control-r> {Reopen key}
 	Macro <<Macro>> <Control-m> {Macro key}
 }
+
 Classy::configkey Find {
 	Goto <<Goto>> <Control-j> {Goto key}
 	Find <<Find>> <Control-F> {Find key}
@@ -52,6 +54,7 @@ Classy::configkey Control {
 	SpecialFocusPrev <<SpecialFocusPrev>> <ISO_Left_Tab> {TextFocusPrev key}
 }
 Classy::configkey Misc {
+	New <<New>> <Control-n> {Help key}
 	Help <<Help>> <F1> {Help key}
 	Format <<Format>> <Control-Alt-j> {Format key}
 	Print <<Print>> <Control-p> {Print key}
@@ -75,7 +78,7 @@ Classy::configkey Movement {
 	End <<End>> {<End> <Alt-Right>} {End key}
 	Top <<Top>> <Control-Home> {Top key}
 	Bottom <<Bottom>> <Control-End> {Bottom key}
-	PageTop <<PageTop>> <alt-Up> {PageTop key}
+	PageTop <<PageTop>> <Alt-Up> {PageTop key}
 	PageBottom <<PageBottom>> <Alt-Down> {PageBottom key}
 	PageUp <<PageUp>> <Prior> {PageUp key}
 	PageDown <<PageDown>> <Next> {PageDown key}

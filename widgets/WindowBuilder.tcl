@@ -33,8 +33,10 @@ option add *Classy::WindowBuilder_select.stickyForeground black widgetDefault
 option add *Classy::WindowBuilder_select.width 5 widgetDefault
 option add *Classy::WindowBuilder_select.height 5 widgetDefault
 option add *Classy::WindowBuilder_tool.highlightThickness 0 widgetDefault
-option add *Classy::WindowBuilder_tool.indel.background [option get . darkBackground DarkBackground] widgetDefault
-option add *Classy::WindowBuilder_tool.resize.background [option get . darkBackground DarkBackground] widgetDefault
+option add *Classy::WindowBuilder_tool.indel.background \
+	[Classy::realcolor [Classy::optionget . darkBackground DarkBackground darkBackground]] widgetDefault
+option add *Classy::WindowBuilder_tool.resize.background \
+	[Classy::realcolor [Classy::optionget . darkBackground DarkBackground darkBackground]] widgetDefault
 
 bind Classy::WindowBuilder_select <<Action-ButtonPress>> "\[Classy::WindowBuilder_win %W\] _sticky start %W %X %Y"
 bind Classy::WindowBuilder_select <<Action-Motion>> "\[Classy::WindowBuilder_win %W\] _sticky motion %W %X %Y"
@@ -81,7 +83,7 @@ Classy::WindowBuilder classmethod init {args} {
 			bind $c <<Drag>> "DragDrop start %X %Y $type -types [list [list create $command]] -image [Classy::geticon Builder/$name]"			
 		}
 	}
-	Classy::Paned $object.pane -window $object.icons -orient vertical
+	Classy::Paned $object.pane -window $object.icons -orient horizontal
 	Classy::NoteBook $object.book
 		$object.book configure -width 100 -height 100
 		$object.book propagate off
@@ -556,7 +558,6 @@ Classy::WindowBuilder method code {{function {}}} {
 }
 
 Classy::WindowBuilder method open {file function} {
-putsvars file function
 	global auto_index
 	private $object data current border
 	if [info exists data(base)] {
@@ -1818,7 +1819,7 @@ Classy::WindowBuilder method _createattributes {w} {
 	listbox $w.list -yscrollcommand [list $w.scroll set] -takefocus 1 -width 10
 	scrollbar $w.scroll -orient vertical -command [list $w.list yview]
 	frame $w.edit
-	Classy::Paned $w.pane -orient vertical -window $w.list
+	Classy::Paned $w.pane -orient horizontal -window $w.list
 	grid $w.type -row 0 -column 0 -columnspan 2 -sticky nwse
 	grid $w.list -row 1 -column 0 -sticky nwse
 	grid $w.scroll -row 1 -column 1 -sticky ns
@@ -1941,7 +1942,7 @@ Classy::WindowBuilder method _createbindings {w} {
 	grid columnconfigure $w.b 0 -weight 1
 	listbox $w.list -yscrollcommand [list $w.scroll set] -takefocus 1 -width 5
 	scrollbar $w.scroll -orient vertical -command [list $w.list yview]
-	Classy::Paned $w.pane -orient vertical -window $w.list
+	Classy::Paned $w.pane -orient horizontal -window $w.list
 	frame $w.edit
 #	grid $w.bindtags -row 0 -column 0 -columnspan 4 -sticky we
 	grid $w.b -row 1 -column 0 -columnspan 2 -sticky nwse
@@ -2213,7 +2214,6 @@ Classy::WindowBuilder method _dialogoptiondelete {option} {
 
 Classy::WindowBuilder method _createcode {window} {
 	frame $window
-putsvars window
 	Classy::NoteBook $window.book 
 	grid $window.book -row 0 -column 0 -sticky nesw
 	frame $window.book.options

@@ -1103,7 +1103,7 @@ Classy::Editor method _reconfigure {} {
 		foreach {option name class} {
 			-font font Font
 			-foreground foreground Foreground
-	      -background background Background
+			-background background Background
 			-highlightbackground highlightBackground HighlightBackground
 			-highlightcolor highlightColor HighlightColor
 			-highlightthickness highlightThickness HighlightThickness
@@ -1116,7 +1116,7 @@ Classy::Editor method _reconfigure {} {
 	 		-selectforeground selectForeground Background
 			-troughcolor troughColor Background
 		} {
-			catch {[::Classy::window $w] configure $option [option get $w $name $class]}
+			catch {[::Classy::window $w] configure $option [Classy::optionget $w $name $class]}
 		}
 	}
 	if [winfo exists $object.find] {

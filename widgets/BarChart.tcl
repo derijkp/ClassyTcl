@@ -205,7 +205,7 @@ Classy::BarChart method _create {name num} {
 	private $object data tag options
 	set canvas $options(-canvas)
 	if {"$canvas" == ""} return
-	set colors [option get . colorList ColorList]
+	set colors [Classy::optionget . colorList ColorList]
 	regsub -all {{|}} $colors {} colors
 	set color [lindex $colors $num]
 	if {"$color" == ""} {

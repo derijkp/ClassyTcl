@@ -36,6 +36,7 @@ proc browse {tree dir} {
 			}
 		}
 	}
+	update idletasks
 	.c configure -scrollregion [.c bbox all]
 }
 
