@@ -48,15 +48,15 @@ proc ::Classy::busy {{action {add}} args} {
 			update idletasks
 			if [regexp {^\.} $action] {list_unshift args $action;set action add}
 			if {"$action"!="add"} {
-				error "Unkown action $action: should be one of add, remove status"
+				error "Unkown action $action: should be one of add, remove or status"
 			}
 			if {"$args"==""} {
 				set args .
 			}
 			foreach p $args {
-				if {"$p"=="."} {
+				if [string_equal $p .] {
 					set pattern $p*
-				} else {
+				} elseif ![catch {winfo id $p}] {
 					set pattern $p.*
 					if ![info exists ::Classy::busy($p,c)] {
 						set ::Classy::busy($p,c) [$p cget -cursor]
@@ -68,11 +68,12 @@ proc ::Classy::busy {{action {add}} args} {
 					}
 				}
 				foreach w [lsort [info commands $pattern]] {
-					if ![info exists ::Classy::busy($p,c)] {
+					if [catch {winfo id $w}] continue
+					if ![info exists ::Classy::busy($w,c)] {
 						set ::Classy::busy($w,c) [$w cget -cursor]
 						$w configure -cursor watch
 					}
-					if ![info exists ::Classy::busy($p,bt)] {
+					if ![info exists ::Classy::busy($w,bt)] {
 						set ::Classy::busy($w,bt) [bindtags $w]
 						bindtags $w none
 					}

@@ -42,6 +42,7 @@ test Classy::Toplevel {keepgeometry 1} {
 		grid .try.b1 -sticky nwse
 		grid .try.b2 -sticky nwse
 		grid columnconfigure . 0 -weight 1
+		bind .try <Escape> {destroy .try}
 	} -text "Click for toplevel"
 	pack .b
 	manualtest
@@ -103,7 +104,6 @@ test Classy::Toplevel {do not execute destroycommand when error in init} {
 	catch {Test .try} res
 	set ::try
 } {0}
-
 
 testsummarize
 

@@ -44,6 +44,17 @@ proc Classy::getbitmap {name {reload {}}} {
 	return "@$file"
 }
 
+proc Classy::findicon {name} {
+	foreach type {appuser appdef user def} {
+		set base [file join $::Classy::dir($type) icons $name]
+		foreach type {{} .gif .xbm} {
+			if [file readable $base$type] {
+				return $base$type
+			}
+		}
+	}
+}
+
 proc Classy::geticon {name {reload {}}} {
 	if [info exists ::Classy::icons($name)] {
 		if {"$reload" == ""} {
@@ -53,15 +64,7 @@ proc Classy::geticon {name {reload {}}} {
 			unset ::Classy::icons($name)
 		}
 	}
-	set file ""
-	foreach type {appuser appdef user def} {
-		set base [file join $::Classy::dir($type) icons $name]
-		foreach type {{} .gif .xbm} {
-			if [file readable $base$type] {
-				set file $base$type
-			}
-		}
-	}
+	set file [Classy::findicon $name]
 	if {"$file" == ""} {
 		error "Could not find icon \"$name\""
 	} else {

@@ -231,7 +231,6 @@ Classy::Tree method _redraw {} {
 	::Classy::canceltodo $object _redraw
 	set canvas $options(-canvas)
 	if {"$canvas" == ""} return
-	::Classy::busy
 	$canvas delete $options(-tag)
 	if {("$options(-rootimage)" == "")&&("$options(-roottext)" == "")} {
 		set i [$canvas create text $options(-startx) $options(-starty) -text "" \
@@ -287,7 +286,6 @@ Classy::Tree method _redraw {} {
 		}
 	}
 	$canvas lower $options(-tag)_selection
-	::Classy::busy remove
 }
 
 #doc {Tree command addnode} cmd {

@@ -112,7 +112,7 @@ Classy::SelectDialog addoption -addcommand {addCommand AddCommand {}} {
 			-command "$object invoke add" \
 			-default [getprivate $object options(-default)] \
 			-combo [getprivate $object options(-combo)] \
-			-combopreset [getprivate $object options(-combopreset)] \
+			-combopreset [getprivate $object options(-combopreset)]
 		pack $object.options.add -side bottom -fill x
 		$object add add "Add" [list $object _add] Insert
 	}

@@ -136,6 +136,8 @@ Classy::Toplevel method hide {} {
 #}
 Classy::Toplevel method place {} {
 	private $object options
+	set bx $::Classy::bx
+	set by $::Classy::by
 	set resize $options(-resize)
 	update idletasks
 	set keeppos 0
@@ -162,9 +164,9 @@ Classy::Toplevel method place {} {
 			if {$xs>$minw} {set w $xs}
 			if {$ys>$minh} {set h $ys}
 			if {"$keepgeometry" != "all"} {
-				set temp [expr [winfo pointerx .]-$prevx]
+				set temp [expr {[winfo pointerx .]-$prevx}]
 				if {($temp>0)&&($temp<$w)} {
-					set temp [expr [winfo pointery .]-$prevy]
+					set temp [expr {[winfo pointery .]-$prevy}]
 					if {($temp>0)&&($temp<$h)} {
 						set keeppos 1
 						set x $prevx
@@ -180,17 +182,18 @@ Classy::Toplevel method place {} {
 	}
 	# position
 	if !$keeppos {
-		set maxx [expr [winfo vrootwidth $object]-$w]
-		set maxy [expr [winfo vrootheight $object]-$h]
-		set x [expr [winfo pointerx .]-$w/2]
-		set y [expr [winfo pointery .]-$h/2]
+		set maxx [expr {[winfo vrootwidth $object]-$w}]
+		set maxy [expr {[winfo vrootheight $object]-$h}]
+		set x [expr {[winfo pointerx .]-$w/2}]
+		set y [expr {[winfo pointery .]-$h/2}]
 		if {$x>$maxx} {set x $maxx}
 		if {$y>$maxy} {set y $maxy}
+#		if {$x<$bx} {set x $bx}
 		if {$x<0} {set x 0}
-		if {$y<0} {set y 0}
+		if {$y<$by} {set y $by}
+#		if {$y<0} {set y 0}
 	}
 	wm geometry $object +1000000+1000000
-	update idletasks
 	if {"$::tcl_platform(platform)" != "windows"} {
 		wm deiconify $object
 		raise $object
@@ -201,6 +204,7 @@ Classy::Toplevel method place {} {
 		wm deiconify $object
 		wm geometry $object ${w}x${h}+$x+$y
 	}
+	focus $object
 }
 
 # ------------------------------------------------------------------

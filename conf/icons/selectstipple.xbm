@@ -1,0 +1,4 @@
+#define selectionstipple_width 4
+#define selectionstipple_height 2
+static unsigned char selectionstipple_bits[] = {
+  0x0f, 0x00, };

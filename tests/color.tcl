@@ -79,5 +79,14 @@ test getcolor {getcolor} {
 	Classy::getcolor -initialcolor yellow
 } {yellow}
 
+test getcolor {getcolor} {
+	classyclean
+	option add *GetColor Classy startupFile
+	set ::temp {}
+	Classy::getcolor -initialcolor yellow -command {set ::temp}
+	tkwait variable temp
+	set ::temp
+} {yellow}
+
 testsummarize
 

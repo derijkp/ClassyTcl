@@ -16,7 +16,7 @@
 # The progress will be displayed as the fraction of ticks passed (
 # ticks are passed by invoking the incr method), compared to the number 
 # of ticks to go (-ticks options). The display will be updated every
-# -step ticks
+# -refresh miliseconds (if incr is called enough)
 #}
 #doc {Progress options} h2 {
 #	Progress specific options
@@ -25,7 +25,7 @@
 #	Progress specific methods
 #}
 
-bind Classy::Progress <Configure> {Classy::todo %W _redraw}
+bind Classy::Progress <Configure> {Classy::todo %W redraw}
 
 # ------------------------------------------------------------------
 #  Widget creation
@@ -34,7 +34,7 @@ bind Classy::Progress <Configure> {Classy::todo %W _redraw}
 Widget subclass Classy::Progress
 
 Classy::Progress method init {args} {
-	private $object w
+	private $object w clicks refresh
 	set w [super init canvas]
 	$w configure -width 100 -height 16 -relief sunken
 	$w create rectangle 0 0 0 16 -fill green -tags bar
@@ -49,6 +49,8 @@ Classy::Progress method init {args} {
 	# REM Configure initial arguments
 	# -------------------------------
 	if {"$args" != ""} {eval $object configure $args}
+	set clicks [clock clicks]
+	set refresh [expr {50*$::Classy::clickspms}]
 	update idletasks
 }
 
@@ -62,9 +64,12 @@ Classy::Progress chainoptions {$object}
 #}
 Classy::Progress addoption -ticks {ticks Ticks 100}
 
-#doc {Progress options -step} option {-step step Step} descr {
+#doc {Progress options -refresh} option {-refresh refresh Refresh} descr {
 #}
-Classy::Progress addoption -step {step Step 1}
+Classy::Progress addoption -refresh {refresh Refresh 50} {
+	private $object refresh
+	set refresh [expr {$value*$::Classy::clickspms}]
+}
 
 # ------------------------------------------------------------------
 #  Methods
@@ -75,13 +80,13 @@ Classy::Progress addoption -step {step Step 1}
 #} descr {
 #}
 Classy::Progress method incr {{value 1}} {
-	private $object current next options
-	set step $options(-step)
+	private $object current clicks
 	incr current $value
-	if {$current<$next} {return}
-	incr next $step
-	$object _redraw
-	update idletasks
+	if {[clock clicks] < $clicks} return
+	$object redraw
+	update
+	private $object refresh
+	set clicks [expr {[clock clicks] + $refresh}]
 }
 
 #doc {Progress command set} cmd {
@@ -89,12 +94,10 @@ Classy::Progress method incr {{value 1}} {
 #} descr {
 #}
 Classy::Progress method set {value} {
-	private $object current next options
-	set step $options(-step)
+	private $object current
 	set current $value
-	set next [expr {$value+$step}]
-	$object _redraw
-	update idletasks
+	$object redraw
+	update
 }
 
 #doc {Progress command get} cmd {
@@ -126,7 +129,12 @@ Classy::Progress method barconfigure {args} {
 	eval $w itemconfigure bar $args
 }
 
-Classy::Progress method _redraw {} {
+#doc {Progress command redraw} cmd {
+#pathname redraw
+#} descr {
+# redraw progress bar
+#}
+Classy::Progress method redraw {} {
 	private $object w current options
 	set ticks $options(-ticks)
 	if {$ticks == 0} {set ticks 1}

@@ -486,7 +486,8 @@ Classy::Entry method combo_draw {args} {
 	eval $w.list insert end $list
 	set mainw $object.frame.entry
 	set xpos [winfo rootx $mainw]
-	set ypos [expr {[winfo rooty $mainw] + [winfo height $mainw]}]
+#	set ypos [expr {[winfo rooty $mainw] + [winfo height $mainw] - [winfo height $mainw]}]
+	set ypos [winfo rooty $mainw]
 	set width [winfo width $mainw]
 	set maxheight [expr {[winfo screenheight $mainw] - $ypos}]
 	set noscroll 0

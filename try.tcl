@@ -1,5 +1,29 @@
-source testapp.tcl
+source tools.tcl
+set object .try
+Classy_printdialog .try -command {invoke {} {puts $args}}
+
+$object.options.paper.select configure -value
+.try configure -printsize A4
+.try configure -portrait 0
+
+set d .classy__.printdialog
+test Classy::Canvas {print dialog} {
+	classyclean
+	Classy::Canvas .try
+	.try configure -papersize A4
+	pack .try -fill both -expand yes
+	set id [.try create text 10 10 -text "A"]
+	.try create text 50 50 -text "B" -font {times 14 bold}
+	.try create line 20 10 60 50 -width 4
+	.try itemconfigure $id -text
+	.try configure -papersize A5-l
+	.try print
+	manualtest
+} {}
+
 Classy::Builder .builder
+.builder configure -dir /home/peter/dev/ClassyTcl/dialogs
+
 set file /home/peter/dev/ClassyTcl/tests/testapp/lib/interface/mainw.tcl
 set function mainw
 set type toplevel

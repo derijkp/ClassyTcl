@@ -6,32 +6,8 @@
 # element name is the name of a command and the value is
 # a script that loads the command.
 
-set auto_index(::Classy::config_saveas) [list source [file join $dir ConfigDialogcmds.tcl]]
-set auto_index(::Classy::config_start) [list source [file join $dir ConfigDialogcmds.tcl]]
-set auto_index(::Classy::config_browse) [list source [file join $dir ConfigDialogcmds.tcl]]
-set auto_index(::Classy::config_close) [list source [file join $dir ConfigDialogcmds.tcl]]
-set auto_index(::Classy::config_open) [list source [file join $dir ConfigDialogcmds.tcl]]
-set auto_index(::Classy::config_selectlevel) [list source [file join $dir ConfigDialogcmds.tcl]]
-set auto_index(::Classy::config_setleveltype) [list source [file join $dir ConfigDialogcmds.tcl]]
-set auto_index(::Classy::config_reset) [list source [file join $dir ConfigDialogcmds.tcl]]
-set auto_index(::Classy::config_load) [list source [file join $dir ConfigDialogcmds.tcl]]
-set auto_index(::Classy::config_save) [list source [file join $dir ConfigDialogcmds.tcl]]
-set auto_index(::Classy::config_test) [list source [file join $dir ConfigDialogcmds.tcl]]
-set auto_index(::Classy::config_loadfile) [list source [file join $dir ConfigDialogcmds.tcl]]
-set auto_index(::Classy::config_redraw) [list source [file join $dir ConfigDialogcmds.tcl]]
-set auto_index(::Classy::config_clear) [list source [file join $dir ConfigDialogcmds.tcl]]
-set auto_index(::Classy::config_reconfigurefont) [list source [file join $dir ConfigDialogcmds.tcl]]
-set auto_index(::Classy::config_reconfigurecolor) [list source [file join $dir ConfigDialogcmds.tcl]]
-set auto_index(::Classy::config_setoption) [list source [file join $dir ConfigDialogcmds.tcl]]
-set auto_index(::Classy::config_get) [list source [file join $dir ConfigDialogcmds.tcl]]
-set auto_index(::Classy::config_movenode) [list source [file join $dir ConfigDialogcmds.tcl]]
-set auto_index(::Classy::config_addnode) [list source [file join $dir ConfigDialogcmds.tcl]]
-set auto_index(::Classy::config_deletenode) [list source [file join $dir ConfigDialogcmds.tcl]]
-set auto_index(::Classy::config_changenode) [list source [file join $dir ConfigDialogcmds.tcl]]
-set auto_index(::Classy::config_destroy) [list source [file join $dir ConfigDialogcmds.tcl]]
 
 # Addition of ClassyTcl classes defined in the directory
-set auto_index(Classy_config) [list source [file join $dir Classy_config.tcl]]
-set auto_index(Classy_configedit) [list source [file join $dir Classy_configedit.tcl]]
 set auto_index(Classy_printdialog) [list source [file join $dir Classy_printdialog.tcl]]
 set auto_index(Classy_menueditor) [list source [file join $dir Classy_menueditor.tcl]]
+set auto_index(Classy_printscalingdialog) [list source [file join $dir Classy_printscalingdialog.tcl]]

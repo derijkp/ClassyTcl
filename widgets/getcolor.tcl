@@ -31,6 +31,7 @@ proc Classy::getcolor {args} {
 	Classy::parseopt $args opt {
 		-initialcolor {} white
 		-title {} "Set color"
+		-command {} {}
 	} remain
 	if {"$remain" != ""} {
 		error "unknown options \"$remain\": must be -initialcolor or -title"
@@ -47,18 +48,23 @@ proc Classy::getcolor {args} {
 		set ::Classy::temp ""
 		destroy .classy__.getcolor
 	}
-	.classy__.getcolor add go "Select" {
-		set ::Classy::temp [.classy__.getcolor.options.select get]
-	} default
+	if [string length $opt(-command)] {
+		.classy__.getcolor add go "Select" "$opt(-command) \[.classy__.getcolor.options.select get\]" default
+		.classy__.getcolor persistent add go
+	} else {
+		.classy__.getcolor add go "Select" {set ::Classy::temp [.classy__.getcolor.options.select get]} default
+	}
 	Classy::ColorSelect .classy__.getcolor.options.select
 	catch {.classy__.getcolor.options.select set $opt(-initialcolor)}
 	pack .classy__.getcolor.options.select -fill both -expand yes
 	.classy__.getcolor place
-	tkwait window .classy__.getcolor
-	if {"$::Classy::temp"==""} {
-		return -code return ""
-	} else {
-		return $::Classy::temp
+	if ![string length $opt(-command)] {
+		tkwait window .classy__.getcolor
+		if {"$::Classy::temp"==""} {
+			return -code return ""
+		} else {
+			return $::Classy::temp
+		}
 	}
 }
 

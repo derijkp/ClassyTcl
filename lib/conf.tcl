@@ -82,6 +82,37 @@ proc Classy::realfont {font} {
 	return $font
 }
 
+proc Classy::getpapersize {descr} {
+	if {[llength $descr] != 1} {return $descr}
+	set portrait 0
+	set orient -p
+	set p $descr
+	regexp {^(.+)(-l|-p)$} $descr temp p orient
+	set c [structlist_get [Classy::optionget . paperSizes PaperSizes {
+		User      "595p 842p"
+		Letter    "612p 792p"
+		Tabloid   "792p 1224p"
+		Ledger    "1224p 792p"
+		Legal     "612p 1008p"
+		Statement "396p 612p"
+		Executive "540p 720p"
+		A0        "2380p 3368p"
+		A1        "1684p 2380p"
+		A2        "1190p 1684p"
+		A3        "842p 1190p"
+		A4        "595p 842p"
+		A5        "420p 595p"
+		B4        "729p 1032p"
+		B5        "516p 729p"
+		Folio     "612p 936p"
+		Quarto    "610p 780p"
+	}] $p]
+	if {"$orient" == "-l"} {
+		set c [list_reverse $c]
+	}
+	return $c
+}
+
 proc Classy::conf_buildcache {files} {
 	foreach file $files {
 		catch {array set conf [file_read $file]}

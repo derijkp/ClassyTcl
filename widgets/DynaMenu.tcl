@@ -104,6 +104,7 @@ Classy::DynaMenu classmethod cmdw {menutype {cmdw {}}} {
 	if {"$cmdw"==""} {
 		return [Classy::mainw $cmdws($menutype)]
 	} else {
+		set cmdw [Classy::mainw $cmdw]
 		if {"$cmdws($menutype)"=="$cmdw"} {return $cmdw}
 		set cmdws($menutype) $cmdw
 		private $class checks

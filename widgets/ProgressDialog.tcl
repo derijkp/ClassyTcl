@@ -15,8 +15,7 @@
 # creates a dialog in which the ProgressDialog of some action will be displayed.
 # The ProgressDialog will be displayed as the fraction of ticks passed (
 # ticks are passed by invoking the incr method), compared to the number 
-# of ticks to go (-ticks options). The display will be updated every
-# -step ticks
+# of ticks to go (-ticks options).
 #}
 #doc {ProgressDialog options} h2 {
 #	ProgressDialog specific options
@@ -32,6 +31,7 @@
 Classy::Dialog subclass Classy::ProgressDialog
 
 Classy::ProgressDialog method init {args} {
+	private $object clicks refresh
 	super init -title "ProgressDialog"
 	message $object.options.message -text "Progress" -justify center
 	frame $object.options.frame -relief sunken -height 20
@@ -52,6 +52,8 @@ Classy::ProgressDialog method init {args} {
 	# REM Configure initial arguments
 	# -------------------------------
 	if {"$args" != ""} {eval $object configure $args}
+	set clicks [clock clicks]
+	set refresh [expr {50*$::Classy::clickspms}]
 	update idletasks
 }
 
@@ -63,10 +65,6 @@ Classy::ProgressDialog component message {$object.options.message}
 #doc {ProgressDialog options -ticks} option {-ticks ticks Ticks} descr {
 #}
 Classy::ProgressDialog addoption -ticks {ticks Ticks 100}
-
-#doc {ProgressDialog options -step} option {-step step Step} descr {
-#}
-Classy::ProgressDialog addoption -step {step Step 1}
 
 #doc {ProgressDialog options -width} option {-width width Width} descr {
 #}
@@ -80,6 +78,13 @@ Classy::ProgressDialog chainoption -fg {$object.options.frame.prog} -bg
 #}
 Classy::ProgressDialog chainoption -message {$object.options.message} -text
 
+#doc {ProgressDialog options -refresh} option {-refresh refresh Refresh} descr {
+#}
+Classy::ProgressDialog addoption -refresh {refresh Refresh 50} {
+	private $object refresh
+	set refresh [expr {$value*$::Classy::clickspms}]
+}
+
 # ------------------------------------------------------------------
 #  Methods
 # ------------------------------------------------------------------
@@ -89,18 +94,13 @@ Classy::ProgressDialog chainoption -message {$object.options.message} -text
 #} descr {
 #}
 Classy::ProgressDialog method incr {{value 1}} {
-	set step [getprivate $object options(-step)]
-	set ticks [getprivate $object options(-ticks)]
-	private $object current next
+	private $object current clicks
 	incr current $value
-	if {$current<$next} {return}
-	incr next $step
-	if {$value<0} {set value 0}
-	if {$value>$ticks} {set value $ticks}
-	set ratio [expr double($current)/$ticks]
-	$object.options.percent configure -text "[expr int($ratio*100)]%"
-	$object.options.frame.prog configure -width [expr int($ratio*[winfo width $object.options.frame])]
-	update idletasks
+	if {[clock clicks] < $clicks} return
+	$object redraw
+	update
+	private $object refresh
+	set clicks [expr {[clock clicks] + $refresh}]
 }
 
 #doc {ProgressDialog command set} cmd {
@@ -108,14 +108,10 @@ Classy::ProgressDialog method incr {{value 1}} {
 #} descr {
 #}
 Classy::ProgressDialog method set {value} {
-	set ticks [getprivate $object options(-ticks)]
 	private $object current
 	set current $value
-	if {$value<0} {set value 0}
-	if {$value>$ticks} {set value $ticks}
-	set ratio [expr double($current)/$ticks]
-	$object.options.percent configure -text "[expr int($ratio*100)]%"
-	$object.options.frame.prog configure -width [expr int($ratio*[winfo width $object.options.frame])]
+	$object redraw
+	update
 }
 
 #doc {ProgressDialog command get} cmd {
@@ -127,3 +123,19 @@ Classy::ProgressDialog method get {} {
 	return $current
 }
 
+#doc {Progress command redraw} cmd {
+#pathname redraw
+#} descr {
+# redraw progress bar
+#}
+Classy::ProgressDialog method redraw {} {
+	private $object w current options
+	set ticks $options(-ticks)
+	if {$ticks == 0} {set ticks 1}
+	if {$current<0} {set current 0}
+	if {$current>$ticks} {set current $ticks}
+	set ratio [expr double($current)/$ticks]
+	$object.options.percent configure -text "[expr int($ratio*100)]%"
+	$object.options.frame.prog configure -width [expr int($ratio*[winfo width $object.options.frame])]
+	update idletasks
+}

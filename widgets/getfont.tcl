@@ -47,7 +47,15 @@ proc Classy::getfont {args} {
 		set ::Classy::temp ""
 		::Classy::Dialog .classy__.fontselect -help classy_font_select
 		set w [.classy__.fontselect component options]
-		.classy__.fontselect add go "Select" "set ::Classy::temp \[$w.fontselect get\]" default
+		set pos [lsearch $args -command]
+		if {$pos != -1} {
+			set pos2 [expr {$pos+1}]
+			.classy__.fontselect add go "Select" "[lindex $args $pos2] \[$w.fontselect get\]" default
+			set args [lreplace $args $pos $pos2]
+			.classy__.fontselect persistent add go
+		} else {
+			.classy__.fontselect add go "Select" "set ::Classy::temp \[$w.fontselect get\]" default
+		}
 		::Classy::FontSelect $w.fontselect -command "$w.fontselect.font nocmdset \[$w.fontselect get\]"
 		if [catch {
 			if {"$args"!=""} {eval $w.fontselect configure $args}
@@ -58,8 +66,10 @@ proc Classy::getfont {args} {
 		pack $w.fontselect -fill both -expand yes
 		update idletasks
 		.classy__.fontselect configure -resize {1 1}
-		tkwait window .classy__.fontselect
-		return $::Classy::temp
+		if {$pos == -1} {
+			tkwait window .classy__.fontselect
+			return $::Classy::temp
+		}
 	}
 }
 

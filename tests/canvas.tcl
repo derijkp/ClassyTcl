@@ -3,7 +3,7 @@
 exec wish8.0 "$0" "$@"
 
 source tools.tcl
-set object .trys
+set object .try
 
 if 0 {
 	classyclean
@@ -885,6 +885,19 @@ test Classy::Canvas {print dialog} {
 	manualtest
 } {}
 
+test Classy::Canvas {print dialog} {
+	classyclean
+	Classy::Canvas .try
+	.try configure -papersize A4
+	pack .try -fill both -expand yes
+	set id [.try create text 10 10 -text "A"]
+	.try create text 50 50 -text "B" -font {times 14 bold}
+	.try create line 20 10 60 50 -width 4
+	.try itemconfigure $id -text
+	.try print
+	manualtest
+} {}
+
 test Classy::Canvas {itemcget float width} {
 	classyclean
 	Classy::Canvas .try
@@ -949,5 +962,43 @@ test Classy::Canvas {undo scale to fractional font size} {
 	.try undo
 	.try itemcget $id -font
 } {helvetica 12.0}
+
+test Classy::Canvas {changedcommand} {
+	classyclean
+	set ::temp 0
+	Classy::Canvas .try
+	pack .try -fill both -expand yes
+	set id [.try create text 10 10 -text "A" -tags try -font {helvetica 12}]
+	.try configure -changedcommand {set ::temp 1}
+	.try scale try 0 0 1.2 1.2
+	set ::temp
+} {1}
+
+test Classy::Canvas {-selectstipple} {
+	classyclean
+	Classy::Canvas .try
+	.try configure -selectstipple gray75
+	pack .try -fill both -expand yes
+	set id [.try create text 10 10 -text "A" -tags txt]
+	.try create text 50 50 -text "B" -font {times 14 bold}
+	.try create line 20 10 60 50 -width 4
+	.try selection add $id
+	.try cget -selectstipple
+} gray75
+
+.try configure -selectstipple solid
+.try configure -selectstipple gray50
+
+test Classy::Canvas {-selectstipple from file} {
+	classyclean
+	Classy::Canvas .try
+	.try configure -selectstipple selectstipple
+	pack .try -fill both -expand yes
+	set id [.try create text 10 10 -text "A" -tags txt]
+	.try create text 50 50 -text "B" -font {times 14 bold}
+	.try create line 20 10 60 50 -width 4
+	.try selection add $id
+	string_equal [.try cget -selectstipple] @[Classy::getconf icons/selectstipple.xbm]
+} 1
 
 testsummarize

@@ -155,14 +155,26 @@ test Classy::FontSelector {basic} {
 	classyclean
 	Classy::FontSelect .try
 	pack .try -fill both -expand yes
+	.try set {times 16 bold italic underline}
+	.try set {times 16 {bold italic overstrike}}
+	.try set {times 16.2 italic}
 	.try set {helvetica 16 {bold}}
 	.try get
 } {helvetica 16 {bold roman}}
 
 test Classy::getfont {basic} {
 	classyclean
-	Classy::getfont -font {times 16 {bold roman}}
+	Classy::getfont -font {times 16 {bold italic}}
 } {times 16 {bold roman}}
+
+test Classy::getfont {command} {
+	classyclean
+	set ::temp {}
+	Classy::getfont -font {times 16 bold italic} -command {set ::temp}
+	tkwait variable temp
+	set ::temp
+} {times 16 {bold roman}}
+
 } else {
 test Classy::FontSelector {basic} {
 	classyclean
@@ -187,38 +199,42 @@ test Classy::RepeatButton {basic} {
 
 test Classy::Progress {basic} {
 	classyclean
-	Classy::Progress .try -ticks 1000 -step 100
+	Classy::Progress .try -ticks 10000
 	pack .try -fill x -expand yes
 	#.try set 50
-	for {set i 0} {$i<1000} {incr i} {
+	for {set i 0} {$i<10000} {incr i} {
 		.try incr
 	}
+	.try redraw
 	.try get
-} {1000}
+} {10000}
 
 test Classy::Progress {run 2 times} {
 	classyclean
-	Classy::Progress .try -ticks 1000 -step 100
+	Classy::Progress .try -ticks 1000
 	pack .try -fill x -expand yes
 	for {set i 0} {$i<1000} {incr i} {
 		.try incr
 	}
+	.try redraw
 	.try set 0
 	for {set i 0} {$i<1000} {incr i} {
 		.try incr
 	}
+	.try redraw
 	.try get
 } {1000}
 
 test Classy::ProgressDialog {basic} {
 	classyclean
-	Classy::ProgressDialog .try -message "Testing\n Please wait" -ticks 1000 -step 100
+	Classy::ProgressDialog .try -message "Testing\n Please wait" -ticks 5000
 	#.try set 50
-	for {set i 0} {$i<1000} {incr i} {
+	for {set i 0} {$i<5000} {incr i} {
 		.try incr
 	}
+	.try redraw
 	.try get
-} {1000}
+} {5000}
 
 test Classy::OptionMenu {basic} {
 	classyclean

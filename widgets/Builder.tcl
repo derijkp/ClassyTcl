@@ -169,13 +169,9 @@ Classy::Builder method new {type {name {}}} {
 			close $f
 			set dir [file dir $file]
 			set base [list $file $name [string tolower $cmd]]
-			if [string_equal $dir $defdir] {
-				set parent {}
-			} else {
-				set parent [list $dir {} dir]
-			}
+			set parent [list $dir {} dir]
 			$object.browse addnode $parent $base \
-				-type end -text $name -image [Classy::geticon new[string tolower $cmd]]
+				-text $name -image [Classy::geticon new[string tolower $cmd]]
 		}
 		return
 	} elseif [string_equal $type option] {
@@ -972,4 +968,3 @@ Classy::Builder method rename {args} {
 		}
 	}
 }
-

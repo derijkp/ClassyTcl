@@ -115,11 +115,13 @@ test Classy::Entry {textvariable set before} {
 	.try get
 } {t}
 
+source tools.tcl
+
 test Classy::Entry {combo} {
 	classyclean
 	set ::try t
 	Classy::Entry .try -textvariable try -combo 10
-	pack .try
+	pack .try -fill x -expand yes
 	.try set test
 	.try set test2
 	.try.defaults invoke
@@ -177,6 +179,13 @@ test Classy::Entry {-labelbackground} {
 	pack .try
 	.try cget -labelbackground
 } {green}
+
+test Classy::Entry {-default} {
+	classyclean
+	Classy::Default set app try {test {test 2}}
+	Classy::Entry .try -label try -default try
+	pack .try -fill x -expand yes
+} {vertical}
 
 testsummarize
 

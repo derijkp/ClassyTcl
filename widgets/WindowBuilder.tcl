@@ -196,8 +196,8 @@ Classy::WindowBuilder method select {w} {
 	$object.children configure -list [concat {Select {Select parent}} $flist]
 	$object.children set Select
 	focus $w
-	Classy::todo $object drawedit
 	Classy::todo $object redraw
+	Classy::todo $object drawedit
 }
 
 Classy::WindowBuilder method current {} {
@@ -649,11 +649,11 @@ Classy::WindowBuilder method open {file} {
 		}
 	}
 	set data(class,$window) $type
-	update idletasks
+#	update idletasks
 	set geom [Classy::Default get geometry $object.work.keep]
 	if {"$geom" != ""} {
 		wm geometry $object.work $geom
-		update idletasks
+#		update idletasks
 		set geom [split [winfo geometry $object.work] "x+"]
 		set w [lindex $geom 0]
 		set h [lindex $geom 1]
@@ -670,7 +670,7 @@ Classy::WindowBuilder method open {file} {
 	}
 	$object parsecode $data(code)
 	$object startedit $data(base)
-	Classy::todo $object select $data(base)
+#	Classy::todo $object select $data(base)
 	wm title $object $file
 }
 
@@ -1004,7 +1004,7 @@ Classy::WindowBuilder method delete {{list {}}} {
 	private $object data current
 	set keep $current(w)
 	if {"$list" == ""} {set list $keep}
-	catch {$object finalcode}
+#	catch {$object finalcode}
 	set p [winfo parent [lindex $list end]]
 	foreach base $list {
 		set type [$object itemclass $base]

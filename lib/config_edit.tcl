@@ -14,7 +14,6 @@ proc Classy::config_edit_new {} {
 }
 
 proc Classy::config_edit_pos {pos} {
-putsvars pos
 	upvar #0 Classy::configedit configedit
 	set w .classy__.configedit.options
 	set tpos $pos
@@ -299,8 +298,8 @@ proc Classy::config_edit_getdef {dir pos} {
 proc Classy::config_edit_create {} {
 	upvar #0 Classy::configedit configedit
 	set dir [file dir $configedit(file)]
-	catch {file create $dir menu}
-	catch {file create $dir toolbar}
+	catch {file mkdir [file join $dir menu]}
+	catch {file mkdir [file join $dir toolbar]}
 	set file [file join $dir conf.values]
 	if [file exists $file] {
 		if ![Classy::yorn "Overwrite file \"$file\"?"] return
