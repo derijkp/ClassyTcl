@@ -105,7 +105,7 @@ Classy::Canvas	addoption -papersize {papeSize PaperSize {}} {
 		set orient p
 		set p $value
 		regexp {^(.+)(-l|-p)$} $value temp p orient
-		set c [structlget [Classy::optionget $object paperSizes PaperSizes {
+		set c [structlist_get [Classy::optionget $object paperSizes PaperSizes {
 User      "595p 842p"
 Letter    "612p 792p"
 Tabloid   "792p 1224p"
@@ -2109,7 +2109,7 @@ Classy::Canvas method doprint {args} {
 	foreach {option value} $args {
 		switch -- $option {
 			-size {
-				set c [structlget [Classy::optionget $object paperSizes PaperSizes {
+				set c [structlist_get [Classy::optionget $object paperSizes PaperSizes {
 User      "595p 842p"
 Letter    "612p 792p"
 Tabloid   "792p 1224p"

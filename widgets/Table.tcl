@@ -1324,7 +1324,7 @@ Classy::Table method tag {option tag args} {
 			} elseif {$len == 1} {
 				set option [lindex $args 0]
 				if [info exists data(style,$tag)] {
-					if ![catch {structlget $data(style,$tag) $option} value] {
+					if ![catch {structlist_get $data(style,$tag) $option} value] {
 						return $value
 					}
 				}

@@ -269,10 +269,10 @@ Classy::Tree method _redraw {} {
 	foreach node $selection {
 		if ![info exists data($node)] continue
 		if [catch {
-			set bbox [$canvas bbox [structlget $data($node) i]]
+			set bbox [$canvas bbox [structlist_get $data($node) i]]
 			set x1 [lindex $bbox 0]
 			set y1 [lindex $bbox 1]
-			set item [structlget $data($node) ti]
+			set item [structlist_get $data($node) ti]
 			set bbox [$canvas bbox $item]
 			$canvas itemconfigure $item -fill $fg
 			set x2 [lindex $bbox 2]
@@ -447,7 +447,7 @@ Classy::Tree method exists {node} {
 #}
 Classy::Tree method type {node} {
 	private $object data
-	switch [structlget $data($node) t] {
+	switch [structlist_get $data($node) t] {
 		c {return closed}
 		f {return open}
 		e {return end}
@@ -498,7 +498,7 @@ Classy::Tree method what {index {y {}}} {
 #}
 Classy::Tree method parentnode {node} {
 	private $object data
-	return [structlget $data($node) p]
+	return [structlist_get $data($node) p]
 }
 
 #doc {Tree command children} cmd {
@@ -507,7 +507,7 @@ Classy::Tree method parentnode {node} {
 #}
 Classy::Tree method children {node} {
 	private $object data
-	return [structlget $data($node) l]
+	return [structlist_get $data($node) l]
 }
 
 #doc {Tree command selection} cmd {

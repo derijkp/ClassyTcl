@@ -459,7 +459,7 @@ Classy::WindowBuilder method newpos {p col} {
 	set row -1
 	foreach slave [grid slaves $p -column $col] {
 		if [regexp {.classy__[a-z0-9]+$} $slave] continue
-		set temp [structlget [grid info $slave] -row]
+		set temp [structlist_get [grid info $slave] -row]
 		if {$temp > $row} {set row $temp}
 	}
 	incr row
@@ -1127,13 +1127,14 @@ Classy::WindowBuilder method save {{file {}}} {
 	uplevel #0 $code
 	file_write $file "Classy::$type subclass $function\n$code"
 	set result $function
+	Classy::auto_mkindex [file dir $file]
 	return $result
 }
 
 Classy::WindowBuilder method gridremovecolumn {p pos} {
 	foreach slave [grid slaves $p -column $pos] {
 		if {"$slave" == "$object.work.classy__c$pos"} continue
-		if {[structlget [grid info $slave] -column] == $pos} {
+		if {[structlist_get [grid info $slave] -column] == $pos} {
 			error "cannot remove column $pos: it is not empty"
 			return
 		}
@@ -1184,7 +1185,7 @@ Classy::WindowBuilder method gridinsertcolumn {p pos} {
 Classy::WindowBuilder method gridremoverow {p pos} {
 	foreach slave [grid slaves $p -row $pos] {
 		if {"$slave" == "$object.work.classy__r$pos"} continue
-		if {[structlget [grid info $slave] -row] == $pos} {
+		if {[structlist_get [grid info $slave] -row] == $pos} {
 			error "cannot remove row $pos: it is not empty"
 			return
 		}
@@ -1243,7 +1244,7 @@ Classy::WindowBuilder method _indelcol {pos} {
 	}
 	foreach slave [grid slaves $current(p) -column $pos] {
 		if {"$slave" == "$object.work.classy__c$pos"} continue
-		if {[structlget [grid info $slave] -column] == $pos} {
+		if {[structlist_get [grid info $slave] -column] == $pos} {
 			$object gridinsertcolumn $current(p) $pos
 			return
 		}
@@ -1262,7 +1263,7 @@ Classy::WindowBuilder method _indelrow {pos} {
 	}
 	foreach slave [grid slaves $current(p) -row $pos] {
 		if {"$slave" == "$object.work.classy__r$pos"} continue
-		if {[structlget [grid info $slave] -row] == $pos} {
+		if {[structlist_get [grid info $slave] -row] == $pos} {
 			$object gridinsertrow $current(p) $pos
 			return
 		}
@@ -1288,7 +1289,7 @@ Classy::WindowBuilder method switch {p w col row} {
 
 Classy::WindowBuilder method gridinsert {p col row} {
 	foreach slave [grid slaves $p -column $col] {
-		set slave([structlget [grid info $slave] -row]) $slave
+		set slave([structlist_get [grid info $slave] -row]) $slave
 	}
 	set pos $row
 	while ([info exists slave($pos)]) {
@@ -2006,7 +2007,7 @@ Classy::WindowBuilder method drop {dst} {
 		if {"[winfo class $dst]" != "Classy::WindowBuilder_tool"} {
 			set dst [winfo parent $dst]
 		}
-		set dst [structlget [grid info $dst] -in]
+		set dst [structlist_get [grid info $dst] -in]
 	}
 	if {"[Classy::DragDrop types create]" != ""} {
 		set type [Classy::DragDrop get]
@@ -2348,7 +2349,7 @@ Classy::WindowBuilder method class2cmd {type} {
 #	set p .try.dedit.work.options
 #	foreach slave [grid slaves $p] {
 #		set info [grid info $slave]
-#		puts "grid $slave -row [structlget $info -row] -column [structlget $info -column]"
+#		puts "grid $slave -row [structlist_get $info -row] -column [structlist_get $info -column]"
 #	}	
 #	puts "set from $current(-row)"
 #	puts "set col $current(-column)"

@@ -42,7 +42,7 @@ test Classy::NumEntry {create with configuration configure} {
 	Classy::NumEntry .try -label int -constraint int -warn 0
 	pack .try
 	.try cget -constraint
-} {^(-?)[0-9]*$}
+} {int}
 
 test Classy::NumEntry {min} {
 	classyclean

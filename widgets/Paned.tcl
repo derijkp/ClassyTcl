@@ -222,7 +222,7 @@ Classy::Paned method _start {x y} {
 	set data(gain) 0
 	if {"$orient"=="horizontal"} {
 		set data(gridpos) $info(-column)
-		if {[structlget $temp -column] < $info(-column)} {
+		if {[structlist_get $temp -column] < $info(-column)} {
 			set data(rev) 1
 		} else {
 			set data(rev) 0
@@ -235,7 +235,7 @@ Classy::Paned method _start {x y} {
 		grid columnconfigure $data(master) $data(gridpos) -minsize $data(startsize)
 		if [string length $options(-gainfrom)] {
 			if {"[winfo manager $options(-gainfrom)]"!="grid"} {error  "$window not managed by grid"}
-			set data(gainpos) [structlget [grid info $options(-gainfrom)] -column]
+			set data(gainpos) [structlist_get [grid info $options(-gainfrom)] -column]
 			if {[grid columnconfigure $data(master) $data(gainpos) -weight] == 0} {
 				set data(gain) 1
 			} else {
@@ -244,7 +244,7 @@ Classy::Paned method _start {x y} {
 		}
 	} else {
 		set data(gridpos) $info(-row)
-		if {[structlget $temp -row] < $info(-row)} {
+		if {[structlist_get $temp -row] < $info(-row)} {
 			set data(rev) 1
 		} else {
 			set data(rev) 0
@@ -257,7 +257,7 @@ Classy::Paned method _start {x y} {
 		grid rowconfigure $data(master) $data(gridpos) -minsize $data(startsize)
 		if [string length $options(-gainfrom)] {
 			if {"[winfo manager $options(-gainfrom)]"!="grid"} {error  "$window not managed by grid"}
-			set data(gainpos) [structlget [grid info $options(-gainfrom)] -row]
+			set data(gainpos) [structlist_get [grid info $options(-gainfrom)] -row]
 			if {[grid rowconfigure $data(master) $data(gainpos) -weight] == 0} {
 				set data(gain) 1
 			} else {

@@ -34,7 +34,7 @@ file=$TK_CONFIG_DIR/tkConfig.sh
 AC_ARG_WITH(installdir, [  --with-installdir=DIR		directory in which to put Tcl extensions
 DIR], INSTALL_DIR=$withval, INSTALL_DIR=`cd ${exec_prefix}/lib; pwd`)
 
-AC_ARG_WITH(bindir, [  --with-bindir=DIR		directory in which to put links to the RnaViz binary
+AC_ARG_WITH(bindir, [  --with-bindir=DIR		directory in which to put links to the binaries
 DIR], BIN_DIR=$withval, BIN_DIR=`cd ${exec_prefix}/bin; pwd`)
 
 CC=$TCL_CC

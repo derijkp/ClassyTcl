@@ -11,7 +11,7 @@ proc Classy::config_saveas window {
 proc Classy::config_start window {
 	upvar #0 ::Classy::config conf
 	if [info exists conf(tree)] {
-		foreach node [structlfields $conf(tree)] {
+		foreach node [structlist_fields $conf(tree)] {
 			catch {$window.browse deletenode $node}
 		}
 	}
@@ -24,7 +24,7 @@ proc Classy::config_start window {
 		}
 	}
 	set fields {Colors Fonts Keys Mouse Misc Toolbars Menus}
-	foreach field [structlfields $conf(tree)] {
+	foreach field [structlist_fields $conf(tree)] {
 		list_addnew fields $field
 	}
 	foreach field $fields {
@@ -39,14 +39,14 @@ proc Classy::config_start window {
 
 proc Classy::config_browse {window node} {
 upvar ::Classy::config conf
-foreach field [structlfields $conf(tree) $node] {
+foreach field [structlist_fields $conf(tree) $node] {
 	set type [lindex $node 0]
 	if [catch {Classy::geticon config_$type} icon] {
 		set icon [Classy::geticon config_Unknown]
 	}
 	set newnode $node
 	lappend newnode $field
-	set id [structlget $conf(tree) $newnode]
+	set id [structlist_get $conf(tree) $newnode]
 	if {[llength $id] != 1} {
 		$window addnode $node $newnode -text $field -image $icon
 	} else {
@@ -82,7 +82,7 @@ proc Classy::config_open {window node} {
 	}
 	$window selection clear
 	$window selection add $node
-	if [catch {structlget $conf(tree) $node} id] {
+	if [catch {structlist_get $conf(tree) $node} id] {
 		error "Configuration node \"$node\" not found"
 	}
 	$w.frame.descr configure -text $conf($id,descr)
@@ -340,7 +340,7 @@ proc Classy::config_loadfile {file level {reload {}}} {
 		set line [gets $f]
 		if ![string length $line] continue
 		set pos [string trimleft $line "# "]
-		if [catch {structlget $conf(tree) $pos} id] {
+		if [catch {structlist_get $conf(tree) $pos} id] {
 			incr conf(lastid)
 			set id $conf(lastid)
 			set conf(tree) [structlist_set $conf(tree) $pos $id]
@@ -391,7 +391,7 @@ foreach node [$window.browse children {}] {
 	$window.browse deletenode $node
 }
 set fields {Colors Fonts Keys Mouse Misc Toolbars Menus}
-foreach field [structlfields $conf(tree)] {
+foreach field [structlist_fields $conf(tree)] {
 	list_addnew fields $field
 }
 foreach field $fields {
@@ -491,10 +491,10 @@ proc Classy::config_setoption {type level id {value {}}} {
 proc Classy::config_get {level root} {
 	upvar #0 ::Classy::config conf
 	set result ""
-	foreach sub [structlfields $conf(tree) $root] {
+	foreach sub [structlist_fields $conf(tree) $root] {
 		set ssub [concat $root [list $sub]]
-		if [catch {structlfields $conf(tree) $ssub}] {
-			set id [structlget $conf(tree) $ssub]
+		if [catch {structlist_fields $conf(tree) $ssub}] {
+			set id [structlist_get $conf(tree) $ssub]
 			if [info exists conf($id,$level,changed)] {
 				lappend conf(forsave) $id,$level,changed
 			}
@@ -519,19 +519,19 @@ proc Classy::config_movenode {window tonode} {
 upvar #0 ::Classy::config conf
 set node $::Classy::config(node)
 #set tonode $::Classy::config(cnode)
-if [catch {structlget $conf(tree) $node} id] {
+if [catch {structlist_get $conf(tree) $node} id] {
 	error "Node \"$node\" does not exist"
 }
 if {[llength $id] != 1} {
 	error "Node \"$node\" is not an endnode"
 }
-if ![catch {structlget $conf(tree) $tonode}] {
+if ![catch {structlist_get $conf(tree) $tonode}] {
 	error "Node \"$tonode\" already exist"
 }
 
 if ![Classy::yorn "Are you sure you want to move node \n\"$node\"\nto\n\"$tonode\""] return
 set conf($id,pos) $tonode
-set conf(tree) [structlunset $conf(tree) $node]
+set conf(tree) [structlist_unset $conf(tree) $node]
 set conf(tree) [structlist_set $conf(tree) $tonode $id]
 Classy::config_redraw $window
 set selection $tonode
@@ -559,7 +559,7 @@ set value $conf(cvalue)
 set type $conf(ctype)
 set id $conf(lastid)
 incr conf(lastid)
-if ![catch {structlget $conf(tree) $node}] {
+if ![catch {structlist_get $conf(tree) $node}] {
 	error "Cannot create node \"$node\": already exists"
 }
 set parent $node
@@ -567,8 +567,8 @@ list_pop parent
 if ![llength $parent] {
 	error "root can only contain subnodes"
 }
-#if ![catch {set temp [structlfields $conf(tree) $parent]}] {
-#	if ![catch {structlfields $conf(tree) [concat $parent [list [lindex $temp 0]]]}] {
+#if ![catch {set temp [structlist_fields $conf(tree) $parent]}] {
+#	if ![catch {structlist_fields $conf(tree) [concat $parent [list [lindex $temp 0]]]}] {
 #		error "node \"$parent\" already contains subnodes, so you cannot add a value to it"
 #	}
 #}
@@ -602,16 +602,16 @@ upvar #0 ::Classy::config conf
 if ![llength $node] {
 	set node $::Classy::config(cnode)
 }
-if [catch {structlget $conf(tree) $node} id] {
+if [catch {structlist_get $conf(tree) $node} id] {
 	error "Node \"$node\" does not exist"
 }
 if {[llength $id] != 1} {
-	set fields [structlfields $id {}]
+	set fields [structlist_fields $id {}]
 	foreach field $fields {
 		Classy::config_deletenode $window [concat $node [list $field]]
 	}
-	if ![llength [structlget $conf(tree) $node]] {
-		set conf(tree) [structlunset $conf(tree) $node]
+	if ![llength [structlist_get $conf(tree) $node]] {
+		set conf(tree) [structlist_unset $conf(tree) $node]
 	}
 }
 if ![Classy::yorn "Are you sure you want to delete node \"$node\""] return
@@ -625,7 +625,7 @@ foreach level {def user appdef appuser} {
 	}
 	catch {unset conf($id,comment,$level)}
 }
-set conf(tree) [structlunset $conf(tree) $node]
+set conf(tree) [structlist_unset $conf(tree) $node]
 Classy::config_redraw $window
 }
 

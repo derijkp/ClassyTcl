@@ -19,7 +19,7 @@ ac_help="$ac_help
   --with-installdir=DIR		directory in which to put Tcl extensions
 DIR"
 ac_help="$ac_help
-  --with-bindir=DIR		directory in which to put links to the RnaViz binary
+  --with-bindir=DIR		directory in which to put links to the binaries
 DIR"
 
 # Initialize some variables set by options.

@@ -155,7 +155,7 @@ $object.options.paper.select set User
 		-command [varsubst object {invoke {window} {
 set size [$object.options.paper.select get]
 set ::Classy::print(size) $size
-set papersize [structlget [option get $object paperSizes PaperSizes] $size]
+set papersize [structlist_get [option get $object paperSizes PaperSizes] $size]
 $object.options.paper.width nocmdset [lindex $papersize 0]
 $object.options.paper.height nocmdset [lindex $papersize 1]
 } $object}] \

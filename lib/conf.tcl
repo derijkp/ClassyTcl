@@ -257,7 +257,7 @@ proc Classy::newconfig {type level {name {}} {descr {}}} {
 	if [inlist [Classy::DynaTool types] $name] {
 		error "Toolbar \"$name\" already exists"
 	}
-	catch {set ltype [structlget {color Colors font Fonts misc Misc mouse Mouse key Keys menu Menus toolbar Toolbars} $type]}
+	catch {set ltype [structlist_get {color Colors font Fonts misc Misc mouse Mouse key Keys menu Menus toolbar Toolbars} $type]}
 	switch $type {
 		toolbar {
 			set file [file join $Classy::dir($level) init $ltype.conf]
