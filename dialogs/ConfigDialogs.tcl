@@ -58,6 +58,7 @@ proc Classy::config_saveas args {# ClassyTcl generated Dialog
 	Classy::parseopt $args opt {-variable {} ::Classy::tempa -level {} appuser}
 	# Create windows
 	Classy::Dialog $window  \
+		-help classy_configure \
 		-title {Save as}
 	Classy::OptionBox $window.options.level  \
 		-label Level \
@@ -75,16 +76,14 @@ proc Classy::config_saveas args {# ClassyTcl generated Dialog
 	grid $window.options.named -row 1 -column 0 -sticky new
 	grid columnconfigure $window.options 0 -weight 1
 
+	# End windows
 # ClassyTcl Initialise
 set var $opt(-variable)
 	# Parse this
-	$window add b1 Go [varsubst {var window} {
-	Classy::Config saveas $var \
-		[$window.options.level get] \
-		[$window.options.named get]
-}] default
+	$window persistent set 
 # ClassyTcl Finalise
 $window.options.level set $opt(-level)
+	return $window
 }
 
 proc Classy::config_tool args {# ClassyTcl generated Frame
@@ -468,5 +467,6 @@ $window.top.level configure -list $list
 $window.top.level set $level
 	return $window
 }
+
 
 

@@ -26,6 +26,7 @@ proc ::Classy::Selector {} {}
 proc Selector {} {}
 }
 
+catch {auto_load Classy::ScrolledText}
 option add *Classy::Selector.highlightThickness 0 widgetDefault
 
 # ------------------------------------------------------------------

@@ -4,12 +4,13 @@
 
 proc ::Classy::WindowBuilder::start_Classy::Dialog {object base} {
 	private $object data
-	set buttons [lremove [winfo children $base.actions] $base.actions.close]
+	set buttons [lremove [winfo children $base.actions] $base.actions.close $base.actions.help]
 	$object startedit $buttons
 	foreach b $buttons {
 		set data(class,$b) Classy::DialogButton
 	}
 	bindtags $base.actions.close Classy::none
+	catch {bindtags $base.actions.help Classy::none}
 	$object startedit [winfo children $base.options]
 	set data(redir,$base.actions) $base
 	set data(parent,$base.options) $base.options
@@ -28,7 +29,7 @@ proc ::Classy::WindowBuilder::edit_Classy::Dialog {object w} {
 	eval destroy [winfo children $w]
 	frame $w.general
 	::Classy::WindowBuilder::defattredit $object $w.general {
-		-title Title 0 -keepgeometry Keepgeometry 0 -closecommand Closecommand 1
+		-title Title 0 -keepgeometry Keepgeometry 0 -help Help 0 -closecommand Closecommand 1
 	} 12 0
 	set ::Classy::WindowBuilder::error {}
 	button $w.addb -text "Add Button" -command [list ::Classy::WindowBuilder::Dialog_addbutton $object $c]
@@ -47,7 +48,7 @@ proc ::Classy::WindowBuilder::generate_Classy::Dialog {object base} {
 	append body [$object gridconf $base.options]
 	append body "\n"
 	set def 1
-	foreach b [lremove [$base button] close] {
+	foreach b [llremove [$base button] {close help}] {
 		catch {
 			append data(parse) "\t$outw add $b [$object getoption $base.actions.$b -text]"
 			append data(parse) " [$object getoption $base.actions.$b -command]"
@@ -95,6 +96,9 @@ proc ::Classy::WindowBuilder::attr_Classy::DialogButton_name {object w args} {
 		return [lindex [split $w {\.}] end]
 	} else {
 		set value [lindex $args 0]
+		if {"$value" == "help"} {
+			error "To create a help button, use the help option"
+		}
 		set split [split $w {\.}]
 		[winfo toplevel $w] rename [lindex $split end] $value
 		set nw [join [lreplace $split end end $value] .]

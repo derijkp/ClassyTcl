@@ -77,21 +77,21 @@ Classy::OptionBox addoption -orient {orient Orient horizontal} {
 		pack $object.label -side top -fill x -expand yes
 		pack $object.box -side bottom -fill x -expand yes
 		foreach child $children {
-			pack $child -side top -fill x -expand yes
+			pack $child -side top -fill x
 		}
 	} elseif {"$value" == "stacked"} {
 		set children [winfo children $object.box]
 		pack $object.label -side top -fill both
 		pack $object.box -side right -fill x -expand yes
 		foreach child $children {
-			pack $child -side left -fill x -expand yes
+			pack $child -side left -fill x
 		}
 	} else {
 		set children [winfo children $object.box]
 		pack $object.label -side left -fill both
 		pack $object.box -side right -fill x -expand yes
 		foreach child $children {
-			pack $child -side left -fill x -expand yes
+			pack $child -side left -fill x
 		}
 	}
 }
@@ -129,9 +129,9 @@ Classy::OptionBox method add {item text args} {
 	radiobutton $object.box.b$num -relief flat -anchor w\
 		-variable $varname -text $text -value $item
 	if {"$options(-orient)" == "vertical"} {
-		pack $object.box.b$num -side top -fill x -expand yes
+		pack $object.box.b$num -side top -fill x
 	} else {
-		pack $object.box.b$num -side left -fill x -expand yes
+		pack $object.box.b$num -side left -fill x
 	}
 	if {"$args" != ""} {eval $object.box.b$num configure $args}
 	return $object.box.b$num

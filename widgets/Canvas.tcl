@@ -1413,6 +1413,7 @@ Classy::Canvas method selection {action {list {}}} {
 			catch {$w itemconfigure all -stipple {}}
 			catch {$w itemconfigure all -outlinestipple {}}
 			$w dtag _sel
+			Classy::todo $object selection redraw
 			if $data(undo) {
 				set post {}
 				if {"$pre" != "$post"} {
@@ -1876,14 +1877,44 @@ Classy::Canvas method _getprint {var} {
 	private $object w data
 	upvar #0 ::$var print
 	if $print(portrait) {set rotate 0} else {set rotate 1}
-	set xoffset [winfo fpixels $object $print(xoffset)]
-	set yoffset [winfo fpixels $object $print(yoffset)]
-	return [$w postscript \
+	set x [winfo fpixels $object $print(x)]
+	set y [winfo fpixels $object $print(y)]
+	if $print(scaledxy) {
+		set x [expr {100.0*$x/$print(scale)}]
+		set y [expr {100.0*$y/$print(scale)}]
+	}
+	set pagewidth [expr {$print(scale)*$print(pwidth)/[winfo fpixels $object 100p]}]
+	set height $print(height)
+	if [regexp {[0-9]$} $height] {append height p}
+	set pagey $print(pagey)
+	if [regexp {[0-9]$} $pagey] {append pagey p}
+	set pagey [expr {([winfo fpixels $object $height] - [winfo fpixels $object $pagey])/[winfo fpixels $object 1p]}]
+	set list [$w find withtag _sel]
+	if {"$list" != ""} {
+		catch {$w itemconfigure all -stipple {}}
+		catch {$w itemconfigure all -outlinestipple {}}
+		$w coords $data(cur) -1000 -1000 -1000 -1000
+		foreach name {nw n ne e se s sw w} {
+			$w coords $data($name) -1000 -1000
+		}
+		$w coords $data(sel) -1000 -1000 -1000 -1000
+		$w delete _ind
+	}
+	set result [$w postscript \
 		-rotate $rotate -colormode $print(colormode) \
 		-width $print(pwidth) -height $print(pheight) \
-		-pagewidth [expr {$print(scale)*$print(pwidth)/100.0}] \
-		-x $xoffset -y $yoffset \
-		-pageanchor nw -pagex 0 -pagey 0]
+		-pagewidth $pagewidth \
+		-x $x -y $y \
+		-pageanchor $print(pageanchor) -pagex $print(pagex) -pagey $pagey]
+	if {"$list" != ""} {
+		catch {$w itemconfigure all -stipple gray50}
+		catch {$w itemconfigure all -outlinestipple gray50}
+		catch {$w itemconfigure _sel -stipple {}}
+		catch {$w itemconfigure _sel -outlinestipple {}}
+		$w itemconfigure _page -stipple {}
+		Classy::todo $object selection redraw
+	}
+	return $result
 }
 
 #doc {Canvas command print} cmd {
@@ -1894,5 +1925,10 @@ Classy::Canvas method _getprint {var} {
 Classy::Canvas method print {} {
 	private $object w data
 	set page [$w coords _page]
-	Classy::printdialog -papersize [lrange $page 2 3] -getdata [list $object _getprint]
+	if [winfo exists .classy__.printdialog] {
+		.classy__.printdialog place
+	} else {
+		Classy::printdialog .classy__.printdialog -papersize [lrange $page 2 3] -getdata [list $object _getprint]
+		.classy__.printdialog configure -cache 1
+	}
 }

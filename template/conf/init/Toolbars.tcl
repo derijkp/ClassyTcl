@@ -11,9 +11,6 @@ Classy::configtool MainTool {Application main toolbar} {
 	action cut "Cut" {error "cut not implemented yet"}
 	action paste "Paste" {error "paste not implemented yet"}
 	separator
-
-
-
 }
 
 

@@ -1,32 +1,32 @@
 #Application menu configuration file
 
 Classy::configmenu MainMenu {Main application menu} {
-	menu file "File" {
-		action Load "Open file" {error "cannot load \"[Classy::selectfile -title Open -selectmode persistent]\" yet"}
-		action Save "Save" {error "save not implemented yet"}
-		action SaveAs "Save as" {error "save not implemented yet"}
+	menu "File" {
+		action "Open file" {error "cannot load \"[Classy::selectfile -title Open -selectmode persistent]\" yet"} <<Load>>
+		action "Save" {error "save not implemented yet"} <<Save>>
+		action "Save as" {error "save not implemented yet"} <<SaveAs>>
 		separator
-		action Editor "New editor" {edit newfile}
-		action Cmd "Command window" {Classy::cmd}
-		action Builder "Builder" {Classy::Builder .classy__.builder}
-		action Configure "Customise application" {Classy::Config dialog}
-		action ConfigureMenu "Customise menu" {Classy::Config config menu MainMenu}
-		action ConfigureTool "Customise toolbar" {Classy::Config config tool MainTool}
-		action Exit "Exit" "exit"
+		action "New editor" {edit newfile} <<Editor>>
+		action "Command window" {Classy::cmd} <<Cmd>>
+		action "Builder" {Classy::Builder .classy__.builder} <<Builder>>
+		action "Customise application" {Classy::Config dialog} <<Configure>>
+		action "Customise menu" {Classy::Config config menu MainMenu} <<ConfigureMenu>>
+		action "Customise toolbar" {Classy::Config config tool MainTool} <<ConfigureTool>>
+		action "Exit" "exit" <<Exit>>
 	}
-	menu edit "Edit" {
-		action Cut "Cut" {error "cut not implemented yet"}
-		action Copy "Copy" {error "copy not implemented yet"}
-		action Paste "Paste" {error "paste not implemented yet"}
-		action Undo "Undo" {error "undo not implemented yet"}
-		action Redo "Redo" {error "redo not implemented yet"}
-		action ClearUndo "Clear undo buffer" {error "clearundo not implemented yet"}
+	menu "Edit" {
+		action "Cut" {error "cut not implemented yet"} <<Cut>>
+		action "Copy" {error "copy not implemented yet"} <<Copy>>
+		action "Paste" {error "paste not implemented yet"} <<Paste>>
+		action "Undo" {error "undo not implemented yet"} <<Undo>>
+		action "Redo" {error "redo not implemented yet"} <<Redo>>
+		action "Clear undo buffer" {error "clearundo not implemented yet"} <<ClearUndo>>
 	}
-	menu help "Help" {
-		action Help "Application" {Classy::help application}
+	menu "Help" {
+		action "Application" {Classy::help application} <<Help>>
 		separator
-		action HelpClassyTcl "ClassyTcl" {Classy::help ClassyTcl}
-		action HelpHelp "Help" {Classy::help help}
+		action "ClassyTcl" {Classy::help ClassyTcl} <<HelpClassyTcl>>
+		action "Help" {Classy::help help} <<HelpHelp>>
 	}
 
 }

@@ -55,7 +55,7 @@ Classy::configmenu MainMenu {Main application menu} {
 		action "Application" {Classy::help application} <<Help>>
 		separator
 		action "ClassyTcl" {Classy::help ClassyTcl} <<HelpClassyTcl>>
-		action "Help" {Classy::help help} <<HelpHelp>>
+		action "Help" {Classy::help classy_help} <<HelpHelp>>
 	}
 
 
@@ -65,7 +65,9 @@ Classy::configmenu MainMenu {Main application menu} {
 
 
 
+
 }
+
 
 
 

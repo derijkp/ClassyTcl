@@ -150,7 +150,10 @@ Classy::CmdWidget method do {} {
 			$w insert end $result
 			$w insert end "\n"
 		}
-		$object insert end [subst $options(-prompt)] prompt
+		if [catch [list send $connection subst [list $options(-prompt)]] prompt] {
+			set prompt [subst $options(-prompt)]
+		}
+		$object insert end $prompt prompt
 		incr cmdnum
 		set histnum $cmdnum
 		$object mark set cmdstart "end-1c"
@@ -386,6 +389,22 @@ Classy::CmdWidget method paste {} {
 #}
 Classy::CmdWidget method clear {} {
 	$object delete cmdstart end
+}
+
+#doc {CmdWidget command clearall} cmd {
+#pathname clearall
+#} descr {
+# clear the entire cmd widget
+#}
+Classy::CmdWidget method clearall {} {
+	private $object connection options
+	$object delete 1.0 end
+	if [catch [list send $connection subst [list $options(-prompt)]] prompt] {
+		set prompt [subst $options(-prompt)]
+	}
+	$object insert end $prompt prompt
+	$object mark set cmdstart "end-1c"
+	$object mark gravity cmdstart left
 }
 
 #doc {CmdWidget command historyup} cmd {
@@ -869,6 +888,7 @@ Classy::CmdWidget method connect {args} {
 	send $connection [list proc puts args $puts]
 	set interactive [send $connection set tcl_interactive]
 	send $connection set tcl_interactive 1
+	$object clearall
 }
 
 if ![info exists Classy__unknowntempf] {

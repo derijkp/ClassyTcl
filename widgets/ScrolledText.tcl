@@ -24,7 +24,7 @@ proc ScrolledText {} {}
 }
 
 option add *Classy::ScrolledText.highlightThickness 0 widgetDefault
-
+catch {auto_load Classy::Text}
 bind Classy::ScrolledText <Configure> {Classy::todo %W redraw}
 
 # ------------------------------------------------------------------

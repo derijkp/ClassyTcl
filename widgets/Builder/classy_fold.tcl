@@ -6,6 +6,7 @@ proc ::Classy::WindowBuilder::add_Classy::Fold {object base args} {
 	private $object data
 	Classy::Fold $base -title Fold
 	eval $base configure $args
+	[$base component content] configure -height 10
 	return $base
 }
 

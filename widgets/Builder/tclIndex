@@ -15,6 +15,7 @@ set auto_index(::Classy::WindowBuilder::edit_Classy::Dialog) [list source [file 
 set auto_index(::Classy::WindowBuilder::generate_Classy::Dialog) [list source [file join $dir classy_dialog.tcl]]
 set auto_index(::Classy::WindowBuilder::Dialog_addbutton) [list source [file join $dir classy_dialog.tcl]]
 set auto_index(::Classy::WindowBuilder::attr_Classy::DialogButton_name) [list source [file join $dir classy_dialog.tcl]]
+set auto_index(::Classy::WindowBuilder::attr_Classy::DialogButton_persistent) [list source [file join $dir classy_dialog.tcl]]
 set auto_index(::Classy::WindowBuilder::edit_Classy::DialogButton) [list source [file join $dir classy_dialog.tcl]]
 set auto_index(::Classy::WindowBuilder::generate_Classy::DialogButton) [list source [file join $dir classy_dialog.tcl]]
 set auto_index(::Classy::WindowBuilder::parse_Classy::Dialog) [list source [file join $dir classy_dialog.tcl]]
@@ -137,3 +138,5 @@ set auto_index(::Classy::WindowBuilder::add_Classy::Selector) [list source [file
 set auto_index(::Classy::WindowBuilder::attr_Classy::Selector_initialvalue) [list source [file join $dir classy_selector.tcl]]
 set auto_index(::Classy::WindowBuilder::attr_Classy::Selector_-type) [list source [file join $dir classy_selector.tcl]]
 set auto_index(::Classy::WindowBuilder::edit_Classy::Selector) [list source [file join $dir classy_selector.tcl]]
+set auto_index(::Classy::WindowBuilder::add_Classy::CmdWidget) [list source [file join $dir classy_cmdwidget.tcl]]
+set auto_index(::Classy::WindowBuilder::edit_Classy::CmdWidget) [list source [file join $dir classy_cmdwidget.tcl]]

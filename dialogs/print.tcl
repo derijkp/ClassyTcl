@@ -9,6 +9,7 @@ proc Classy::printdialog args {# ClassyTcl generated Dialog
 	Classy::parseopt $args opt {-papersize {} {} -getdata {} {}}
 	# Create windows
 	Classy::Dialog $window  \
+		-help classy_print \
 		-destroycommand {destroy .b.dedit.work} \
 		-title Print
 	Classy::Entry $window.options.entry1 \
@@ -28,18 +29,18 @@ proc Classy::printdialog args {# ClassyTcl generated Dialog
 	
 	button $window.options.button1 \
 		-text {Select file}
-	grid $window.options.button1 -row 4 -column 1 -sticky nesw
+	grid $window.options.button1 -row 3 -column 2 -sticky nesw
 	Classy::Entry $window.options.file \
 		-label File \
 		-default Classy::print_file \
 		-textvariable ::Classy::print(file) \
 		-width 4
-	grid $window.options.file -row 4 -column 0 -sticky nesw
+	grid $window.options.file -row 3 -column 0 -columnspan 2 -sticky nesw
 	frame $window.options.paper  \
 		-borderwidth 0 \
 		-height 10 \
 		-width 10
-	grid $window.options.paper -row 1 -column 0 -columnspan 2 -sticky nesw
+	grid $window.options.paper -row 0 -column 0 -columnspan 3 -sticky nesw
 	label $window.options.paper.label1 \
 		-text Papersize
 	grid $window.options.paper.label1 -row 0 -column 0 -sticky nesw
@@ -60,81 +61,105 @@ proc Classy::printdialog args {# ClassyTcl generated Dialog
 	Classy::OptionMenu $window.options.paper.select 
 	grid $window.options.paper.select -row 0 -column 1 -sticky nesw
 	$window.options.paper.select set {}
-	radiobutton $window.options.paper.radiobutton1 \
-		-anchor w \
-		-text Portrait \
-		-value 1 \
-		-variable ::Classy::print(portrait)
-	grid $window.options.paper.radiobutton1 -row 1 -column 0 -sticky nesw
-	radiobutton $window.options.paper.radiobutton2 \
-		-anchor w \
-		-text Landscape \
-		-value 0 \
-		-variable ::Classy::print(portrait)
-	grid $window.options.paper.radiobutton2 -row 1 -column 1 -sticky nesw
 	Classy::OptionBox $window.options.paper.cmode  \
 		-label Colormode \
 		-variable ::Classy::print(colormode) \
 		-relief flat
-	grid $window.options.paper.cmode -row 2 -column 0 -columnspan 3 -sticky nesw
+	grid $window.options.paper.cmode -row 3 -column 0 -columnspan 3 -sticky nesw
 	$window.options.paper.cmode add color Color
 	$window.options.paper.cmode add gray Gray
 	$window.options.paper.cmode add mono Mono
 	$window.options.paper.cmode set color
+	checkbutton $window.options.paper.autoscale1 \
+		-text {Auto scale} \
+		-variable ::Classy::print(autoscale)
+	grid $window.options.paper.autoscale1 -row 1 -column 0 -sticky nesw
+	Classy::NumEntry $window.options.paper.scale1 \
+		-textvariable ::Classy::print(scale) \
+		-width 3
+	grid $window.options.paper.scale1 -row 1 -column 1 -sticky nesw
+	Classy::OptionBox $window.options.paper.optionbox1  \
+		-label Orientation \
+		-variable ::Classy::print(portrait) \
+		-bd 0 \
+		-borderwidth 0
+	grid $window.options.paper.optionbox1 -row 2 -column 0 -columnspan 3 -sticky nesw
+	$window.options.paper.optionbox1 add 1 Portrait
+	$window.options.paper.optionbox1 add 0 Landscape
+	$window.options.paper.optionbox1 set 1
 	grid columnconfigure $window.options.paper 2 -weight 1
-	grid rowconfigure $window.options.paper 2 -weight 1
+	grid rowconfigure $window.options.paper 3 -weight 1
 	Classy::Entry $window.options.printcommand \
 		-label {Print command} \
 		-default Classy::print_command \
 		-textvariable ::Classy::print(command) \
 		-width 4
-	grid $window.options.printcommand -row 3 -column 0 -columnspan 2 -sticky nesw
+	grid $window.options.printcommand -row 2 -column 0 -columnspan 3 -sticky nesw
 	frame $window.options.frame1  \
 		-borderwidth 2 \
 		-height 10 \
 		-relief groove \
 		-width 10
 	
-	frame $window.options.offset  \
+	frame $window.options.advanced  \
 		-borderwidth 2 \
 		-height 10 \
 		-relief groove \
 		-width 10
-	grid $window.options.offset -row 2 -column 0 -columnspan 2 -sticky nesw
-	Classy::NumEntry $window.options.offset.scale \
-		-textvariable ::Classy::print(scale) \
-		-width 3
-	grid $window.options.offset.scale -row 1 -column 0 -sticky nesw
-	checkbutton $window.options.offset.autoscale \
-		-text {Auto scale} \
-		-variable ::Classy::print(autoscale)
-	grid $window.options.offset.autoscale -row 0 -column 0 -sticky nesw
-	Classy::Entry $window.options.offset.entry1 \
-		-label {X offset} \
-		-textvariable ::Classy::print(xoffset) \
+	grid $window.options.advanced -row 1 -column 0 -columnspan 3 -sticky nesw
+	Classy::Entry $window.options.advanced.pagey \
+		-label {Page Y} \
+		-textvariable ::Classy::print(pagey) \
 		-width 4
-	grid $window.options.offset.entry1 -row 0 -column 1 -sticky nesw
-	Classy::Entry $window.options.offset.entry2 \
-		-label {Y offset} \
-		-textvariable ::Classy::print(yoffset) \
+	grid $window.options.advanced.pagey -row 3 -column 1 -sticky nesw
+	Classy::Entry $window.options.advanced.pagex \
+		-label {Page X} \
+		-textvariable ::Classy::print(pagex) \
 		-width 4
-	grid $window.options.offset.entry2 -row 1 -column 1 -sticky nesw
-	grid columnconfigure $window.options.offset 0 -weight 1
-	grid columnconfigure $window.options.offset 1 -weight 1
-	grid columnconfigure $window.options 0 -weight 1
+	grid $window.options.advanced.pagex -row 2 -column 1 -sticky nesw
+	Classy::Entry $window.options.advanced.x \
+		-label X \
+		-textvariable ::Classy::print(x) \
+		-width 4
+	grid $window.options.advanced.x -row 2 -column 0 -sticky nesw
+	Classy::Entry $window.options.advanced.y \
+		-label Y \
+		-textvariable ::Classy::print(y) \
+		-width 4
+	grid $window.options.advanced.y -row 3 -column 0 -sticky nesw
+	checkbutton $window.options.advanced.scaledxy \
+		-text {Scaled XY} \
+		-variable ::Classy::print(scaledxy)
+	grid $window.options.advanced.scaledxy -row 1 -column 0 -sticky nesw
+	frame $window.options.advanced.anchor  \
+		-borderwidth 0 \
+		-height 10 \
+		-width 10
+	grid $window.options.advanced.anchor -row 1 -column 1 -sticky nesw
+	radiobutton $window.options.advanced.anchor.anchornw \
+		-indicatoron 0 \
+		-text Topleft \
+		-value nw \
+		-variable ::Classy::print(pageanchor)
+	grid $window.options.advanced.anchor.anchornw -row 0 -column 0 -sticky nesw
+	radiobutton $window.options.advanced.anchor.anchorc \
+		-indicatoron 0 \
+		-text Center \
+		-value center \
+		-variable ::Classy::print(pageanchor)
+	grid $window.options.advanced.anchor.anchorc -row 0 -column 1 -sticky nesw
+	radiobutton $window.options.advanced.anchor.anchorse \
+		-indicatoron 0 \
+		-text BottomRight \
+		-value se \
+		-variable ::Classy::print(pageanchor)
+	grid $window.options.advanced.anchor.anchorse -row 0 -column 2 -sticky nesw
+	grid columnconfigure $window.options.advanced 0 -weight 1
+	grid columnconfigure $window.options.advanced 1 -weight 1
+	grid columnconfigure $window.options 1 -weight 1
 
 	# End windows
 	# Parse this
-	$window configure \
-		-closecommand [list invoke {} {
-upvar #0 ::Classy::print print
-foreach {type} {
-	width height portrait size colormode
-	command file scale xoffset yoffset autoscale
-} {
-	Classy::Default set app print_$type $print($type)
-}
-}]
 	$window.options.button1 configure \
 		-command [varsubst window {$window.options.file set [Classy::selectfile]}]
 	$window.options.paper.width configure \
@@ -157,11 +182,7 @@ $window.options.paper.height nocmdset [lindex $papersize 1]
 Classy::print_autoscale $window
 } $window}] \
 		-list [lunmerge [option get $window paperSizes PaperSizes]]
-	$window.options.paper.radiobutton1 configure \
-		-command [varsubst window {Classy::print_autoscale $window}]
-	$window.options.paper.radiobutton2 configure \
-		-command [varsubst window {Classy::print_autoscale $window}]
-	$window.options.offset.autoscale configure \
+	$window.options.paper.autoscale1 configure \
 		-background [Classy::realcolor DarkBackground] \
 		-command [varsubst window {invoke {} {
 upvar #0 ::Classy::print print
@@ -179,8 +200,7 @@ set f [open $print(file) w]
 puts $f [eval $print(getdata) ::Classy::print]
 close $f
 }]
-	$window add help Help {Classy::help classy_print}
-	$window persistent set help
+	$window persistent set save
 # ClassyTcl Finalise
 upvar #0 Classy::print print
 set print(psize) $opt(-papersize)
@@ -190,12 +210,16 @@ foreach {type def} {
 	portrait 1
 	size A4
 	colormode mono
+	autoscale 1
 	command lpr
 	file print.ps
 	scale 100
-	xoffset 0
-	yoffset 0
-	autoscale 1
+	scaledxy 1
+	x 0
+	y 0
+	pagex 0
+	pagey 0
+	pageanchor nw
 } {
 	if {![info exists print($type)]||("$print($type)" == "")} {
 		set print($type) [Classy::Default get app print_$type $def]
@@ -250,6 +274,19 @@ proc Classy::print_autoscale {window} {
 		if {$hs<$print(scale)} {set print(scale) $hs}
 	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
