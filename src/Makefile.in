@@ -28,18 +28,18 @@ TK_LIB_SPEC = @TK_LIB_SPEC@
 
 CC_SWITCHES = $(CFLAGS) $(SHLIB_CFLAGS) $(DEFS) -I$(TCL_SRC)/unix -I$(TCL_SRC)/generic \
 			 -I${TK_SRC}/generic -I${TK_SRC}/xlib/X11 ${X11_INCLUDES}
-PEOSOBJS= classyInit.o
+CLASSYOBJS= classyInit.o
 SRCS= classyInit.c
 
 # --------------------------- Rules -----------------------------
 
-all: peos$(SHLIB_SUFFIX)
+all: classy$(SHLIB_SUFFIX)
 
-peos$(SHLIB_SUFFIX): $(PEOSOBJS) peosInit.o
-	$(SHLIB_LD) -o ../peos$(SHLIB_SUFFIX) $(PEOSOBJS) peosInit.o
+classy$(SHLIB_SUFFIX): $(CLASSYOBJS) classyInit.o
+	$(SHLIB_LD) -o ../classy$(SHLIB_SUFFIX) $(CLASSYOBJS) classyInit.o
 
 clean:
-	rm -f *.o ../peos$(SHLIB_SUFFIX) ../win/*.csm ../win/tmp/* ../*.dll
+	rm -f *.o ../classy$(SHLIB_SUFFIX) ../win/*.csm ../win/tmp/* ../*.dll
 
 distclean:
 	rm -f config.cache config.log config.status Makefile

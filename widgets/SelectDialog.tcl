@@ -56,7 +56,7 @@ Classy::SelectDialog classmethod init {args} {
 	# REM Create bindings
 	# -------------------
 	bind $object.options.list <Enter> "focus $object.options.list"
-	bind $object.options.list <space> "$object invoke go"
+	bind $object.options.list <<Invoke>> "$object invoke go"
 	bind $object.options.list <<MExecute>> "$object invoke go Action"
 	bind $object.options.list <<MExecuteAjust>> "$object.options.list activate @%x,%y;$object invoke go Adjust"
 

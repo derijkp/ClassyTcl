@@ -35,7 +35,7 @@ Widget subclass Classy::DefaultMenu
 Classy::export DefaultMenu {}
 
 Classy::DefaultMenu classmethod init {args} {
-	super button $object -relief raised -bitmap @[::Classy::geticon cbxarrow] -takefocus 0
+	super button $object -relief raised -image [::Classy::geticon cbxarrow.xbm] -takefocus 0
 	bind $object <<ButtonPress-Action>> "$object menu"
 	bind $object <Any-ButtonRelease> "$object _action"
 

@@ -1,5 +1,5 @@
 ## Editor {menu used in the ClassyTcl Editor} menu
-option add *Classy::Editor.Menu {
+Classy::setoption *Classy::Editor.Menu {
 menu file "File" {
 	action Load "Open file" {eval %W load [Classy::selectfile -title Open -selectmode persistent]}
 	action LoadNext "Open next" "%W loadnext"
@@ -49,38 +49,33 @@ menu tools "Tools" {
 	action SetTabs "Set tab stops" {Classy::InputBox %W.tabstops -label "Tab stops" -title Tabstops -buttontext Set -command {%W configure -tabs [%W.tabstops get]}}
 	separator
 	action Connect "Connect to" "%W connectto"
-	action Execute "Execute Tcl command" "%W execute"
+	action ExecuteCmd "Execute Tcl command" "%W execute"
 	action Format "format" "%W format 76"
 }
 activemenu macros "Macros" {%W getmacromenu}
-} widgetDefault
+}
 ## Help {menu used in the ClassyTcl help system} menu
-option add *Classy::Help.Menu {
+Classy::setoption *Classy::Help.Menu {
 menu file "File" {
 	action Reload "Reload" {%W reload}
 	action Edit "Edit" {%W edit}
+	action Save "Save source" {%W save [Classy::selectfile]}
+	action SaveText "Save as text" {%W save [Classy::selectfile] text}
 	action Configure "Configure" {Configurator dialog}
 	separator
 	action Close "Close" {destroy %W}
 }
-activemenu contents "Contents" {%W getcontents}
+activemenu contents "Contents" {%W getcontentsmenu}
 menu go "Go" {
 	action Back "Back" {%W back}
 	action Forward "Forward" {%W forward} C-r
 	action History "History" {%W historymenu}
-	action HelpWord "search in helptext" "%W search word"
-	action HelpGrep "search through all helpfiles" "%W search grep"
-	action HelpFile "search a named Helpfile" "%W search file"
 }
-menu general "General" {
-	action HelpHelp "Help on Help" {%W load help}
+activemenu general "General" {%W getgeneralmenu}
 }
 
-
-
-} widgetDefault
 ## Filer {menu used in the ClassyTcl Filer} menu
-option add *Classy::Filer.Menu {
+Classy::setoption *Classy::Filer.Menu {
 menu sel "Selection" {
 	action Delete "Delete" {%W deletefiles sel}
 	action Rename "Rename" {%W renamebox} C-r
@@ -100,5 +95,5 @@ menu option "Options" {
 	radio SmallIcons "Small icons" {-variable [privatevar %W view] -value small -command {%W redraw}}
 	radio FullInfo "Full info" {-variable [privatevar %W view] -value full -command {%W redraw}}
 }
-} widgetDefault
+}
 

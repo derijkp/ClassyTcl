@@ -41,7 +41,7 @@ Classy::Fold classmethod init {args} {
 	# REM Create object
 	# -----------------
 	super
-	button $object.knob -bitmap @[Classy::geticon foldclosed] -command [list $object open]
+	button $object.knob -image [Classy::geticon foldclosed.xbm] -command [list $object open]
 	button $object.title -text "" -command {}
 	frame $object.spacer
 	frame $object.content
@@ -92,7 +92,7 @@ Classy::Fold chainoption -space {$object.spacer} -width
 #}
 Classy::Fold method open {} {
 	private $object options
-	$object.knob configure -bitmap @[Classy::geticon foldopen] -command [list $object close]
+	$object.knob configure -image [Classy::geticon foldopen.xbm] -command [list $object close]
 	grid $object.spacer -column 1 -row 1 -sticky nwse
 	grid $object.content -column 2 -row 1 -sticky nwse
 	uplevel #0 $options(-opencommand)
@@ -105,7 +105,7 @@ Classy::Fold method open {} {
 #}
 Classy::Fold method close {} {
 	private $object options
-	$object.knob configure -bitmap @[Classy::geticon foldclosed] -command [list $object open]
+	$object.knob configure -image [Classy::geticon foldclosed.xbm] -command [list $object open]
 	grid forget $object.spacer
 	grid forget $object.content
 	uplevel #0 $options(-closecommand)

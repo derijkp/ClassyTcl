@@ -20,7 +20,7 @@
 # Next is to get the attention of auto_mkindex
 if 0 {
 proc ::Classy::Configurator {} {}
-proc Configurator {} {}
+#proc Configurator {} {}
 }
 catch {Classy::Configurator destroy}
 
@@ -56,6 +56,8 @@ Classy::Configurator method dialog {} {
 	Classy::Dialog .classy__config -title "Configuration Dialog" \
 		-closecommand "if \[$object _checksaved\] {destroy .classy__config}" \
 		-help classy_configure
+	.classy__config add reconf "Reconfigure" [list $object _reconfigure .]
+	.classy__config persistent add recon
 	.classy__config persistent add close
 	set w [.classy__config component options]
 
@@ -110,11 +112,7 @@ Classy::Configurator method _parseconffile {level file} {
 					if {"$description" == ""} {
 						error "error in format of file \"$file\": no description for line $line"
 					}
-					if {("$conftype" == "key")||("$conftype" == "mouse")} {
-						set key [lindex $line 1]
-					} else {
-						set key [lindex $line 2]
-					}
+					set key [lindex $line 1]
 					laddnew data(section__$section) $description
 					set data(descr__$description) $key
 					set data(help__$key) $help
@@ -270,7 +268,8 @@ Classy::Configurator method _createconfw {entrytype} {
 		appdef "Application Default"
 		appuser "Application user"
 	} {
-		checkbutton $w.${level}_label -text $title -anchor w -variable [set pre]($level)
+		checkbutton $w.${level}_label -text $title -anchor w \
+			-variable [set pre]($level)
 		if {"$level" == "def"} {
 			$w.${level}_label configure -command [list set [set pre]($level) 1]
 		} else {
@@ -279,7 +278,8 @@ Classy::Configurator method _createconfw {entrytype} {
 			}]
 		}
 		checkbutton $w.${level}_rem -text "as remark" -anchor w \
-			-variable [set pre](${level}__rem)
+			-variable [set pre](${level}__rem) \
+			-command [list $object _activateconf]
 		switch [lindex $entrytype 0] {
 			menu -
 			tool {
@@ -302,7 +302,7 @@ Classy::Configurator method _createconfw {entrytype} {
 				}]
 				entry $w.$level
 				bind $w.$level <Key> "set [set pre]($level) 1"
-				bind $w.$level <Return> [list $object _activateconf]
+				bind $w.$level <<Return>> [list $object _activateconf]
 				grid $w.${level}_select -row [expr $row+1] -column 0 -sticky nwse
 				grid $w.$level -row [expr $row+1] -column 1 -columnspan 3 -sticky nwse
 			}
@@ -317,7 +317,7 @@ Classy::Configurator method _createconfw {entrytype} {
 				}]
 				entry $w.$level
 				bind $w.$level <Key> "set [set pre]($level) 1"
-				bind $w.$level <Return> [list $object _activateconf]
+				bind $w.$level <<Return>> [list $object _activateconf]
 				grid $w.${level}_select -row [expr $row+1] -column 0 -sticky nwse
 				grid $w.$level -row [expr $row+1] -column 1 -columnspan 3 -sticky nwse
 			}
@@ -329,7 +329,7 @@ Classy::Configurator method _createconfw {entrytype} {
 			default {
 				entry $w.$level
 				bind $w.$level <Key> "set [set pre]($level) 1"
-				bind $w.$level <Return> [list $object _activateconf]
+				bind $w.$level <<Return>> [list $object _activateconf]
 				grid $w.$level -row [expr $row+1] -column 0 -columnspan 4 -sticky nwse
 			}
 		}
@@ -378,14 +378,14 @@ Classy::Configurator method _configureitem {descr} {
 		}
 		if [info exists data(${level}__$key)] {
 			set data($level) 1
-			if {("$conftype" == "key")||("$conftype" == "mouse")} {
+			if {("$conftype"=="key")||("$conftype"=="mouse")} {
 				set temp [lrange $data(${level}__$key) 2 end]
 			} else {
-				set temp [lindex $data(${level}__$key) 3]
+				set temp [lindex $data(${level}__$key) 2]
 			}
 			if {"$temp" != ""} {set current $temp}
 			$object _setfield $level $temp
-			if [regexp ^# $data($level)__$key] {
+			if [regexp ^# $data(${level}__$key)] {
 				set data(${level}__rem) 1
 			} else {
 				set data(${level}__rem) 0
@@ -481,15 +481,6 @@ Classy::Configurator method _activateconfall {} {
 			}
 		}
 	}
-	if {"$conftype" == "font"} {
-		foreach name {
-			DefaultFont DefaultBoldFont DefaultItalicFont
-			DefaultBoldItalicFont DefaultNonpropFont
-		} {
-			catch {font delete $name}
-			eval {font create $name} [font actual [option get . $name $name]]
-		}
-	}
 }
 
 Classy::Configurator method _activateconf {} {
@@ -508,11 +499,18 @@ Classy::Configurator method _activateconf {} {
 					set new "setevent $key $value"
 					set current $value
 				}
+			} elseif {"$conftype" == "font"} {
+				if $data(${level}__rem) {
+					set new "#Classy::setfont $key [list $value]"
+				} else {
+					set new "Classy::setfont $key [list $value]"
+					set current $value
+				}
 			} else {
 				if $data(${level}__rem) {
-					set new "#option add $key [list $value] widgetDefault"
+					set new "#Classy::setoption $key [list $value]"
 				} else {
-					set new "option add $key [list $value] widgetDefault"
+					set new "Classy::setoption $key [list $value]"
 					set current $value
 				}
 			}
@@ -537,29 +535,65 @@ Classy::Configurator method _activateconf {} {
 	if {("$conftype" == "key")||("$conftype" == "mouse")} {
 		eval setevent $key $current
 	} elseif {"$conftype" == "font"} {
-		option add $key $current widgetDefault
-		foreach name {
-			DefaultFont DefaultBoldFont DefaultItalicFont
-			DefaultBoldItalicFont DefaultNonpropFont
-		} {
-			catch {font delete $name}
-			eval {font create $name} [font actual [option get . $name $name]]
-		}
+		Classy::setfont $key $current
 	} elseif {"$conftype" == "tool"} {
-		option add $key $current widgetDefault
+		Classy::setoption $key $current
 		regexp {([^.*]+)(\.|\*)(T|t)oolbar$} $key temp tooltype
 		Classy::DynaTool define $tooltype
 	} elseif {"$conftype" == "menu"} {
-		option add $key $current widgetDefault
+		Classy::setoption $key $current
 		regexp {([^.*]+)(\.|\*)(M|m)enu$} $key temp menutype
 		Classy::DynaMenu define $menutype
 	} else {
-		option add $key [list $current] widgetDefault
+		Classy::setoption $key [list $current]
 	}
 	if {[string first "\n" $current] == -1} {
 		$w.current configure -text $current
 	} else {
 		$w.current configure -text "... too long to display; look above ..."
+	}
+}
+
+Classy::Configurator method _noreconf {args} {
+	private $object noreconf
+	foreach w $args {
+		set noreconf($w) 1
+	}
+}
+
+Classy::Configurator method _reconf {args} {
+	private $object noreconf
+	foreach w $args {
+		catch {unset noreconf($w)}
+	}
+}
+
+Classy::Configurator method _reconfigure {w} {
+	private $object noreconf
+	$object _activateconfall
+	set noreconf(.classy__config) 1
+	if [info exists noreconf($w)] return
+	if ![catch {$w _reconfigure}] return
+	foreach child [winfo children $w] {
+		$object _reconfigure $child
+	}
+	foreach {option name class} {
+		-font font Font
+		-foreground foreground Foreground
+      -background background Background
+		-highlightbackground highlightBackground HighlightBackground
+		-highlightcolor highlightColor HighlightColor
+		-highlightthickness highlightThickness HighlightThickness
+		-borderwidth borderWidth BorderWidth
+		-disabledforeground disabledForeground DisabledForeground
+		-insertbackground insertBackground Foreground
+ 		-insertborderwidth insertBorderWidth BorderWidth
+		-selectbackground selectBackground Foreground
+		-selectborderwidth selectBorderWidth BorderWidth
+ 		-selectforeground selectForeground Background
+		-troughcolor troughColor Background
+	} {
+		catch {$w configure $option [option get $w $name $class]}
 	}
 }
 

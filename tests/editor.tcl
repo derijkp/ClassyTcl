@@ -2,7 +2,7 @@
 # the next line restarts using wish \
 exec wish8.0 "$0" "$@"
 
-source tools.tcl 
+source tools.tcl
 
 test Classy::Editor {Editor and find} {
 	clean

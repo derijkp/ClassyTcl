@@ -62,6 +62,7 @@ Classy::Help classmethod init {args} {
 	Classy::HTML $w.html -yscrollcommand "$w.vbar set" \
 		-state disabled -wrap word -cursor hand2 \
 		-width 70 -height 28 -relief sunken
+	$w.html bindlink <<Adjust>> {newhelp [%W linkat %x %y]}
 	scrollbar $w.vbar -orient vertical -command "$w.html yview"
 	Classy::DynaMenu makemenu Classy::Help $w.menu $object Classy::Help
 	bindtags $object "Classy::Help [bindtags $object]"
@@ -86,21 +87,14 @@ Classy::Help classmethod init {args} {
 	if {"$args" != ""} {eval $object configure $args}
 }
 
+Classy::Help private generalmenu {
+	action HelpHelp "Help on Help" {%W gethelp classy_help}
+	action HelpHelp "ClassyTcl" {%W gethelp ClassyTcl}
+}
 # ------------------------------------------------------------------
 #  Widget options
 # ------------------------------------------------------------------
 Classy::Help chainoptions {$object.html}
-#doc {Help options -general} option {-general general General} descr {
-#what is to be displayed in the General menu
-#}
-Classy::Help addoption -general {general General {}} {
-	-general {
-		$object.menu.general delete 1 end
-		foreach {label file} $value {
-			$object.menu.general addaction $label "$object gethelp $file"
-		}
-	}
-}
 
 # ------------------------------------------------------------------
 #  Methods
@@ -113,28 +107,44 @@ Classy::Help chainallmethods {$object.html} HTML
 # find a helpfile in the Classy::help_path and display it
 #}
 Classy::Help method gethelp {name} {
-	foreach dir $::Classy::help_path {
-		set file [file join $dir $name.html]
-		if [file exists $file] {
-			break
+	if {"[file pathtype $name]" == "absolute"} {
+		set url file:$name
+	} elseif {[regexp {^http:/|^file:/|^ftp:/} $name]} {
+		set url $name
+	} else {
+		foreach dir $::Classy::help_path {
+			if {"[file extension $name]" == ""} {
+				set name $name.html
+			}
+			set file [file join $dir $name]
+			if [file exists $file] break
 		}
+		if ![file exists $file] return
+		set url file:$file
 	}
-	if ![file exists $file] return
-	$object.html geturl file:$file
+	$object.html geturl $url
+}
+
+#doc {Help command gethelp} cmd {
+#pathname save filename ?text?
+#} descr {
+# save the current content. You can save as a plain text file by 
+# specifying text as a parameter
+#}
+Classy::Help method save {filename {how {}}} {
+	private $object.html html
+	if {"$how" == "text"} {
+		writefile $filename [[Classy::widget $object.html] get 1.0 end]
+	} else {
+		writefile $filename $html
+	}
 }
 
 Classy::Help method historymenu {} {
-	private $object history
 	set w $object.history
 	Classy::SelectDialog $w -title "Reopen list" \
-		-command "$object load \[$w get\]" \
-		-deletecommand "$object historyforget \[$w get\]"
-	$w fill $history
-}
-
-Classy::Help method historyforget {item} {
-	private $object history
-	set history [lremove $history $item]
+		-command "$object gethelp \[$w get\]"
+	$w fill [$object.html history]
 }
 
 Classy::Help method contents {tag} {
@@ -201,11 +211,23 @@ Classy::Help method edit {} {
 	}
 }
 
-Classy::Help method getcontents {} {
+Classy::Help method getcontentsmenu {} {
 	set data "action TopHelp Top {%W see 1.0}\n"
 	return $data
 }
 
+Classy::Help method getgeneralmenu {} {
+	private $object generalmenu
+	if [info exists generalmenu] {
+		if {"$generalmenu" != ""} {
+			return $generalmenu
+		} else {
+			return [getprivate $class generalmenu]
+		}
+	} else {
+		return [getprivate $class generalmenu]
+	}
+}
 
 set ::Classy::helpfind word
 proc Classy::findhelp {w} {
@@ -217,7 +239,7 @@ proc Classy::findhelp {w} {
 }
 
 proc Classy::newhelp {{subject {help}}} {
-	set w .peos__help
+	set w .classy__help
 	set num 1
 	while {[winfo exists $w$num] == 1} {incr num}
 	set w $w$num
@@ -225,13 +247,13 @@ proc Classy::newhelp {{subject {help}}} {
 	$w gethelp $subject
 }
 
-proc Classy::help {{subject {help}}} {
-	if ![winfo exists .peos__help] {
-		Classy::Help .peos__help
+proc Classy::help {{subject {classy_help}}} {
+	if ![winfo exists .classy__help] {
+		Classy::Help .classy__help
 	}
-	if ![winfo ismapped .peos__help] {wm deiconify .peos__help}
-	raise .peos__help
-	.peos__help gethelp $subject
+	if ![winfo ismapped .classy__help] {wm deiconify .classy__help}
+	raise .classy__help
+	.classy__help gethelp $subject
 }
 Classy::export {help newhelp} {}
 

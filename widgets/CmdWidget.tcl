@@ -975,7 +975,7 @@ proc Classy__puts {args} {
 }
 
 proc Classy::cmd {args} {
-	set w .peos__cmd
+	set w .classy__cmd
 	set num 1
 	while {[winfo exists $w$num] == 1} {incr num}
 	set w $w$num

@@ -12,10 +12,13 @@ test Classy::HTML {create and configure} {
 	scrollbar .vbar -command {.try yview}
 	pack .try -side left -fill both -expand yes
 	pack .vbar -side left -fill y
+	.try geturl http://rrna.uia.ac.be/lsu/query/index.html
 	.try geturl file:[file join $::class::dir html_library-0.3 html help.html]
-	.try geturl http://localhost/
+	.try geturl http://rrna.uia.ac.be/
 	.try cget -wrap
 } {char}
+
+.try bindlink <3> {puts [.try linkat %x %y]}
 
 test Classy::help {create and configure} {
 	clean

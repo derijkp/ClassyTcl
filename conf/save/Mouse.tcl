@@ -11,6 +11,10 @@ setevent <<Menu>> <3>
 setevent <<MExecute>> <Double-1>
 ## {Adjust Execute} {executes an alternative action, like when selecting in a listbox, but without removing the dialog it is in}
 setevent <<MExecuteAjust>> <Double-2>
+## {icursor} {set the insertion cursor, without removing the selection}
+setevent <<MIcursor>> <Control-1>
+## {position} {set the a scrollbar to the give position}
+setevent <<MPosition>> <Control-1> <Control-2>
 
 ## ---- Change selection ----
 ## {Select word} {Select entire words}

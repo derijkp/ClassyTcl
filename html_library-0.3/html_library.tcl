@@ -5,7 +5,6 @@
 # Some small changes by Peter De Rijk (derijkp@uia.ua.ac.be)
 # Universitaire Instelling Antwerpen
 #  - namespace html
-#  - tag properties fro option database
 #
 # See the file "license.terms" for information on usage and redistribution
 # of this file, and for a DISCLAIMER OF ALL WARRANTIES.
@@ -40,7 +39,7 @@ namespace eval html {}
 
 # These are Defined in HTML 2.0
 
-foreach {tag def} {
+array set html::tag_map {
 	b      {weight bold}
 	blockquote	{style italic indent 1 Trindent rindent}
 	bq		{style italic indent 1 Trindent rindent}
@@ -67,33 +66,28 @@ foreach {tag def} {
 	u	 {Tunderline underline}
 	ul     {indent 1}
 	var    {style italic}	
-} {
-	option add *htmltag_$tag $def widgetDefault
 }
 
 # These are in common(?) use, but not defined in html2.0
 
-foreach {tag def} {
+array set html::tag_map {
 	center {Tcenter center}
 	strike {Tstrike strike}
 	u	   {Tunderline underline}
-} {
-	option add *htmltag_$tag $def widgetDefault
 }
-
 
 # initial values
 
-option add *htmltag_hmstart {
+set html::tag_map(hmstart) {
 	family times   weight normal   style roman   size 12
 	Tcenter ""   Tlink ""   Tnowrap ""   Tunderline ""   list list
 	fill 1   indent "" counter 0 adjust 0
-} widgetDefault
+}
 
 
 # html tags that insert white space
 
-foreach {tag def} {
+array set ::html::insert_map {
 	blockquote "\n\n" /blockquote "\n"
 	br	"\n"
 	dd	"\n" /dd	"\n"
@@ -113,8 +107,6 @@ foreach {tag def} {
 	/menu "\n"
 	p	"\n\n"
 	pre "\n"	/pre "\n"
-} {
-	option add *htmlinsert_$tag $def widgetDefault
 }
 
 #array set ::html::insert_map {
@@ -178,7 +170,7 @@ proc ::html::init_win {win} {
 
 	# generic link enter callback
 
-	$win tag bind link <1> "::html::link_hit $win %x %y"
+#	$win tag bind link <<Action>> "::html::link_hit $win %x %y"
 }
 
 # set the indent spacing (in cm) for lists
@@ -309,16 +301,11 @@ proc ::html::render {win tag not param text} {
 	}
 
 	# adjust (push or pop) tag state
-	catch {::html::stack $win $not "[option get $win htmltag_$tag htmltag_$tag] $list"}
+	catch {::html::stack $win $not "$::html::tag_map($tag) $list"}
 
 	# insert white space (with current font)
 	# adding white space can get a bit tricky.  This isn't quite right
-	set temp [option get $win htmlinsert_$not$tag htmlinsert_$not$tag]
-	if {"$temp" != ""} {
-		set bad [catch {$win insert $var(S_insert) [option get $win htmlinsert_$not$tag htmlinsert_$not$tag] "space $var(font)"}]
-	} else {
-		set bad 1
-	}
+	set bad [catch {$win insert $var(S_insert) $::html::insert_map($not$tag) "space $var(font)"}]
 	if {!$bad && [lindex $var(fill) end]} {
 		set text [string trimleft $text]
 	}
@@ -600,7 +587,7 @@ proc ::html::tag_img {win param text} {
 		foreach i [array names ::html::events] {
 			bind $label <$i> "catch \{%W configure $::html::events($i)\}"
 		}
-		bind $label <1> "+::html::link_callback $win $link2?%x,%y"
+		bind $label <<Action>> "+::html::link_callback $win $link2?%x,%y"
 	} 
 
 	# now callback to the application
@@ -638,12 +625,12 @@ proc ::html::got_image {win image_error} {
 #   win:   The name of the text widget to render into
 #   href:  The HREF link for this <a> tag.
 
-array set ::html::events {
-	Enter	{-borderwidth 2 -relief raised }
-	Leave	{-borderwidth 2 -relief flat }
-	1		{-borderwidth 2 -relief sunken}
-	ButtonRelease-1	{-borderwidth 2 -relief raised}
-}
+#array set ::html::events {
+#	Enter	{-borderwidth 2 -relief raised }
+#	Leave	{-borderwidth 2 -relief flat }
+#	<Action>		{-borderwidth 2 -relief sunken}
+#	<ButtonRelease-Action>	{-borderwidth 2 -relief raised}
+#}
 
 # We need to escape any %'s in the href tag name so the bind command
 # doesn't try to substitute them.
@@ -900,7 +887,7 @@ proc ::html::tag_isindex {win param text} {
 	::html::extract_param $param prompt
 	label $item.label -text [::html::map_esc $prompt] -font $var(xfont)
 	entry $item.entry
-	bind $item.entry <Return> "$item.submit invoke"
+	bind $item.entry <<Return>> "$item.submit invoke"
 	button $item.submit -text search -font $var(xfont) -command \
 		[format {::html::submit_index %s {%s} [::html::map_reply [%s get]]} \
 		$win $param $item.entry]
@@ -1059,13 +1046,15 @@ proc ::html::input_checkbox {win param} {
 	upvar #0 $var(form_id) form
 
 	::html::extract_param $param name
+#	set value [string trimleft [string trimright $name " \n"]]
+	set value 0
 	::html::extract_param $param value
 
 	# Set the global variable, don't use the "form" alias as it is not
 	# defined in the global scope of the button
 	set variable $var(form_id)(check_$var(tags))	
 	set item $win.input_checkbutton,$var(tags)
-	checkbutton $item -variable $variable -off {} -on $value -text "  "
+	checkbutton $item -variable $variable -offvalue {} -onvalue $value -text "  "
 	if {[::html::extract_param $param checked]} {
 		$item select
 		append form(reset) ";$item select"
@@ -1144,13 +1133,13 @@ proc ::html::input_image {win param} {
 	
 	$item configure -takefocus 1
 	bind $item <FocusIn> "catch \{$win see $item\}"
-	bind $item <1> "$item configure -relief sunken"
-	bind $item <Return> "
+	bind $item <<Action>> "$item configure -relief sunken"
+	bind $item <<Return>> "
 		set $var(form_id)(X) 0
 		set $var(form_id)(Y) 0
 		$submit invoke	
 	"
-	bind $item <ButtonRelease-1> "
+	bind $item <<ButtonRelease-Action>> "
 		set $var(form_id)(X) %x
 		set $var(form_id)(Y) %y
 		$item configure -relief raised
@@ -1216,6 +1205,7 @@ proc ::html::tag_select {win param text} {
 	} else {
 		set mode single
 	}
+	set form(select_mode) $mode
 	set item $win.select,$var(tags)
     frame $item
     set form(select_frame) $item
@@ -1244,6 +1234,7 @@ proc ::html::tag_option {win param text} {
     }
     set value [string trimright $data " \n"]
     $frame.list insert end $value
+    set value [string trimleft $value " \n"]
 	::html::extract_param $param value
 	lappend form(select_values) $value
 	set data ""
@@ -1270,6 +1261,7 @@ proc ::html::tag_/select {win param text} {
 			$frame.list selection set $i
 			append form(reset) ";$frame.list selection set $i"
 		}
+	} elseif {"$form(select_mode)" == "multiple"} {
 	} else {
 		$frame.list selection set 0
 		append form(reset) ";$frame.list selection set 0"
@@ -1450,24 +1442,24 @@ proc ::html::cgiMap {data} {
 # version of the library routine, until the bug is fixed, make sure we
 # over-ride the library version, and not the otherway around
 
-auto_load tkFocusOK
-proc tkFocusOK w {
-    set code [catch {$w cget -takefocus} value]
-    if {($code == 0) && ($value != "")} {
-    if {$value == 0} {
-        return 0
-    } elseif {$value == 1} {
-        return 1
-    } else {
-        set value [uplevel #0 $value $w]
-        if {$value != ""} {
-        return $value
-        }
-    }
-    }
-    set code [catch {$w cget -state} value]
-    if {($code == 0) && ($value == "disabled")} {
-    return 0
-    }
-    regexp Key|Focus "[bind $w] [bind [winfo class $w]]"
-}
+#auto_load tkFocusOK
+#proc tkFocusOK w {
+#    set code [catch {$w cget -takefocus} value]
+#    if {($code == 0) && ($value != "")} {
+#    if {$value == 0} {
+#        return 0
+#    } elseif {$value == 1} {
+#        return 1
+#    } else {
+#        set value [uplevel #0 $value $w]
+#        if {$value != ""} {
+#        return $value
+#        }
+#    }
+#    }
+#    set code [catch {$w cget -state} value]
+#    if {($code == 0) && ($value == "disabled")} {
+#    return 0
+#    }
+#    regexp Key|Focus "[bind $w] [bind [winfo class $w]]"
+#}

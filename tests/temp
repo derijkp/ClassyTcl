@@ -1,244 +1,44 @@
-tagon {} 1.0 tagon indent0 1.0 tagon font:times:12:normal:roman 1.0 text {  } 1.0 tagoff indent0 1.2 tagoff {} 1.2 tagon space 1.2 text {
-} 1.2 text {
-} 2.0 tagoff space 3.0 tagoff font:times:12:normal:roman 3.0 tagon {} 3.0 tagon indent0 3.0 tagon font:times:24:bold:italic 3.0 text {use all HTML 1.0 tags} 3.0 tagoff indent0 3.21 tagoff {} 3.21 tagon space 3.21 text {
-} 3.21 tagoff font:times:24:bold:italic 4.0 text {
-} 4.0 tagoff space 5.0 tagon thin 5.0 text {
-} 5.0 tagon hr 6.0 text {	} 6.0 tagoff hr 6.1 text {
-} 6.1 tagoff thin 7.0 tagon {} 7.0 tagon indent0 7.0 tagon font:times:12:normal:roman 7.0 text { Contents: } 7.0 tagon L:#headings 7.11 tagon link 7.11 text headings 7.11 tagoff link 7.19 tagoff L:#headings 7.19 text {, } 7.19 tagon L:#lists 7.21 tagon link 7.21 text lists 7.21 tagoff link 7.26 tagoff L:#lists 7.26 text {, } 7.26 tagon L:#markup 7.28 tagon link 7.28 text markup 7.28 tagoff link 7.34 tagoff L:#markup 7.34 text {, } 7.34 tagon L:#entities 7.36 tagon link 7.36 text entities 7.36 tagoff link 7.44 tagoff L:#entities 7.44 text {, } 7.44 tagon L:#images 7.46 tagon link 7.46 text images 7.46 tagoff link 7.52 tagoff L:#images 7.52 text {, } 7.52 tagon L:#other 7.54 tagon link 7.54 text other 7.54 tagoff link 7.59 tagoff L:#other 7.59 text {, } 7.59 tagon L:#forms 7.61 tagon link 7.61 text forms 7.61 tagoff link 7.66 tagoff L:#forms 7.66 text {, } 7.66 tagon L:#end 7.68 tagon link 7.68 text end 7.68 tagoff link 7.71 tagoff L:#end 7.71 text {. } 7.71 tagoff font:times:12:normal:roman 7.73 tagoff indent0 7.73 tagoff {} 7.73 tagon space 7.73 text {
-} 7.73 tagoff space 8.0 tagon thin 8.0 text {
-} 8.0 tagon hr 9.0 text {	} 9.0 tagoff hr 9.1 text {
-} 9.1 tagoff thin 10.0 mark N:headings 10.0 tagon {} 10.0 tagon indent0 10.0 tagon font:times:12:normal:roman 10.0 text { } 10.0 tagon N:headings 10.1 tagon anchor 10.1 text { } 10.1 tagoff indent0 10.2 tagoff anchor 10.2 tagoff {} 10.2 tagoff N:headings 10.2 tagon space 10.2 text {
-} 10.2 text {
-} 11.0 tagoff space 12.0 tagoff font:times:12:normal:roman 12.0 tagon N:headings 12.0 tagon anchor 12.0 tagon {} 12.0 tagon indent0 12.0 tagon font:times:18:bold:italic 12.0 text {headings This is level 2} 12.0 tagoff indent0 12.24 tagoff anchor 12.24 tagoff {} 12.24 tagoff N:headings 12.24 tagon space 12.24 text {
-} 12.24 tagoff font:times:18:bold:italic 13.0 tagon font:times:12:normal:roman 13.0 text {
-} 13.0 text {
-} 14.0 tagoff space 15.0 tagoff font:times:12:normal:roman 15.0 tagon N:headings 15.0 tagon anchor 15.0 tagon {} 15.0 tagon indent0 15.0 tagon font:times:18:bold:roman 15.0 text headin 15.0 mark anchor 15.6 mark insert 15.6 text {g level 3} 15.6 tagoff indent0 15.15 tagoff anchor 15.15 tagoff {} 15.15 tagoff N:headings 15.15 tagon space 15.15 text {
-} 15.15 tagoff font:times:18:bold:roman 16.0 tagon font:times:12:normal:roman 16.0 text {
-} 16.0 tagoff space 17.0 tagoff font:times:12:normal:roman 17.0 tagon N:headings 17.0 tagon anchor 17.0 tagon {} 17.0 tagon indent0 17.0 tagon font:times:16:bold:roman 17.0 text {heading level 4} 17.0 tagoff indent0 17.15 tagoff anchor 17.15 tagoff {} 17.15 tagoff N:headings 17.15 tagon space 17.15 text {
-} 17.15 tagoff font:times:16:bold:roman 18.0 tagon font:times:12:normal:roman 18.0 text {
-} 18.0 tagoff space 19.0 tagoff font:times:12:normal:roman 19.0 tagon N:headings 19.0 tagon anchor 19.0 tagon {} 19.0 tagon indent0 19.0 tagon font:times:14:bold:roman 19.0 text {heading level 5} 19.0 tagoff indent0 19.15 tagoff anchor 19.15 tagoff {} 19.15 tagoff N:headings 19.15 tagon space 19.15 text {
-} 19.15 tagoff font:times:14:bold:roman 20.0 tagon font:times:12:normal:roman 20.0 text {
-} 20.0 tagoff space 21.0 tagoff font:times:12:normal:roman 21.0 tagon N:headings 21.0 tagon anchor 21.0 tagon {} 21.0 tagon indent0 21.0 tagon font:times:14:normal:italic 21.0 text {heading level 6} 21.0 tagoff indent0 21.15 tagoff anchor 21.15 tagoff {} 21.15 tagoff N:headings 21.15 tagon space 21.15 text {
-} 21.15 tagoff font:times:14:normal:italic 22.0 text {
-} 22.0 tagoff space 23.0 tagon thin 23.0 text {
-} 23.0 tagon hr 24.0 text {	} 24.0 tagoff hr 24.1 text {
-} 24.1 tagoff thin 25.0 mark N:lists 25.0 tagon {} 25.0 tagon indent0 25.0 tagon font:times:12:normal:roman 25.0 text { } 25.0 tagon N:lists 25.1 tagon anchor 25.1 text { } 25.1 tagoff indent0 25.2 tagoff anchor 25.2 tagoff {} 25.2 tagoff N:lists 25.2 tagon space 25.2 text {
-} 25.2 text {
-} 26.0 tagoff space 27.0 tagoff font:times:12:normal:roman 27.0 tagon N:lists 27.0 tagon anchor 27.0 tagon {} 27.0 tagon indent0 27.0 tagon font:times:18:bold:italic 27.0 text {List constructs} 27.0 tagoff indent0 27.15 tagoff anchor 27.15 tagoff {} 27.15 tagoff N:lists 27.15 tagon space 27.15 text {
-} 27.15 tagoff space 28.0 tagoff font:times:18:bold:italic 28.0 tagon {} 28.0 tagon indent0 28.0 tagon font:times:12:normal:roman 28.0 text { HTML supports 5 different list constructs: } 28.0 tagoff indent0 28.44 tagoff {} 28.44 tagon space 28.44 text {
-} 28.44 tagoff font:times:12:normal:roman 29.0 tagon font:times:12:bold:roman 29.0 text {
-} 29.0 tagoff space 30.0 tagon indent0 30.0 tagon compact 30.0 tagon hi 30.0 text ul 30.0 tagoff hi 30.2 tagoff compact 30.2 tagoff indent0 30.2 tagoff font:times:12:bold:roman 30.2 tagon font:times:12:normal:roman 30.2 tagon space 30.2 text {
-} 30.2 tagoff space 31.0 tagon {} 31.0 tagon indent1 31.0 text {Unordered lists } 31.0 tagoff font:times:12:normal:roman 31.16 tagoff indent1 31.16 tagoff {} 31.16 tagon font:times:12:bold:roman 31.16 tagon space 31.16 text {
-} 31.16 tagoff space 32.0 tagon indent0 32.0 tagon compact 32.0 tagon hi 32.0 text ol 32.0 tagoff hi 32.2 tagoff compact 32.2 tagoff indent0 32.2 tagoff font:times:12:bold:roman 32.2 tagon font:times:12:normal:roman 32.2 tagon space 32.2 text {
-} 32.2 tagoff space 33.0 tagon {} 33.0 tagon indent1 33.0 text {Ordered lists } 33.0 tagoff font:times:12:normal:roman 33.14 tagoff indent1 33.14 tagoff {} 33.14 tagon font:times:12:bold:roman 33.14 tagon space 33.14 text {
-} 33.14 tagoff space 34.0 tagon indent0 34.0 tagon compact 34.0 tagon hi 34.0 text dl 34.0 tagoff hi 34.2 tagoff compact 34.2 tagoff indent0 34.2 tagoff font:times:12:bold:roman 34.2 tagon font:times:12:normal:roman 34.2 tagon space 34.2 text {
-} 34.2 tagoff space 35.0 tagon {} 35.0 tagon indent1 35.0 text {definition lists (like this) } 35.0 tagoff font:times:12:normal:roman 35.29 tagoff indent1 35.29 tagoff {} 35.29 tagon font:times:12:bold:roman 35.29 tagon space 35.29 text {
-} 35.29 tagoff space 36.0 tagon indent0 36.0 tagon compact 36.0 tagon hi 36.0 text menu 36.0 tagoff hi 36.4 tagoff compact 36.4 tagoff indent0 36.4 tagoff font:times:12:bold:roman 36.4 tagon font:times:12:normal:roman 36.4 tagon space 36.4 text {
-} 36.4 tagoff space 37.0 tagon {} 37.0 tagon indent1 37.0 text {menu lists } 37.0 tagoff font:times:12:normal:roman 37.11 tagoff indent1 37.11 tagoff {} 37.11 tagon font:times:12:bold:roman 37.11 tagon space 37.11 text {
-} 37.11 tagoff space 38.0 tagon indent0 38.0 tagon compact 38.0 tagon hi 38.0 text dir 38.0 tagoff hi 38.3 tagoff compact 38.3 tagoff indent0 38.3 tagoff font:times:12:bold:roman 38.3 mark current 38.3 tagon font:times:12:normal:roman 38.3 tagon space 38.3 text {
-} 38.3 tagoff space 39.0 tagon {} 39.0 tagon indent1 39.0 text {directory lists } 39.0 tagoff indent1 39.16 tagoff {} 39.16 tagon space 39.16 text {
-} 39.16 text {
-} 40.0 text {
-} 41.0 tagoff space 42.0 tagon {} 42.0 tagon indent0 42.0 text {All of the list constructs can nest, with each successive nesting level indented relative to the previous one. The HTML } 42.0 tagoff font:times:12:normal:roman 42.120 tagon font:times:12:bold:roman 42.120 text blockquote 42.120 tagoff font:times:12:bold:roman 42.130 tagon font:times:12:normal:roman 42.130 text { element, although not technically a list construct, nests with the other lists. } 42.130 tagoff indent0 42.211 tagoff {} 42.211 tagon space 42.211 text {
-} 42.211 text {
-} 43.0 tagoff space 44.0 tagon {} 44.0 tagon indent0 44.0 text {Lists have two rendering styles, } 44.0 tagoff font:times:12:normal:roman 44.33 tagon font:times:12:bold:roman 44.33 text regular 44.33 tagoff font:times:12:bold:roman 44.40 tagon font:times:12:normal:roman 44.40 text { } 44.40 tagoff indent0 44.41 tagon indent1 44.41 text { } 44.41 tagoff indent1 44.42 tagoff {} 44.42 tagon space 44.42 text {
-} 44.42 tagoff space 45.0 tagon indent0 45.0 tagon list 45.0 tagon mark 45.0 text {	O	} 45.0 tagoff mark 45.3 tagoff list 45.3 tagoff indent0 45.3 tagon {} 45.3 tagon indent1 45.3 text {This is a regular list element } 45.3 tagoff indent1 45.34 tagoff {} 45.34 tagon space 45.34 text {
-} 45.34 tagoff space 46.0 tagon indent0 46.0 tagon list 46.0 tagon mark 46.0 text {	O	} 46.0 tagoff mark 46.3 tagoff list 46.3 tagoff indent0 46.3 tagon {} 46.3 tagon indent1 46.3 text {So is this } 46.3 tagoff indent1 46.14 tagoff {} 46.14 tagon space 46.14 text {
-} 46.14 text {
-} 47.0 text {
-} 48.0 tagoff space 49.0 tagon {} 49.0 tagon indent0 49.0 text {Which leaves a little space between the elements, and } 49.0 tagoff font:times:12:normal:roman 49.54 tagon font:times:12:bold:roman 49.54 text compact 49.54 tagoff font:times:12:bold:roman 49.61 tagon font:times:12:normal:roman 49.61 text { } 49.61 tagoff indent0 49.62 tagon indent1 49.62 text { } 49.62 tagoff indent1 49.63 tagoff {} 49.63 tagon space 49.63 text {
-} 49.63 tagoff space 50.0 tagon indent0 50.0 tagon compact 50.0 tagon mark 50.0 text {	O	} 50.0 tagoff mark 50.3 tagoff compact 50.3 tagoff indent0 50.3 tagon {} 50.3 tagon indent1 50.3 text {This is a compact list element } 50.3 tagoff indent1 50.34 tagoff {} 50.34 tagon space 50.34 text {
-} 50.34 tagoff space 51.0 tagon indent0 51.0 tagon compact 51.0 tagon mark 51.0 text {	O	} 51.0 tagoff mark 51.3 tagoff compact 51.3 tagoff indent0 51.3 tagon {} 51.3 tagon indent1 51.3 text {So is this } 51.3 tagoff indent1 51.14 tagoff {} 51.14 tagon space 51.14 text {
-} 51.14 text {
-} 52.0 text {
-} 53.0 tagoff space 54.0 tagon {} 54.0 tagon indent0 54.0 text {Compact lists are a more scrunched together. } 54.0 tagoff indent0 54.45 tagoff {} 54.45 tagon space 54.45 text {
-} 54.45 text {
-} 55.0 tagoff space 56.0 tagoff font:times:12:normal:roman 56.0 tagon {} 56.0 tagon indent0 56.0 tagon font:times:18:bold:italic 56.0 text {Examples of list elements} 56.0 tagoff indent0 56.25 tagoff {} 56.25 tagon space 56.25 text {
-} 56.25 tagoff space 57.0 tagoff font:times:18:bold:italic 57.0 tagon {} 57.0 tagon indent0 57.0 tagon font:times:12:normal:roman 57.0 text { This is a summary of the list types: } 57.0 tagoff indent0 57.38 tagon indent1 57.38 text { } 57.38 tagoff indent1 57.39 tagoff {} 57.39 tagon space 57.39 text {
-} 57.39 tagoff space 58.0 tagon indent0 58.0 tagon list 58.0 tagon mark 58.0 text {	O	} 58.0 tagoff mark 58.3 tagoff list 58.3 tagoff indent0 58.3 tagon {} 58.3 tagon indent1 58.3 text {This is an unordered list } 58.3 tagoff indent1 58.29 tagoff {} 58.29 tagon space 58.29 text {
-} 58.29 tagoff space 59.0 tagon indent0 59.0 tagon list 59.0 tagon mark 59.0 text {	O	} 59.0 tagoff mark 59.3 tagoff list 59.3 tagoff indent0 59.3 tagon {} 59.3 tagon indent1 59.3 text {Each list element in an unordered list is preceded by a list symbol, or marker that changes depending upon the nesting level of the list. As you can see, when a single list element needs to wrap onto the next display line, it stays indented } 59.3 tagoff indent1 59.244 tagon indent2 59.244 text { } 59.244 tagoff indent2 59.245 tagoff {} 59.245 tagon space 59.245 text {
-} 59.245 tagoff space 60.0 tagon indent1 60.0 tagon compact 60.0 tagon mark 60.0 text {	*	} 60.0 tagoff mark 60.3 tagoff compact 60.3 tagoff indent1 60.3 tagon {} 60.3 tagon indent2 60.3 text {This is a nested unordered list } 60.3 tagoff indent2 60.35 tagoff {} 60.35 tagon space 60.35 text {
-} 60.35 tagoff space 61.0 tagon indent1 61.0 tagon compact 61.0 tagon mark 61.0 text {	*	} 61.0 tagoff mark 61.3 tagoff compact 61.3 tagoff indent1 61.3 tagon {} 61.3 tagon indent2 61.3 text {The marker symbol changed } 61.3 tagoff indent2 61.29 tagoff {} 61.29 tagon space 61.29 text {
-} 61.29 tagoff space 62.0 tagon indent1 62.0 tagon compact 62.0 tagon mark 62.0 text {	*	} 62.0 tagoff mark 62.3 tagoff compact 62.3 tagoff indent1 62.3 tagon {} 62.3 tagon indent2 62.3 text {This list is } 62.3 tagoff font:times:12:normal:roman 62.16 tagon font:times:12:bold:roman 62.16 text compact 62.16 tagoff font:times:12:bold:roman 62.23 tagon font:times:12:normal:roman 62.23 text { } 62.23 tagoff indent2 62.24 tagoff {} 62.24 tagon space 62.24 text {
-} 62.24 tagoff space 63.0 tagon indent1 63.0 tagon compact 63.0 tagon mark 63.0 text {	*	} 63.0 tagoff mark 63.3 tagoff compact 63.3 tagoff indent1 63.3 tagon {} 63.3 tagon indent2 63.3 text {Notice less spacing between the list elements } 63.3 tagoff indent2 63.49 tagoff {} 63.49 tagon space 63.49 text {
-} 63.49 text {
-} 64.0 tagoff space 65.0 tagon indent0 65.0 tagon list 65.0 tagon mark 65.0 text {	O	} 65.0 tagoff mark 65.3 tagoff list 65.3 tagoff indent0 65.3 tagon {} 65.3 tagon indent1 65.3 text {Back to the outer list } 65.3 tagoff indent1 65.26 tagoff {} 65.26 tagon space 65.26 text {
-} 65.26 tagoff space 66.0 tagon indent0 66.0 tagon list 66.0 tagon mark 66.0 text {	O	} 66.0 tagoff mark 66.3 tagoff list 66.3 tagoff indent0 66.3 tagon {} 66.3 tagon indent1 66.3 text {Its not compact } 66.3 tagoff indent1 66.19 tagoff {} 66.19 tagon space 66.19 text {
-} 66.19 text {
-} 67.0 text {
-} 68.0 tagoff space 69.0 tagon {} 69.0 tagon indent0 69.0 text {Here is an example of an ordered list } 69.0 tagoff indent0 69.38 tagon indent1 69.38 text { } 69.38 tagoff indent1 69.39 tagoff {} 69.39 tagon space 69.39 text {
-} 69.39 tagoff space 70.0 tagon indent0 70.0 tagon list 70.0 tagon mark 70.0 text {	1	} 70.0 tagoff mark 70.3 tagoff list 70.3 tagoff indent0 70.3 tagon {} 70.3 tagon indent1 70.3 text {This is item 1 } 70.3 tagoff indent1 70.18 tagoff {} 70.18 tagon space 70.18 text {
-} 70.18 tagoff space 71.0 tagon indent0 71.0 tagon list 71.0 tagon mark 71.0 text {	2	} 71.0 tagoff mark 71.3 tagoff list 71.3 tagoff indent0 71.3 tagon {} 71.3 tagon indent1 71.3 text {This is item 2 } 71.3 tagoff indent1 71.18 tagoff {} 71.18 tagon space 71.18 text {
-} 71.18 tagoff space 72.0 tagon indent0 72.0 tagon list 72.0 tagon mark 72.0 text {	3	} 72.0 tagoff mark 72.3 tagoff list 72.3 tagoff indent0 72.3 tagon {} 72.3 tagon indent1 72.3 text {You can see the list items are numbered } 72.3 tagoff indent1 72.43 tagon indent2 72.43 text { } 72.43 tagoff indent2 72.44 tagoff {} 72.44 tagon space 72.44 text {
-} 72.44 tagoff space 73.0 tagon indent1 73.0 tagon list 73.0 tagon mark 73.0 text {	1	} 73.0 tagoff mark 73.3 tagoff list 73.3 tagoff indent1 73.3 tagon {} 73.3 tagon indent2 73.3 text {When ordered lists are nested } 73.3 tagoff indent2 73.33 tagoff {} 73.33 tagon space 73.33 text {
-} 73.33 tagoff space 74.0 tagon indent1 74.0 tagon list 74.0 tagon mark 74.0 text {	2	} 74.0 tagoff mark 74.3 tagoff list 74.3 tagoff indent1 74.3 tagon {} 74.3 tagon indent2 74.3 text {Each nesting level gets its own numbers } 74.3 tagoff indent2 74.43 tagoff {} 74.43 tagon space 74.43 text {
-} 74.43 text {
-} 75.0 tagoff space 76.0 tagon indent0 76.0 tagon list 76.0 tagon mark 76.0 text {	4	} 76.0 tagoff mark 76.3 tagoff list 76.3 tagoff indent0 76.3 tagon {} 76.3 tagon indent1 76.3 text {This is the end of the ordered list } 76.3 tagoff indent1 76.39 tagoff {} 76.39 tagon space 76.39 text {
-} 76.39 text {
-} 77.0 text {
-} 78.0 tagoff space 79.0 tagon {} 79.0 tagon indent0 79.0 text {The other two list styles are } 79.0 tagoff font:times:12:normal:roman 79.30 tagon font:times:12:bold:roman 79.30 text directory 79.30 tagoff font:times:12:bold:roman 79.39 tagon font:times:12:normal:roman 79.39 text { lists and } 79.39 tagoff font:times:12:normal:roman 79.50 tagon font:times:12:bold:roman 79.50 text menu 79.50 tagoff font:times:12:bold:roman 79.54 tagon font:times:12:normal:roman 79.54 text { lists. For now, directory lists are rendered excactly like unordered lists, because no-one uses them. Menu lists are also like un-ordered lists, but the're not supposed to nest, and they get a different list marker, like this: } 79.54 tagoff indent0 79.282 tagon indent1 79.282 text { } 79.282 tagoff indent1 79.283 tagoff {} 79.283 tagon space 79.283 text {
-} 79.283 tagoff space 80.0 tagon indent0 80.0 tagon compact 80.0 tagon mark 80.0 text {	->	} 80.0 tagoff mark 80.4 tagoff compact 80.4 tagoff indent0 80.4 tagon {} 80.4 tagon indent1 80.4 text {menu item 1 } 80.4 tagoff indent1 80.16 tagoff {} 80.16 tagon space 80.16 text {
-} 80.16 tagoff space 81.0 tagon indent0 81.0 tagon compact 81.0 tagon mark 81.0 text {	->	} 81.0 tagoff mark 81.4 tagoff compact 81.4 tagoff indent0 81.4 tagon {} 81.4 tagon indent1 81.4 text {menu item 2 } 81.4 tagoff indent1 81.16 tagoff {} 81.16 tagon space 81.16 text {
-} 81.16 tagoff space 82.0 tagon indent0 82.0 tagon compact 82.0 tagon mark 82.0 text {	->	} 82.0 tagoff mark 82.4 tagoff compact 82.4 tagoff indent0 82.4 tagon {} 82.4 tagon indent1 82.4 text {menu item 3 } 82.4 tagoff indent1 82.16 tagoff {} 82.16 tagon space 82.16 text {
-} 82.16 text {
-} 83.0 text {
-} 84.0 tagoff space 85.0 tagoff font:times:12:normal:roman 85.0 tagon {} 85.0 tagon indent0 85.0 tagon font:times:18:bold:italic 85.0 text {Mixed lists} 85.0 tagoff indent0 85.11 tagoff {} 85.11 tagon space 85.11 text {
-} 85.11 tagoff space 86.0 tagoff font:times:18:bold:italic 86.0 tagon {} 86.0 tagon indent0 86.0 tagon font:times:12:normal:roman 86.0 text { Definition lists, ordered lists, and un-ordered lists can be freely intermingled (} 86.0 tagoff font:times:12:normal:roman 86.83 tagon font:times:12:bold:roman 86.83 text {block quotes} 86.83 tagoff font:times:12:bold:roman 86.95 tagon font:times:12:normal:roman 86.95 text { too). Menu lists and directory lists can be combined with the others, but } 86.95 tagoff font:times:12:normal:roman 86.170 tagon font:times:12:normal:italic 86.170 text officially 86.170 tagoff font:times:12:normal:italic 86.180 tagon font:times:12:normal:roman 86.180 text { only at the highest nesting level. } 86.180 tagoff indent0 86.216 tagon indent1 86.216 text { } 86.216 tagoff indent1 86.217 tagoff {} 86.217 tagon space 86.217 text {
-} 86.217 tagoff space 87.0 tagon indent0 87.0 tagon list 87.0 tagon mark 87.0 text {	O	} 87.0 tagoff mark 87.3 tagoff list 87.3 tagoff indent0 87.3 tagon {} 87.3 tagon indent1 87.3 text {This is an un-ordered list } 87.3 tagoff indent1 87.30 tagoff {} 87.30 tagon space 87.30 text {
-} 87.30 tagoff space 88.0 tagon indent0 88.0 tagon list 88.0 tagon mark 88.0 text {	O	} 88.0 tagoff mark 88.3 tagoff list 88.3 tagoff indent0 88.3 tagon {} 88.3 tagon indent1 88.3 text {Individual list items can have phrase markup, such as } 88.3 tagoff font:times:12:normal:roman 88.57 tagon font:times:12:bold:roman 88.57 text bold 88.57 tagoff font:times:12:bold:roman 88.61 tagon font:times:12:normal:roman 88.61 text { or } 88.61 tagoff font:times:12:normal:roman 88.65 tagon font:times:12:normal:italic 88.65 text italic 88.65 tagoff font:times:12:normal:italic 88.71 tagon font:times:12:normal:roman 88.71 text { } 88.71 tagoff indent1 88.72 tagon indent2 88.72 text { } 88.72 tagoff indent2 88.73 tagoff {} 88.73 tagon space 88.73 text {
-} 88.73 tagoff space 89.0 tagon indent1 89.0 tagon compact 89.0 tagon mark 89.0 text {	1	} 89.0 tagoff mark 89.3 tagoff compact 89.3 tagoff indent1 89.3 tagon {} 89.3 tagon indent2 89.3 text {This is a } 89.3 tagoff font:times:12:normal:roman 89.13 tagon font:times:12:bold:roman 89.13 text compact 89.13 tagoff font:times:12:bold:roman 89.20 tagon font:times:12:normal:roman 89.20 text { ordered list } 89.20 tagoff indent2 89.34 tagoff {} 89.34 tagon space 89.34 text {
-} 89.34 tagoff space 90.0 tagon indent1 90.0 tagon compact 90.0 tagon mark 90.0 text {	2	} 90.0 tagoff mark 90.3 tagoff compact 90.3 tagoff indent1 90.3 tagon {} 90.3 tagon indent2 90.3 text {The list items are numbered. Inside this ordered list we could have a } 90.3 tagoff font:times:12:normal:roman 90.73 tagon font:times:12:bold:roman 90.73 text {block quote} 90.73 tagoff font:times:12:bold:roman 90.84 tagon font:times:12:normal:roman 90.84 text { which is a nested paragraph. Notice that blockquotes, in addition to rendering in } 90.84 tagoff font:times:12:normal:roman 90.167 tagon font:times:12:normal:italic 90.167 text italic 90.167 tagoff font:times:12:normal:italic 90.173 tagon font:times:12:normal:roman 90.173 text {, indent the right margin. } 90.173 tagoff indent2 90.200 tagoff {} 90.200 tagon space 90.200 text {
-} 90.200 tagoff space 91.0 tagon indent1 91.0 tagon compact 91.0 tagon mark 91.0 text {	3	} 91.0 tagoff mark 91.3 tagoff compact 91.3 tagoff indent1 91.3 tagon {} 91.3 tagon indent2 91.3 text {From Moby Dick: } 91.3 tagoff indent2 91.19 tagoff {} 91.19 tagon space 91.19 text {
-} 91.19 text {
-} 92.0 tagoff space 93.0 tagoff font:times:12:normal:roman 93.0 tagon {} 93.0 tagon rindent 93.0 tagon indent3 93.0 tagon font:times:12:normal:italic 93.0 text {Call me Ishmael. Some years ago--never mind how long precisely --having little or no money in my purse, and nothing particular to interest me on shore, I thought I would sail about a little and see the watery part of the world. It is a way I have of driving off the spleen, and regulating the circulation. } 93.0 tagoff indent3 93.306 tagoff rindent 93.306 tagoff {} 93.306 tagon space 93.306 text {
-} 93.306 tagoff font:times:12:normal:italic 94.0 tagon font:times:12:normal:roman 94.0 text {
-} 94.0 tagoff space 95.0 tagon indent1 95.0 tagon compact 95.0 tagon mark 95.0 text {	4	} 95.0 tagoff mark 95.3 tagoff compact 95.3 tagoff indent1 95.3 tagon {} 95.3 tagon indent2 95.3 text {Back to the list } 95.3 tagoff indent2 95.20 tagon indent3 95.20 text { } 95.20 tagoff indent3 95.21 tagoff {} 95.21 tagon space 95.21 text {
-} 95.21 tagoff space 96.0 tagon indent2 96.0 tagon list 96.0 tagon mark 96.0 text {	1	} 96.0 tagoff mark 96.3 tagoff list 96.3 tagoff indent2 96.3 tagon {} 96.3 tagon indent3 96.3 text {Lists can be nested arbitrarily deep } 96.3 tagoff indent3 96.40 tagoff {} 96.40 tagon space 96.40 text {
-} 96.40 tagoff space 97.0 tagon indent2 97.0 tagon list 97.0 tagon mark 97.0 text {	2	} 97.0 tagoff mark 97.3 tagoff list 97.3 tagoff indent2 97.3 tagon {} 97.3 tagon indent3 97.3 text {Nesting levels more than about 5 or 6 probably won't do what you expect, however. } 97.3 tagoff indent3 97.85 tagoff {} 97.85 tagon space 97.85 text {
-} 97.85 tagoff space 98.0 tagon indent2 98.0 tagon list 98.0 tagon mark 98.0 text {	3	} 98.0 tagoff mark 98.3 tagoff list 98.3 tagoff indent2 98.3 tagon {} 98.3 tagon indent3 98.3 text {Within nested list elements, you can include preformatted objects, such as } 98.3 tagoff font:times:12:normal:roman 98.78 tagon font:times:12:normal:italic 98.78 text tables 98.78 tagoff font:times:12:normal:italic 98.84 tagon font:times:12:normal:roman 98.84 text { that observe the current list indent setting, such as} 98.84 tagoff indent3 98.138 tagoff {} 98.138 tagon space 98.138 text {
-} 98.138 tagoff space 99.0 tagoff font:times:12:normal:roman 99.0 tagon nowrap 99.0 tagon {} 99.0 tagon indent3 99.0 tagon font:courier:12:normal:roman 99.0 text {
-} 99.0 text {
-} 100.0 tagoff font:courier:12:normal:roman 101.0 tagon font:courier:12:bold:roman 101.0 text {item		quantity		price
-} 101.0 text {----		--------		-----} 102.0 tagoff font:courier:12:bold:roman 102.21 tagon font:courier:12:normal:roman 102.21 text {
-} 102.21 text {  A		  27		  $4.36
-} 103.0 text {  B		  19		  $2.84
-} 104.0 text {  C		  11		  $22.34
-} 105.0 tagoff indent3 106.0 tagoff {} 106.0 tagoff nowrap 106.0 tagon space 106.0 text {
-} 106.0 tagoff space 107.0 tagoff font:courier:12:normal:roman 107.0 tagon {} 107.0 tagon indent3 107.0 tagon font:times:12:normal:roman 107.0 text {Tabs within preformatted objects each take up half of an indent level. You can also use line breaks inside lists. } 107.0 tagoff indent3 107.114 tagoff {} 107.114 tagon space 107.114 text {
-} 107.114 tagoff space 108.0 tagon {} 108.0 tagon indent3 108.0 text {- like this -} 108.0 tagoff indent3 108.13 tagoff {} 108.13 tagon space 108.13 text {
-} 108.13 tagoff space 109.0 tagon {} 109.0 tagon indent3 109.0 text {or even start new paragraphs. } 109.0 tagoff indent3 109.30 tagoff {} 109.30 tagon space 109.30 text {
-} 109.30 text {
-} 110.0 tagoff space 111.0 tagon {} 111.0 tagon indent3 111.0 text {This is a new paragraph started inside a list element. In general, except where explicitly prohibited (or indicated otherwise), you may nest any tag within any other tag. } 111.0 tagoff indent3 111.171 tagoff {} 111.171 tagon space 111.171 text {
-} 111.171 text {
-} 112.0 tagoff space 113.0 tagon indent1 113.0 tagon compact 113.0 tagon mark 113.0 text {	5	} 113.0 tagoff mark 113.3 tagoff compact 113.3 tagoff indent1 113.3 tagon {} 113.3 tagon indent2 113.3 text {We can also nest definition lists, like this: } 113.3 tagoff indent2 113.49 tagoff {} 113.49 tagon space 113.49 text {
-} 113.49 text {
-} 114.0 tagoff space 115.0 tagon indent2 115.0 tagon list 115.0 tagon hi 115.0 text {This is the defining term } 115.0 tagoff hi 115.26 tagoff list 115.26 tagoff indent2 115.26 tagon space 115.26 text {
-} 115.26 tagoff space 116.0 tagon {} 116.0 tagon indent3 116.0 text {And this is its definition } 116.0 tagoff indent3 116.27 tagoff {} 116.27 tagon space 116.27 text {
-} 116.27 tagoff space 117.0 tagon indent2 117.0 tagon list 117.0 tagon hi 117.0 text {term 1} 117.0 tagoff hi 117.6 tagoff list 117.6 tagoff indent2 117.6 tagon space 117.6 text {
-} 117.6 tagoff space 118.0 tagon indent2 118.0 tagon list 118.0 tagon hi 118.0 text {term2 } 118.0 tagoff hi 118.6 tagoff list 118.6 tagoff indent2 118.6 tagon space 118.6 text {
-} 118.6 tagoff space 119.0 tagon {} 119.0 tagon indent3 119.0 text {More than one term can have the same definition } 119.0 tagoff indent3 119.48 tagoff {} 119.48 tagon space 119.48 text {
-} 119.48 text {
-} 120.0 tagoff space 121.0 tagon indent1 121.0 tagon compact 121.0 tagon mark 121.0 text {	6	} 121.0 tagoff mark 121.3 tagoff compact 121.3 tagoff indent1 121.3 tagon {} 121.3 tagon indent2 121.3 text {Currently, markup can't be used inside a definition term of a definition list (although one can use markup out-side of it). } 121.3 tagoff indent2 121.127 tagoff {} 121.127 tagon space 121.127 text {
-} 121.127 text {
-} 122.0 tagoff space 123.0 tagon indent0 123.0 tagon list 123.0 tagon mark 123.0 text {	O	} 123.0 tagoff mark 123.3 tagoff list 123.3 tagoff indent0 123.3 tagon {} 123.3 tagon indent1 123.3 text {This is the outer-most list. Although not indicated in the specification, you can use lists with no } 123.3 tagoff font:times:12:normal:roman 123.103 tagon font:courier:12:normal:roman 123.103 text li 123.103 tagoff font:courier:12:normal:roman 123.105 tagon font:times:12:normal:roman 123.105 text { constructs to effect indented paragraphs. } 123.105 tagoff indent1 123.148 tagoff {} 123.148 tagon space 123.148 text {
-} 123.148 tagoff space 124.0 tagon {} 124.0 tagon indent2 124.0 text {This is text in an unordered list, but leaving off the } 124.0 tagoff font:times:12:normal:roman 124.55 tagon font:courier:12:normal:roman 124.55 text li 124.55 tagoff font:courier:12:normal:roman 124.57 tagon font:times:12:normal:roman 124.57 text { tag. As you can see, it looks just like an indented paragraph, a construct that is not defined in HTML. } 124.57 tagoff indent2 124.162 tagoff {} 124.162 tagon space 124.162 text {
-} 124.162 tagoff space 125.0 tagon {} 125.0 tagon indent1 125.0 text {This is back to the outer-most list. } 125.0 tagoff indent1 125.37 tagoff {} 125.37 tagon space 125.37 text {
-} 125.37 tagoff font:times:12:normal:roman 126.0 text {
-} 126.0 tagoff space 127.0 tagon thin 127.0 text {
-} 127.0 tagon hr 128.0 text {	} 128.0 tagoff hr 128.1 text {
-} 128.1 tagoff thin 129.0 mark N:markup 129.0 tagon {} 129.0 tagon indent0 129.0 tagon font:times:12:normal:roman 129.0 text { } 129.0 tagon N:markup 129.1 tagon anchor 129.1 text { } 129.1 tagoff indent0 129.2 tagoff anchor 129.2 tagoff {} 129.2 tagoff N:markup 129.2 tagon space 129.2 text {
-} 129.2 text {
-} 130.0 tagoff space 131.0 tagoff font:times:12:normal:roman 131.0 tagon N:markup 131.0 tagon anchor 131.0 tagon {} 131.0 tagon indent0 131.0 tagon font:times:18:bold:italic 131.0 text {Phrase markup} 131.0 tagoff indent0 131.13 tagoff anchor 131.13 tagoff {} 131.13 tagoff N:markup 131.13 tagon space 131.13 text {
-} 131.13 tagoff font:times:18:bold:italic 132.0 tagon font:times:12:normal:roman 132.0 text {
-} 132.0 text {
-} 133.0 tagoff space 134.0 tagon {} 134.0 tagon indent0 134.0 text {HTML has many tags that affect the font style, one can use either } 134.0 tagoff font:times:12:normal:roman 134.66 tagon font:times:12:normal:italic 134.66 text functional 134.66 tagoff font:times:12:normal:italic 134.76 tagon font:times:12:normal:roman 134.76 text { tags such as } 134.76 tagoff font:times:12:normal:roman 134.90 tagon font:times:12:bold:roman 134.90 text strong 134.90 tagoff font:times:12:bold:roman 134.96 tagon font:times:12:normal:roman 134.96 text { or } 134.96 tagoff font:times:12:normal:roman 134.100 tagon font:times:12:normal:italic 134.100 text cite 134.100 tagoff font:times:12:normal:italic 134.104 tagon font:times:12:normal:roman 134.104 text {, which is the prefered method, or markup tags, such as } 134.104 tagoff font:times:12:normal:roman 134.160 tagon font:times:12:bold:roman 134.160 text bold 134.160 tagoff font:times:12:bold:roman 134.164 tagon font:times:12:normal:roman 134.164 text { or } 134.164 tagoff font:times:12:normal:roman 134.168 tagon font:times:12:normal:italic 134.168 text italic 134.168 tagoff font:times:12:normal:italic 134.174 tagon font:times:12:normal:roman 134.174 text {. } 134.174 tagoff indent0 134.176 tagoff {} 134.176 tagon space 134.176 text {
-} 134.176 text {
-} 135.0 tagoff space 136.0 tagon {} 136.0 tagon indent0 136.0 text {The basic font style is a plain medium-roman font. } 136.0 tagoff indent0 136.51 tagon indent1 136.51 text { } 136.51 tagoff indent1 136.52 tagoff {} 136.52 tagon space 136.52 text {
-} 136.52 tagoff space 137.0 tagon indent0 137.0 tagon list 137.0 tagon mark 137.0 text {	O	} 137.0 tagoff mark 137.3 tagoff list 137.3 tagoff indent0 137.3 tagon {} 137.3 tagon indent1 137.3 text {The Quick brown fox jumped over the lazy dog. } 137.3 tagoff indent1 137.49 tagoff {} 137.49 tagon space 137.49 text {
-} 137.49 text {
-} 138.0 mark N:test 139.0 text {
-} 139.0 tagoff space 140.0 tagon N:test 140.0 tagon anchor 140.0 tagon {} 140.0 tagon indent0 140.0 text target 140.0 tagoff anchor 140.6 tagoff N:test 140.6 text { HTML defines many tags that alter the font style. The Three primary style alterations are: } 140.6 tagoff indent0 140.98 tagon indent1 140.98 text { } 140.98 tagoff indent1 140.99 tagoff {} 140.99 tagon space 140.99 text {
-} 140.99 tagoff space 141.0 tagon indent0 141.0 tagon list 141.0 tagon mark 141.0 text {	O	} 141.0 tagoff mark 141.3 tagoff list 141.3 tagoff indent0 141.3 tagon {} 141.3 tagon indent1 141.3 text bold: 141.3 tagoff indent1 141.8 tagoff {} 141.8 tagon space 141.8 text {
-} 141.8 tagoff space 142.0 tagoff font:times:12:normal:roman 142.0 tagon {} 142.0 tagon indent1 142.0 tagon font:times:12:bold:roman 142.0 text {The Quick brown fox jumped over the lazy dog.} 142.0 tagoff font:times:12:bold:roman 142.45 tagon font:times:12:normal:roman 142.45 text { } 142.45 tagoff indent1 142.46 tagoff {} 142.46 tagon space 142.46 text {
-} 142.46 tagoff space 143.0 tagon indent0 143.0 tagon list 143.0 tagon mark 143.0 text {	O	} 143.0 tagoff mark 143.3 tagoff list 143.3 tagoff indent0 143.3 tagon {} 143.3 tagon indent1 143.3 text italic: 143.3 tagoff indent1 143.10 tagoff {} 143.10 tagon space 143.10 text {
-} 143.10 tagoff space 144.0 tagoff font:times:12:normal:roman 144.0 tagon {} 144.0 tagon indent1 144.0 tagon font:times:12:normal:italic 144.0 text {The Quick brown fox jumped over the lazy dog.} 144.0 tagoff font:times:12:normal:italic 144.45 tagon font:times:12:normal:roman 144.45 text { } 144.45 tagoff indent1 144.46 tagoff {} 144.46 tagon space 144.46 text {
-} 144.46 tagoff space 145.0 tagon indent0 145.0 tagon list 145.0 tagon mark 145.0 text {	O	} 145.0 tagoff mark 145.3 tagoff list 145.3 tagoff indent0 145.3 tagon {} 145.3 tagon indent1 145.3 text {mono-spaced font:} 145.3 tagoff indent1 145.20 tagoff {} 145.20 tagon space 145.20 text {
-} 145.20 tagoff space 146.0 tagoff font:times:12:normal:roman 146.0 tagon {} 146.0 tagon indent1 146.0 tagon font:courier:12:normal:roman 146.0 text {The Quick brown fox jumped over the lazy dog.} 146.0 tagoff font:courier:12:normal:roman 146.45 tagon font:times:12:normal:roman 146.45 text { } 146.45 tagoff indent1 146.46 tagoff {} 146.46 tagon space 146.46 text {
-} 146.46 text {
-} 147.0 text {
-} 148.0 tagoff space 149.0 tagon {} 149.0 tagon indent0 149.0 text {There are two additional styles that are deprecated, but still used in some contexts. They are } 149.0 tagoff indent0 149.95 tagon indent1 149.95 text { } 149.95 tagoff indent1 149.96 tagoff {} 149.96 tagon space 149.96 text {
-} 149.96 tagoff space 150.0 tagon indent0 150.0 tagon list 150.0 tagon mark 150.0 text {	O	} 150.0 tagoff mark 150.3 tagoff list 150.3 tagoff indent0 150.3 tagon {} 150.3 tagon indent1 150.3 text underline: 150.3 tagoff indent1 150.13 tagoff {} 150.13 tagon space 150.13 text {
-} 150.13 tagoff space 151.0 tagon underline 151.0 tagon {} 151.0 tagon indent1 151.0 text {The Quick brown fox jumped over the lazy dog.} 151.0 tagoff underline 151.45 text { } 151.45 tagoff indent1 151.46 tagoff {} 151.46 tagon space 151.46 text {
-} 151.46 tagoff space 152.0 tagon indent0 152.0 tagon list 152.0 tagon mark 152.0 text {	O	} 152.0 tagoff mark 152.3 tagoff list 152.3 tagoff indent0 152.3 tagon {} 152.3 tagon indent1 152.3 text strike-out: 152.3 tagoff indent1 152.14 tagoff {} 152.14 tagon space 152.14 text {
-} 152.14 tagoff space 153.0 tagon strike 153.0 tagon {} 153.0 tagon indent1 153.0 text {The Quick brown fox jumped over the lazy dog.} 153.0 tagoff strike 153.45 text { } 153.45 tagoff indent1 153.46 tagoff {} 153.46 tagon space 153.46 text {
-} 153.46 text {
-} 154.0 text {
-} 155.0 tagoff space 156.0 tagon {} 156.0 tagon indent0 156.0 text {Font styles may be arbitrarily nested, to obtain combinations like } 156.0 tagoff font:times:12:normal:roman 156.67 tagon font:times:12:bold:italic 156.67 text {bold italic} 156.67 tagoff font:times:12:bold:italic 156.78 tagon font:times:12:normal:roman 156.78 text { or } 156.78 tagoff font:times:12:normal:roman 156.82 tagon underline 156.82 tagon font:courier:12:bold:roman 156.82 text {Underlined bold mono-spaced} 156.82 tagoff underline 156.109 tagoff font:courier:12:bold:roman 156.109 tagon font:times:12:normal:roman 156.109 text {. all of the combinations are enumerated somewhere else. } 156.109 tagoff indent0 156.166 tagoff {} 156.166 tagon space 156.166 text {
-} 156.166 text {
-} 157.0 tagoff space 158.0 tagon {} 158.0 tagon indent0 158.0 text {The } 158.0 tagoff font:times:12:normal:roman 158.4 tagon font:times:12:normal:italic 158.4 text functional 158.4 tagoff font:times:12:normal:italic 158.14 tagon font:times:12:normal:roman 158.14 text { tags, which map to one of more of the combinations above are: } 158.14 tagoff indent0 158.77 tagon indent1 158.77 text { } 158.77 tagoff indent1 158.78 tagoff {} 158.78 tagon space 158.78 text {
-} 158.78 tagoff space 159.0 tagon indent0 159.0 tagon compact 159.0 tagon mark 159.0 text {	->	} 159.0 tagoff mark 159.4 tagoff compact 159.4 tagoff indent0 159.4 tagoff font:times:12:normal:roman 159.4 tagon {} 159.4 tagon indent1 159.4 tagon font:times:12:normal:italic 159.4 text cite 159.4 tagoff font:times:12:normal:italic 159.8 tagon font:times:12:normal:roman 159.8 text { - for citations } 159.8 tagoff indent1 159.25 tagoff {} 159.25 tagon space 159.25 text {
-} 159.25 tagoff space 160.0 tagon indent0 160.0 tagon compact 160.0 tagon mark 160.0 text {	->	} 160.0 tagoff mark 160.4 tagoff compact 160.4 tagoff indent0 160.4 tagoff font:times:12:normal:roman 160.4 tagon {} 160.4 tagon indent1 160.4 tagon font:courier:12:normal:roman 160.4 text code 160.4 tagoff font:courier:12:normal:roman 160.8 tagon font:times:12:normal:roman 160.8 text { - for code fragments } 160.8 tagoff indent1 160.30 tagoff {} 160.30 tagon space 160.30 text {
-} 160.30 tagoff space 161.0 tagon indent0 161.0 tagon compact 161.0 tagon mark 161.0 text {	->	} 161.0 tagoff mark 161.4 tagoff compact 161.4 tagoff indent0 161.4 tagoff font:times:12:normal:roman 161.4 tagon {} 161.4 tagon indent1 161.4 tagon font:times:12:normal:i 161.4 text em 161.4 tagoff font:times:12:normal:i 161.6 tagon font:times:12:normal:roman 161.6 text { - for emphasis } 161.6 tagoff indent1 161.22 tagoff {} 161.22 tagon space 161.22 text {
-} 161.22 tagoff space 162.0 tagon indent0 162.0 tagon compact 162.0 tagon mark 162.0 text {	->	} 162.0 tagoff mark 162.4 tagoff compact 162.4 tagoff indent0 162.4 tagoff font:times:12:normal:roman 162.4 tagon {} 162.4 tagon indent1 162.4 tagon font:courier:12:bold:roman 162.4 text kbd 162.4 tagoff font:courier:12:bold:roman 162.7 tagon font:times:12:normal:roman 162.7 text { - for } 162.7 tagoff font:times:12:normal:roman 162.14 tagon font:times:12:normal:italic 162.14 text {user input} 162.14 tagoff font:times:12:normal:italic 162.24 tagon font:times:12:normal:roman 162.24 text { } 162.24 tagoff indent1 162.25 tagoff {} 162.25 tagon space 162.25 text {
-} 162.25 tagoff space 163.0 tagon indent0 163.0 tagon compact 163.0 tagon mark 163.0 text {	->	} 163.0 tagoff mark 163.4 tagoff compact 163.4 tagoff indent0 163.4 tagoff font:times:12:normal:roman 163.4 tagon {} 163.4 tagon indent1 163.4 tagon font:courier:12:normal:roman 163.4 text samp 163.4 tagoff font:courier:12:normal:roman 163.8 tagon font:times:12:normal:roman 163.8 text { - for samples } 163.8 tagoff indent1 163.23 tagoff {} 163.23 tagon space 163.23 text {
-} 163.23 tagoff space 164.0 tagon indent0 164.0 tagon compact 164.0 tagon mark 164.0 text {	->	} 164.0 tagoff mark 164.4 tagoff compact 164.4 tagoff indent0 164.4 tagoff font:times:12:normal:roman 164.4 tagon {} 164.4 tagon indent1 164.4 tagon font:times:12:bold:roman 164.4 text strong 164.4 tagoff font:times:12:bold:roman 164.10 tagon font:times:12:normal:roman 164.10 text { } 164.10 tagoff indent1 164.11 tagoff {} 164.11 tagon space 164.11 text {
-} 164.11 tagoff space 165.0 tagon indent0 165.0 tagon compact 165.0 tagon mark 165.0 text {	->	} 165.0 tagoff mark 165.4 tagoff compact 165.4 tagoff indent0 165.4 tagoff font:times:12:normal:roman 165.4 tagon {} 165.4 tagon indent1 165.4 tagon font:times:12:normal:italic 165.4 text var 165.4 tagoff font:times:12:normal:italic 165.7 tagon font:times:12:normal:roman 165.7 text { - for variable references } 165.7 tagoff indent1 165.34 tagoff {} 165.34 tagon space 165.34 text {
-} 165.34 tagoff font:times:12:normal:roman 166.0 text {
-} 166.0 tagoff space 167.0 tagon thin 167.0 text {
-} 167.0 tagon hr 168.0 text {	} 168.0 tagoff hr 168.1 text {
-} 168.1 tagoff thin 169.0 mark N:entities 169.0 tagon {} 169.0 tagon indent0 169.0 tagon font:times:12:normal:roman 169.0 text { } 169.0 tagon N:entities 169.1 tagon anchor 169.1 text { } 169.1 tagoff indent0 169.2 tagoff anchor 169.2 tagoff {} 169.2 tagoff N:entities 169.2 tagon space 169.2 text {
-} 169.2 text {
-} 170.0 tagoff space 171.0 tagoff font:times:12:normal:roman 171.0 tagon N:entities 171.0 tagon anchor 171.0 tagon {} 171.0 tagon indent0 171.0 tagon font:times:18:bold:italic 171.0 text {HTML entities} 171.0 tagoff indent0 171.13 tagoff anchor 171.13 tagoff {} 171.13 tagoff N:entities 171.13 tagon space 171.13 text {
-} 171.13 tagoff font:times:18:bold:italic 172.0 tagon font:times:12:normal:roman 172.0 text {
-} 172.0 text {
-} 173.0 tagoff space 174.0 tagon {} 174.0 tagon indent0 174.0 text {In HTML, the characters &, <, >, and " are special, and need to be represented as: &amp;, &lt;, &gt;, and &quot;. } 174.0 tagoff indent0 174.114 tagoff {} 174.114 tagon space 174.114 text {
-} 174.114 text {
-} 175.0 tagoff space 176.0 tagon {} 176.0 tagon indent0 176.0 text {n addition, the entire latin-1 character set can be represented similarly, such as &reg; (®) or &ouml; (ö). } 176.0 tagoff font:times:12:normal:roman 176.108 tagoff indent0 176.108 tagoff {} 176.108 tagon space 176.108 text {
-} 176.108 tagoff space 177.0 tagon thin 177.0 text {
-} 177.0 tagon hr 178.0 text {	} 178.0 tagoff hr 178.1 text {
-} 178.1 tagoff thin 179.0 mark N:images 179.0 tagon {} 179.0 tagon indent0 179.0 tagon font:times:12:normal:roman 179.0 text { } 179.0 tagon N:images 179.1 tagon anchor 179.1 text { } 179.1 tagoff indent0 179.2 tagoff anchor 179.2 tagoff {} 179.2 tagoff N:images 179.2 tagon space 179.2 text {
-} 179.2 text {
-} 180.0 tagoff space 181.0 tagoff font:times:12:normal:roman 181.0 tagon N:images 181.0 tagon anchor 181.0 tagon {} 181.0 tagon indent0 181.0 tagon font:times:18:bold:italic 181.0 text Images 181.0 tagoff indent0 181.6 tagoff anchor 181.6 tagoff {} 181.6 tagoff N:images 181.6 tagon space 181.6 text {
-} 181.6 tagoff font:times:18:bold:italic 182.0 tagon font:times:12:normal:roman 182.0 text {
-} 182.0 text {
-} 183.0 tagoff space 184.0 tagon {} 184.0 tagon indent0 184.0 text {The library can handle any inline image type that you can coerce into a TK image. Images are often used in HTML to simulate lists, as in: } 184.0 tagoff indent0 184.138 tagoff {} 184.138 tagon space 184.138 text {
-} 184.138 tagoff space 185.0 tagoff font:times:12:normal:roman 185.0 tagon nowrap 185.0 tagon {} 185.0 tagon indent0 185.0 tagon font:courier:12:normal:roman 185.0 text {
-} 185.0 window .try.281 186.0 text { This is a good point
-} 186.1 window .try.282 187.0 text { This is a good point too
-} 187.1 window .try.283 188.0 text { This is a } 188.1 tagoff font:courier:12:normal:roman 188.12 tagon font:courier:12:bold:roman 188.12 text bad 188.12 tagoff font:courier:12:bold:roman 188.15 tagon font:courier:12:normal:roman 188.15 text { point
-} 188.15 window .try.286 189.0 text { so is this
-} 189.1 window .try.287 190.0 text { another good one
-} 190.1 tagoff indent0 191.0 tagoff {} 191.0 tagoff nowrap 191.0 tagon space 191.0 text {
-} 191.0 tagoff font:courier:12:normal:roman 192.0 tagon font:times:12:normal:roman 192.0 text {
-} 192.0 text {
-} 193.0 tagoff space 194.0 tagon {} 194.0 tagon indent0 194.0 text {Sometimes images are used for, well images. } 194.0 window .try.290 194.44 text { } 194.45 tagoff font:times:12:normal:roman 194.46 tagon font:times:12:normal:italic 194.46 text {The view out the window...} 194.46 tagoff font:times:12:normal:italic 194.72 tagon font:times:12:normal:roman 194.72 text { } 194.72 tagoff font:times:12:normal:roman 194.73 tagoff indent0 194.73 tagoff {} 194.73 tagon space 194.73 text {
-} 194.73 tagoff space 195.0 tagon thin 195.0 text {
-} 195.0 tagon hr 196.0 text {	} 196.0 tagoff hr 196.1 text {
-} 196.1 tagoff thin 197.0 tagon {} 197.0 tagon indent0 197.0 tagon font:times:12:normal:roman 197.0 text { } 197.0 mark N:other 197.1 tagon center 197.1 text { } 197.1 tagon N:other 197.2 tagon anchor 197.2 text { } 197.2 tagoff indent0 197.3 tagoff center 197.3 tagoff anchor 197.3 tagoff {} 197.3 tagoff N:other 197.3 tagon space 197.3 text {
-} 197.3 text {
-} 198.0 tagoff space 199.0 tagoff font:times:12:normal:roman 199.0 tagon N:other 199.0 tagon anchor 199.0 tagon center 199.0 tagon {} 199.0 tagon indent0 199.0 tagon font:times:18:bold:italic 199.0 text {Other Stuff} 199.0 tagoff indent0 199.11 tagoff center 199.11 tagoff anchor 199.11 tagoff {} 199.11 tagoff N:other 199.11 tagon space 199.11 text {
-} 199.11 tagoff space 200.0 tagoff font:times:18:bold:italic 200.0 tagon center 200.0 tagon {} 200.0 tagon indent0 200.0 tagon font:times:12:normal:roman 200.0 text { Although not in the spec, I support centering. } 200.0 tagoff indent0 200.48 tagoff center 200.48 tagoff {} 200.48 tagon space 200.48 text {
-} 200.48 text {
-} 201.0 tagoff space 202.0 tagoff font:times:12:normal:roman 202.0 tagon center 202.0 tagon {} 202.0 tagon indent0 202.0 tagon font:times:18:bold:roman 202.0 text {This is a centered heading} 202.0 tagoff indent0 202.26 tagoff center 202.26 tagoff {} 202.26 tagon space 202.26 text {
-} 202.26 tagoff space 203.0 tagoff font:times:18:bold:roman 203.0 tagon center 203.0 tagon {} 203.0 tagon indent0 203.0 tagon font:times:12:normal:roman 203.0 window .try.301 203.0 text { } 203.1 window .try.302 203.2 text { } 203.3 window .try.303 203.4 text { } 203.5 window .try.304 203.6 text { } 203.7 window .try.305 203.8 text { } 203.9 tagoff indent0 203.10 tagoff center 203.10 tagoff {} 203.10 tagon space 203.10 text {
-} 203.10 tagoff space 204.0 tagoff font:times:12:normal:roman 204.0 tagon nowrap 204.0 tagon center 204.0 tagon {} 204.0 tagon indent0 204.0 tagon font:courier:12:normal:roman 204.0 text {
-} 204.0 text {Those are centered balls.
-} 205.0 text {-
-} 206.0 text {---
-} 207.0 text {-----
-} 208.0 text {--------
-} 209.0 text {This is some more centered stuff.
-} 210.0 tagoff indent0 211.0 tagoff center 211.0 tagoff {} 211.0 tagoff nowrap 211.0 tagon space 211.0 text {
-} 211.0 tagoff space 212.0 tagoff font:courier:12:normal:roman 212.0 tagon {} 212.0 tagon indent0 212.0 tagon font:times:12:normal:roman 212.0 text { } 212.0 tagoff font:times:12:normal:roman 212.1 tagoff indent0 212.1 tagoff {} 212.1 tagon space 212.1 text {
-} 212.1 tagoff space 213.0 tagon thin 213.0 text {
-} 213.0 tagon hr 214.0 text {	} 214.0 tagoff hr 214.1 text {
-} 214.1 tagoff thin 215.0 mark N:forms 215.0 tagon {} 215.0 tagon indent0 215.0 tagon font:times:12:normal:roman 215.0 text { } 215.0 tagon N:forms 215.1 tagon anchor 215.1 text { } 215.1 tagoff indent0 215.2 tagoff anchor 215.2 tagoff {} 215.2 tagoff N:forms 215.2 tagon space 215.2 text {
-} 215.2 text {
-} 216.0 tagoff space 217.0 tagoff font:times:12:normal:roman 217.0 tagon N:forms 217.0 tagon anchor 217.0 tagon {} 217.0 tagon indent0 217.0 tagon font:times:18:bold:italic 217.0 text Forms 217.0 tagoff indent0 217.5 tagoff anchor 217.5 tagoff {} 217.5 tagoff N:forms 217.5 tagon space 217.5 text {
-} 217.5 tagoff font:times:18:bold:italic 218.0 tagon font:times:12:normal:roman 218.0 text {
-} 218.0 text {
-} 219.0 tagoff space 220.0 tagon {} 220.0 tagon indent0 220.0 text {HTML defines 3 types of user-modifyable constructs: } 220.0 tagoff indent0 220.52 tagoff {} 220.52 tagon space 220.52 text {
-} 220.52 text {
-} 221.0 tagoff space 222.0 tagon indent-2 222.0 tagon list 222.0 tagon mark 222.0 text {		} 222.0 tagoff mark 222.2 tagoff list 222.2 tagoff indent-2 222.2 tagon {} 222.2 tagon indent-1 222.2 text {image maps } 222.2 tagoff indent-1 222.13 tagoff {} 222.13 tagon space 222.13 text {
-} 222.13 tagoff space 223.0 tagon indent-2 223.0 tagon list 223.0 tagon mark 223.0 text {		} 223.0 tagoff mark 223.2 tagoff list 223.2 tagoff indent-2 223.2 tagon {} 223.2 tagon indent-1 223.2 text {searchable indexes } 223.2 tagoff indent-1 223.21 tagoff {} 223.21 tagon space 223.21 text {
-} 223.21 tagoff space 224.0 tagon indent-2 224.0 tagon list 224.0 tagon mark 224.0 text {		} 224.0 tagoff mark 224.2 tagoff list 224.2 tagoff indent-2 224.2 tagon {} 224.2 tagon indent-1 224.2 text {forms } 224.2 tagoff indent-1 224.8 tagoff {} 224.8 tagon space 224.8 text {
-} 224.8 text {
-} 225.0 text {
-} 226.0 tagoff space 227.0 tagon {} 227.0 tagon indent-1 227.0 text {An image map is an image defined inside a hyperlink anchor, such as:} 227.0 tagoff indent-1 227.68 tagoff {} 227.68 tagon space 227.68 text {
-} 227.68 tagoff space 228.0 tagon L:imagemap 228.0 tagon link 228.0 tagon {} 228.0 tagon indent-1 228.0 window .try.323 228.0 tagoff link 228.1 tagoff L:imagemap 228.1 text { When you click on the image, it tacks the cursor position onto the } 228.1 tagoff font:times:12:normal:roman 228.69 tagon font:courier:12:normal:roman 228.69 text href 228.69 tagoff font:courier:12:normal:roman 228.73 tagon font:times:12:normal:roman 228.73 text { value, and (hopefully), the server knows what to do with it. } 228.73 tagoff indent-1 228.135 tagoff {} 228.135 tagon space 228.135 text {
-} 228.135 text {
-} 229.0 tagoff space 230.0 tagon {} 230.0 tagon indent-1 230.0 text {The } 230.0 tagoff font:times:12:normal:roman 230.4 tagon font:courier:12:normal:roman 230.4 text isindex 230.4 tagoff font:courier:12:normal:roman 230.11 tagon font:times:12:normal:roman 230.11 text { tag is for simple searchable indexes. They look like this:} 230.11 tagoff indent-1 230.70 tagoff {} 230.70 tagon space 230.70 text {
-} 230.70 tagoff space 231.0 tagoff font:times:12:normal:roman 231.0 tagon isindex 231.0 text {
-} 231.0 tagoff isindex 232.0 tagon indent-1 232.0 window .try.331 232.0 tagoff indent-1 232.1 tagon isindex 232.1 text {
-} 232.1 tagoff isindex 233.0 tagon font:times:12:normal:roman 233.0 tagon space 233.0 text {
-} 233.0 tagoff space 234.0 tagon {} 234.0 tagon indent-1 234.0 text {or if you use the } 234.0 tagoff font:times:12:normal:roman 234.18 tagon font:courier:12:normal:roman 234.18 text prompt 234.18 tagoff font:courier:12:normal:roman 234.24 tagon font:times:12:normal:roman 234.24 text { parameter, like this: } 234.24 tagoff indent-1 234.47 tagoff {} 234.47 tagon space 234.47 text {
-} 234.47 tagoff space 235.0 tagoff font:times:12:normal:roman 235.0 tagon isindex 235.0 text {
-} 235.0 tagoff isindex 236.0 tagon indent-1 236.0 window .try.336 236.0 tagoff indent-1 236.1 tagon isindex 236.1 text {
-} 236.1 tagoff isindex 237.0 tagon font:times:12:normal:roman 237.0 tagon space 237.0 text {
-} 237.0 tagoff space 238.0 tagon {} 238.0 tagon indent-1 238.0 text {Like imagemaps, the text you entered is munged beyond recognition, and tacked onto the } 238.0 tagoff font:times:12:normal:roman 238.87 tagon font:times:12:bold:roman 238.87 text current 238.87 tagoff font:times:12:bold:roman 238.94 tagon font:times:12:normal:roman 238.94 text { link. You can either key } 238.94 tagoff font:times:12:normal:roman 238.120 tagon font:courier:12:normal:roman 238.120 text return 238.120 tagoff font:courier:12:normal:roman 238.126 tagon font:times:12:normal:roman 238.126 text { or hit the } 238.126 tagoff font:times:12:normal:roman 238.138 tagon font:times:12:normal:italic 238.138 text submit 238.138 tagoff font:times:12:normal:italic 238.144 tagon font:times:12:normal:roman 238.144 text { button. } 238.144 tagoff indent-1 238.153 tagoff {} 238.153 tagon space 238.153 text {
-} 238.153 text {
-} 239.0 tagoff space 240.0 tagon {} 240.0 tagon indent-1 240.0 text {The } 240.0 tagon L:forms.html 240.4 tagon link 240.4 text {remaining contructs} 240.4 tagoff link 240.23 tagoff L:forms.html 240.23 text { occur inside } 240.23 tagoff font:times:12:normal:roman 240.37 tagon font:courier:12:normal:roman 240.37 text form 240.37 tagoff font:courier:12:normal:roman 240.41 tagon font:times:12:normal:roman 240.41 text { and } 240.41 tagoff font:times:12:normal:roman 240.46 tagon font:courier:12:normal:roman 240.46 text /form 240.46 tagoff font:courier:12:normal:roman 240.51 tagon font:times:12:normal:roman 240.51 text { tags. } 240.51 tagoff font:times:12:normal:roman 240.58 tagoff indent-1 240.58 tagoff {} 240.58 tagon space 240.58 text {
-} 240.58 tagoff space 241.0 tagon thin 241.0 text {
-} 241.0 tagon hr 242.0 text {	} 242.0 tagoff hr 242.1 text {
-} 242.1 tagoff thin 243.0 mark N:end 243.0 tagon {} 243.0 tagon indent-1 243.0 tagon font:times:12:normal:roman 243.0 text { } 243.0 tagon N:end 243.1 tagon L:help.html 243.1 tagon anchor 243.1 tagon link 243.1 text home 243.1 tagoff link 243.5 tagoff anchor 243.5 tagoff L:help.html 243.5 tagoff N:end 243.5 text { } 243.5 tagoff font:times:12:normal:roman 243.6 tagoff indent-1 243.6 tagoff {} 243.6 mark Insert 243.6 text {
-} 243.6
+        
+
+ClassyTcl
+Object system for Tcl 
+by Peter De Rijk (Universiteit Antwerpen) 
+
+What is ClassyTcl
+ClassyTcl is an object system for Tcl, written enirely in Tcl. This means it doesn't require patches to the Tcl core, making keeping up with new releases easier. Performance is very adequate. Included in the distribution is a large set of  new widgets, written using the object system. While the object system itself only requires Tcl (>8.0), the widgets that come with it require Tk (of course), and another freely available extension called ExtraL. ExtraL also does not require compiled code, but can be speeded up by having it available. 
+
+Use
+You should be able to obtain the latest versions of ClassyTcl and ExtraL on our server rrna.uia.ac.be via WWW or anonymous ftp (directory /pub/tcl). Both Extral and ClassyTcl are implemented as loadable packages. ClassyTcl can be used by  putting the directories (after unpacking) somewhere appropriate and using the command 
+package require Class 
+
+To use the widgets that come with the distribution, first use the command 
+classyinit <program name> 
+
+Implementation
+Loading the package will create on class named  Class. All other classes and objects are created by subclassing or instanciating Class (or its subclasses), so all documentation to use the object system is in the description of Class. 
+
+Widgets
+There are a lot of interesting widgets in ClassyTcl, that you can use in your programs. There are complex widgets, such as a full featured text editor, a HTML display widget, a console widget, a help and  configuration system as well as component widgets, such as  intelligent dialogs, a NoteBook or a Folding frame. Classes such as DynaMenu and DynaTool help in easily making configurable menus. There are also several widgets that are improvments on the Tk widgets or systems, such as the text and canvas with undo capabilities and specialised entry widgets with label and contstraint options. 
+
+Unfortunately documentation is often somewhat limited, but besides the documentation, you can learn a lot from sources. Be sure to check out the file 'widgets/Editor.tcl' as an example. The Editor widget uses a lot of the other widgets. 
+
+How to contact me
+I will do my best to reply as fast as I can to any problems, etc. However, the development of ClassyTcl is not my only task, which is why my response might not be always as fast as you would like (although I get a good average).  Peter De Rijk 
+University of Antwerp (UIA) 
+Department of Biochemistry 
+Universiteitsplein 1 
+B-2610 Antwerp 
+
+tel.: 32-03-820.23.16 
+fax: 32-03-820.22.48 
+E-mail: derijkp@uia.ua.ac.be 
+web: http://rrna.uia.ac.be/~peter/personal/peter.html 
+
+Legalities
+ClassyTcl is Copyright Peter De Rijk, University of Antwerp (UIA), 1995 The following terms apply to all files associated with the software unless explicitly disclaimed in individual files. 
+
+The author hereby grant permission to use, copy, modify, distribute, and license this software and its documentation for any purpose, provided that existing copyright notices are retained in all copies and that this notice is included verbatim in any distributions. No written agreement, license, or royalty fee is required for any of the authorized uses. Modifications to this software may be copyrighted by their authors and need not follow the licensing terms described here, provided that the new terms are clearly indicated on the first page of each file where they apply. 
+
+IN NO EVENT SHALL THE AUTHORS OR DISTRIBUTORS BE LIABLE TO ANY PARTY FOR DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OF THIS SOFTWARE, ITS DOCUMENTATION, OR ANY DERIVATIVES THEREOF, EVEN IF THE AUTHORS HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+
+THE AUTHORS AND DISTRIBUTORS SPECIFICALLY DISCLAIM ANY WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT. THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, AND THE AUTHORS AND DISTRIBUTORS HAVE NO OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.   

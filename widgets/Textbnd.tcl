@@ -192,14 +192,14 @@ bind Classy::Text <Tab> {
 	focus %W
 	break
 }
-#bind Classy::Text <Shift-Tab> {
-#	# Needed only to keep <Tab> binding from triggering;  doesn't
-#	# have to actually do anything.
-#}
-bind Classy::Text <<FocusNext>> {
+bind Classy::Text <Shift-Tab> {
+	# Needed only to keep <Tab> binding from triggering;  doesn't
+	# have to actually do anything.
+}
+bind Classy::Text <<TextFocusNext>> {
 	focus [tk_focusNext %W]
 }
-bind Classy::Text <<FocusPrev>> {
+bind Classy::Text <<TextFocusPrev>> {
 	focus [tk_focusPrev %W]
 }
 bind Classy::Text <Control-i> {

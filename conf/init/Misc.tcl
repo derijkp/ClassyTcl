@@ -1,46 +1,45 @@
 ## ---- Misc settings ----
-## {patch Tk} {patch Tk to to use virtual events. (0/1)} {select 0 1}
-option add *Patchtk 1 widgetDefault
+## {patch Tk} {patch Tk to to use virtual events. This will be only be really activated after a restart of the program (0/1)} {select 0 1}
+Classy::setoption *PatchTk 1
 ## Menutype {Menutype: can be popup or top} {select popup top}
-option add *MenuType top widgetDefault
+Classy::setoption *MenuType top
 ## {Scrollbar position} {Scrollbar position (left/right)} {select left right}
-option add *ScrollSide right widgetDefault
+Classy::setoption *ScrollSide right
 
 ## ---- Dialogs ----
 ## {Color select} {type of color selection dialog (Tk/Peos)} {select Peos Tk}
-option add *GetColor Peos widgetDefault
+Classy::setoption *GetColor Peos
 ## {Select File} {type of Select File dialog used when running Windows (Win/Peos)} {select Win Peos}
-#option add *SelectFile Win widgetDefault
+#Classy::setoption *SelectFile Win
 ## {Save File} {type of Save File dialog used when running Windows (Win/Peos)} {select Win Peos}
-#option add *SaveFile Win widgetDefault
+#Classy::setoption *SaveFile Win
 ## {Font select} {type of font selection dialog when running Windows (Win/Peos)} {select Win Peos}
-#option add *GetFont Win widgetDefault
+#Classy::setoption *GetFont Win
 
 ## ---- Relief and borders ----
 ## {Border width} {Default Border width color}
-option add *borderWidth 1 widgetDefault
+Classy::setoption *borderWidth 1
 ## {Menu border width} {Default Menu border width color}
-#option add *Menu.BorderWidth 1 widgetDefault
+#Classy::setoption *Menu.BorderWidth 1
 ## {Scrollbar width} {Default Scrollbar width color}
-option add *Scrollbar.width 10 widgetDefault
+Classy::setoption *Scrollbar.width 10
 ## {Highlight thickness} {Default Highlight thickness color}
-option add *HighlightThickness 1 widgetDefault
+Classy::setoption *HighlightThickness 1
 ## {Frame highlight thickness} {Default Frame highlight thickness color}
-option add *Frame.HighlightThickness 0 widgetDefault
+Classy::setoption *Frame.HighlightThickness 0
 ## {Toplevel highlight thickness} {Default Toplevel highlight thickness color}
-option add *Toplevel.HighlightThickness 0 widgetDefault
+Classy::setoption *Toplevel.HighlightThickness 0
 ## {Button padx} {Default Button padx color}
-option add *Button.padX 1 widgetDefault
+Classy::setoption *Button.padX 1
 ## {Button pady} {Default Button pady color}
-option add *Button.padY 1 widgetDefault
+Classy::setoption *Button.padY 1
 ## {Menu button padx} {Default Menu button padx color}
-option add *MenuButton.padX 1 widgetDefault
+Classy::setoption *MenuButton.padX 1
 ## {Menu button pady} {Default Menu button pady color}
-option add *MenuButton.padY 1 widgetDefault
+Classy::setoption *MenuButton.padY 1
 ## {Checkbutton anchor} {Default Checkbutton anchor color}
-option add *Checkbutton.anchor w widgetDefault
+Classy::setoption *Checkbutton.anchor w
 ## {Option box border width} {Default Option box border width color}
-option add *Peos__OptionBox.BorderWidth 2 widgetDefault
+Classy::setoption *Peos__OptionBox.BorderWidth 2
 ## {Option box relief} {Default Option box relief color}
-option add *Peos__OptionBox.Relief groove widgetDefault
-
+Classy::setoption *Peos__OptionBox.Relief groove

@@ -38,8 +38,8 @@ Classy::export NumEntry {}
 Classy::NumEntry classmethod init {args} {
 	super
 	frame $object.controls
-	button $object.controls.incr -bitmap @[Classy::geticon incr]
-	button $object.controls.decr -bitmap @[Classy::geticon decr]
+	button $object.controls.incr -image [Classy::geticon incr.xbm]
+	button $object.controls.decr -image [Classy::geticon decr.xbm]
 	pack $object.controls.incr -side top
 	pack $object.controls.decr -side bottom
 	pack $object.controls -in $object.frame.entry -after $object.entry -side left

@@ -580,37 +580,37 @@ Classy::Editor method finddialog {} {
 	set w $object.find
 	if ![winfo exists $w] {
 		Classy::Dialog $w -cache 1
+		wm title $w Find
+		set what "\[$w.options.find get\] "
+		$w add find Find "$object find $what -\[set [privatevar $object options(-searchdir)]\]" default
+		$w add repl Replace "$object replace"
+		$w add replall "Replace all" "$object replace all"
+	
+		Classy::Entry $w.options.find -label Find -textvariable [privatevar $object options(-findwhat)]
+		Classy::Entry $w.options.replace -label Replace -textvariable [privatevar $object options(-replace)]
+		frame $w.options.frame
+		Classy::OptionBox $w.options.type -label "Type" -orient vertical -variable [privatevar $object options(-searchtype)]
+		$w.options.type add exact Exact
+		$w.options.type add regexp Regexp
+		Classy::OptionBox $w.options.case -label "Case" -orient vertical -variable [privatevar $object options(-searchcase)]
+		$w.options.case add nocase "No case"
+		$w.options.case add case "Case sensitive"
+		Classy::OptionBox $w.options.dir -label "Direction" -orient horizontal -variable [privatevar $object options(-searchdir)]
+		$w.options.dir add forwards "Forward"
+		$w.options.dir add backwards "Backwards"
+		checkbutton $w.options.searchreopen -text "Search Reopen" -variable [privatevar $object options(-searchreopen)]
+		pack $w.options.find -fill x
+		pack $w.options.replace -fill x
+		pack $w.options.frame -fill x
+		pack $w.options.searchreopen -in $w.options.frame -side bottom -fill x -expand yes
+		pack $w.options.dir -in $w.options.frame -side bottom -fill x -expand yes
+		pack $w.options.type -in $w.options.frame -side left -fill x -expand yes
+		pack $w.options.case -in $w.options.frame -side left -fill x -expand yes
 	} else {
 		$w place
 		focus $w.options.find.entry
 		$w.options.find.entry select range 0 end
 	}
-	wm title $w Find
-	set what "\[$w.options.find get\] "
-	$w add find Find "$object find $what -\[set [privatevar $object options(-searchdir)]\]" default
-	$w add repl Replace "$object replace"
-	$w add replall "Replace all" "$object replace all"
-
-	Classy::Entry $w.options.find -label Find -textvariable [privatevar $object options(-findwhat)]
-	Classy::Entry $w.options.replace -label Replace -textvariable [privatevar $object options(-replace)]
-	frame $w.options.frame
-	Classy::OptionBox $w.options.type -label "Type" -orient vertical -variable [privatevar $object options(-searchtype)]
-	$w.options.type add exact Exact
-	$w.options.type add regexp Regexp
-	Classy::OptionBox $w.options.case -label "Case" -orient vertical -variable [privatevar $object options(-searchcase)]
-	$w.options.case add nocase "No case"
-	$w.options.case add case "Case sensitive"
-	Classy::OptionBox $w.options.dir -label "Direction" -orient horizontal -variable [privatevar $object options(-searchdir)]
-	$w.options.dir add forwards "Forward"
-	$w.options.dir add backwards "Backwards"
-	checkbutton $w.options.searchreopen -text "Search Reopen" -variable [privatevar $object options(-searchreopen)]
-	pack $w.options.find -fill x
-	pack $w.options.replace -fill x
-	pack $w.options.frame -fill x
-	pack $w.options.searchreopen -in $w.options.frame -side bottom -fill x -expand yes
-	pack $w.options.dir -in $w.options.frame -side bottom -fill x -expand yes
-	pack $w.options.type -in $w.options.frame -side left -fill x -expand yes
-	pack $w.options.case -in $w.options.frame -side left -fill x -expand yes
 	focus $w.options.find.entry
 	$w.options.find.entry select range 0 end
 }
@@ -732,7 +732,7 @@ Classy::Editor method setmacro {name command {key {}}} {
 	laddnew macros $name
 	Classy::Default set app Classy::Editor_macros $macros
 	Classy::Default set app Classy::Editor_macro_$name [list $command $key]
-	Classy::DynaMenu define Classy::Editor::macros [$object getmacromenu]
+	eval [.classy__editormenu.macros cget -postcommand]
 }
 
 #doc {Editor command deletemacro} cmd {
@@ -745,7 +745,7 @@ Classy::Editor method deletemacro {name} {
 		return
 	}
 	Classy::Default unset app Classy::Editor_macro_$name
-	Classy::DynaMenu define Classy::Editor::macros [$object getmacromenu]
+	eval [.classy__editormenu.macros cget -postcommand]
 }
 
 #doc {Editor command getmacromenu} cmd {
@@ -1044,6 +1044,58 @@ Classy::Editor method marker {command args} {
 	}
 }
 
+Classy::Editor method _reconfigure {} {
+	foreach w [list $object $object.edit $object.vbar $object.hbar] {
+		foreach {option name class} {
+			-font font Font
+			-foreground foreground Foreground
+	      -background background Background
+			-highlightbackground highlightBackground HighlightBackground
+			-highlightcolor highlightColor HighlightColor
+			-highlightthickness highlightThickness HighlightThickness
+			-borderwidth borderWidth BorderWidth
+			-disabledforeground disabledForeground DisabledForeground
+			-insertbackground insertBackground Foreground
+	 		-insertborderwidth insertBorderWidth BorderWidth
+			-selectbackground selectBackground Foreground
+			-selectborderwidth selectBorderWidth BorderWidth
+	 		-selectforeground selectForeground Background
+			-troughcolor troughColor Background
+		} {
+			catch {[::Classy::widget $w] configure $option [option get $w $name $class]}
+		}
+	}
+	if [winfo exists $object.find] {
+		Classy::Configurator _reconfigure $object.find
+	}
+	[::Classy::widget $object] configure -highlightthickness 0 -borderwidth 0
+	eval grid forget [winfo children $object]
+	if {[option get $object showTool ShowTool]} {
+		catch {Classy::Configurator _reconfigure $object.tool}
+		grid $object.tool -row 0 -column 0 -columnspan 2 -sticky we
+		grid rowconfigure $object 0 -weight 0
+		grid rowconfigure $object 1 -weight 1
+	} else {
+		grid rowconfigure $object 0 -weight 1
+		grid rowconfigure $object 1 -weight 0
+		grid rowconfigure $object 2 -weight 0
+	}
+	if {"[option get $object scrollSide ScrollSide]"=="left"} {
+		grid $object.vbar -row 1 -column 0 -sticky ns
+		grid $object.edit -row 1 -column 1 -sticky nswe
+		grid $object.hbar -row 2 -column 1 -sticky we
+		grid columnconfigure $object 0 -weight 0
+		grid columnconfigure $object 1 -weight 1
+	} else {
+		grid $object.edit -row 1 -column 0 -sticky nswe
+		grid $object.vbar -row 1 -column 1 -sticky ns
+		grid $object.hbar -row 2 -column 0 -sticky we
+		grid columnconfigure $object 0 -weight 1
+		grid columnconfigure $object 1 -weight 0
+	}
+	update idletasks
+}
+
 proc Classy::title {w title} {
 	wm title $w $title
 	wm iconname $w $title
@@ -1051,7 +1103,7 @@ proc Classy::title {w title} {
 
 proc edit {args} {
 	if {"$args"==""} {set args "Newfile"}
-	set w .peos__edit
+	set w .classy__edit
 	set num 1
 	while {[winfo exists $w$num] == 1} {incr num}
 	set w $w$num
@@ -1063,4 +1115,3 @@ proc edit {args} {
 	eval $w.editor load $args
 	return $w
 }
-

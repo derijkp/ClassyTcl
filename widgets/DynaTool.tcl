@@ -82,6 +82,7 @@ Classy::DynaTool method maketool {tooltype tool cmdw} {
 	}
 	set num 0
 	foreach current [splitcomplete $tooldata($tooltype)] {
+		if {"$current" == ""} continue
 		set type [lshift current]
 		incr num
 		set key b$num
@@ -91,7 +92,7 @@ Classy::DynaTool method maketool {tooltype tool cmdw} {
 			set command [lshift current]
 			regsub -all {%W} $command "\[$object cmdw $tool\]" command
 			regsub -all {%%} $command % command
-			set image [$object image $tool $id]
+			set image [Classy::geticon $id reload]
 			if {"$image"!=""} {
 				button $tool.$key -image $image -highlightthickness 0 -command [list Classy::check $command]
 			} else {
@@ -102,7 +103,7 @@ Classy::DynaTool method maketool {tooltype tool cmdw} {
 			set command [lshift current]
 			regsub -all {%W} $command $cmdw tempcmd
 			regsub -all {%%} $tempcmd % tempcmd
-			set image [$object image $tool $id]
+			set image [Classy::geticon $id reload]
 			if {"$image"!=""} {
 				eval {checkbutton $tool.$key -image $image -indicatoron 0 -highlightthickness 0} $tempcmd
 			} else {
@@ -114,7 +115,7 @@ Classy::DynaTool method maketool {tooltype tool cmdw} {
 			set command [lshift current]
 			regsub -all {%W} $command $cmdw tempcmd
 			regsub -all {%%} $tempcmd % tempcmd
-			set image [$object image $tool $id]
+			set image [Classy::geticon $id reload]
 			if {"$image"!=""} {
 				eval {radiobutton $tool.$key -image $image -indicatoron 0 -highlightthickness 0} $tempcmd
 			} else {
@@ -284,9 +285,9 @@ Classy::DynaTool method delete {tooltype} {
 		error "Couldn't delete $tooltype; it is not a tooltype managed by $object."
 	}
 	unset tooldata($tooltype)
-	foreach image [info commands Classy::Tool__img_$tooltype_*] {
-		image delete $image
-	}
+#	foreach image [info commands Classy::Tool__img_$tooltype_*] {
+#		image delete $image
+#	}
 	if [info exists tooltypes] {
 		set toollist [array get tooltypes]
 		set poss [lfind -exact $toollist $tooltype]
@@ -477,36 +478,4 @@ Classy::DynaTool method _placetop {tool} {
 	set y [expr $y+$mh+2*[$tool cget -bd]+1]
 	$tool configure -height $y
 	after idle "bind $tool <Configure> [list $keep]"
-}
-
-
-#doc {DynaTool image} cmd {
-#pathname image tool image
-#} descr {
-#}
-Classy::DynaTool method image {tool image} {
-	private $object tooltypes
-	if [catch {set file [Classy::geticon $image.gif]}] {
-		if [catch {set file [Classy::geticon $image.xpm]}] {
-			return ""
-		}
-	} else {
-		set name Classy::Tool__img_$tooltypes($tool)_$image
-	}
-	if [info exists $name] {
-		$name read $file
-	} else {
-		if {"[file extension $file]"==".xpm"} {
-			global tcl_platform
-			package require Img
-			if {"$tcl_platform(platform)"=="windows"} {
-				image create photo Classy::Tool__${tool}_$image -file $file
-			} else {
-				image create pixmap Classy::Tool__${tool}_$image -file $file
-			}
-		} else {
-			image create photo Classy::Tool__${tool}_$image -file $file
-		}
-	}
-	return Classy::Tool__${tool}_$image
 }

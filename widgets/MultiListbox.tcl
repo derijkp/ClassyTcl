@@ -26,7 +26,7 @@ catch {Classy::MultiListbox destroy}
 bind Classy::MultiListbox <<Action>> {set w [winfo parent %W];$w select [$w nearest %y]}
 bind Classy::MultiListbox <<Action-Motion>> {set w [winfo parent %W];$w select [$w nearest %y]}
 bind Classy::MultiListbox <<MExecute>> {[winfo parent %W] command}
-bind Classy::MultiListbox <Return> {[winfo parent %W] command}
+bind Classy::MultiListbox <<Return>> {[winfo parent %W] command}
 bind Classy::MultiListbox <<Up>> {
 	set w [winfo parent %W]
 	set sel [$w curselection]

@@ -40,7 +40,7 @@ proc Classy::selectfile {args} {
 		-filter {} *
 		-selectmode {single browse multiple extended persistent} browse
 		-default {} Classy__fileselect
-		-help {} Classy_file_select.html
+		-help {} Classy_file_select
 	} remain
 	if {"$remain"!=""} {
 		error "Unknown options \"$remain\""

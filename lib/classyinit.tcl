@@ -6,7 +6,7 @@
 # of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 #
 # ---------------------------------------------------------------
-package require Extral 1.23
+package require Extral 0.96
 lappend auto_path [file join ${::class::dir} widgets]
 option add *ColorList {{blue cyan green yellow orange red magenta} {blue3 cyan3 green3 yellow3 orange3 red3 magenta3} {black gray20 gray40 gray50 gray60 gray80 white}} widgetDefault
 
@@ -16,6 +16,9 @@ proc classyinit {appname {appdir {}}} {
 	source [file join [set ::class::dir] lib conf.tcl]
 	source [file join [set ::class::dir] lib tools.tcl]
 	Classy::initconf
+	if {[option get . patchTk PatchTk]==1} {
+		source [file join [set ::class::dir] patches patchtk.tcl]
+	}
 }
 
 namespace eval ::Classy {}

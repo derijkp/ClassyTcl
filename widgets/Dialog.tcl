@@ -61,7 +61,7 @@ bind Classy::DialogButton <<ButtonRelease-Action>> {
 bind Classy::DialogButton <<ButtonRelease-Adjust>> {
 	Classy::DialogButtonUp %W Adjust
 }
-bind Classy::DialogButton <space> {
+bind Classy::DialogButton <<Invoke>> {
 	Classy::DialogButtonInvoke %W
 }
 

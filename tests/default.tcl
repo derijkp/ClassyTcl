@@ -34,7 +34,7 @@ test Classy::DefaultMenu {create and configure} {
 	clean
 	classyinit test [pwd]
 	entry .e
-	Classy::DefaultMenu .try -reference try -command {.e delete 0 end;.e insert 0 [.try get]} -getcommand {.e get}
+	Classy::DefaultMenu .try -key try -command {.e delete 0 end;.e insert 0 [.try get]} -getcommand {.e get}
 	pack .e .try -side left
 	.e delete 0 end;.e insert 0 try
 	Classy::Default set app try {ertu fghfh dfhjdf dffj}

@@ -197,10 +197,10 @@ bind Classy::CmdWidget <<CompleteVar>> {
 	%W complete var
 	break
 }
-bind Classy::CmdWidget <<FocusNext>> {
+bind Classy::CmdWidget <<TextFocusNext>> {
 	focus [tk_focusNext %W]
 }
-bind Classy::CmdWidget <<FocusPrev>> {
+bind Classy::CmdWidget <<TextFocusPrev>> {
 	focus [tk_focusPrev %W]
 }
 bind Classy::CmdWidget <Control-i> {
@@ -211,6 +211,16 @@ bind Classy::CmdWidget <<Empty>> {
 }
 bind Classy::CmdWidget <Return> {
 	%W textinsert "\n"
+}
+bind Classy::CmdWidget <Tab> {
+	%W textinsert "\t"
+	focus %W
+    break
+}
+bind Classy::CmdWidget <Shift-Tab> {
+    # Needed only to keep <Tab> binding from triggering;  doesn't
+    # have to actually do anything.
+    break
 }
 bind Classy::CmdWidget <<Delete>> {
 	%W textdelete

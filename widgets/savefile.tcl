@@ -38,9 +38,9 @@ proc Classy::savefile {args} {
 		-initialfile {} {}
 		-title {} {Save file}
 		-filter {} *
-		-default {} peos__fileselect
+		-default {} classy__fileselect
 		-transfercommand {} {}
-		-help {} peos_file_save.html
+		-help {} classy_file_save
 	} remain
 	if {"$remain"!=""} {
 		error "Unknown options \"$remain\""
@@ -51,8 +51,7 @@ proc Classy::savefile {args} {
 					-filetypes $opt(-filetypes) -initialdir $opt(-initialdir) \
 					-initialfile $opt(-initialfile) -title $opt(-title)] 0]
 	} else {
-		global peos__selectfile
-		catch {destroy .peos__selectfile}
+		catch {destroy .classy__selectfile}
 		set filter $opt(-filter)
 		set dir $opt(-initialdir)
 		if {"$dir"==""} {
@@ -61,15 +60,16 @@ proc Classy::savefile {args} {
 		if {"$dir"==""} {
 			set dir [pwd]
 		}
-		Classy::FileSelect .peos__selectfile -dir $dir \
-			-title $opt(-title) -command {set peos__selectfile [.peos__selectfile get]} \
-			-filter $filter -default $opt(-default) -help $opt(-help)
-		if {"$remain"!=""} {eval .peos__selectfile configure $remain}
+		Classy::FileSelect .classy__selectfile -dir $dir \
+			-title $opt(-title) -command {set ::Classy::selectfile [.classy__selectfile get]} \
+			-filter $filter -default $opt(-default) -help $opt(-help) \
+			-closecommand {set ::Classy::selectfile ""}
+		if {"$remain"!=""} {eval .classy__selectfile configure $remain}
 		if {"$opt(-initialfile)"!=""} {
-			.peos__selectfile set $opt(-initialfile)
+			.classy__selectfile set $opt(-initialfile)
 		}
-		tkwait window .peos__selectfile
-		return $peos__selectfile
+		tkwait window .classy__selectfile
+		return $::Classy::selectfile
 	}
 }
 

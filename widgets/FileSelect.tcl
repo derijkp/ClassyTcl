@@ -110,12 +110,12 @@ Classy::FileSelect classmethod init {args} {
 	bind $w.files <<Action-Motion>> "$object dirset;focus $w.files"
 	bind $w.files <<MExecute>> "$object dirset \[$w.files get @%x,%y\]; $object invoke go;break;"
 	bindtags $w.files "Listbox $w.files $object all"
-	bind $w.files <Return> "$object dirset"
-	bind $w.files <space> "$object dirset"
+	bind $w.files <<Return>> "$object dirset"
+	bind $w.files <<Invoke>> "$object dirset"
 	bind $w.file <<Complete>> "$w.file insert insert \[Classyfilecompletion \[$w.file get 0 insert\]\] ; break"
 	bind $w.filter <<Complete>> "$w.file insert insert \[Classyfilecompletion \[$w.file get 0 insert\]\] ; break"
 	bind $w.dirs <<MExecute>> "$object movedir \[$w.dirs get @%x,%y\]"
-	bind $w.dirs <Return> "$object movedir \[$w.dirs get active\];break"
+	bind $w.dirs <<Return>> "$object movedir \[$w.dirs get active\];break"
 	bind $w.file.entry <<Complete>> "$w.file nocmdset \[Classyfilecomplete \[$w.file get\]\];break"
 
 	# REM Configure initial arguments
@@ -279,4 +279,6 @@ Classy::FileSelect method movedir {movedir} {
 	} else {
 		set new [file join $options(-dir) $movedir]
 	}
+	set options(-dir) $new
+	Classy::todo $object refresh
 }

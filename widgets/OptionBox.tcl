@@ -25,7 +25,6 @@ proc OptionBox {} {}
 catch {Classy::OptionBox destroy}
 
 option add *Classy::OptionBox.relief raised widgetDefault
-#option add *Classy::OptionBox.label.background $PeosOption(dark_bg) widgetDefault
 #option add *Classy::OptionBox.label.anchor w widgetDefault
 option add *Classy::OptionBox.label.relief flat widgetDefault
 option add *Classy::OptionBox.box.relief flat widgetDefault

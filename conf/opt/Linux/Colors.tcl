@@ -19,33 +19,36 @@ option add *selectForeground black widgetDefault
 option add *selectColor orange widgetDefault
 ## {Highlight background} {Default Highlight background color} color
 option add *HighlightBackground #efefef widgetDefault
+## {Highlight color} {Default Highlight color} color
+option add *HighlightColor black widgetDefault
 ## Colorlist {list of colors as used the getcolor} color
 option add *ColorList {{blue cyan green yellow orange red magenta} {blue3 cyan3 green3 yellow3 orange3 red3 magenta3} {black gray20 gray40 gray50 gray60 gray80 white}} widgetDefault
 
 ## ---- Widget Colors ----
 ## {Entry background} {Entry background color} color
-option add *Entry.background #efefef widgetDefault
+#option add *Entry.background #efefef widgetDefault
 ## {Text background} {Text background color} color
-option add *Text.background #efefef widgetDefault
+#option add *Text.background #efefef widgetDefault
 ## {Listbox background} {Listbox background color} color
 option add *Listbox.background #dfdfdf widgetDefault
 ## {Scale foreground} {Scale foreground color} color
-option add *Scale.foreground black widgetDefault
+#option add *Scale.foreground black widgetDefault
 ## {Scale active foreground} {Scale active foreground color} color
-option add *Scale.activeForeground #efefef widgetDefault
+#option add *Scale.activeForeground #efefef widgetDefault
 ## {Scale background} {Scale background color} color
-option add *Scale.background #efefef widgetDefault
+#option add *Scale.background #efefef widgetDefault
 ## {Scale slider foreground} {Scale slider foreground color} color
-option add *Scale.sliderForeground #efefef widgetDefault
+#option add *Scale.sliderForeground #efefef widgetDefault
 ## {Scale slider background} {Scale slider background color} color
-option add *Scale.sliderBackground #dfdfdf widgetDefault
+#option add *Scale.sliderBackground #dfdfdf widgetDefault
 ## {Scrollbar foreground} {Scrollbar foreground color} color
-option add *Scrollbar.foreground #efefef widgetDefault
+#option add *Scrollbar.foreground #efefef widgetDefault
 ## {Scrollbar active foreground} {Scrollbar active foreground color} color
-option add *Scrollbar.activeForeground #efefef widgetDefault
+#option add *Scrollbar.activeForeground #efefef widgetDefault
 ## {Scrollbar background} {Scrollbar background color} color
-option add *Scrollbar.background #dfdfdf widgetDefault
+#option add *Scrollbar.background #dfdfdf widgetDefault
 ## {Label background} {Label background color} color
 option add *Label.background #dfdfdf widgetDefault
 ## {label background} {label background color} color
 option add *label.background #dfdfdf widgetDefault
+

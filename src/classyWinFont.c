@@ -17,7 +17,7 @@
 #endif
 
 int
-Peos_GetFontCmd(notUsed, interp, argc, argv)
+Classy_GetFontCmd(notUsed, interp, argc, argv)
 	 ClientData notUsed;        	        /* Not used. */
 	 Tcl_Interp *interp;        	        /* Current interpreter. */
 	 int argc;        	        	/* Number of arguments. */

@@ -58,7 +58,7 @@ Classy::export DynaMenu {}
 # ------------------------------------------------------------------
 
 #doc {DynaMenu makemenu} cmd {
-#DynaMenu makemenu menutype menu cmdw bindtag
+#DynaMenu makemenu menutype menu cmdw bindtag ?menuroot?
 #} descr {
 # This is usually the only method you need to create menus. It
 # creates a menu named $menu of type $menutype if $menu does not exist yet.
@@ -68,311 +68,153 @@ Classy::export DynaMenu {}
 # will make all shortcuts available from that widget.
 # The menu created will be a popup or top menu depending
 # on the <a href="../classy_configure.html">ClassyTcl configuration</a>.
+# <br>menuw can optionally be given to give the window on wich to tag 
+# a menubar. If not given the toplevel of the cmdw is used. In this case,
+# the cmdw has to exist when the menu is made.
 #}
-Classy::DynaMenu method makemenu {menutype menu cmdw bindtag} {
-	if ![winfo exists $menu] {
-		$object makepopup $menutype $menu $cmdw $bindtag
+Classy::DynaMenu method makemenu {menutype menu cmdw bindtag {menuroot {}}} {
+	private $object mtype cmdws checks bindtags bindings
+	private $object menudata menutypes
+	if ![info exists menudata($menutype)] {
+		$object define $menutype
 	}
-	if {"[option get $cmdw menuType MenuType]"=="top"} {
+	set menutypes($menu) $menutype
+	set bindtags($menu) $bindtag
+	set cmdws($menu) $cmdw
+	set checks($menu) ""
+	bind $bindtag <<KeyMenu>> [list $object post $menu %X %Y]
+	bind $bindtag <<Menu>> [list $object post $menu %X %Y]
+	bind $bindtag <FocusIn> [list $object cmdw $menu %W]
+	if ![winfo exists $menu] {
+		menu $menu -title [lindex $menutype 0]
+		$object makepopup $menu $menu $menudata($menutype) $cmdw $bindtag
+	}
+	if {"$menuroot" == ""} {
+		set root [winfo toplevel $cmdw]
+	} else {
+		set root [winfo toplevel $menuroot]
+	}
+	if {"[option get $root menuType MenuType]"=="top"} {
+		set mtype($menu) top
 		$menu configure -type menubar
-		[Classy::widget [winfo toplevel $cmdw]] configure -menu $menu
+		[Classy::widget $root] configure -menu $menu
+	} else {
+		set mtype($menu) popup
 	}
 }
 #doc {DynaMenu makepopup} cmd {
-#DynaMenu makepopup menutype menu cmdw bindtag
+#DynaMenu makepopup menu curmenu data cmdw bindtag
 #} descr {
-# create a popup menu of type $menutype. $cmdw
+# create a popup menu by the definition given in data. $cmdw
 # determines the initial cmdw. All key bindings for key shortcuts
 # are bound to $bindtag. Adding $bindtag to the bindtags of a widget
 # will make all shortcuts available from that widget.
 #}
-Classy::DynaMenu method makepopup {menutype menu cmdw bindtag} {
-	private $object mtype cmdws menudata menutypes checks bindtags actives
-	if ![info exists menudata($menutype)] {
-		$object define $menutype
-	}
-	set actives($menu) ""
-	set bindtags($menu) $bindtag
-	set menutypes($menu) $menutype
-	set mtype($menu) popup
-	set cmdws($menu) $cmdw
-	set checks($menu) ""
-	bind $bindtag <<KeyMenu>> [list $object post $menu %X %Y]
-	bind $bindtag <<Menu>> [list $object post $menu %X %Y]
-	bind $bindtag <FocusIn> [list $object cmdw $menu %W]
-	set todo($menu) $menudata($menutype)
-	menu $menu -title [lindex $menutype 0]
-	while {[array names todo] != ""} {
-		foreach curmenu [array names todo] {
-			set num 1
-			foreach current [splitcomplete $todo($curmenu)] {
-				set type [lindex $current 0]
-				set key [lindex $current 1]
-				set text [lindex $current 2]
-				if {"$type"=="menu"} {
-					menu $curmenu.$key
-					set todo($curmenu.$key) [lindex $current 3]
-					set shortcut [lindex $current 4]
-					if {"$shortcut"!=""} {
-						catch {bind $bindtag <$shortcut> "tk_popup $curmenu.$key %X %Y 1;break"}
-					} else {
-						set shortcut [event info <<menu$key>>]
-						catch {bind $bindtag <<menu$key>> "tk_popup $curmenu.$key %X %Y 1;break"}
-					}
-					$curmenu add cascade -label $text -menu $curmenu.$key -accelerator $shortcut
-					incr num
-				} elseif {"$type"=="activemenu"} {
-					set command [lindex $current 3]
-					regsub -all {%W} $command "\[$object cmdw $menu\]" command
-					regsub -all {%%} $command % command
-					set newmenu $curmenu.$key
-					lappend actives($menu) $newmenu
-					set newmenutype ${menutype}::$key
-					$object define $newmenutype [uplevel #0 $command]
-					$object makepopup $newmenutype $newmenu $cmdw ${bindtag}::$key
-					$curmenu.$key configure -postcommand [list Classy::DynaMenu _activemenu ${menutype}::$menu $command]
-					set shortcut [lindex $current 4]
-					if {"$shortcut"!=""} {
-						catch {bind $bindtag <$shortcut> "tk_popup $curmenu.$key %X %Y 1;break"}
-					} else {
-						set shortcut [event info <<menu$key>>]
-						catch {bind $bindtag <<menu$key>> "tk_popup $curmenu.$key %X %Y 1;break"}
-					}
-					$curmenu add cascade -label $text -menu $curmenu.$key -accelerator $shortcut
-					incr num
-				} elseif {"$type"=="separator"} {
-					$curmenu add separator
-					incr num
-				} elseif {"$type"=="action"} {
-					set command [lindex $current 3]
-					set shortcut [lindex $current 4]
-					regsub -all {%W} $command "\[$object cmdw $menu\]" command
-					regsub -all {%%} $command % command
-					if {"$shortcut"!=""} {
-						catch {bind $bindtag <$shortcut> "$object invoke $curmenu $num;break"}
-					} else {
-						set shortcut [event info <<$key>>]
-						catch {bind $bindtag <<$key>> "$object invoke $curmenu $num;break"}
-					}
-					$curmenu add command -label $text -command [list Classy::check $command] -accelerator [::Classy::shrink_accelerator $shortcut]
-					incr num
-				} elseif {"$type"=="check"} {
-					set command [lindex $current 3]
-					set shortcut [lindex $current 4]
-					regsub -all {%W} $command $cmdw temp
-					regsub -all {%%} $temp % temp
-					if {"$shortcut"!=""} {
-						catch {bind $bindtag <$shortcut> "$object invoke $curmenu $num;break"}
-					} else {
-						set shortcut [event info <<$key>>]
-						catch {bind $bindtag <<$key>> "$object invoke $curmenu $num;break"}
-					}
-					eval {$curmenu add check -label $text -accelerator $shortcut} $temp
-					append checks($menu) "$curmenu entryconfigure [$curmenu index last] $command\n"
-					incr num
-				} elseif {"$type"=="radio"} {
-					set command [lindex $current 3]
-					set shortcut [lindex $current 4]
-					regsub -all {%W} $command $cmdw temp
-					regsub -all {%%} $temp % temp
-					if {"$shortcut"!=""} {
-						catch {bind $bindtag <$shortcut> "$object invoke $curmenu $num;break"}
-					} else {
-						set shortcut [event info <<$key>>]
-						catch {bind $bindtag <<$key>> "$object invoke $curmenu $num;break"}
-					}
-					eval {$curmenu add radio -label $text -accelerator $shortcut} $temp
-					append checks($menu) "$curmenu entryconfigure [$curmenu index last] $command\n"
-					incr num
-				} elseif [regexp ^# $type] {
-				} elseif {"$type" ==""} {
-				} else {
-					error "Unknown entrytype $type" 
-				}
-			}
-			unset todo($curmenu)
+Classy::DynaMenu method makepopup {menu curmenu data cmdw bindtag} {
+	private $object checks base bindings
+	if [info exists bindings($curmenu)] {
+		foreach binding $bindings($curmenu) {
+			bind $bindtag $binding {}
 		}
 	}
-}
-
-#doc {DynaMenu maketop} cmd {
-#DynaMenu maketop menutype menu cmdw bindtag
-#} descr {
-# create a top menu of type $menutype. $cmdw
-# determines the initial cmdw. All key bindings for key shortcuts
-# are bound to $bindtag. Adding $bindtag to the bindtags of a widget
-# will make all shortcuts available from that widget.
-#}
-Classy::DynaMenu method maketop {menutype menu cmdw bindtag} {
-	private $object mtype cmdws menudata menutypes checks bindtags
-	if ![info exists menudata($menutype)] {
-		$object define $menutype
-	}
-	set bindtags($menu) $bindtag
-	set menutypes($menu) $menutype
-	set mtype($menu) popup
-	set cmdws($menu) $cmdw
-	set checks($menu) ""
-	if ![info exists notop] {
-		frame $menu -class Classy::TopMenu -highlightthickness 0 -bd 0
-#		bind $menu <Configure> [list $object _placetop $menu]
-	}
-	bind $bindtag <<KeyMenu>> [list $object post $menu %X %Y]
-	bind $bindtag <<Menu>> [list $object post $menu %X %Y]
-	bind $bindtag <FocusIn> [list $object cmdw $menu %W]
+	$curmenu delete 0 end
+	set bindings($curmenu) ""
+	set base($curmenu) $menu
 	set num 1
-	foreach current [splitcomplete $menudata($menutype)] {
+	foreach current [splitcomplete $data] {
 		set type [lindex $current 0]
 		set key [lindex $current 1]
 		set text [lindex $current 2]
 		if {"$type"=="menu"} {
+			menu $curmenu.$key -title $key
+			$object makepopup $menu $curmenu.$key [lindex $current 3] $cmdw $bindtag
 			set shortcut [lindex $current 4]
 			if {"$shortcut"!=""} {
-				catch {bind $bindtag <$shortcut> "tk_popup $menu.$key.menu %X %Y 1;break"}
+				lappend bindings($curmenu) <$shortcut>
+				catch {bind $bindtag <$shortcut> "tk_popup $curmenu.$key %X %Y 1;break"}
+			} else {
+				lappend bindings($curmenu) <<menu$key>>
+				set shortcut [event info <<menu$key>>]
+				lappend bindings($curmenu) <<menu$key>>
+				catch {bind $bindtag <<menu$key>> "tk_popup $curmenu.$key %X %Y 1;break"}
+			}
+			$curmenu add cascade -label $text -menu $curmenu.$key -accelerator $shortcut
+			incr num
+		} elseif {"$type"=="activemenu"} {
+			set command [lindex $current 3]
+			regsub -all {%W} $command "\[$object cmdw $menu\]" command
+			regsub -all {%%} $command % command
+
+			set data [uplevel #0 $command]
+			menu $curmenu.$key -title $key -postcommand [list $object _activemenu $menu $curmenu.$key $key $command]
+			$object makepopup $menu $curmenu.$key $data $cmdw $bindtag
+			set shortcut [lindex $current 4]
+			if {"$shortcut"!=""} {
+				lappend bindings($curmenu) <$shortcut>
+				catch {bind $bindtag <$shortcut> "tk_popup $curmenu.$key %X %Y 1;break"}
 			} else {
 				set shortcut [event info <<menu$key>>]
-				catch {bind $bindtag <<menu$key>> "tk_popup $menu.$key.menu %X %Y 1;break"}
+				lappend bindings($curmenu) <<menu$key>>
+				catch {bind $bindtag <<menu$key>> "tk_popup $curmenu.$key %X %Y 1;break"}
 			}
-			menubutton $menu.$key -text $text -highlightthickness 0 -menu $menu.$key.menu
-			menu $menu.$key.menu
-			set todo($menu.$key.menu) [lindex $current 3]
-			place $menu.$key -x 0 -y 0
+			$curmenu add cascade -label $text -menu $curmenu.$key -accelerator $shortcut
+			incr num
 		} elseif {"$type"=="separator"} {
+			$curmenu add separator
+			incr num
 		} elseif {"$type"=="action"} {
 			set command [lindex $current 3]
 			set shortcut [lindex $current 4]
 			regsub -all {%W} $command "\[$object cmdw $menu\]" command
 			regsub -all {%%} $command % command
-			regexp {^(.)(.*)$} $key temp f end
-			set key [string tolower $f]$end
 			if {"$shortcut"!=""} {
-				catch {bind $bindtag <$shortcut> [list $menu.$key invoke]}
+				lappend bindings($curmenu) <$shortcut>
+				catch {bind $bindtag <$shortcut> "$object invoke $curmenu $num;break"}
 			} else {
 				set shortcut [event info <<$key>>]
-				catch {bind $bindtag <<$key>> [list $menu.$key invoke]}
+				lappend bindings($curmenu) <<$key>>
+				catch {bind $bindtag <<$key>> "$object invoke $curmenu $num;break"}
 			}
-			if {"$shortcut"!=""} {
-				append text " ([::Classy::shrink_accelerator $shortcut])"
-			}
-			button $menu.$key -text $text -highlightthickness 0 -command [list Classy::check $command]
-			place $menu.$key -x 0 -y 0
+			$curmenu add command -label $text -command [list Classy::check $command] -accelerator [::Classy::shrink_accelerator $shortcut]
+			incr num
 		} elseif {"$type"=="check"} {
 			set command [lindex $current 3]
 			set shortcut [lindex $current 4]
-			regsub -all {%W} $command $cmdw tempcmd
-			regsub -all {%%} $tempcmd % tempcmd
-			regexp {^(.)(.*)$} $key temp f end
-			set key [string tolower $f]$end
+			regsub -all {%W} $command $cmdw temp
+			regsub -all {%%} $temp % temp
 			if {"$shortcut"!=""} {
-				catch {bind $bindtag <$shortcut> [list $menu.$key invoke]}
+				lappend bindings($curmenu) <$shortcut>
+				catch {bind $bindtag <$shortcut> "$object invoke $curmenu $num;break"}
 			} else {
 				set shortcut [event info <<$key>>]
-				catch {bind $bindtag <<$key>> [list $menu.$key invoke]}
+				lappend bindings($curmenu) <<$key>>
+				catch {bind $bindtag <<$key>> "$object invoke $curmenu $num;break"}
 			}
-			if {"$shortcut"!=""} {
-				append text " ([::Classy::shrink_accelerator $shortcut])"
-			}
-			eval {checkbutton $menu.$key -text $text -highlightthickness 0} $tempcmd
-			place $menu.$key -x 0 -y 0
-			append checks($menu) "$menu.$key configure $command\n"
+			eval {$curmenu add check -label $text -accelerator $shortcut} $temp
+			append checks($menu) "$curmenu entryconfigure [$curmenu index last] $command\n"
+			incr num
 		} elseif {"$type"=="radio"} {
 			set command [lindex $current 3]
 			set shortcut [lindex $current 4]
-			regsub -all {%W} $command $cmdw tempcmd
-			regsub -all {%%} $tempcmd % tempcmd
-			regexp {^(.)(.*)$} $key temp f end
-			set key [string tolower $f]$end
+			regsub -all {%W} $command $cmdw temp
+			regsub -all {%%} $temp % temp
 			if {"$shortcut"!=""} {
-				catch {bind $bindtag <$shortcut> [list $menu.$key invoke]}
+				lappend bindings($curmenu) <$shortcut>
+				catch {bind $bindtag <$shortcut> "$object invoke $curmenu $num;break"}
 			} else {
 				set shortcut [event info <<$key>>]
-				catch {bind $bindtag <<$key>> [list $menu.$key invoke]}
+				lappend bindings($curmenu) <<$key>>
+				catch {bind $bindtag <<$key>> "$object invoke $curmenu $num;break"}
 			}
-			eval {radiobutton $menu.$key -text $text -highlightthickness 0} $tempcmd
-			place $menu.$key -x 0 -y 0
-			append checks($menu) "$menu.$key configure $command\n"
+			eval {$curmenu add radio -label $text -accelerator $shortcut} $temp
+			append checks($menu) "$curmenu entryconfigure [$curmenu index last] $command\n"
+			incr num
 		} elseif [regexp ^# $type] {
 		} elseif {"$type" ==""} {
 		} else {
 			error "Unknown entrytype $type" 
 		}
 	}
-#
-#	Do submenus: same as popup
-#
-	while {[array names todo] != ""} {
-		foreach curmenu [array names todo] {
-			set num 1
-			foreach current [splitcomplete $todo($curmenu)] {
-				set type [lindex $current 0]
-				set key [lindex $current 1]
-				set text [lindex $current 2]
-				if {"$type"=="menu"} {
-					menu $curmenu.$key
-					set todo($curmenu.$key) [lindex $current 3]
-					set shortcut [lindex $current 4]
-					if {"$shortcut"!=""} {
-						catch {bind $bindtag <$shortcut> "tk_popup $curmenu.$key %X %Y 1;break"}
-					} else {
-						set shortcut [event info <<menu$key>>]
-						catch {bind $bindtag <<menu$key>> "tk_popup $curmenu.$key %X %Y 1;break"}
-					}
-					$curmenu add cascade -label $text -menu $curmenu.$key -accelerator $shortcut
-					incr num
-				} elseif {"$type"=="separator"} {
-					$curmenu add separator
-					incr num
-				} elseif {"$type"=="action"} {
-					set command [lindex $current 3]
-					set shortcut [lindex $current 4]
-					regsub -all {%W} $command "\[$object cmdw $menu\]" command
-					regsub -all {%%} $command % command
-					if {"$shortcut"!=""} {
-						catch {bind $bindtag <$shortcut> "$object invoke $curmenu $num;break"}
-					} else {
-						set shortcut [event info <<$key>>]
-						catch {bind $bindtag <<$key>> "$object invoke $curmenu $num;break"}
-					}
-					$curmenu add command -label $text -command [list Classy::check $command] -accelerator [::Classy::shrink_accelerator $shortcut]
-					incr num
-				} elseif {"$type"=="check"} {
-					set command [lindex $current 3]
-					set shortcut [lindex $current 4]
-					regsub -all {%W} $command $cmdw temp
-					regsub -all {%%} $temp % temp
-					if {"$shortcut"!=""} {
-						catch {bind $bindtag <$shortcut> "$object invoke $curmenu $num;break"}
-					} else {
-						set shortcut [event info <<$key>>]
-						catch {bind $bindtag <<$key>> "$object invoke $curmenu $num;break"}
-					}
-					eval {$curmenu add check -label $text -accelerator $shortcut} $temp
-					append checks($menu) "$curmenu entryconfigure [$curmenu index last] $command\n"
-					incr num
-				} elseif {"$type"=="radio"} {
-					set command [lindex $current 3]
-					set shortcut [lindex $current 4]
-					regsub -all {%W} $command $cmdw temp
-					regsub -all {%%} $temp % temp
-					if {"$shortcut"!=""} {
-						catch {bind $bindtag <$shortcut> "$object invoke $curmenu $num;break"}
-					} else {
-						set shortcut [event info <<$key>>]
-						catch {bind $bindtag <<$key>> "$object invoke $curmenu $num;break"}
-					}
-					eval {$curmenu add radio -label $text -accelerator $shortcut} $temp
-					append checks($menu) "$curmenu entryconfigure [$curmenu index last] $command\n"
-					incr num
-				} elseif [regexp ^# $type] {
-				} elseif {"$type" ==""} {
-				} else {
-					error "Unknown entrytype $type" 
-				}
-			}
-			unset todo($curmenu)
-		}
-	}
-	$object _placetopfirst $menu
 }
 
 #doc {DynaMenu define} cmd {
@@ -390,27 +232,66 @@ Classy::DynaMenu method maketop {menutype menu cmdw bindtag} {
 # that isn't managed yet.
 #}
 Classy::DynaMenu method define {menutype {data {}}} {
-	private $object menudata keep
-	if [info exists menudata($menutype)] {set keep $menudata($menutype)}
-	if {"$data" != ""} {
-		set menudata($menutype) $data
-	} else {
+	private $object menudata menutypes mtype cmdws checks bindtags flag
+	if {"$data" == ""} {
 		catch {destroy .classy__temp}
 		frame .classy__temp -class $menutype
-		set menudata($menutype) [option get .classy__temp menu Menu]
+		set data [option get .classy__temp menu Menu]
 		destroy .classy__temp
 	}
-	$object redraw $menutype
+	foreach menu [$object menus $menutype] {
+		if ![winfo exists $menu] {
+			catch {unset menutypes($menu)}
+			catch {unset mtype($menu)}
+			catch {unset cmdws($menu)}
+			catch {unset bindtags($menu)}
+			catch {unset checks($menu)}
+		} else {
+			eval destroy [winfo children $menu]
+			if [catch {$object makepopup $menu $menu $data $cmdws($menu) $bindtags($menu)} error] {
+				if [info exists flag] {
+					unset flag
+					error "error while defining menu; could not restore old: $error"
+				} else {
+					if [info exists menudata($menutype)] {
+						set flag 1
+						eval destroy [winfo children $menu]
+						$object define $menutype $menudata($menutype)
+						unset flag
+					}
+				}
+				error "error while defining menu; restored old: $error"
+			}
+		}
+	}
+	set menudata($menutype) $data
 }
 
-#doc {DynaMenu names} cmd {
+#doc {DynaMenu types} cmd {
 #DynaMenu names 
 #} descr {
 # returns a list of menutypes managed by Dynamenu
 #}
-Classy::DynaMenu method names {} {
+Classy::DynaMenu method types {} {
 	private $object menudata
 	return [array names menudata]
+}
+
+#doc {DynaMenu menus} cmd {
+#DynaMenu menus menutype
+#} descr {
+# returns a list of menus of type $menutype managed by Dynamenu
+#}
+Classy::DynaMenu method menus {menutype} {
+	private $object menutypes
+	if ![info exists menutypes] {return ""}
+	set menulist [array get menutypes]
+	set poss [lfind -exact $menulist $menutype]
+	set result ""
+	foreach pos $poss {
+		lappend result [lindex $menulist [expr $pos-1]]
+	}
+	return $result
 }
 
 Classy::DynaMenu method add {menutype data} {
@@ -458,25 +339,6 @@ Classy::DynaMenu method add {menutype data} {
 #	after idle "$object redraw $menutype"
 #}
 
-#doc {DynaMenu redraw} cmd {
-#DynaMenu redraw menutype
-#} descr {
-# redraw menus of type $menutype
-#}
-Classy::DynaMenu method redraw {menutype} {
-	private $object keep
-	if [catch {$object _refresh $menutype} result] {
-		global errorInfo
-		set error $errorInfo
-		if [info exists keep] {
-			set menudata($menutype) $keep
-			$object _refresh $menutype
-			append result "\nRestored old menu"
-		}
-		error $result $error
-	}
-}
-
 #doc {DynaMenu get} cmd {
 #DynaMenu get menutype
 #} descr {
@@ -493,51 +355,15 @@ Classy::DynaMenu method get {menutype} {
 # delete the definition and all menus of $menutype
 #}
 Classy::DynaMenu method delete {menutype} {
-	private $object menudata menutypes mtype cmdws checks bindtags
+	private $object menudata menutypes mtype cmdws checks bindtags active
 	unset menudata($menutype)
-	if [info exists menutypes] {
-		set menulist [array get menutypes]
-		set poss [lfind -exact $menulist $menutype]
-		foreach pos $poss {
-			set menu [lindex $menulist [expr $pos-1]]
-			if [winfo exists $menu] {destroy $menu}
-			unset menutypes($menu)
-			unset mtype($menu)
-			unset cmdws($menu)
-			unset checks($menu)
-			unset bindtags($menu)
-		}
-	}
-}
-
-Classy::DynaMenu method _refresh {menutype} {
-	private $object menutypes mtype cmdws checks bindtags notop
-	if [info exists menutypes] {
-		set menulist [array get menutypes]
-		set poss [lfind -exact $menulist $menutype]
-		foreach pos $poss {
-			set menu [lindex $menulist [expr $pos-1]]
-			if ![winfo exists $menu] {
-				catch {unset menutypes($menu)}
-				catch {unset mtype($menu)}
-				catch {unset cmdws($menu)}
-				catch {unset bindtags($menu)}
-				catch {unset checks($menu)}
-			} else {
-				set tag $bindtags($menu)
-				foreach binding [bind $tag] {
-					bind $tag $binding {}
-				}
-				if {"$mtype($menu)"=="top"} {
-					eval destroy [winfo children $menu]
-				} else {
-					destroy $menu
-				}
-				set notop 1
-				$object make$mtype($menu) $menutype $menu $cmdws($menu) $tag
-				unset notop
-			}
-		}
+	foreach menu [$object menus $menutype] {
+		if [winfo exists $menu] {destroy $menu}
+		unset menutypes($menu)
+		unset mtype($menu)
+		unset cmdws($menu)
+		unset checks($menu)
+		unset bindtags($menu)
 	}
 }
 
@@ -550,21 +376,18 @@ Classy::DynaMenu method _refresh {menutype} {
 # defined by DynaMenu recieves the focus.
 #}
 Classy::DynaMenu method cmdw {menu {cmdw {}}} {
-	private $object cmdws
+	private $object cmdws base
 	if {"$cmdw"==""} {
-		return $cmdws($menu)
+		return $cmdws($base($menu))
 	} else {
-		private $object actives
-		if {"$cmdws($menu)"=="$cmdw"} {return $cmdw}
-		set cmdws($menu) $cmdw
+		set basemenu $base($menu)
+		if {"$cmdws($basemenu)"=="$cmdw"} {return $cmdw}
+		set cmdws($basemenu) $cmdw
 		private $object checks
-		if [info exists checks($menu)] {
-			regsub -all {%W} $checks($menu) $cmdw command
+		if [info exists checks($basemenu)] {
+			regsub -all {%W} $checks($basemenu) $cmdw command
 			regsub -all {%%} $command % command
 			eval $command
-		}
-		foreach active $actives($menu) {
-			Classy::DynaMenu cmdw $active $cmdw
 		}
 		return $cmdw
 	}
@@ -686,7 +509,10 @@ Classy::DynaMenu method _placetop {menu} {
 	after idle "bind $menu <Configure> [list $keep]"
 }
 
-Classy::DynaMenu method _activemenu {menutype command} {
+Classy::DynaMenu method _activemenu {menu curmenu key command} {
+	private $object cmdws bindtags bindings
 	set data [uplevel #0 $command]
-	$object define $menutype $data
+	set cmdw $cmdws($menu)
+	set bindtag $bindtags($menu)
+	$object makepopup $menu $curmenu $data $cmdw $bindtag
 }

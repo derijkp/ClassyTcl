@@ -17,6 +17,10 @@ setevent <<Empty>> <Control-u>
 setevent <<Delete>> <Delete>
 ## BackSpace {BackSpace key}
 setevent <<BackSpace>> <BackSpace>
+## Transpose {Transpose key: switches the letters before and after the cursor}
+setevent <<Transpose>> <Control-t>
+## DeleteEnd {Delete from cursor to end}
+setevent <<DeleteEnd>> <Control-k>
 
 ## ---- Select ----
 ## SelectAll {SelectAll key}
@@ -26,7 +30,7 @@ setevent <<SelectNone>> <Alt-z>
 ## StartSelect {StartSelect key}
 setevent <<StartSelect>> <Control-space>
 ## EndSelect {EndSelect key}
-setevent <<EndSelect>> <Control-Alt-space>
+setevent <<EndSelect>> <Control-Shift-space>
 
 ## ---- File ----
 ## Load {Load key}
@@ -58,15 +62,13 @@ setevent <<ReplaceFindNext>> <Alt-g>
 ## FindFunction {FindFunction key}
 setevent <<FindFunction>> <Control-Alt-f>
 
-## ---- Misc ----
-## Help {Help key}
-setevent <<Help>> <F1>
-## Format {Format key}
-setevent <<Format>> <Control-Alt-j>
-## Print {Print key}
-setevent <<Print>> <Control-p>
+## ---- Control ----
 ## Escape {Escape key}
 setevent <<Escape>> <Escape>
+## Return {Return key}
+setevent <<Return>> <Return>
+## Invoke {Invoke key}
+setevent <<Invoke>> <space>
 ## KeyMenu {KeyMenu key}
 setevent <<KeyMenu>> <Alt-m>
 ## Default {Default key}
@@ -81,6 +83,18 @@ setevent <<Complete>> <Control-Tab>
 setevent <<FocusNext>> <Tab>
 ## FocusPrev {FocusPrev key}
 setevent <<FocusPrev>> <Shift-Tab>
+## TextFocusNext {TextFocusNext key}
+setevent <<TextFocusNext>> <Control-Tab>
+## TextFocusPrev {TextFocusPrev key}
+setevent <<TextFocusPrev>> <Control-Shift-Tab>
+
+## ---- Misc ----
+## Help {Help key}
+setevent <<Help>> <F1>
+## Format {Format key}
+setevent <<Format>> <Control-Alt-j>
+## Print {Print key}
+setevent <<Print>> <Control-p>
 ## MarkerSet {MarkerSet key}
 setevent <<MarkerSet>> <Alt-w>
 ## MarkerSelect {MarkerSelect key}
@@ -95,8 +109,8 @@ setevent <<IndentIn>> <Alt-i>
 setevent <<IndentOut>> <Alt-I>
 ## Connect {Connect key}
 setevent <<Connect>> <Control-C>
-## Execute {Execute key}
-setevent <<Execute>> <Alt-e>
+## {Execute command} {Execute command key}
+setevent <<ExecuteCmd>> <Alt-e>
 ## HistoryUp {HistoryUp key}
 setevent <<HistoryUp>> <Alt-Up>
 ## HistoryDown {HistoryDown key}

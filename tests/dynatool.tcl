@@ -9,13 +9,14 @@ test Classy::DynaTool {text} {
 	eval destroy [winfo children .]
 	classyinit test
 	Classy::DynaTool define Test {
+		action open "Open" {puts open}
 		action "Test" "Test" {puts test}
 		action "OK" "OK" {puts OK}
 	}
 	Classy::DynaTool maketool Test .t .
 	pack .t -fill x
 	text .text
-	pack .text -side bottom
+	pack .text -side bottom -fill both -expand yes
 	manualtest
 	set try 1
 } {1}

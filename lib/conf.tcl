@@ -36,14 +36,43 @@ proc setevent {event args} {
 	}
 }
 
-proc Classy::geticon {name} {
-	foreach type {appuser appdef user def} {
-		set file [file join $::Classy::dir($type) icons $name]
-		if [file readable $file] {
-			return $file
+proc Classy::geticon {name {reload {}}} {
+	if [info exists ::Classy::icons($name)] {
+		if {"$reload" == ""} {
+			return $::Classy::icons($name)
+		} else {
+			image delete $::Classy::icons($name)
+			unset ::Classy::icons($name)
 		}
 	}
-	return -code error "Icon \"$name\" not found"
+	set file ""
+	foreach type {appuser appdef user def} {
+		set base [file join $::Classy::dir($type) icons $name]
+		foreach type {{} .xpm .gif} {
+			if [file readable $base$type] {
+				set file $base$type
+			}
+		}
+	}
+	if {"$file" == ""} {
+		return ""
+	} else {
+		if {"[file extension $file]"==".xbm"} {
+			image create bitmap Classy::icon_$name -file $file
+		} elseif {"[file extension $file]"==".xpm"} {
+			global tcl_platform
+			package require Img
+			if {"$tcl_platform(platform)"=="windows"} {
+				image create photo Classy::icon_$name -file $file
+			} else {
+				image create pixmap Classy::icon_$name -file $file
+			}
+		} else {
+			image create photo Classy::icon_$name -file $file
+		}
+	}
+	set ::Classy::icons($name) Classy::icon_$name
+	return Classy::icon_$name
 }
 
 proc Classy::loadconf {conf args} {
@@ -58,26 +87,18 @@ proc Classy::loadconf {conf args} {
 	}
 }
 
-proc Classy::loadFonts {args} {
-	foreach dir [set ::Classy::dirs] {
-		set file [file join $dir init Fonts.tcl]
-		if [file readable $file] {
-			source $file
-		}
-	} 
-#	catch {font delete default}
-#	catch {font delete default_bold}
-#	catch {font delete default_italic}
-#	catch {font delete default_bold_italic}
-	foreach name {
-		DefaultFont DefaultBoldFont DefaultItalicFont
-		DefaultBoldItalicFont DefaultNonpropFont
-	} {
-		catch {font delete $name}
-		eval {font create $name} [font actual [option get . $name $name]]
+proc Classy::setoption {key value} {
+	if {"$value" != ""} {
+		option add $key $value widgetDefault
 	}
-	if {"$args" != ""} {
-		eval $args Fonts
+}
+
+proc Classy::setfont {key value} {
+	if {"$value" == ""} {
+	} elseif [regexp {^Font$|^BoldFont$|^ItalicFont$|^BoldItalicFont$|^NonPropFont$} $value] {
+		option add $key [option get . $value $value] widgetDefault
+	} else {
+		option add $key $value widgetDefault
 	}
 }
 
@@ -163,7 +184,7 @@ proc Classy::initconf {} {
 		event delete $event
 	}
 	::Classy::loadconf Misc
-	::Classy::loadFonts
+	::Classy::loadconf Fonts
 	::Classy::loadconf Colors
 	::Classy::loadKeys
 	::Classy::loadMouse

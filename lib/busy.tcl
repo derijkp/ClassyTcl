@@ -4,7 +4,9 @@
 #
 # busy command
 # ----------------------------------------------------------------------
-
+if 0 {
+proc busy {} {}
+}
 proc ::Classy::busy {{action {add}} args} {
 	switch $action {
 		remove {
@@ -83,4 +85,4 @@ proc ::Classy::busy {{action {add}} args} {
 	}
 }
 
-
+Classy::export busy {}

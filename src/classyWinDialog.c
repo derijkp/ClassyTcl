@@ -1,5 +1,5 @@
 /*
- * peosWinDlg.c --
+ * classyWinDlg.c --
  *
  *	Contains the Windows implementation of the common dialog boxes.
  *
@@ -48,15 +48,15 @@ typedef struct _OpenFileData {
 	 TCHAR szFile[MAX_PATH+1024+1];
 } OpenFileData;
 
-static int 		Peos_GetFileName _ANSI_ARGS_((ClientData clientData,
+static int 		Classy_GetFileName _ANSI_ARGS_((ClientData clientData,
 					 Tcl_Interp *interp, int argc, char **argv,
 					 int isOpen));
-static int 		Peos_MakeFilter _ANSI_ARGS_((Tcl_Interp *interp,
+static int 		Classy_MakeFilter _ANSI_ARGS_((Tcl_Interp *interp,
 					 OPENFILENAME *ofnPtr, char * string));
-static int		Peos_ParseFileDlgArgs _ANSI_ARGS_((Tcl_Interp * interp,
+static int		Classy_ParseFileDlgArgs _ANSI_ARGS_((Tcl_Interp * interp,
 					 OPENFILENAME *ofnPtr, int argc, char ** argv,
 				 int isOpen));
-static int 		Peos_ProcessCDError _ANSI_ARGS_((Tcl_Interp * interp,
+static int 		Classy_ProcessCDError _ANSI_ARGS_((Tcl_Interp * interp,
 				 DWORD dwErrorCode, HWND hWnd));
 
 /*
@@ -81,13 +81,13 @@ static int 		Peos_ProcessCDError _ANSI_ARGS_((Tcl_Interp * interp,
  */
 
 int
-Peos_GetOpenFileCmd(clientData, interp, argc, argv)
+Classy_GetOpenFileCmd(clientData, interp, argc, argv)
 	 ClientData clientData;	/* Main window associated with interpreter. */
 	 Tcl_Interp *interp;		/* Current interpreter. */
 	 int argc;			/* Number of arguments. */
 	 char **argv;		/* Argument strings. */
 {
-	 return Peos_GetFileName(clientData, interp, argc, argv, OPEN_FILE);
+	 return Classy_GetFileName(clientData, interp, argc, argv, OPEN_FILE);
 }
 
 /*
@@ -108,13 +108,13 @@ Peos_GetOpenFileCmd(clientData, interp, argc, argv)
  */
 
 int
-Peos_GetSaveFileCmd(clientData, interp, argc, argv)
+Classy_GetSaveFileCmd(clientData, interp, argc, argv)
 	 ClientData clientData;	/* Main window associated with interpreter. */
 	 Tcl_Interp *interp;		/* Current interpreter. */
 	 int argc;			/* Number of arguments. */
 	 char **argv;		/* Argument strings. */
 {
-	 return Peos_GetFileName(clientData, interp, argc, argv, SAVE_FILE);
+	 return Classy_GetFileName(clientData, interp, argc, argv, SAVE_FILE);
 }
 
 /*
@@ -133,7 +133,7 @@ Peos_GetSaveFileCmd(clientData, interp, argc, argv)
  *----------------------------------------------------------------------
  */
 
-static int Peos_GetFileName(clientData, interp, argc, argv, isOpen)
+static int Classy_GetFileName(clientData, interp, argc, argv, isOpen)
 	 ClientData clientData;	/* Main window associated with interpreter. */
 	 Tcl_Interp *interp;		/* Current interpreter. */
 	 int argc;			/* Number of arguments. */
@@ -152,7 +152,7 @@ static int Peos_GetFileName(clientData, interp, argc, argv, isOpen)
 	 /*
 	  * 1. Parse the arguments.
 	  */
-	 if (Peos_ParseFileDlgArgs(interp, ofnPtr, argc, argv, isOpen)!= TCL_OK) {
+	 if (Classy_ParseFileDlgArgs(interp, ofnPtr, argc, argv, isOpen)!= TCL_OK) {
 	return TCL_ERROR;
 	 }
 	 custData = (OpenFileData*)ofnPtr->lCustData;
@@ -179,7 +179,7 @@ static int Peos_GetFileName(clientData, interp, argc, argv, isOpen)
 	char * p;
 	Tcl_ResetResult(interp);
 
-/* Peos patch */
+/* Classy patch */
 	if ((ofnPtr->Flags & OFN_EXPLORER)&&(ofnPtr->Flags & OFN_ALLOWMULTISELECT)) {
 		char *keep;
 		keep=ofnPtr->lpstrFile;
@@ -215,7 +215,7 @@ static int Peos_GetFileName(clientData, interp, argc, argv, isOpen)
 	tclCode = TCL_OK;
 	 }
    else {
-	tclCode = Peos_ProcessCDError(interp, CommDlgExtendedError(),
+	tclCode = Classy_ProcessCDError(interp, CommDlgExtendedError(),
 		 ofnPtr->hwndOwner);
 	 }
 
@@ -246,7 +246,7 @@ static int Peos_GetFileName(clientData, interp, argc, argv, isOpen)
  *----------------------------------------------------------------------
  */
 
-static int Peos_ParseFileDlgArgs(interp, ofnPtr, argc, argv, isOpen)
+static int Classy_ParseFileDlgArgs(interp, ofnPtr, argc, argv, isOpen)
 	 Tcl_Interp * interp;	/* Current interpreter. */
 	 OPENFILENAME *ofnPtr;	/* Info about the file dialog */
 	 int argc;			/* Number of arguments. */
@@ -296,7 +296,7 @@ static int Peos_ParseFileDlgArgs(interp, ofnPtr, argc, argv, isOpen)
 	ofnPtr->Flags |= OFN_EXPLORER;
 	 }
 
-/* Peos patch
+/* Classy patch
 	 if (isOpen) {
 	ofnPtr->Flags |= OFN_FILEMUSTEXIST;
 	 } else {
@@ -319,7 +319,7 @@ static int Peos_ParseFileDlgArgs(interp, ofnPtr, argc, argv, isOpen)
 	else if (strncmp(argv[i], "-filetypes", len)==0) {
 		 if (v==argc) {goto arg_missing;}
 
-		 if (Peos_MakeFilter(interp, ofnPtr, argv[v]) != TCL_OK) {
+		 if (Classy_MakeFilter(interp, ofnPtr, argv[v]) != TCL_OK) {
 		return TCL_ERROR;
 		 }
 		 doneFilter = 1;
@@ -356,7 +356,7 @@ static int Peos_ParseFileDlgArgs(interp, ofnPtr, argc, argv, isOpen)
 
 		 ofnPtr->lpstrTitle = argv[v];
 	}
-/* Peos patch */
+/* Classy patch */
 	else if (strncmp(argv[i], "-selectmode", len)==0) {
 		 if (v==argc) {goto arg_missing;}
 		 if (strcmp(argv[v], "browse")!=0) {
@@ -374,7 +374,7 @@ static int Peos_ParseFileDlgArgs(interp, ofnPtr, argc, argv, isOpen)
 	 }
 
     if (!doneFilter) {
-	if (Peos_MakeFilter(interp, ofnPtr, "") != TCL_OK) {
+	if (Classy_MakeFilter(interp, ofnPtr, "") != TCL_OK) {
 	    return TCL_ERROR;
 	}
 	 }
@@ -408,7 +408,7 @@ static int Peos_ParseFileDlgArgs(interp, ofnPtr, argc, argv, isOpen)
  *
  *----------------------------------------------------------------------
  */
-static int Peos_MakeFilter(interp, ofnPtr, string)
+static int Classy_MakeFilter(interp, ofnPtr, string)
 	 Tcl_Interp *interp;		/* Current interpreter. */
 	 OPENFILENAME *ofnPtr;	/* Info about the file dialog */
 	 char * string;		/* String value of the -filetypes option */
@@ -543,7 +543,7 @@ static int Peos_MakeFilter(interp, ofnPtr, string)
  *
  *----------------------------------------------------------------------
  */
-static int Peos_ProcessCDError(interp, dwErrorCode, hWnd)
+static int Classy_ProcessCDError(interp, dwErrorCode, hWnd)
 	 Tcl_Interp * interp;		/* Current interpreter. */
 	 DWORD dwErrorCode;			/* The Windows-specific error code */
 	 HWND hWnd;				/* window in which the error happened*/

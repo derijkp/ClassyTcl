@@ -25,12 +25,23 @@ proc HTML {} {}
 catch {Classy::HTML destroy}
 
 source [file join $::class::dir html_library-0.3 html_library.tcl]
+
 proc ::html::link_callback {win href} {
 	$win geturl $href
+}
+proc ::html::submit_form {win param query} {
+	regexp {method="([^"]+)"} $param temp method
+	regexp {action="([^"]+)"} $param temp action
+	if {"$method"=="post"} {
+		$win geturl $action [eval ::http::formatQuery $query]
+	} else {
+		error "unsupported method \"$method\""
+	}
 }
 proc ::html::set_image {win handle src} {
 	$win _setimage $handle $src
 }
+catch {unset ::html::events}
 array set ::html::events {
 	Enter	{-borderwidth 2 -relief raised }
 	Leave	{-borderwidth 2 -relief flat }
@@ -47,6 +58,10 @@ Classy::export HTML {}
 
 Classy::HTML classmethod init {args} {
 	super text
+	bindtags $object [list $object Classy::HTML . all]
+	set w [Classy::widget $object]
+	$w tag bind link <<Action>> {%W geturl [%W linkat %x %y]}
+
 	::html::init_win $object
 
 	# REM Initialise options and variables
@@ -54,6 +69,7 @@ Classy::HTML classmethod init {args} {
 	private $object control options
 	setprivate $object options(-url) "file:/"
 	setprivate $object tempfile [tempfile]
+	setprivate $object currentquery ""
 	set control(history) ""
 	set control(forward) ""
 	set control(back) ""
@@ -120,6 +136,14 @@ Classy::HTML addoption -symbols {symbols Symbols {}} {
 	html::set_state $object -symbols $value
 }
 
+#doc {HTML options -tagmap} option {-tagmap tagMap TagMap} descr {
+#}
+Classy::HTML addoption -tagmap {tagMap TagMap {}}
+
+#doc {HTML options -insertmap} option {-insertmap insertMap InsertMap} descr {
+#}
+Classy::HTML addoption -insertmap {insertMap InsertMap {}}
+
 # ------------------------------------------------------------------
 #  Methods
 # ------------------------------------------------------------------
@@ -130,9 +154,9 @@ Classy::HTML chainallmethods {$object} text
 #pathname geturl url
 #} descr {
 #}
-Classy::HTML method geturl {url} {
-	private $object control options
-
+Classy::HTML method geturl {url {query {}}} {
+	private $object control options currentquery html
+	Classy::busy add $object
 	set url [$object fullurl $url]
 
 	# if it is the same url as the current, don't reload
@@ -144,20 +168,28 @@ Classy::HTML method geturl {url} {
 	regexp {([^#]*)#(.+)} $url dummy base fragment
 	regexp {([^#]*)#(.+)} $options(-url) dummy currentbase currentfragment
 	if ![info exists control(reload)] {
-		if {"$currentbase" == "$base"} {
-			if {"$currentfragment" != "$fragment"} {
-				::html::goto $object $url
-				if [info exists control(direction)] {
-					unset control(direction)
-				} else {
-					lappend control(back) $options(-url)
-					set control(forward) ""
-					lunshift control(history) $options(-url)
-					set control(history) [lrange $control(history) 0 50]
+		if {"$query" == ""} {
+			if {"$currentbase" == "$base"} {
+				if {"$currentfragment" != "$fragment"} {
+					if {"$fragment" != ""} {::html::goto $object $fragment}
+					if [info exists control(direction)] {
+						unset control(direction)
+					} else {
+						if {"$query" != ""} {
+							set keep [list $options(-url) $currentquery]
+						} else {
+							set keep $options(-url)
+						}
+						lappend control(back) $keep
+						set control(forward) ""
+						lunshift control(history) $keep
+						set control(history) [lrange $control(history) 0 50]
+					}
+					set options(-url) $url
 				}
-				set options(-url) $url
+				set currentquery $query
+				return $url
 			}
-			return $url
 		}
 	}
 
@@ -169,21 +201,29 @@ Classy::HTML method geturl {url} {
 	switch $protocol {
 		http {
 			package require http
-			set id [http::geturl $base]
+			if {"$query" == ""} {
+				set id [http::geturl $base]
+			} else {
+				set id [http::geturl $base -query $query]
+			}
 			set html [http::data $id]
 			array set state [set [set id](meta)]
-			set type $state(Content-Type)
-			unset id
-			if {"$type" != "text/html"} {
-				set html "<pre>$html</pre>"
+			if [info exists state(Content-Type)] {
+				set type [string trimright [string trimleft $state(Content-Type)]]
+#				if {"$type" != "text/html"} {
+#					set html "<pre>$html</pre>"
+#				}
+			} else {
+				set type text/html
 			}
+			unset $id
 		}
 		file {
 			set html [readfile $file]
 			if [regexp {html?$} $file] {
 				set type text/html
 			} else {
-				set html "<pre>$html</pre>"
+#				set html "<pre>$html</pre>"
 			}
 		}
 		data {
@@ -205,9 +245,14 @@ Classy::HTML method geturl {url} {
 	} elseif [info exists control(direction)] {
 		unset control(direction)
 	} else {
-		lappend control(back) $options(-url)
+		if {"$query" != ""} {
+			set keep [list $options(-url) $currentquery]
+		} else {
+			set keep $options(-url)
+		}
+		lappend control(back) $keep
 		set control(forward) ""
-		lunshift control(history) $options(-url)
+		lunshift control(history) $keep
 		set control(history) [lrange $control(history) 0 50]
 	}
 	set options(-url) $url
@@ -220,7 +265,80 @@ Classy::HTML method geturl {url} {
 	if {$fragment != ""} {
 		::html::goto $object $fragment
 	}
-	::html::parse_html $html [list ::html::render $object]
+	# These are Defined in HTML 2.0
+	catch {unset ::html::tag_map}
+	array set ::html::tag_map {
+		b      {weight bold}
+		blockquote	{style italic indent 1 Trindent rindent}
+		bq		{style italic indent 1 Trindent rindent}
+		cite   {style italic}
+		code   {family courier}
+		dfn    {style italic}	
+		dir    {indent 1}
+		dl     {indent 1}
+		em     {style i}
+		h1     {size 24 weight bold style italic}
+		h2     {size 18 weight bold style italic}		
+		h3     {size 18 weight bold}	
+		h4     {size 16 weight bold}
+		h5     {size 14 weight bold}
+		h6     {size 14 style italic}
+		i      {style italic}
+		kbd    {family courier weight bold}
+		menu     {indent 1}
+		ol     {indent 1}
+		pre    {fill 0 family courier Tnowrap nowrap}
+		samp   {family courier}		
+		strong {weight bold}		
+		tt     {family courier}
+		u	 {Tunderline underline}
+		ul     {indent 1}
+		var    {style italic}	
+	}
+
+	# These are in common(?) use, but not defined in html2.0
+
+	array set ::html::tag_map {
+		center {Tcenter center}
+		strike {Tstrike strike}
+		u	   {Tunderline underline}
+	}
+	set html::tag_map(hmstart) {
+		family times   weight normal   style roman   size 12
+		Tcenter ""   Tlink ""   Tnowrap ""   Tunderline ""   list list
+		fill 1   indent "" counter 0 adjust 0
+	}
+	array set ::html::tag_map $options(-tagmap)
+
+	array set ::html::insert_map {
+		blockquote "\n\n" /blockquote "\n"
+		br	"\n"
+		dd	"\n" /dd	"\n"
+		dl	"\n" /dl	"\n"
+		dt	"\n"
+		form "\n"	/form "\n"
+		h1	"\n\n"	/h1	"\n"
+		h2	"\n\n"	/h2	"\n"
+		h3	"\n\n"	/h3	"\n"
+		h4	"\n"	/h4	"\n"
+		h5	"\n"	/h5	"\n"
+		h6	"\n"	/h6	"\n"
+		li   "\n"
+		/dir "\n"
+		/ul "\n"
+		/ol "\n"
+		/menu "\n"
+		p	"\n\n"
+		pre "\n"	/pre "\n"
+	}
+	array set ::html::insert_map $options(-insertmap)
+	if {"$type" == "text/html"} {
+		::html::parse_html $html [list ::html::render $object]
+	} else {
+		[Classy::widget $object] insert end $html
+	}
+	set currentquery $query
+	Classy::busy remove $object
 }
 
 #doc {HTML command reload} cmd {
@@ -228,11 +346,10 @@ Classy::HTML method geturl {url} {
 #} descr {
 #}
 Classy::HTML method reload {} {
-	private $object options control
+	private $object options control currentquery
 	set control(reload) 1
-	$object geturl $options(-url)
+	$object geturl $options(-url) $currentquery
 }
-
 
 #doc {HTML command back} cmd {
 #pathname back 
@@ -244,9 +361,8 @@ Classy::HTML method back {} {
 	set url [lpop control(back)]
 	lappend control(forward) $options(-url)
 	set control(direction) 1
-	$object geturl $url
+	$object geturl [lindex $url 0] [lindex $url 1]
 }
-
 
 #doc {HTML command forward} cmd {
 #pathname forward 
@@ -258,7 +374,16 @@ Classy::HTML method forward {} {
 	set url [lpop control(forward)]
 	lappend control(back) $options(-url)
 	set control(direction) 1
-	$object geturl $url
+	$object geturl [lindex $url 0] [lindex $url 1]
+}
+
+#doc {HTML command history} cmd {
+#pathname history
+#} descr {
+#}
+Classy::HTML method history {} {
+	private $object control
+	return $control(history)
 }
 
 Classy::HTML method _setimage {handle url} {
@@ -312,18 +437,21 @@ Classy::HTML method fullurl {url} {
 
 	# make url fully specified
 	# ------------------------
+	if [regexp ^# $url] {
+		set base $options(-url)
+		regexp {([^#]*)#(.+)} $options(-url) dummy base fragment
+		return $base$url
+	}
 	regsub {/[^/]*$} $options(-url) {} dir
 	switch -regexp $url {
-		^# {
-			set url $options(-url)$url
-		}
 		{^(http|ftp|file|data)://} {
 		}
 		{^(http|ftp|file|data):/} {
 			regsub {^(http|ftp|file|data):/} $url {\0/localhost/} url
 		}
 		^/ {
-			set url $dir$url
+			regexp {^([^:]*)://([^/]+)(/.*)$} $options(-url) dummy protocol host file
+			set url $protocol://$host$url
 		}
 		default {
 			set url $dir/$url
@@ -349,10 +477,31 @@ Classy::HTML method load {file} {
 #}
 Classy::HTML method set {html} {
 	$object geturl "data://localhost/$html"
-#	private $object options
-#	set options(-url) ""
-#	::html::set_state $object -stop 1	;# stop rendering previous page if busy
-#	update idletasks
-#	::html::reset_win $object
-#	::html::parse_html $html [list ::html::render $object]
+}
+
+#doc {HTML command linkat} cmd {
+#pathname linkat x y
+#} descr {
+# returns the link (href) at position x,y.
+# This is used in comination with bindlink to change the behaviour
+# of links.
+#} example {
+# objectName bindlink <3> {puts [%W linkat %x %y]}
+#}
+Classy::HTML method linkat {x y} {
+	set tags [$object tag names @$x,$y]
+	set link [lindex $tags [lsearch -glob $tags L:*]]
+	regsub L: $link {} link
+	return [$object fullurl $link]
+}
+
+#doc {HTML command bindlink} cmd {
+#pathname bindlink ?event? ?sequence?
+#} descr {
+# binds action to a certain event happening on a link
+#} example {
+# objectName bindlink <3> {puts [%W linkat %x %y]}
+#}
+Classy::HTML method bindlink {args} {
+	eval [Classy::widget $object] tag bind link $args
 }

@@ -7,6 +7,9 @@
 #
 # =============================================================
 package require -exact Tcl 8.0
+
+# Solve problems with auto_loading from namespaces
+# in patchlevels 0 and 1 of Tcl8.0
 if {("$tcl_patchLevel" == "8.0")||("$tcl_patchLevel" == "8.0p1")} {
 	source [file join $::class::dir patches init.tcl]
 }
