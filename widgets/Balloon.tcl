@@ -124,3 +124,4 @@ Classy::Balloon method _schedule {widget} {
 	private $object id
 	set id [after $time "$object display $widget"]
 }
+

@@ -197,9 +197,16 @@ Classy::Toplevel method place {} {
 	}
 	wm geometry $object +1000000+1000000
 	update idletasks
-	wm deiconify $object
-	raise $object
-	wm geometry $object ${w}x${h}+$x+$y
+	if {"$::tcl_platform(platform)" != "windows"} {
+		wm deiconify $object
+		raise $object
+		wm geometry $object ${w}x${h}+$x+$y
+	} else {
+		wm geometry $object ${w}x${h}+$x+$y
+		raise $object
+		wm deiconify $object
+		wm geometry $object ${w}x${h}+$x+$y
+	}
 }
 
 # ------------------------------------------------------------------
@@ -220,4 +227,5 @@ Classy::Toplevel method destroy {} {
 	Classy::Default set geometry $object $geom
 	uplevel #0 $options(-destroycommand)
 }
+
 

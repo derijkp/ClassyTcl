@@ -72,8 +72,8 @@ bind Classy::Table::all <<TableDown>> {Classy::Tableobject %W movey %W 1;break}
 bind Classy::Table::all <<TableLeft>> {Classy::Tableobject %W movex %W -1;break}
 bind Classy::Table::all <<TableRight>> {Classy::Tableobject %W movex %W 1;break}
 bind Classy::Table::all <<PasteSpecial>> {Classy::Tableobject %W paste;break}
-bind Classy::Table::all <<PageUp>> {Classy::Tableobject %W yview scroll -1 page;break}
-bind Classy::Table::all <<PageDown>> {Classy::Tableobject %W yview scroll 1 page;break}
+bind Classy::Table::all <<PageUp>> {Classy::Tableobject %W yview scroll -1 pages;break}
+bind Classy::Table::all <<PageDown>> {Classy::Tableobject %W yview scroll 1 pages;break}
 
 bind Classy::Table::text <<SpecialFocusPrev>> {Classy::Tableobject %W movex %W -1;break}
 bind Classy::Table::text <<SpecialFocusNext>> {Classy::Tableobject %W movex %W 1;break}
@@ -285,17 +285,7 @@ Classy::Table method colsize {col args} {
 			set dcol(s,$col) $size
 		}
 	}
-	$object _scheduleredraw
-}
-
-Classy::Table method _scheduleredraw {} {
-	private $object redrawing
-	if $redrawing {
-		set redrawing 0
-	} else {
-		update
-		Classy::todo $object _redraw
-	}
+	$object _redraw
 }
 
 #doc {Table command rowsize} cmd {
@@ -326,7 +316,7 @@ Classy::Table method rowsize {row args} {
 			set drow(s,$row) $size
 		}
 	}
-	$object _scheduleredraw
+	$object _redraw
 }
 
 #doc {Table command set} cmd {
@@ -356,11 +346,6 @@ Classy::Table method _set {w args} {
 	}
 	set rcol [expr {$col+$dcol(start)}]
 	set rrow [expr {$row+$drow(start)}]
-	set ::Classy::table(object) $object
-	set ::Classy::table(rrow) $rrow
-	set ::Classy::table(rcol) $rcol
-	set ::Classy::table(w) $object.base.e$row,$col
-	set ::Classy::table(value) $value
 	set error [catch {uplevel #0 $options(-setcommand) $object $object.base.e$row,$col $rrow $rcol [list $value]} res]
 	$object refreshcell $rrow $rcol
 	if $error {error $res}
@@ -547,40 +532,6 @@ proc Classy::Table__create_elem {object type row col} {
 	grid $object.base.e$row,$col -row [expr {2*$row+2}] -column [expr {2*$col+2}] -sticky nwse
 }
 
-Classy::Table method _sethbar {} {
-	private $object options dcol
-	set curlow $dcol(start)
-	set curhigh [expr {$dcol(start) + $dcol(num)}]
-	set min 0
-	set max $options(-cols)
-
-	if {$curlow < $min} {set curlow $min}
-	if {$curhigh < $min} {set curhigh $min}
-	if {$curlow > $max} {set curlow $max}
-	if {$curhigh > $max} {set curhigh $max}
-	set realw [expr {$max - $min}]
-	if {"$options(-xscrollcommand)" != ""} {
-		eval $options(-xscrollcommand) {[expr double($curlow)/$realw] [expr {double($curhigh)/$realw}]}
-	}
-}
-
-Classy::Table method _setvbar {} {
-	private $object options drow
-	set curlow $drow(start)
-	set curhigh [expr {$drow(start) + $drow(num)}]
-	set min 0
-	set max $options(-rows)
-
-	if {$curlow < $min} {set curlow $min}
-	if {$curhigh < $min} {set curhigh $min}
-	if {$curlow > $max} {set curlow $max}
-	if {$curhigh > $max} {set curhigh $max}
-	set realw [expr {$max - $min}]
-	if {"$options(-yscrollcommand)" != ""} {
-		eval $options(-yscrollcommand) {[expr {double($curlow)/$realw}] [expr {double($curhigh)/$realw}]}
-	}
-}
-
 Classy::Table method _startdrag {dir w x y} {
 	private $object drag dcol drow
 	set drag(dir) $dir
@@ -614,16 +565,19 @@ Classy::Table method _drag {w x y} {
 #} descr {
 #}
 Classy::Table method _redraw {} {
-	private $object options drow dcol data
-	set ::Classy::table(object) $object
+puts redraw
+	private $object options drow dcol data redrawing
+	if $redrawing {
+		set redrawing 0
+		update idletasks
+	}
+	set redrawing 1
 	if ![winfo exists $object.base.ypanelabel] {
 		frame $object.base.ypanelabel -class Classy::Table::ypane
 	}
 	if ![winfo exists $object.base.xpanelabel] {
 		frame $object.base.xpanelabel -class Classy::Table::xpane
 	}
-	$object _sethbar
-	$object _setvbar
 	set width [winfo width $object]
 	set prevcol $dcol(num)
 	set dcol(num) 0
@@ -635,7 +589,6 @@ Classy::Table method _redraw {} {
 	} else {		
 		set cs 0
 	}
-
 	while 1 {
 		if [info exists dcol(s,$rcol)] {
 			set size $dcol(s,$rcol)
@@ -675,7 +628,6 @@ Classy::Table method _redraw {} {
 		if {$cs > $height} break
 	}
 	set rownum [expr {$drow(num)-$prevrow}]
-
 	set to $drow(num)
 	if {$prevrow < $to} {set to $prevrow}
 	if {$colnum > 0} {
@@ -693,7 +645,6 @@ Classy::Table method _redraw {} {
 			destroy $object.base.xpane$col
 		}
 	}
-
 	if {$rownum > 0} {
 		for {set row $prevrow} {$row < $drow(num)} {incr row} {
 			for {set col 0} {$col < $dcol(num)} {incr col} {
@@ -709,7 +660,6 @@ Classy::Table method _redraw {} {
 			destroy $object.base.ypane$row
 		}
 	}
-
 	for {set row 0} {$row < $drow(num)} {incr row} {
 		set pos [expr {2*$row+3}]
 		grid $object.base.ypane$row -row 0 -row $pos -columnspan [expr {2*$dcol(num)+2}] -sticky nwse
@@ -720,7 +670,6 @@ Classy::Table method _redraw {} {
 		grid $object.base.xpane$col -row 0 -column $pos -rowspan [expr {2*$drow(num)+2}] -sticky nwse
 		raise $object.base.xpane$col
 	}
-
 	# labels
 	if {"$options(-ylabelcommand)" != ""} {
 		grid $object.base.ypanelabel -row 1 -column 0 -columnspan $dcol(num) -sticky nwse
@@ -778,7 +727,6 @@ Classy::Table method _redraw {} {
 			catch {$w configure -bg [lindex $selection($name) 0] -fg [lindex $selection($name) 1]}
 		}
 	}
-
 	# sizes
 	set rcol $dcol(start)
 	for {set col 0} {$col < $dcol(num)} {incr col} {
@@ -798,7 +746,6 @@ Classy::Table method _redraw {} {
 		}
 		incr rrow
 	}
-
 	# labels
 	if {"$options(-ylabelcommand)" != ""} {
 		grid columnconfigure $object.base 0 -minsize $dcol(ls)
@@ -851,16 +798,12 @@ Classy::Table method _redraw {} {
 		}
 	}
 	$object _refreshtable
+	set redrawing 0
 }
 
 Classy::Table method _refreshtable {} {
 	private $object options drow dcol data selection redrawing
-	set ::Classy::table(object) $object
-	foreach var {w rrow rcol} {
-		upvar ::Classy::table($var) $var
-	}
 	#values
-	set redrawing 1
 	set rrow $drow(start)
 	for {set row 0} {$row < $drow(num)} {incr row} {
 		set rcol $dcol(start)
@@ -890,14 +833,11 @@ Classy::Table method _refreshtable {} {
 			incr rcol
 		}
 		incr rrow
-		update
+		update idletasks
 		if !$redrawing {
-			update
-			$object _redraw
 			return
 		}
 	}
-	set redrawing 0
 	foreach name [array names selection] {
 		$object refreshcell [lindex $name 0] [lindex $name 1]
 	}
@@ -908,13 +848,12 @@ Classy::Table method _refreshtable {} {
 #} descr {
 #}
 Classy::Table method xview {args} {
-	private $object options dcol
+	private $object options dcol redrawing
 	set pagesize $dcol(num)
 	set pos $dcol(start)
 	set size $dcol(num)
 	set min 0
 	set max [expr {$options(-cols)-1}]
-
 	switch [lindex $args 0] {
 		"" {
 			set end [expr {double($pos + $size)/$max}]
@@ -923,7 +862,7 @@ Classy::Table method xview {args} {
 		}
 		moveto {
 			set fraction [lindex $args 1]
-			set pos [expr $fraction*$max]
+			set pos [expr {int($fraction*$max)}]
 		}
 		scroll {
 			set number [lindex $args 1]
@@ -937,10 +876,12 @@ Classy::Table method xview {args} {
 	}
 	if {$pos > $max} {set pos $max}
 	if {$pos < 0} {set pos 0}
-
-	set dcol(start) [expr int($pos)]
-	$object _sethbar
-	$object _scheduleredraw
+	set dcol(start) $pos
+	if {"$options(-xscrollcommand)" != ""} {
+		eval $options(-xscrollcommand) {[expr double($pos)/$max] [expr {double($pos+$size)/$max}]}
+	}
+	Classy::todo $object _redraw
+	return [list [expr {double($pos)/$max}] [expr {double($pos+$size)/$max}]]
 }
 
 #doc {Table command yview} cmd {
@@ -954,7 +895,6 @@ Classy::Table method yview {args} {
 	set size $drow(num)
 	set min 0
 	set max [expr {$options(-rows)-1}]
-
 	switch [lindex $args 0] {
 		"" {
 			set end [expr {double($pos + $size)/$max}]
@@ -963,7 +903,7 @@ Classy::Table method yview {args} {
 		}
 		moveto {
 			set fraction [lindex $args 1]
-			set pos [expr $fraction*$max]
+			set pos [expr {int($fraction*$max)}]
 		}
 		scroll {
 			set number [lindex $args 1]
@@ -977,9 +917,13 @@ Classy::Table method yview {args} {
 	}
 	if {$pos > $max} {set pos $max}
 	if {$pos < 0} {set pos 0}
-
-	set drow(start) [expr int($pos)]
-	$object _setvbar
-	$object _scheduleredraw
+	set drow(start) $pos
+	if {"$options(-yscrollcommand)" != ""} {
+		eval $options(-yscrollcommand) {[expr {double($pos)/$max}] [expr {double($pos+$size)/$max}]}
+	}
+	Classy::todo $object _redraw
+	return [list [expr {double($pos)/$max}] [expr {double($pos+$size)/$max}]]
 }
+
+
 

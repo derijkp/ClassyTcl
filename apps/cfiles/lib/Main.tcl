@@ -17,7 +17,7 @@ proc mainw args {# ClassyTcl generated Toplevel
 		-getimage getimage \
 		-height 50 \
 		-width 50
-	grid $window.browser -row 3 -column 0 -sticky nesw
+	grid $window.browser -row 2 -column 0 -sticky nesw
 	frame $window.dir  \
 		-borderwidth 0 \
 		-height 10 \
@@ -50,24 +50,27 @@ proc mainw args {# ClassyTcl generated Toplevel
 	grid $window.file.tool -row 0 -column 0 -sticky nesw
 	grid columnconfigure $window.file 1 -weight 1
 	grid columnconfigure $window 0 -weight 1
-	grid rowconfigure $window 3 -weight 1
+	grid rowconfigure $window 2 -weight 1
 
 	# End windows
 	# Parse this
 	$window configure \
-		-destroycommand "exit" \
-		-title [tk appname]
+		-destroycommand {} \
+		-title {[tk appname]}
 	$window.browser configure \
-		-list [concat .. [glob [pwd]/*]]
+		-list {[concat .. [glob [pwd]/*]]}
+	bind $window.browser <<Drop>> {filer_drop w x y}
+	bind $window.browser <<MExecuteAjust>> {filer_exec_adjust %W [%W name %x %y]}
+	bind $window.browser <<Adjust>> {filer_adjust %W [%W name %x %y]}
+	bind $window.browser <<MExecute>> {filer_exec %W [%W name %x %y]}
+	bind $window.browser <<Action>> {filer_action %W [%W name %x %y]}
 	bind $window.browser <<Drag>> {filer_drag %W %x %y %X %Y}
-	bind $window.browser <<Action>> {filer_action %W %x %y}
-	bind $window.browser <<MExecute>> {filer_exec %W %x %y}
 	$window.dir.entry configure \
-		-command [varsubst window {setdir $window.browser}] \
-		-textvariable [varsubst window {status($window.browser,dir)}]
+		-command {[varsubst window {setdir $window.browser}]} \
+		-textvariable {[varsubst window {status($window.browser,dir)}]}
 	$window.file.entry configure \
-		-command [varsubst window {file_rename $window.browser}] \
-		-textvariable [varsubst window {status($window.browser,file)}]
+		-command {[varsubst window {file_rename $window.browser}]} \
+		-textvariable {[varsubst window {status($window.browser,file)}]}
 	Classy::DynaMenu attachmainmenu MainMenu $window.browser
 # ClassyTcl Finalise
 setdir $window.browser [pwd]
@@ -76,7 +79,15 @@ setdir $window.browser [pwd]
 	return $window
 	return $window
 	return $window
+	return $window
+	return $window
+	return $window
 }
+
+
+
+
+
 
 
 

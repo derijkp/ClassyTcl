@@ -12,3 +12,4 @@ Extral::makedoc widgets/[lindex $argv 0].tcl help/widgets "ClassyTcl widgets"
 file delete help/widgets/index.html
 file rename help/widgets/index.html.save help/widgets/index.html
 }
+

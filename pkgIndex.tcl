@@ -12,7 +12,7 @@ namespace eval __temp {
 	# $Format: "\tset version 0.$ProjectMajorVersion$"$
 	set version 0.1
 	# $Format: "\tset minorversion $ProjectMinorVersion$"$
-	set minorversion 2
+	set minorversion 6
 	regsub -all {[ab]} $version {} version
 	set loadcmd {
 		package provide Class @version@
@@ -37,3 +37,4 @@ namespace eval __temp {
 	package ifneeded ClassyTcl $version $loadcmd
 }
 namespace delete __temp
+

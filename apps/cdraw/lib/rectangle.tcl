@@ -30,3 +30,4 @@ proc rectangle_abort {w x y} {
 	catch {unset current(cur)}
 }
 
+

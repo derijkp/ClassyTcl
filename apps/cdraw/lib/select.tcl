@@ -157,6 +157,10 @@ proc select_release {w x y args} {
 	set zoom [$w zoom]
 	set current(px) [expr {$x/$zoom}]
 	set current(py) [expr {$y/$zoom}]
+	if ![info exists current(action)] {
+		$w undo check stop
+		return
+	}
 	if {"$current(action)" == "sel"} {
 		set list ""
 		foreach item [$w find enclosed $current(x) $current(y) $x $y] {
@@ -209,4 +213,5 @@ $w current {}
 bindtags $w [list Select $w Classy::Menu_MainMenu Classy::Canvas Canvas .mainw all]
 set status($w,type) select
 }
+
 

@@ -438,3 +438,4 @@ Classy::DynaTool method redraw {} {
 	$object configure -height $y
 	after idle "bind $object <Configure> [list $keep]"
 }
+

@@ -64,3 +64,4 @@ if 0 {
 	set object .try.dedit
 	set window .try.dedit.work
 }
+

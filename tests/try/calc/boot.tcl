@@ -1,1 +1,2 @@
 puts stdout "boot ok!"
+

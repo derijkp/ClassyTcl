@@ -209,7 +209,11 @@ Classy::Selector method redraw {} {
 			}]
 		}
 		color {
+			set temp [Classy::optionget $object colorList ColorList]
+			regsub -all "\n" $temp { } temp
+			Classy::Default set app selector_color [eval concat $temp]
 			Classy::Entry $object.value -textvariable $var \
+				-default selector_color \
 				-command [list invoke value "$object _command \$value ; $v.sample configure -bg \[Classy::realcolor \$value\]"]
 			$v.value configure -label $title
 			label $v.sample -text sample
@@ -393,3 +397,4 @@ Classy::Selector method _stickyset {args} {
 		$object.value nocmdset $value
 	}
 }
+

@@ -28,11 +28,15 @@ Classy::configmenu MainMenu {Main application menu} {
 		action "Raise to top" {top_objects %W _sel} <<Top>>
 		action "Lower to bottom" {bottom_objects %W _sel} <<Bottom>>
 		separator
+		action "Add point" {addpoint %W} <Key-plus>
+		separator
 		action "Delete" {delete %W} <<Delete>>
 		action "Cut" {%W cut _sel} <<Cut>>
 		action "Copy" {%W copy _sel} <<Copy>>
 		action "Paste" {%W paste} <<Paste>>
 		action "Undo" {%W undo} <<Undo>>
+		action "Copy to windows clipb" {%W wincopy} <<WinCopy>>
+		action "Copy sel to windows clipb" {%W wincopy _sel} <<WinSelCopy>>
 		action "Redo" {%W redo} <<Redo>>
 		action "Clear undo buffer" {%W undo clear} <<ClearUndo>>
 	}
@@ -59,32 +63,5 @@ Classy::configmenu MainMenu {Main application menu} {
 		action "ClassyTcl" {Classy::help ClassyTcl} <<HelpClassyTcl>>
 		action "Help" {Classy::help classy_help} <<HelpHelp>>
 	}
-
-
-
-
-
-
-
-
-
-
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

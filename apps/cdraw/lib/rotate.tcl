@@ -29,3 +29,4 @@ proc rotate_set {w {x {}} {y {}}} {
 		$w noundo create bitmap $x $y -bitmap [Classy::getbitmap rotatepos] -tags {_rotatepos _sel}
 	}
 }
+

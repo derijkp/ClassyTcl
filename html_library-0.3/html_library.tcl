@@ -1463,3 +1463,4 @@ proc ::html::cgiMap {data} {
 #    }
 #    regexp Key|Focus "[bind $w] [bind [winfo class $w]]"
 #}
+

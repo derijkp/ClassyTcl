@@ -7,7 +7,14 @@ source tools.tcl
 test Classy::Table {create and configure} {
 	classyclean
 	Classy::Table .try
-	.try configure -xscrollcommand {.hbar set} -yscrollcommand {.vbar set} -getcommand {
+	scrollbar .hbar -orient horizontal \
+		-command {.try xview}
+	scrollbar .vbar -orient vertical \
+		-command {.try yview}
+	.try configure \
+		-xscrollcommand {.hbar set} \
+		-yscrollcommand {.vbar set} \
+		-getcommand {
 		invoke {object w x y} {
 			if {$x == 1} {
 				$w configure -bg gray
@@ -18,14 +25,13 @@ test Classy::Table {create and configure} {
 			}
 			get ::d($x,$y)
 		}
-	} -setcommand {
+		} \
+		-setcommand {
 		invoke {object w x y v} {
 			if {"$v" == "error"} {error "some error"}
 			set ::d($x,$y) $v
 		}
-	}
-	scrollbar .hbar -command {.try xview} -orient horizontal
-	scrollbar .vbar -command {.try yview} -orient vertical
+		}
 	grid .try .vbar -row 0 -sticky nwse
 	grid .hbar -row 1 -sticky we
 	grid columnconfigure . 0 -weight 1
@@ -40,8 +46,23 @@ test Classy::Table {create and configure} {
 			set ::d($row,$col) "r $row c $col"
 		}
 	}
-	manualtest
+#	manualtest
 } {}
 
+#testsummarize
 
-testsummarize
+if 0 {
+lappend auto_path /peter/dev
+package require ClassyTcl
+cd /peter/dev/classytcl/tests
+catch {destroy .t}
+toplevel .t
+scrollbar .t.v
+.t.v configure -command {invoke {} {puts ".t.t yview $args" ; eval .t.t yview $args ; return -code break} }
+text .t.t 
+.t.t configure -yscrollcommand {invoke {} {puts ".t.v set $args" ; eval .t.v set $args}}
+for {set i 0} {$i < 500} {incr i} {.t.t insert end $i\n}
+pack .t.t .t.v -fill both -side left
+}
+
+

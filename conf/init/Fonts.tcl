@@ -18,3 +18,4 @@ Classy::configfont {Widget Fonts} {
 	{Browser font} *Classy::Browser.font BoldFont {font used for names in the browser widget}
 	{Browser data font} *Classy::Browser.dataFont Font {font used for data in the browser widget}
 }
+

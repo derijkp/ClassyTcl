@@ -15,7 +15,7 @@ if [info exists current(cur)] {
 	}
 	eval $w coords $cur $coords
 } else {
-	set current(cur) [$w create polygon $x $y $x $y]
+	set current(cur) [$w create polygon $x $y $x $y $x $y]
 }
 }
 
@@ -42,4 +42,5 @@ $w selection set {}
 bindtags $w [list Polygon $w Classy::Menu_MainMenu Classy::Canvas Canvas .mainw all]
 set status($w,type) polygon
 }
+
 

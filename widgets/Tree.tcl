@@ -64,6 +64,7 @@ Classy::Tree classmethod init {args} {
 		-starty 10
 		-rootimage {}
 		-roottext {}
+		-foreground black
 	}
 	setprivate $object order ""
 	setprivate $object selection ""
@@ -145,6 +146,15 @@ Classy::Tree method configure {args} {
 				-roottext {
 					::Classy::todo $object _redraw
 				}
+				-foreground {
+					::Classy::todo $object _redraw
+				}
+				-selectforeground {
+					::Classy::todo $object _redraw
+				}
+				-selectbackground {
+					::Classy::todo $object _redraw
+				}
 			}
 		}
 	}
@@ -191,10 +201,10 @@ Classy::Tree method _drawnode {node} {
 		set xpos [expr {$x + $width/2.0 + $padx + $ca(len)}]
 		$canvas coords $ca(i) $xpos $ypos
 		set ca(x) [$canvas create line $x $ypos $xpos $ypos \
-			-tags [list $tag classy::Tree $name line]]
+			-tags [list $tag classy::Tree $name line] -fill $options(-foreground)]
 		$canvas lower $ca(x)
 		set ca(ti) [$canvas create text [expr {$x + $padx + $ca(len) + $width + $padtext}] $ypos -text $ca(txt) -anchor w \
-			-tags [list $tag classy::Tree $name text]]
+			-tags [list $tag classy::Tree $name text] -fill $options(-foreground)]
 		if {"$font" != ""} {
 			$canvas itemconfigure $ca(ti) -font $font
 		}
@@ -215,7 +225,7 @@ Classy::Tree method _drawnode {node} {
 		}
 	}
 	set drawinfo(y) [$canvas create line $x $sy $x $ypos \
-		-tags [list $tag classy::Tree $node yline]]
+		-tags [list $tag classy::Tree $node yline] -fill $options(-foreground)]
 	$canvas lower $drawinfo(y)
 	set data($node) [array get drawinfo]
 	return $y
@@ -230,7 +240,7 @@ Classy::Tree method _redraw {} {
 	$canvas delete $options(-tag)
 	if {("$options(-rootimage)" == "")&&("$options(-roottext)" == "")} {
 		set i [$canvas create text $options(-startx) $options(-starty) -text "" \
-			-tags [list $options(-tag) classy::Tree {}]]
+			-tags [list $options(-tag) classy::Tree {}] -fill $options(-foreground)]
 		set data() [structlset $data() i $i]
 	} else {
 		if {"$options(-font)" == ""} {
@@ -250,22 +260,28 @@ Classy::Tree method _redraw {} {
 		set ti [$canvas create text \
 				[expr {$options(-startx) + $width/2 + $options(-padtext)}] $options(-starty) \
 				-text $options(-roottext) -anchor w \
+				-fill $options(-foreground) \
 				-tags [list $options(-tag) classy::Tree {}]]
    	if {"$font" != ""} {$canvas itemconfigure $ti -font $font}
 		set data() [structlset $data() i $i ti $ti]
 	}
 	$object _drawnode {}
 	$canvas delete $options(-tag)_selection
+#	set bg [Classy::realcolor [Classy::optionget $canvas selectBackground SelectBackground selectBackground]]
+#	set fg [Classy::realcolor [Classy::optionget $canvas selectForeground SelectForeground selectForeground]]
+	set bg [$canvas cget -selectbackground]
+	set fg [$canvas cget -selectforeground]
 	foreach node $selection {
 		if ![info exists data($node)] continue
 		set bbox [$canvas bbox [structlget $data($node) i]]
 		set x1 [lindex $bbox 0]
 		set y1 [lindex $bbox 1]
-		set bbox [$canvas bbox [structlget $data($node) ti]]
+		set item [structlget $data($node) ti]
+		set bbox [$canvas bbox $item]
+		$canvas itemconfigure $item -fill $fg
 		set x2 [lindex $bbox 2]
 		set y2 [lindex $bbox 3]
 		if {"$bbox" != ""} {
-			set bg [Classy::realcolor [Classy::optionget $canvas selectBackground SelectBackground selectBackground]]
 			$canvas create rectangle $x1 $y1 $x2 $y2 \
 				-tags [list $options(-tag) $options(-tag)_selection] \
 				-fill $bg -outline $bg
@@ -563,3 +579,4 @@ Classy::Tree method stopedit {} {
 	destroy $canvas.classy_edit
 	$canvas delete $options(-tag)_edit
 }
+

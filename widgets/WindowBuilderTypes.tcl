@@ -279,3 +279,4 @@ proc ::Classy::WindowBuilder::defattredit {object w list wide {fill 1}} {
 	return $row
 }
 
+

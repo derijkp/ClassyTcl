@@ -273,8 +273,9 @@ test Classy::Canvas {undo rotate} {
 	.try create line 20 10 60 50 -width 4 -tags try
 	.try rotate try 0 0 -45
 	.try undo
-	.try coords try
-} {10.0 10.0}
+	set try [.try coords try]
+	list [expr {round([lindex $try 0])}] [expr {round([lindex $try 1])}]
+} {10 10}
 
 test Classy::Canvas {redo rotate} {
 	classyclean
@@ -288,8 +289,9 @@ test Classy::Canvas {redo rotate} {
 	.try rotate try 0 0 -30
 	.try undo
 	.try redo
-	.try coords try
-} {3.66025403784 13.6602540378}
+	set try [.try coords try]
+	list [expr {round([lindex $try 0])}] [expr {round([lindex $try 1])}]
+} {4 14}
 
 test Classy::Canvas {undo lower} {
 	classyclean

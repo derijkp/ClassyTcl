@@ -75,3 +75,4 @@ proc raise_objects {w tag} {
 	}
 	$w dtag temp temp
 }
+

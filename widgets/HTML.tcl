@@ -237,6 +237,9 @@ Classy::HTML method geturl {url {query {}}} {
 				unset $id
 			}
 			file {
+				if {"$::tcl_platform(platform)" == "windows"} {
+					regsub {^/([A-Za-z]:/)} $file {\1} file
+				}
 				set html [readfile $file]
 				if [regexp {html?$} $file] {
 					set type text/html
@@ -257,12 +260,12 @@ Classy::HTML method geturl {url {query {}}} {
 		}
 	} result]
 	if $code {
+		private $object options
 		if {"$options(-errorcommand)" == ""} {
 			return -code $code $result
 		} else {
-			if [catch {$win geturl $href} result] {
-				return [eval $options(-errorcommand) {$url $query $result}]
-			}
+			set code [catch {eval $options(-errorcommand) {$url $query $result}} result]
+			return -code $code $result
 		}
 	}
 
@@ -389,7 +392,13 @@ Classy::HTML method back {} {
 	set url [lpop control(back)]
 	lappend control(forward) $options(-url)
 	set control(direction) 1
-	$object geturl [lindex $url 0] [lindex $url 1]
+	if ![regexp ^data: $url] {
+		set query [lindex $url 1]
+		set url [lindex $url 0]
+	} else {
+		set query {}
+	}
+	$object geturl $url $query
 }
 
 #doc {HTML command forward} cmd {
@@ -402,7 +411,13 @@ Classy::HTML method forward {} {
 	set url [lpop control(forward)]
 	lappend control(back) $options(-url)
 	set control(direction) 1
-	$object geturl [lindex $url 0] [lindex $url 1]
+	if ![regexp ^data: $url] {
+		set query [lindex $url 1]
+		set url [lindex $url 0]
+	} else {
+		set query {}
+	}
+	$object geturl $url $query
 }
 
 #doc {HTML command history} cmd {
@@ -477,6 +492,9 @@ Classy::HTML method fullurl {url} {
 		{^(http|ftp|file|data):/} {
 			regsub {^(http|ftp|file|data):/} $url {\0/localhost/} url
 		}
+		{^file:} {
+			regsub {^file:} $url {file://localhost/} url
+		}
 		^/ {
 			regexp {^([^:]*)://([^/]+)(/.*)$} $options(-url) dummy protocol host file
 			set url $protocol://$host$url
@@ -533,3 +551,4 @@ Classy::HTML method linkat {x y} {
 Classy::HTML method bindlink {args} {
 	eval [Classy::window $object] tag bind link $args
 }
+

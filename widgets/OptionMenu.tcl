@@ -106,3 +106,4 @@ Classy::OptionMenu method command {} {
 	uplevel #0 [getprivate $object options(-command)]
 }
 
+

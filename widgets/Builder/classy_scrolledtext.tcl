@@ -44,3 +44,4 @@ proc ::Classy::WindowBuilder::generate_Classy::ScrolledText {object base} {
 	return $body
 }
 
+

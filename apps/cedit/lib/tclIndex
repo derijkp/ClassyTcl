@@ -10,3 +10,4 @@ set auto_index(end) [list source [file join $dir Main.tcl]]
 set auto_index(savestate) [list source [file join $dir Main.tcl]]
 set auto_index(edit) [list source [file join $dir Main.tcl]]
 set auto_index(main) [list source [file join $dir Main.tcl]]
+

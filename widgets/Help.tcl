@@ -44,8 +44,7 @@ Classy::Help classmethod init {args} {
 	super init
 	Classy::HTML $object.html -yscrollcommand "$object.vbar set" \
 		-state disabled -wrap word -cursor hand2 \
-		-width 70 -height 28 -relief sunken \
-		-errorcommand [list $object retry]
+		-width 10 -height 5 -relief sunken
 	$object.html bindlink <<Adjust>> {newhelp [%W linkat %x %y]}
 	scrollbar $object.vbar -orient vertical -command "$object.html yview"
 	Classy::DynaMenu attachmainmenu Classy::Help $object
@@ -61,7 +60,6 @@ Classy::Help classmethod init {args} {
 	private $object curfile history
 	set curfile ""
 	set history {}
-
 	# REM Configure initial arguments
 	# -------------------------------
 	if {"$args" != ""} {eval $object configure $args}
@@ -95,17 +93,20 @@ Classy::Help chainallmethods {$object.html} HTML
 Classy::Help method gethelp {name} {
 	if {"[file pathtype $name]" == "absolute"} {
 		set url file:$name
-	} elseif {[regexp {^http:/|^file:/|^ftp:/} $name]} {
+	} elseif {[regexp {^http:/|^file:|^ftp:/} $name]} {
 		set url $name
 	} else {
+		if {"[file extension $name]" == ""} {
+			set name $name.html
+		}
 		set i [llength $::Classy::help_path]
 		incr i -1
 		while {$i > -1} {
 			set dir [lindex $::Classy::help_path $i]
-			incr i -1
-			if {"[file extension $name]" == ""} {
-				set name $name.html
+			if {"[file pathtype $dir]" != "absolute"} {
+				set dir [file join [pwd] $dir]
 			}
+			incr i -1
 			set file [file join $dir $name]
 			if [file exists $file] break
 		}
@@ -220,11 +221,11 @@ Classy::Help method getgeneralmenu {} {
 }
 
 set ::Classy::helpfind word
-proc Classy::findhelp {w} {
+proc Classy::Help_find {w} {
 	Classy::Entry $w
 	set p [winfo parent $w]
-	$w configure -command [varsubst {w p} {
-		[$p cmdw] search $::Classy::helpfind
+	return [varsubst w {
+		$w configure -command {%W search $::Classy::helpfind}
 	}]
 }
 
@@ -258,3 +259,19 @@ Classy::export {help newhelp} {}
 Classy::Help method destroy {} {
 	Classy::Default set geometry $object [winfo geometry $object]
 }
+
+proc Classy::Help_findword {w} {
+	radiobutton $w -text Word -variable ::Classy::helpfind -value word
+	return {}
+}
+
+proc Classy::Help_findfile {w} {
+	radiobutton $w -text File -variable ::Classy::helpfind -value file
+	return {}
+}
+
+proc Classy::Help_findinfile {w} {
+	radiobutton $w -text "In file" -variable ::Classy::helpfind -value grep
+	return {}
+}
+

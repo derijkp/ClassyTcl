@@ -15,7 +15,9 @@ Classy::configcolor {Basic colors} {
 	{#Highlight color} *highlightColor black {Default Highlight color}
 	Colorlist *ColorList {{blue cyan green yellow orange red magenta}
 {blue3 cyan3 green3 yellow3 orange3 red3 magenta3}
-{black gray20 gray40 gray50 gray60 gray80 white}} {list of colors as used the getcolor}
+{black gray20 gray40 gray50 gray60 gray80 white}
+{SystemButtonFace SystemButtonText SystemWindow SystemWindowText 
+SystemWindowFrame SystemHighlight SystemHighlightText}} {list of colors as used the getcolor}
 }
 
 Classy::configcolor {Widget Colors} {
@@ -32,6 +34,9 @@ Classy::configcolor {Widget Colors} {
 	{#Scrollbar background} *Scrollbar.background lightBackground {Scrollbar background color}
 	{#Label background} *label.background darkBackground {Label background color}
 }
+
+
+
 
 
 

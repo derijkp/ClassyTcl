@@ -31,3 +31,4 @@ proc ::Classy::WindowBuilder::generate_Classy::OptionMenu {object base} {
 	append body "\t$outw set [list [$base get]]\n"
 	return $body
 }
+

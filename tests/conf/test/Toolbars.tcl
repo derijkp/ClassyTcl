@@ -42,3 +42,4 @@ Classy::configtool Classy::WindowBuilder {toolbar used in the ClassyTcl WindowBu
 	separator
 	action close "Close" {destroy %W}
 }
+

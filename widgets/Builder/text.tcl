@@ -74,3 +74,4 @@ proc ::Classy::WindowBuilder::generate_Text {object base} {
 	return $body
 }
 
+

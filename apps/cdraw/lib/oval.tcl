@@ -30,3 +30,4 @@ proc oval_abort {w x y} {
 	catch {unset current(cur)}
 }
 
+

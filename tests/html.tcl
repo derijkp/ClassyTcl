@@ -3,7 +3,7 @@
 exec wish8.0 "$0" "$@"
 
 source tools.tcl
-
+if [Classy::yorn "Do you have a network connection"] {
 test Classy::HTML {create and configure} {
 	classyclean
 	Classy::HTML .try -yscrollcommand {.vbar set}
@@ -15,8 +15,8 @@ test Classy::HTML {create and configure} {
 	.try geturl http://rrna.uia.ac.be/
 	.try cget -wrap
 } {word}
-
 .try bindlink <3> {puts [.try linkat %x %y]}
+}
 
 test Classy::help {create and configure} {
 	classyclean
@@ -26,3 +26,5 @@ test Classy::help {create and configure} {
 } {word}
 
 testsummarize
+
+

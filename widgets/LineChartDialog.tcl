@@ -42,7 +42,8 @@ Classy::export LineChartDialog {}
 	$object add dataconfig "Configure Data" "$object dataconfigure"
 
 	frame $w.view
-	canvas $w.canvas
+	canvas $w.canvas -bg white
+	bind $w.canvas <Configure> [list $object _autoscale]
 	scrollbar $w.vbar -orient vertical -command "$object yview "
 	scrollbar $w.hbar -orient horizontal -command "$object xview "
 	grid $w.vbar -in $w.view -row 0 -column 0 -sticky ns
@@ -84,6 +85,13 @@ Classy::LineChartDialog method destroy {} {
 # ------------------------------------------------------------------
 #  Widget options
 # ------------------------------------------------------------------
+
+#doc {LineChartDialog options -autoscale} option {-autoscale autoScale AutoScale} descr {
+#}
+Classy::LineChartDialog addoption -autoscale {autoScale AutoScale 1} {
+	set value [true $value]
+	Classy::todo $object _autoscale
+}
 
 #doc {LineChartDialog options -xrange} option {-xrange xRange XRange} descr {
 #}
@@ -206,17 +214,10 @@ Classy::LineChartDialog method dataconfigure {} {
 			$b configure -bg $color
 		}]
 		$b configure -bg [lindex [$chart lineconfigure "$element" -fill] 4]
-		button $w.line$num -text "Line color" -command [varsubst {b chart element} {
-			set color [lindex [$chart lineconfigure "$element" -outline] 4]
-			set color [Classy::getcolor -initialcolor $color -title "$element fill color"]
-			$chart lineconfigure "$element" -outline $color
-			$b configure -fg $color
-		}]
-		$b configure -fg [lindex [$chart lineconfigure "$element" -outline] 4]
 		Classy::NumEntry $w.width$num -label "Line width" -width 5 \
 			-command "$chart lineconfigure [list $element] -width"
 		$w.width$num	set [lindex [$chart lineconfigure $element -width] 4]
-		grid $w.label$num $w.fill$num $w.line$num $w.width$num -sticky we
+		grid $w.label$num $w.fill$num $w.width$num -sticky we
 		incr num
 	}
 }
@@ -301,6 +302,8 @@ Classy::LineChartDialog method rangeconfigure {} {
 		-onvalue vertical -offvalue horizontal \
 		-variable [privatevar $object.options.chart options(-labelorient)] \
 		-command "$chart redraw"
+	checkbutton $w.autoscale -text "Autoscale" -variable [privatevar $object options(-autoscale)] \
+		-onvalue 1 -offvalue 0 -command "$object _autoscale"
 	button $w.fill -text "Fill drawing" -command [varsubst {w object} {
 		$w.area.xmax nocmdset [expr [winfo width [$object component canvas]]-10]
 		$w.area.ymax nocmdset [expr [winfo height [$object component canvas]]-25]
@@ -314,7 +317,8 @@ Classy::LineChartDialog method rangeconfigure {} {
 	grid $w.full - -sticky we
 	grid $w.areal - -sticky we
 	grid $w.area - -sticky we
-	grid $w.fill $w.vertical -sticky we
+	grid $w.fill $w.autoscale -sticky we
+	grid $w.vertical - -sticky we
 	grid columnconfigure $w 0 -weight 1
 	grid columnconfigure $w 1 -weight 1
 }
@@ -333,6 +337,9 @@ Classy::LineChartDialog method chartconfigure {args} {
 		switch -exact -- $option {
 			-axisfont {
 				$object.options.grid configure -font
+			}
+			-background {
+				$object.options.canvas configure -background
 			}
 			default {
 				$object.options.chart configure $option
@@ -355,6 +362,9 @@ Classy::LineChartDialog method chartconfigure {args} {
 					} else {
 						$object.options.grid configure -showx 0
 					}
+				}
+				-background {
+					$object.options.canvas configure -background $value
 				}
 				-axisfont {
 					$object.options.grid configure -font $value
@@ -455,6 +465,7 @@ Classy::LineChartDialog method yview {args} {
 	set yrange [$object.options.chart configure -yrange]
 	set ywidth [expr [lindex $options(-yrange) 1] - [lindex $options(-yrange) 0]]
 	$object.options.vbar	set [expr 1.0-[lindex $yrange 1]/double($ywidth)] [expr 1.0-[lindex $yrange 0]/double($ywidth)]
+	$object.options.canvas raise Classy::LineChart
 }
 
 Classy::LineChartDialog method _getprint {var} {
@@ -492,3 +503,28 @@ Classy::LineChartDialog method print {} {
 	}
 	Classy::printdialog .classy__.printdialog -papersize $pagesize -getdata [list $object _getprint]
 }
+
+Classy::LineChartDialog method _autoscale	{} {
+	private $object options
+	if ![winfo exists [$object component chart]] return
+	if $options(-autoscale) {
+		Classy::todo $object _fill
+	}
+}
+
+Classy::LineChartDialog method _fill	{{w {}}} {
+		set area [[$object component chart] configure -area]
+		set x [lindex $area 0]
+		set y [lindex $area 1]
+		set mx [expr {[winfo width [$object component canvas]]-$x}]
+		set my [expr {[winfo height [$object component canvas]]-$y-25}]
+		if {"$w" != ""} {
+			$w.area.xmax nocmdset $mx
+			$w.area.ymax nocmdset $my
+		}
+		$object chartconfigure -area [list $x $y $mx $my]
+		$object _setscroll
+}
+
+
+

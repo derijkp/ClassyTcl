@@ -10,15 +10,16 @@ Classy::configtool Classy::Editor {Editor toolbar} {
 	action print "Print" {%W insert insert "Print: %W"}
 	action open "Open next" {%W next}
 }
+
 Classy::configtool Classy::Help {Help toolbar} {
 	action reload "Reload" {%W reload}
 	action back "Back" {%W back}
 	action forward "Forward" {%W forward}
 	action edit "Edit" {%W edit}
-	widget Classy::findhelp "Find" 
-	radio Word "Find word" {-variable ::Classy::helpfind -value word}
-	radio File "Find file" {-variable ::Classy::helpfind -value file}
-	radio Infile "Find in file" {-variable ::Classy::helpfind -value grep}
+	tool Classy::Help_find "Find" 
+	tool Classy::Help_findword "Find word"
+	tool Classy::Help_findfile "Find file"
+	tool Classy::Help_findinfile "Find in files"
 }
 
 Classy::configtool Classy::Builder {toolbar used in the ClassyTcl Builder} {
@@ -87,13 +88,14 @@ Classy::configtool Classy::WindowBuilder_icons {Tk widget toolbar used in the Cl
 }
 
 Classy::configtool Classy::Dummy {toolbar used as a dummy in the ClassyTcl WindowBuilder} {
-	action Builder/question {Dummy tool} {Classy::msg "Just a d ummy toolbar"}
+	action Builder/question {Dummy tool} {Classy::msg "Just a dummy toolbar"}
+
 }
 
 Classy::configtool Classy::Config {} {
 	action save {Save} {::Classy::Config save %W}
 	action SaveAs {Save as} {::Classy::Config saveas %W}
-	action Test {Test} {::Classy::Config use %W}
+	action Test {Test} {::Classy::Config test %W}
 	action Select {Select} {::Classy::Config select %W %W}
 	action Clear {Clear} {::Classy::Config clear %W}
 	action Reconfigure {Reconfigure} {::Classy::Config reconfigure %W}
@@ -101,3 +103,5 @@ Classy::configtool Classy::Config {} {
 	action Help {Help} {::Classy::help classy_configure}
 	action Close {Close} {if [info exists %W(close)] {eval [set %W(close)]}}
 }
+
+

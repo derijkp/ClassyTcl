@@ -57,3 +57,4 @@ proc ::Classy::WindowBuilder::edit_Classy::Canvas {object w} {
 		yscroll "Vert. scrollbar" 0 xscroll "Hor. scrollbar" 0 -undosteps Undosteps 0
 	} 12
 }
+

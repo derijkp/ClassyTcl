@@ -225,3 +225,4 @@ Classy::ChartGrid method redraw {args} {
 	update idletasks
 	::Classy::busy remove
 }
+

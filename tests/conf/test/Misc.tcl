@@ -28,3 +28,4 @@ Classy::configmisc {Relief and borders} {
 	{Option box border width} *Peos__OptionBox.BorderWidth 2 int {Default Option box border width color}
 	{Option box relief} *Peos__OptionBox.Relief groove {select raised sunken flat ridge solid groove} {Default Option box relief color}
 }
+

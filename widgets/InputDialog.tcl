@@ -96,3 +96,4 @@ Classy::InputDialog method _command {} {
 		uplevel #0 $command [list [$object get]]
 	}
 }
+

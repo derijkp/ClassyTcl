@@ -80,3 +80,4 @@ proc ::Classy::WindowBuilder::edit_Classy::OptionBoxButton {object w} {
 	grid rowconfigure $w 100 -weight 1
 }
 
+

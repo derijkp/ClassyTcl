@@ -417,3 +417,4 @@ Classy::DynaMenu method updateactive {menutype} {
 		uplevel #0 [$active cget -postcommand]
 	}
 }
+

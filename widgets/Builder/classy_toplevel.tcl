@@ -26,7 +26,11 @@ proc ::Classy::WindowBuilder::start_Classy::Toplevel {object base} {
 proc ::Classy::WindowBuilder::attr_Classy::Toplevel_-destroycommand {object w args} {
 	private $object data
 	if {"$args" == ""} {
-		return $data(opt-destroycommand,$w)
+		if [info exists data(opt-destroycommand,$w)] {
+			return $data(opt-destroycommand,$w)
+		} else {
+			return ""
+		}
 	} else {
 		set value [lindex $args 0]
 		if ![info exists data(opt-destroycommand,$w)] {
@@ -78,3 +82,4 @@ proc ::Classy::WindowBuilder::generate_Classy::Toplevel {object base} {
 	append body "\n"
 	return $body
 }
+

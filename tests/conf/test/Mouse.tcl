@@ -26,3 +26,4 @@ Classy::configmouse {Drag & Drop keys} {
 	{drag move} <<Drag-Move>> {<KeyPress-Control_L> <KeyPress-Control_R>} {move instead of copy}
 	{drag link} <<Drag-Link>> {<KeyPress-Shift_L> <KeyPress-Shift_R>} {link instead of copy}
 }
+

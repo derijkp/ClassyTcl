@@ -36,3 +36,4 @@ proc ::Classy::WindowBuilder::generate_Classy::ScrolledFrame {object base} {
 	append body "\t[$object generate [winfo children $base.view.frame]]"
 	return $body
 }
+

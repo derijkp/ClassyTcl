@@ -1,8 +1,7 @@
 #Functions
 
-proc filer_exec {w x y} {
-	if [catch {$w name $x $y} name] return
-	set type [$w type $x $y]
+proc filer_exec {w name} {
+	if {"$name" == ""} return
 	$w active set $name
 	set curdir [file dirname [lindex [$w cget -list] 1]]
 	if {"$name" == ".."} {
@@ -14,16 +13,46 @@ proc filer_exec {w x y} {
 	}
 	if [file isdir $name] {
 		setdir $w $name
-	} elseif {"$type"=="text"} {
-		$w selection add $name
-		puts $name
 	} else {
+		$w selection add $name
 		puts $name
 	}
 }
 
-proc filer_action {w x y} {
-	if [catch {$w name $x $y} name] return
+proc filer_exec_adjust {w name} {
+	if {"$name" == ""} return
+	$w active set $name
+	set curdir [file dirname [lindex [$w cget -list] 1]]
+	if {"$name" == ".."} {
+		if {"$curdir" != "."} {
+			set name [file dirname $curdir]
+		} else {
+			set name [file dirname [pwd]]
+		}
+	}
+	if [file isdir $name] {
+		set num 1
+		while {[winfo exists .mainw$num]} {incr num}
+		mainw .mainw$num
+		setdir .mainw$num.browser $name
+	} else {
+		$w selection add $name
+		puts $name
+	}
+}
+
+proc filer_action {w name} {
+	if {"$name" == ".."} return
+	if {"$name" == ""} return
+	setfile $w $name
+	if ![$w selection includes $name] {
+		$w selection add $name
+	} else {
+		$w selection delete $name
+	}
+}
+
+proc filer_adjust {w name} {
 	if {"$name" == ".."} return
 	if {"$name" == ""} return
 	setfile $w $name
@@ -97,3 +126,4 @@ proc filer_drag {w x y X Y} {
 	}
 	DragDrop start $X $Y $files -types [list url/file $files] -image $image
 }
+

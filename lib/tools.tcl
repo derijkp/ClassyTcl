@@ -363,3 +363,4 @@ proc Classy::orient {value} {
 		default {return -code error "Unknown orientation \"$value\""}
 	}
 }
+

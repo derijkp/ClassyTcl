@@ -68,3 +68,4 @@ test Classy::DynaMenu {activemenu} {
 } {<Alt-Key-b>}
 
 testsummarize
+

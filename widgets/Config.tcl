@@ -82,7 +82,7 @@ Classy::Config method loadinfile {file name} {
 Classy::Config method saveinfile {file name code} {
 	catch {file delete ${file}~}
 	if ![file exists $file] {writefile $file ""}
-	file rename $file ${file}~
+	file copy $file ${file}~
 	set f [open ${file}~]
 	set o [open $file w]
 	set done 0
@@ -111,7 +111,7 @@ Classy::Config method saveinfile {file name code} {
 Classy::Config method deleteinfile {file name} {
 	catch {file delete ${file}~}
 	if ![file exists $file] {writefile $file ""}
-	file rename $file ${file}~
+	file copy $file ${file}~
 	set f [open ${file}~]
 	set o [open $file w]
 	while {![eof $f]} {
@@ -768,4 +768,5 @@ Classy::Config method config {type name {level appuser}} {
 	pack $win -fill both -expand yes
 	set ::${win}(close) {destroy .classy__.config}
 }
+
 

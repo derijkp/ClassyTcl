@@ -6,18 +6,22 @@
 # ----------------------------------------------------------------------
 
 global env
-if [info exists env(HOME)] {
-	set homedir $env(HOME)
+if [info exists env(CLASSYCONFIG)] {
+	set configdir $env(CLASSYCONFIG)
+} elseif {"$tcl_platform(platform)" == "windows"} {
+	set configdir [file join [set ::class::dir] userconf]
+} elseif [info exists env(HOME)] {
+	set configdir $env(HOME)
 } else {
-	set homedir [file join [set ::class::dir] userconf]
+	set configdir [file join [set ::class::dir] userconf]
 }
 
 set Classy::dir(def) [file join [set ::class::dir] conf]
-set Classy::dir(user) [file join $homedir .classy]
+set Classy::dir(user) [file join $configdir .classy]
 set Classy::dir(appdef) [file join [set ::Classy::appdir] conf]
 set Classy::appname [tk appname]
 regsub { #[0-9]+$} $Classy::appname {} Classy::appname
-set Classy::dir(appuser) [file join $homedir .classy-apps $Classy::appname]
+set Classy::dir(appuser) [file join $configdir .classy-apps $Classy::appname]
 set Classy::dirs [list \
 	$Classy::dir(def) \
 	$Classy::dir(user) \
@@ -91,26 +95,48 @@ proc Classy::realcolor {color} {
 		if {"$temp" != ""} {
 			set color $temp
 		} else {
-			set opt [structlget {
-				Background bg darkBackground bg lightBackground bg
-				Foreground fg activeBackground bg activeForeground fg
-				disabledForeground fg selectBackground selectbackground selectForeground selectforeground
-				selectColor bg highlightBackground highlightbackground highlightColor highlightcolor
-			} $color]
-			set color [.classy__.dummy cget -$opt]
+			switch $color {
+				Background {set color [.classy__.dummyb cget -bg]}
+				darkBackground  {set color [.classy__.dummyb cget -bg]}
+				lightBackground  {set color [.classy__.dummy cget -bg]}
+				Foreground  {set color [.classy__.dummyb cget -fg]}
+				activeBackground  {set color [.classy__.dummyb cget -bg]}
+				activeForeground  {set color [.classy__.dummyb cget -fg]}
+				disabledForeground  {set color [.classy__.dummyb cget -fg]}
+				selectBackground  {set color [.classy__.dummy cget -selectbackground]}
+				selectForeground  {set color [.classy__.dummy cget -selectforeground]}
+				selectColor  {set color [.classy__.dummy cget -bg]}
+				highlightBackground  {set color [.classy__.dummy cget -highlightbackground]}
+				highlightColor  {set color [.classy__.dummy cget -highlightcolor]}
+			}
 		}
 	}
 	if {"$color" == ""} {error "could not convert color"}
 	return $color
 }
 
+#proc Classy::optionget {w name class {def {}}} {
+#	set result [::option get $w $name $class]
+#	if {"$result" == ""} {
+#		if [catch {lindex [$w configure -[string tolower $class]] 3} result] {
+#			if [catch {lindex [$w configure	-[string tolower $class]] 3} result] {
+#				set result $def
+#			}
+#		}
+#	}
+#	return $result
+#}
+
 proc Classy::optionget {w name class {def {}}} {
 	set result [::option get $w $name $class]
 	if {"$result" == ""} {
-		if [catch {lindex [$w configure	-[string tolower $class]] 3} result] {
+		if [catch {lindex [$w configure -[string tolower $name]] 3} result] {
 			if [catch {lindex [$w configure	-[string tolower $class]] 3} result] {
 				set result $def
 			}
+		}
+		if {"$result" == ""} {
+			set result $def
 		}
 	}
 	return $result
@@ -250,7 +276,7 @@ proc Classy::geticon {name {reload {}}} {
 	set file ""
 	foreach type {appuser appdef user def} {
 		set base [file join $::Classy::dir($type) icons $name]
-		foreach type {{} .xpm .gif .xbm} {
+		foreach type {{} .gif .xbm} {
 			if [file readable $base$type] {
 				set file $base$type
 			}
@@ -261,14 +287,6 @@ proc Classy::geticon {name {reload {}}} {
 	} else {
 		if {"[file extension $file]"==".xbm"} {
 			image create bitmap ::Classy::icon_$name -file $file
-		} elseif {"[file extension $file]"==".xpm"} {
-			global tcl_platform
-			package require Img
-			if {"$tcl_platform(platform)"=="windows"} {
-				image create photo ::Classy::icon_$name -file $file
-			} else {
-				image create pixmap ::Classy::icon_$name -file $file
-			}
 		} else {
 			image create photo ::Classy::icon_$name -file $file
 		}
@@ -310,7 +328,7 @@ proc Classy::initconf {{types {Fonts Colors Misc Keys Mouse Menus Toolbars}}} {
 		foreach dir [set ::Classy::dirs] {
 			set file [file join $dir init $type.tcl]
 			if [file readable $file] {
-				if [catch {uplevel #0 source $file} error] {
+				if [catch {uplevel #0 source [list $file]} error] {
 					puts $error
 					bgerror "error while sourcing init file \"$file\":\n$error"
 				}
@@ -319,3 +337,4 @@ proc Classy::initconf {{types {Fonts Colors Misc Keys Mouse Menus Toolbars}}} {
 		catch {Classy::doconfig$stype}
 	}
 }
+

@@ -47,3 +47,4 @@ if [info exists builder] {
 } elseif $Classy::starterror {
 	error $Classy::result $Classy::starterrorinfo
 }
+

@@ -73,7 +73,7 @@ Classy::WindowBuilder classmethod init {args} {
 		grid $object.children -in $object.toolhold -row 0 -column 1 -sticky nsew
 		grid $object.current -in $object.toolhold -row 0 -column 2 -sticky nsew
 		grid columnconfigure $object.toolhold 2 -weight 1
-	Classy::DynaTool $object.icons -type Classy::WindowBuilder_icons -cmdw $object -width 25
+	Classy::DynaTool $object.icons -type Classy::WindowBuilder_icons -cmdw $object -width 30
 	foreach c [winfo children $object.icons] {
 		if {"[winfo class $c]" == "Button"} {
 			set command [$c cget -command]
@@ -1934,7 +1934,7 @@ Classy::WindowBuilder method _createbindings {w} {
 #	}
 	frame $w.b
 	button $w.delete -text "Delete event" -command "$object bindings set \[$w.list get active\]"
-	button $w.donew -text "New event" -command "$object.bindings.new set \[Classy::select Events \[lsort \[event info\]\]\]"
+	button $w.donew -text "New event" -command "$object.bindings.new set \[Classy::select Events \[lsort \[concat \[event info\] <<Drop>>\]\]\]"
 	Classy::Entry $w.new -command [list invoke value "$object bindings set \$value \"#binding\n\""] -width 5
 	grid $w.delete -row 0 -column 0 -in $w.b -sticky we
 	grid $w.donew -row 1 -column 0 -in $w.b -sticky we
@@ -2326,4 +2326,5 @@ Classy::WindowBuilder method _configure {window} {
 #	puts "set from $current(-row)"
 #	puts "set col $current(-column)"
 #}
+
 

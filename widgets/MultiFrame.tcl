@@ -91,3 +91,4 @@ Classy::MultiFrame method select {label} {
 	catch {grid forget [grid slaves $object]}
 	grid $object.$label -row 0 -column 0 -sticky nwse
 }
+

@@ -24,3 +24,4 @@ proc ::Classy::WindowBuilder::edit_Classy::TreeWidget {object w} {
 	} 12
 }
 
+

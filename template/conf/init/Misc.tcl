@@ -2,3 +2,4 @@
 
 Classy::configmisc App {
 }
+

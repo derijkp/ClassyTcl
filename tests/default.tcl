@@ -39,3 +39,4 @@ test Classy::DefaultMenu {create and configure} {
 } {}
 
 testsummarize
+

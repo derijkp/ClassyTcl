@@ -90,3 +90,4 @@ proc newfiler {} {
 	}
 	mainw .filerw$num
 }
+

@@ -8,7 +8,7 @@ Classy::configmisc {Misc settings} {
 }
 
 Classy::configmisc Dialogs {
-	{Color select} *GetColor Classy {select Classy Tk} {type of color selection dialog}
+	{Color select} *GetColor Tk {select Classy Tk} {type of color selection dialog}
 	{Select File} *SelectFile Win {select Win Classy} {type of Select File dialog used when running Windows}
 	{Save File} *SaveFile Win {select Win Classy} {type of Save File dialog used when running Windows}
 	{Font select} *GetFont Win {select Win Classy} {type of font selection dialog when running Windows}
@@ -50,3 +50,4 @@ B5        "516p 729p"
 Folio     "612p 936p"
 Quarto    "610p 780p"} text {possible papersizes}
 }
+

@@ -160,3 +160,4 @@ proc ::Classy::WindowBuilder::edit_Classy::NoteBook_add {object w base name} {
 proc ::Classy::WindowBuilder::delete_Classy::NoteBookButton {object w} {
 	[winfo parent $w] delete [lindex [$w cget -command] 2]
 }
+

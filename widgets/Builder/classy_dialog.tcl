@@ -162,3 +162,4 @@ proc ::Classy::WindowBuilder::parse_Classy::Dialog {object base line} {
 		}
 	}
 }
+

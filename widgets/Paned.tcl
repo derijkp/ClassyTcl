@@ -150,3 +150,4 @@ Classy::Paned method _drag {x y} {
 	set command [getprivate $object options(-command)]
 	if {"$command"!=""} {eval $command}
 }
+

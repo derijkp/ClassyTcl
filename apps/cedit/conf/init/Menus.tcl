@@ -60,14 +60,17 @@ menu "Tools" {
 activemenu "Macros" {%W getmacromenu}
 activemenu "Pattern" {%W getpatternmenu}
 menu "Help" {
-	action "Editor" {Classy::help classy_editor} <<Help>>
+	action "Editor" {Classy::help application} <<Help>>
 	separator
 	action "ClassyTcl" {Classy::help ClassyTcl} <<HelpClassyTcl>>
-	action "Help" {Classy::help help} <<HelpHelp>>
+	action "Help" {Classy::help classy_help} <<HelpHelp>>
 }
 
 
+
 }
+
+
 
 
 

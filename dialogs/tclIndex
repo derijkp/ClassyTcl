@@ -13,3 +13,4 @@ set auto_index(::Classy::config_menu) [list source [file join $dir ConfigDialogs
 set auto_index(::Classy::config_frame) [list source [file join $dir ConfigDialogs.tcl]]
 set auto_index(::Classy::printdialog) [list source [file join $dir print.tcl]]
 set auto_index(::Classy::print_autoscale) [list source [file join $dir print.tcl]]
+

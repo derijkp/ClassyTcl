@@ -18,3 +18,4 @@ Classy::configcolor {Basic colors} {
 {black gray20 gray40 gray50 gray60 gray80 white}} {list of colors as used the getcolor}
 }
 
+

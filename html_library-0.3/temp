@@ -1420,3 +1420,4 @@ proc tkFocusOK w {
     }
     regexp Key|Focus "[bind $w] [bind [winfo class $w]]"
 }
+

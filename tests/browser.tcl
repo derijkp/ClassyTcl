@@ -29,10 +29,17 @@ proc getdata {file} {
 	file lstat $file temp
 	array set attr [file attributes $file]
 	set data ""
-	lappend data $attr(-permissions)
-	lappend data "$attr(-owner).$attr(-group)"
-	lappend data $temp(size)
-	lappend data [clock format $temp(mtime) -format "%b %d %H:%M %Y"]
+	if {"$::tcl_platform(platform)" == "unix"} {
+		lappend data $attr(-permissions)
+		lappend data "$attr(-owner).$attr(-group)"
+		lappend data $temp(size)
+		lappend data [clock format $temp(mtime) -format "%b %d %H:%M %Y"]
+	} else {
+		lappend data ?
+		lappend data ?
+		lappend data [file size $file]
+		lappend data [clock format $temp(mtime) -format "%b %d %H:%M %Y"]
+	}
 	return $data
 }
 
@@ -130,3 +137,4 @@ test browser {list data (side) smallimage} {
 	
 
 testsummarize
+

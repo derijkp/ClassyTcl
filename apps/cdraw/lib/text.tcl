@@ -247,3 +247,4 @@ if {$dist == -1} {
 }
 return [list $ppos $spos $npos $nnpos]
 }
+

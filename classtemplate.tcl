@@ -72,3 +72,4 @@ Classy::Test method _hidden {args} {
 	code
 }
 
+

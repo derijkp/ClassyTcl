@@ -80,3 +80,4 @@ test getcolor {getcolor} {
 } {yellow}
 
 testsummarize
+

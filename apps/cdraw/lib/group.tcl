@@ -7,3 +7,4 @@ proc ungroup w {
 	global current
 	$w dtag [$w findgroup $current(cur)]
 }
+

@@ -84,9 +84,19 @@ Classy::ColorRGB method nocmdset {value} {
 	private $object nocmd
 	set rgb [winfo rgb $object $value]
 	set nocmd 1
-	$object.red.val set [expr 0.00389105*[lindex $rgb 0]]
-	$object.green.val set [expr 0.00389105*[lindex $rgb 1]]
-	$object.blue.val set [expr 0.00389105*[lindex $rgb 2]]
+	foreach {r g b} $rgb {}
+	if {"$::tcl_platform(platform)" == "windows"} {
+		set r [expr {$r*255/65280.0}]
+		set g [expr {$g*255/65280.0}]
+		set b [expr {$b*255/65280.0}]
+	} else {
+		set r [expr {$r*255/65535.0}]
+		set g [expr {$g*255/65535.0}]
+		set b [expr {$b*255/65535.0}]
+	}
+	$object.red.val set $r
+	$object.green.val set $g
+	$object.blue.val set $b
 	update idletasks
 	unset nocmd
 }
@@ -136,3 +146,4 @@ Classy::ColorRGB method _update {args} {
 		}
 	}
 }
+

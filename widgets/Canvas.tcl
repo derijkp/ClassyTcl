@@ -9,7 +9,7 @@
 #} index {
 # Tk improvements
 #} shortdescr {
-# Canvas with zoom, undo/redo, rotate,save and load, group
+# Canvas with zoom, undo/redo, rotate,save and load, group, print
 #} descr {
 # subclass of <a href="../basic/Widget.html">Widget</a><br>
 # Classy::Canvas creates a canvas widget that supports undo and redo, 
@@ -353,10 +353,11 @@ Classy::Canvas method _undoone {current} {
 			set data(undo) 1
 		}
 		rotate {
+			set data(undo) 0
 			foreach {tagOrId x y a} $current {
-				$w visitor rotate $tagOrId \
-					-xcenter $x -ycenter $y -angle [expr -$a]
+				$object rotate $tagOrId $x $y [expr -$a]
 			}
+			set data(undo) 1
 		}
 		lower {
 			set items [lindex $current 0]
@@ -510,9 +511,11 @@ Classy::Canvas method _redoone {current} {
 			set data(undo) 1
 		}
 		rotate {
+			set data(undo) 0
 			foreach {tagOrId x y a} $current {
-				$w visitor rotate $tagOrId -xcenter $x -ycenter $y -angle $a
+				$object rotate $tagOrId $x $y $a
 			}
+			set data(undo) 1
 		}
 		lower {
 			set data(undo) 0
@@ -997,7 +1000,7 @@ Classy::Canvas method scale {tagOrId xOrigin yOrigin xScale yScale} {
 	return $result
 }
 
-if ![catch {package require Visrotate}] {
+if ![catch {load [file join $class::dir visitors visrotate[info sharedlibextension]]}] {
 Classy::Canvas method rotate {tagOrId xcenter ycenter angle} {
 	private $object w data
 	if $data(undo) {
@@ -1456,7 +1459,7 @@ Classy::Canvas method selection {action {list {}}} {
 		redraw {
 			set bbox [$w bbox $data(current)]
 			if {"$bbox" != ""} {
-				$w coords $data(cur) $bbox
+				eval $w coords $data(cur) $bbox
 				$w raise $data(cur)
 			} else {
 				$w coords $data(cur) -1000 -1000 -1000 -1000
@@ -1563,7 +1566,7 @@ Classy::Canvas method current {args} {
 	}
 	set bbox [$w bbox $data(current)]
 	if {"$bbox" != ""} {
-		$w coords $data(cur) $bbox
+		eval $w coords $data(cur) $bbox
 		$w raise $data(cur)
 	} else {
 		$w coords $data(cur) -1000 -1000 -1000 -1000
@@ -1793,7 +1796,7 @@ Classy::Canvas method save {{tag all}} {
 }
 
 #doc {Canvas command undo} cmd {
-#pathname load ?tag?
+#pathname load data
 #} descr {
 # restores a previously saved drawing. Its argument is a list as returned by
 # the save method.
@@ -1855,41 +1858,6 @@ Classy::Canvas method findgroup {tagOrId} {
 	}
 }
 
-#doc {Canvas command cut} cmd {
-#pathname cut ?tagOrId?
-#} descr {
-# copies a description of the objects given by tagOrId to the clipboard
-#}
-Classy::Canvas method cut {{tagOrId _sel}} {
-	clipboard clear -displayof $object			  
-	catch {									
-		clipboard append -displayof $object [$object save $tagOrId]
-		$object delete $tagOrId
-	}										  
-}
-
-#doc {Canvas command copy} cmd {
-#pathname copy ?tagOrId?
-#} descr {
-# copies a description of the objects given by tagOrId to the clipboard
-#}
-Classy::Canvas method copy {{tagOrId _sel}} {
-	clipboard clear -displayof $object			  
-	catch {									
-		clipboard append -displayof $object [$object save $tagOrId]
-	}										  
-}
-
-#doc {Canvas command paste} cmd {
-#pathname paste
-#} descr {
-# creates new objects from a description put on the clipboard by the copy or cut method
-#}
-Classy::Canvas method paste {} {
-	$object selection set {}
-	$object load [selection get -displayof $object -selection CLIPBOARD]
-}
-
 Classy::Canvas method _getprint {var} {
 	private $object w data
 	upvar #0 ::$var print
@@ -1936,21 +1904,6 @@ Classy::Canvas method _getprint {var} {
 	return $result
 }
 
-#doc {Canvas command print} cmd {
-#pathname print
-#} descr {
-# pops up a print dialog
-#}
-Classy::Canvas method print {} {
-	private $object w data
-	set page [$w coords _page]
-	if [winfo exists .classy__.printdialog] {
-		destroy .classy__.printdialog
-	}
-	Classy::printdialog .classy__.printdialog -papersize [lrange $page 2 3] -getdata [list $object _getprint]
-	.classy__.printdialog configure -cache 1
-}
-
 Classy::Canvas method addbitmap {x y file} {
 	private $object load
 	set name $object:$file
@@ -1960,4 +1913,108 @@ Classy::Canvas method addbitmap {x y file} {
 	$object create image $x $y -image $load(image,$name)
 	return $name
 }
+
+#doc {Canvas command cut} cmd {
+#pathname cut ?tagOrId?
+#} descr {
+# copies a description of the objects given by tagOrId to the clipboard
+#}
+Classy::Canvas method cut {{tagOrId _sel}} {
+	clipboard clear -displayof $object			  
+	catch {									
+		clipboard append -displayof $object [$object save $tagOrId]
+		$object delete $tagOrId
+	}										  
+}
+
+#doc {Canvas command copy} cmd {
+#pathname copy ?tagOrId?
+#} descr {
+# copies a description of the objects given by tagOrId to the clipboard
+#}
+Classy::Canvas method copy {{tagOrId _sel}} {
+	clipboard clear -displayof $object			  
+	catch {									
+		clipboard append -displayof $object [$object save $tagOrId]
+	}										  
+}
+
+#doc {Canvas command paste} cmd {
+#pathname paste
+#} descr {
+# creates new objects from a description put on the clipboard by the copy or cut method
+#}
+Classy::Canvas method paste {} {
+	$object selection set {}
+	$object load [selection get -displayof $object -selection CLIPBOARD]
+}
+
+#doc {Canvas command print} cmd {
+#pathname print
+#} descr {
+# pops up a print dialog and prints the current canvas.
+#}
+if ![catch {load [file join $class::dir visitors visexport[info sharedlibextension]]}] {
+Classy::Canvas method print {{tag all}} {
+	set x [lindex [$object xview] 0]
+	set y [lindex [$object yview] 0]
+	set keep [$object zoom]
+	set selection [$object selection get]
+	$object selection clear
+	set cur [$object current]
+	$object current {}
+	$object noundo zoom 10
+	$object noundo xview moveto 0
+	$object noundo yview moveto 0
+	update idletasks
+	set code [catch {$object visitor export $tag print 0.1} result]
+	$object noundo zoom $keep
+	$object noundo xview moveto $x
+	$object noundo yview moveto $y
+	$object selection set $selection
+	$object current $cur
+	update idletasks
+	return -code $code $result
+}
+
+Classy::Canvas method wincopy {{tag all}} {
+	$object noundo addtag _print withtag $tag
+	set x [lindex [$object xview] 0]
+	set y [lindex [$object yview] 0]
+	set keep [$object zoom]
+	set selection [$object selection get]
+	$object selection clear
+	set cur [$object current]
+	$object current {}
+	$object noundo zoom 10
+	$object noundo xview moveto 0
+	$object noundo yview moveto 0
+	update idletasks
+	set code [catch {$object visitor export _print clipboard 0.1} result]
+	$object noundo dtag _print
+	$object noundo zoom $keep
+	$object noundo xview moveto $x
+	$object noundo yview moveto $y
+	$object selection set $selection
+	$object current $cur
+	update idletasks
+	return -code $code $result
+}
+
+} else {
+Classy::Canvas method print {{tag all}} {
+	private $object w data
+	set page [$w coords _page]
+	if [winfo exists .classy__.printdialog] {
+		destroy .classy__.printdialog
+	}
+	Classy::printdialog .classy__.printdialog -papersize [lrange $page 2 3] -getdata [list $object _getprint]
+	.classy__.printdialog configure -cache 1
+}
+
+Classy::Canvas method wincopy {{tag all}} {
+	error "wincopy not supported"
+}
+}
+
 

@@ -60,13 +60,16 @@ proc Classy::selectfile {args} {
 	if {"$dir"==""} {
 		set dir [pwd]
 	}
+	set dir [file nativename $dir]
 	if {("$tcl_platform(platform)"=="windows")&&("[option get . selectFile SelectFile]"=="Win")} {
 		if {"$opt(-selectmode)"=="single"} {
 			set opt(-selectmode) browse
 		}
-		if {"$opt(-initialfile)"==""} {
-			set opt(-initialfile) $opt(-initialdir)
-		}		
+		if {("$opt(-filetypes)" == "")&&("$opt(-defaultextension)" != "")} {
+			set opt(-filetypes) [list \
+				[list "[string range $opt(-defaultextension) 1 end] file" \
+				$opt(-defaultextension)] {{All Files} *}]
+		}
 		set result [Classy::GetOpenFile -defaultextension $opt(-defaultextension) \
 			-filetypes $opt(-filetypes) -initialdir $dir \
 			-initialfile $opt(-initialfile) -title $opt(-title) \
@@ -99,3 +102,4 @@ proc Classy::selectfile {args} {
 	}
 }
 Classy::export selectfile {}
+

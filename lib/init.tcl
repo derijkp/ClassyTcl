@@ -13,7 +13,6 @@ package require -exact Tcl 8.0
 if {("$tcl_patchLevel" == "8.0")||("$tcl_patchLevel" == "8.0p1")} {
 	source [file join $::class::dir patches init.tcl]
 }
-#
 # Load the shared library if present
 # If not, Tcl code will be loaded when necessary
 #
@@ -55,3 +54,4 @@ if [file exists [file join ${::class::dir} classy[info sharedlibextension]]] {
 #
 
 lappend auto_path [file join ${::class::dir} lib]
+

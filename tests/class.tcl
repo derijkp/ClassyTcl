@@ -1049,3 +1049,4 @@ test class {trace class} {
 } {{Base info class} {Base trace {}}}
 
 testsummarize
+

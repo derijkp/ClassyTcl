@@ -79,3 +79,4 @@ Classy::ColorEntry method command {} {
 	}
 }	
 
+

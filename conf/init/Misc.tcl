@@ -50,3 +50,4 @@ B5        "516p 729p"
 Folio     "612p 936p"
 Quarto    "610p 780p"} text {possible papersizes}
 }
+

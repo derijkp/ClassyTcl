@@ -79,3 +79,4 @@ test Classy::FileEntry {create and configure} {
 } {test}
 
 testsummarize
+

@@ -85,10 +85,19 @@ Classy::TreeWidget method destroy {} {
 foreach option {
 	background cursor height highlightbackground highlightcolor highlightthickness
 	insertbackground insertborderwidth insertofftime insertontime inertwidth
-	offset relief selectbackground selectborderwidth selectforeground 
+	offset relief selectborderwidth selectforeground selectbackground
 	state takefocus width
 } {
 	Classy::TreeWidget chainoption -$option {$object.c} -$option
+}
+
+Classy::TreeWidget addoption -foreground {foreground Foreground {}} {
+	if {"$value" == ""} {
+		set col [Classy::realcolor [Classy::optionget $object.c foreground Foreground Foreground]]
+	} else {
+		set col $value
+	}
+	$object.tree configure -foreground $col
 }
 
 Classy::TreeWidget addoption -rootimage {rootImage RootImage {}} {
@@ -179,4 +188,5 @@ Classy::TreeWidget method _execute {x y} {
 	uplevel #0 $options(-executecommand) [list $node]
 	$object _handlebars
 }
+
 

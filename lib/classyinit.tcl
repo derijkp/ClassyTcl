@@ -82,6 +82,21 @@ if {"[info commands ::Tk::bind]" == ""} {
 	}
 }
 
+if {"[info commands send]" == ""} {
+	proc send {args} {
+	while 1 {
+		set arg [lshift args]
+		if ![regexp ^- $arg] break
+		if {"$arg" == "--"} {
+			lshift args
+			break
+		}
+		if {[llength $args] == 0} {return -code error "wrong # args: must be \"send ?options? appname args\""}
+	}
+   	eval uplevel #0 $args
+   }
+}
+
 proc class::bind {w} {
 	if ![info exists ::class::rebind($w)] {
 		return $w
@@ -138,6 +153,7 @@ if {"[info commands ::Tk::focus]" == ""} {
 #----------------------------------------------------------------------
 frame .classy__
 entry .classy__.dummy
+button .classy__.dummyb
 source [file join [set ::class::dir] lib conf.tcl]
 source [file join [set ::class::dir] lib tools.tcl]
 option add *ColorList {{blue cyan green yellow orange red magenta} {blue3 cyan3 green3 yellow3 orange3 red3 magenta3} {black gray20 gray40 gray50 gray60 gray80 white}} widgetDefault
@@ -174,4 +190,5 @@ array set ::Classy::cmds {
 	Menubutton menubutton
 	Classy::Topframe frame
 }
+
 

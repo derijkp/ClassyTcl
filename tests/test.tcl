@@ -21,3 +21,4 @@ test Widget {init entry with args} {
 	}
 	[Test .try] cget -textvariable
 } {try}
+

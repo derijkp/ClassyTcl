@@ -71,7 +71,9 @@ Classy::Builder addoption -dir {dir Directory code} {
 	private $object defdir
 	set value [string trimright $value /]
 	if {"$value" == ""} {
-		set defdir $::Classy::appdir
+		if ![info exists defdir] {
+			set defdir $::Classy::appdir
+		} else return
 	} elseif {"$value" == "code"} {
 		set defdir [file join $::Classy::appdir lib]
 	} elseif {"$value" == "config"} {
@@ -230,6 +232,7 @@ Classy::Builder method new {type {name {}}} {
 Classy::Builder method _creatededit {w} {
 	if ![winfo exists $w] {
 		Classy::WindowBuilder $w
+		$w place
 	} else {
 		$w place
 	}
@@ -430,7 +433,8 @@ Classy::Builder method delete {} {
 	set file $browse(file)
 	switch $browse(type) {
 		file {
-			file rename -force $file $file~
+			file copy -force $file $file~
+			file delete $file
 			$object.browse deletenode $browse(base)
 			catch {auto_mkindex [file dirname $file] *.tcl}
 			return $file
@@ -722,7 +726,8 @@ Classy::Builder method rename {args} {
 	switch [lindex $src 2] {
 		file {
 			set dst [file join [file dir $src] $dst]
-			file rename [lindex $src 0] $dst
+			file copy [lindex $src 0] $dst
+			file delete [lindex $src 0]
 			set parent [$object.browse parentnode $src]
 			$object.browse deletenode $src
 			$object.browse addnode $parent [lreplace $src 0 0 $dst] -text [file tail $dst] -image [Classy::geticon newfile]
@@ -745,3 +750,4 @@ Classy::Builder method rename {args} {
 		}
 	}
 }
+

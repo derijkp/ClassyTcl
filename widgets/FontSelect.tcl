@@ -180,3 +180,4 @@ Classy::FontSelect method display {args} {
 	$object.example configure -font [$object get]
 	uplevel #0 [getprivate $object options(-command)]
 }
+

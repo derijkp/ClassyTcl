@@ -74,3 +74,4 @@ proc ::Classy::WindowBuilder::generate_Classy::DynaTool {object base} {
 	return $body
 }
 
+

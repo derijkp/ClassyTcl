@@ -57,3 +57,4 @@ proc ::Classy::WindowBuilder::add_Classy::Message {object base args} {
 	return $base
 }
 
+

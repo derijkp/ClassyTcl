@@ -9,3 +9,4 @@ proc ::Classy::WindowBuilder::edit_Classy::Paned {object w} {
 		-window Window 0 -orient Orientation 0
 	} 8
 }
+

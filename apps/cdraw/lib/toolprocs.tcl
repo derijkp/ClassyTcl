@@ -69,3 +69,4 @@ proc rotatetool {w} {
 		$w configure -variable status(%W,rotate) -command {rotate_set %W}
 	}]
 }
+

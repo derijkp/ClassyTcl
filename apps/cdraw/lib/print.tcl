@@ -12,3 +12,4 @@ proc printdialog args {# ClassyTcl generated Dialog
 		-destroycommand [list destroy $window]
 	# End windows
 }
+

@@ -66,3 +66,4 @@ Classy::yornDialog chainoption -yescommand {$object.actions.yes} -command
 #doc {yornDialog options -nocommand} option {-nocommand ? ?} descr {
 #}
 Classy::yornDialog chainoption -nocommand {$object.actions.no} -command
+

@@ -14,7 +14,7 @@ proc arc_action {w x y} {
 	set y [$w canvasy $y]
 	set current(x) $x
 	set current(y) $y
-	set current(cur) [$w create arc $x $y $x $y]
+	set current(cur) [$w create arc $x $y [expr {$x+1}] [expr {$y+1}]]
 }
 
 proc arc_motion {w x y} {
@@ -29,4 +29,5 @@ proc arc_abort {w x y} {
 	$w delete $current(cur)
 	catch {unset current(cur)}
 }
+
 

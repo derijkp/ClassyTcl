@@ -132,3 +132,4 @@ Classy::ProgressDialog method get {} {
 	private $object current
 	return $current
 }
+

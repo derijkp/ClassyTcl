@@ -2,3 +2,4 @@
 #define indel_row_height 3
 static char indel_row_bits[] = {
  0x02,0x1f,0x02};
+

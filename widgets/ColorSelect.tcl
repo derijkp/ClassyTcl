@@ -64,10 +64,10 @@ Classy::ColorSelect classmethod init {args} {
 
 	# REM Create bindings
 	# -------------------
-	$object.entry configure -command [list $object set]
-	$object.sample configure -command [list $object set]
-	$object.rgb configure -command [list $object set]
-	$object.hsv configure -command [list $object set]
+	$object.entry configure -command [list $object _set entry]
+	$object.sample configure -command [list $object _set sample]
+	$object.rgb configure -command [list $object _set rgb]
+	$object.hsv configure -command [list $object _set hsv]
 
 	# REM Configure initial arguments
 	# -------------------------------
@@ -112,8 +112,14 @@ Classy::ColorSelect method nocmdset {value} {
 #}
 Classy::ColorSelect method set {value} {
 	$object.entry nocmdset $value
-	$object.rgb nocmdset $value;
-	$object.hsv nocmdset $value;
+	$object.rgb nocmdset $value
+	$object.hsv nocmdset $value
+}
+
+Classy::ColorSelect method _set {src value} {
+	if {"$src" != "hsv"} {$object.hsv nocmdset $value}
+	if {"$src" != "entry"} {$object.entry nocmdset $value}
+	if {"$src" != "rgb"} {$object.rgb nocmdset $value}
 }
 
 #doc {ColorSelect command get} cmd {
@@ -137,3 +143,4 @@ Classy::ColorSelect method select {type} {
 Classy::ColorSelect method _update {from} {
 	uplevel #0 [getprivate $object options(-command)]
 }
+

@@ -23,3 +23,4 @@ proc ::Classy::WindowBuilder::generate_Classy::ListBox {object base} {
 	return $body
 }
 
+

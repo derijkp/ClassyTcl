@@ -121,3 +121,4 @@ Tcl_AppInit(interp)
     Tcl_SetVar(interp, "tcl_rcFileName", "~/.wishrc", TCL_GLOBAL_ONLY);
     return TCL_OK;
 }
+

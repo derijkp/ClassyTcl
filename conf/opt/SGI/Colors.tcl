@@ -32,3 +32,4 @@ Classy::configcolor {Widget Colors} {
 	{Scrollbar background} *Scrollbar.background lightBackground {Scrollbar background color}
 	{Label background} *label.background darkBackground {Label background color}
 }
+

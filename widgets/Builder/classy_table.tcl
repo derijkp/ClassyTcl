@@ -25,3 +25,4 @@ proc ::Classy::WindowBuilder::edit_Classy::Table {object w} {
 		-xlabelcommand "xlabelcommand" 1 -ylabelcommand "ylabelcommand" 1
 	} 12 0
 }
+

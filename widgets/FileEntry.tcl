@@ -46,3 +46,4 @@ Classy::FileEntry classmethod init {args} {
 	if {"$args" != ""} {eval $object configure $args}
 }
 
+

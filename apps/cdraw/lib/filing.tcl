@@ -20,7 +20,7 @@ set temp [Classy::selectfile -title Open -selectmode persistent \
 	-defaultextension .cld \
 	-initialfile $init]
 if {"$temp" == ""} return
-set status($w,file) $temp
+set status($w,file) [lindex $temp 0]
 $w load [readfile $status($w,file)]
 }
 
@@ -38,5 +38,6 @@ if {"$temp" == ""} return
 set status($w,file) $temp
 writefile $status($w,file) [$w save]
 }
+
 
 

@@ -360,20 +360,23 @@ Classy::ColorHSV method _hs2xy {h s} {
 # ------------------------------------------------------------------
 Classy::ColorHSV method _set_rgb {r g b} {
 	private $object valH valS valV
-	set r [expr $r/65535.0]
-	set g [expr $g/65535.0]
-	set b [expr $b/65535.0]
-
+	if {"$::tcl_platform(platform)" == "windows"} {
+		set r [expr {$r/65280.0}]
+		set g [expr {$g/65280.0}]
+		set b [expr {$b/65280.0}]
+	} else {
+		set r [expr {$r/65535.0}]
+		set g [expr {$g/65535.0}]
+		set b [expr {$b/65535.0}]
+	}
 	set max 0
 	if {$r > $max} {set max $r}
 	if {$g > $max} {set max $g}
 	if {$b > $max} {set max $b}
-
-	set min 65535
+	set min 1
 	if {$r < $min} {set min $r}
 	if {$g < $min} {set min $g}
 	if {$b < $min} {set min $b}
-
 	set valV $max
 	if {$max != 0} {
 		set valS  [expr ($max-$min)/$max]
@@ -384,7 +387,6 @@ Classy::ColorHSV method _set_rgb {r g b} {
 		set rc [expr ($max-$r)/($max-$min)]
 		set gc [expr ($max-$g)/($max-$min)]
 		set bc [expr ($max-$b)/($max-$min)]
-
 		if {$r == $max} {
 			set valH [expr $bc-$gc]
 		} elseif {$g == $max} {
@@ -438,3 +440,4 @@ Classy::ColorHSV method _dec_to_hex {val} {
 	set dig2 [expr $val-$dig1*16]
 	return $dec_to_hex_map($dig1)$dec_to_hex_map($dig2)
 }
+

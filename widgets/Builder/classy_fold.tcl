@@ -40,3 +40,4 @@ proc ::Classy::WindowBuilder::generate_Classy::Fold {object base} {
 	return $body
 }
 
+

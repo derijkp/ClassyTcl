@@ -78,6 +78,9 @@ Classy::DefaultMenu addoption -key {key Key {}}
 
 Classy::DefaultMenu chainallmethods {$object} button
 
+Classy::DefaultMenu method conf {args} {
+	eval $object configure $args
+}
 
 #doc {DefaultMenu command get} cmd {
 #pathname get 
@@ -174,11 +177,10 @@ Classy::DefaultMenu method place {} {
 		if {$ys>$h} {set h $ys}
 	}
 	wm geometry .classy__.defaultmenu ${w}x${h}
-
 	# position
 	set maxx [expr [winfo vrootwidth .classy__.defaultmenu]-$w]
 	set maxy [expr [winfo vrootheight .classy__.defaultmenu]-$h]
-	set x [expr [winfo rootx $object]+[winfo width $object]-[winfo width .classy__.defaultmenu]]
+	set x [expr {[winfo rootx $object]-[winfo width .classy__.defaultmenu]}]
 	set y [winfo rooty $object]
 	if {$x<0} {set x 0}
 	if {$y<0} {set y 0}
@@ -187,6 +189,7 @@ Classy::DefaultMenu method place {} {
 	wm geometry .classy__.defaultmenu +$x+$y
 	wm deiconify .classy__.defaultmenu
 	raise .classy__.defaultmenu
+	wm geometry .classy__.defaultmenu +$x+$y
 }
 
 Classy::DefaultMenu method _action {} {
@@ -213,4 +216,5 @@ Classy::DefaultMenu method _motion {X Y} {
 		.classy__.defaultmenu set $index
 	}
 }
+
 

@@ -190,9 +190,8 @@ Classy::LineChart method _create {name num} {
 		set color black
 	}
 	set tag($name) [$canvas create line 1 1 2 2 -width 2 -fill $color \
-		-tags [list $options(-tag) classy::LineChart data]]
+		-tags [list $options(-tag) Classy::LineChart data]]
 }
-
 
 #doc {LineChart command dataget} cmd {
 #pathname dataget name
@@ -319,7 +318,7 @@ Classy::LineChart method _drawlegend {} {
 	}
 	set temp [string trimright $temp "\n"]
 	set id [$canvas create text [expr $legendx+10] $legendy -text $temp \
-		-tags [list $options(-tag) $options(-tag)::legend classy::LineChart] \
+		-tags [list $options(-tag) $options(-tag)::legend Classy::LineChart] \
 		-anchor nw -font $options(-legendfont)]
 	set bbox [$canvas bbox $options(-tag)::legend]
 	set h [expr ([lindex $bbox 3]-[lindex $bbox 1])/[llength $names]]
@@ -331,10 +330,10 @@ Classy::LineChart method _drawlegend {} {
 		set temp [expr $legendx+10]
 		eval $options(-canvas) create line \
 			$legendx [expr $y+$hs] $temp [expr $y+$hs] \
-			$conf {-tags [list $options(-tag) $options(-tag)::legend classy::LineChart]}
+			$conf {-tags [list $options(-tag) $options(-tag)::legend Classy::LineChart]}
 		set y [expr $y+$h]
 	}
-	set temp [eval $canvas create rectangle [$canvas bbox $options(-tag)::legend] {-fill white -tags [list $options(-tag) $options(-tag)::legend classy::LineChart]}]
+	set temp [eval $canvas create rectangle [$canvas bbox $options(-tag)::legend] {-fill white -tags [list $options(-tag) $options(-tag)::legend Classy::LineChart]}]
 	$canvas lower $temp $id
 }
 
@@ -384,7 +383,7 @@ Classy::LineChart method _drawlabels {} {
 	}
 	foreach label $labels {
 		$canvas create text $x $y -anchor nw -text $label -font $options(-labelfont) \
-			-tags [list $options(-tag) $options(-tag)::labels classy::LineChart]
+			-tags [list $options(-tag) $options(-tag)::labels Classy::LineChart]
 		set x [expr $x + $xscale*$gap]
 	}
 }
@@ -509,3 +508,4 @@ Classy::LineChart method redraw {args} {
 	catch {$object _drawdata}
 #	::Classy::busy remove
 }
+

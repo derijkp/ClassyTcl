@@ -153,7 +153,7 @@ bind Select <<MExecute>> {rotate_switch %W %x %y}
 bind Select <<Action-ButtonPress>> {select_action %W %x %y}
 bind Select <<Action-ButtonRelease>> {select_release %W %x %y}
 bind Select <<Action-Motion>> {select_drag %W %x %y}
-bind Select <<MAdd-ButtonPress>> {select_action %W %x %y add}
+bind Select <<MAdd>> {select_action %W %x %y add}
 bind Select <<MAdd-ButtonRelease>> {select_release %W %x %y add}
 bind Select <<MAdd-Motion>> {select_drag %W %x %y}
 bind Select <<Escape>> {select_abort %W %x %y}
@@ -168,4 +168,5 @@ bind Zoom <<MAdd-ButtonRelease>> {zoom_release %W %x %y add}
 bind Zoom <<MAdd-Motion>> {zoom_drag %W %x %y}
 bind Zoom <<Escape>> {zoom_abort %W %x %y}
 }
+
 

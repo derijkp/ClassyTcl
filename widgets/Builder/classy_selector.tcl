@@ -33,3 +33,4 @@ proc ::Classy::WindowBuilder::edit_Classy::Selector {object w} {
 		-type Type 0 -variable Variable 0 -label Label 0 initialvalue "initial value" 0 -command Command 1
 	} 8 0
 }
+

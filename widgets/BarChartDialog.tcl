@@ -39,7 +39,7 @@ Classy::BarChartDialog classmethod init {args} {
 	$object add rangeconfig "Configure Ranges" "$object rangeconfigure"
 	$object add dataconfig "Configure Data" "$object dataconfigure"
 	frame $w.view
-	canvas $w.canvas
+	canvas $w.canvas -bg white
 	scrollbar $w.vbar -orient vertical -command "$object yview "
 	scrollbar $w.hbar -orient horizontal -command "$object xview "
 	grid $w.vbar -in $w.view -row 0 -column 0 -sticky ns
@@ -48,6 +48,9 @@ Classy::BarChartDialog classmethod init {args} {
 	grid columnconfigure $w.view 1 -weight 1
 	grid rowconfigure $w.view 0 -weight 1
 	frame $w.controls
+	bind $w.canvas <Configure> [list $object _autoscale]
+	checkbutton $w.autoscale -text "Autoscale" -variable [privatevar $object options(-autoscale)] \
+		-onvalue 1 -offvalue 0 -command "$object _autoscale"
 	checkbutton $w.stacked -text "Stacked" -variable [privatevar $object.options.chart options(-stacked)] \
 		-onvalue 1 -offvalue 0 -command "$object _newvalues"
 	checkbutton $w.percent -text "Percentages" -variable [privatevar $object.options.chart options(-percentages)]\
@@ -58,12 +61,12 @@ Classy::BarChartDialog classmethod init {args} {
 	Classy::NumEntry $w.barwidth -label "Barwidth" -width 5 -min 0 -max 1 -increment 0.1 \
 		-command "$object _newvalues" -textvariable [privatevar $object.options.chart options(-barwidth)]
 	$w.barwidth nocmdset 1
-	grid $w.stacked $w.percent $w.displace $w.barwidth -in $w.controls -sticky we
+	grid $w.autoscale $w.stacked $w.percent $w.displace $w.barwidth -in $w.controls -sticky we
 	pack $w.view -fill both -expand yes
 	pack $w.controls -fill y
 	update idletasks
 	Classy::ChartGrid new $w.grid -canvas $w.canvas -xrange {0 20} -yrange {0 100}
-	Classy::BarChart new $w.chart -canvas $w.canvas -xrange {0 20} -yrange {0 100}
+	Classy::BarChart new $w.chart -tag barchart -canvas $w.canvas -xrange {0 20} -yrange {0 100}
 	# REM Create bindings
 	# -------------------
 	bind $w.canvas <<Action>> "$w.chart configure -legendpos {%x %y}"
@@ -90,6 +93,13 @@ Classy::BarChartDialog method destroy {} {
 #  Widget options
 # ------------------------------------------------------------------
 
+#doc {BarChartDialog options -autoscale} option {-autoscale autoScale AutoScale} descr {
+#}
+Classy::BarChartDialog addoption -autoscale {autoScale AutoScale 1} {
+	set value [true $value]
+	Classy::todo $object _autoscale
+}
+
 #doc {BarChartDialog options -xrange} option {-xrange xRange XRange} descr {
 #}
 Classy::BarChartDialog addoption -xrange {xRange XRange {0 20}} {
@@ -102,8 +112,8 @@ Classy::BarChartDialog addoption -xrange {xRange XRange {0 20}} {
 	if {$max > [lindex $value 1]} {
 		set max [lindex $value 1]
 	}
-	$object.options.chart configure -xrange [list $min $max]
 	$object.options.grid configure -xrange [list $min $max]
+	$object.options.chart configure -xrange [list $min $max]
 	$object _setscroll
 }
 
@@ -119,8 +129,8 @@ Classy::BarChartDialog addoption -yrange {yRange YRange {0 100}} {
 	if {$max > [lindex $value 1]} {
 		set max [lindex $value 1]
 	}
-	$object.options.chart configure -yrange [list $min $max]
 	$object.options.grid configure -yrange [list $min $max]
+	$object.options.chart configure -yrange [list $min $max]
 	$object _setscroll
 }
 
@@ -136,6 +146,7 @@ Classy::BarChartDialog method _newvalues {args} {
 		$w.grid configure -yrange {0 100}
 	}
 	$w.chart redraw
+	$object.options.canvas raise Classy::BarChart
 }
 
 #doc {BarChartDialog command dataset} cmd {
@@ -272,7 +283,6 @@ Classy::BarChartDialog method rangeconfigure {} {
 	grid $w.view.ymin $w.view.ymax -sticky se
 	grid columnconfigure $w.view 0 -weight 1
 	grid columnconfigure $w.view 0 -weight 1
-
 	Classy::NumEntry $w.full.xmin -label "Min X" -width 5 -constraint int -min 0
 	Classy::NumEntry $w.full.xmax -label "Max X" -width 5 -constraint int
 	Classy::NumEntry $w.full.ymin -label "Min Y" -width 5 -constraint int
@@ -287,7 +297,6 @@ Classy::BarChartDialog method rangeconfigure {} {
 	grid $w.full.ymin $w.full.ymax -sticky se
 	grid columnconfigure $w.full 0 -weight 1
 	grid columnconfigure $w.full 0 -weight 1
-
 	Classy::NumEntry $w.area.xmin -label "Min X" -width 5 -constraint int -min 0
 	Classy::NumEntry $w.area.xmax -label "Max X" -width 5 -constraint int
 	Classy::NumEntry $w.area.ymin -label "Min Y" -width 5 -constraint int
@@ -301,18 +310,11 @@ Classy::BarChartDialog method rangeconfigure {} {
 	grid $w.area.ymin $w.area.ymax -sticky se
 	grid columnconfigure $w.area 0 -weight 1
 	grid columnconfigure $w.area 0 -weight 1
-
 	checkbutton $w.vertical -text "Vertical labels" \
 		-onvalue vertical -offvalue horizontal \
 		-variable [privatevar $object.options.chart options(-labelorient)] \
 		-command "$chart redraw"
-	button $w.fill -text "Fill drawing" -command [varsubst w {
-		$w.area.xmax nocmdset [expr [winfo width [$object component canvas]]-10]
-		$w.area.ymax nocmdset [expr [winfo height [$object component canvas]]-25]
-		$object chartconfigure -area [list [$w.area.xmin get] [$w.area.ymin get] [$w.area.xmax get] [$w.area.ymax get]]
-		$object _setscroll
-	}]
-
+	button $w.fill -text "Fill drawing" -command [list $object _fill $w]
 	grid $w.viewl - -sticky we
 	grid $w.view - -sticky we
 	grid $w.fulll - -sticky we
@@ -322,6 +324,29 @@ Classy::BarChartDialog method rangeconfigure {} {
 	grid $w.fill $w.vertical -sticky we
 	grid columnconfigure $w 0 -weight 1
 	grid columnconfigure $w 1 -weight 1
+}
+
+Classy::BarChartDialog method _autoscale	{} {
+	private $object options
+	if ![winfo exists [$object component chart]] return
+	if $options(-autoscale) {
+		Classy::todo $object _fill
+	}
+}
+
+Classy::BarChartDialog method _fill	{{w {}}} {
+		set area [[$object component chart] configure -area]
+		set x [lindex $area 0]
+		set y [lindex $area 1]
+		set mx [expr {[winfo width [$object component canvas]]-$x}]
+		set my [expr {[winfo height [$object component canvas]]-$y-25}]
+		if {"$w" != ""} {
+			$w.area.xmax nocmdset $mx
+			$w.area.ymax nocmdset $my
+		}
+		$object chartconfigure -area [list $x $y $mx $my]
+		$object.options.canvas raise Classy::BarChart
+		$object _setscroll
 }
 
 #doc {BarChartDialog command chartconfigure} cmd {
@@ -339,6 +364,9 @@ Classy::BarChartDialog method chartconfigure {args} {
 			-axisfont {
 				$object.options.grid configure -font
 			}
+			-background {
+				$object.options.canvas configure -background
+			}
 			default {
 				$object.options.chart configure $option
 			}
@@ -349,8 +377,8 @@ Classy::BarChartDialog method chartconfigure {args} {
 				-area -
 				-xrange -
 				-yrange { 
-					$object.options.chart configure $option $value
 					$object.options.grid configure $option $value
+					$object.options.chart configure $option $value
 					$object _setscroll
 				}
 				-labels {
@@ -360,6 +388,9 @@ Classy::BarChartDialog method chartconfigure {args} {
 					} else {
 						$object.options.grid configure -showx 0
 					}
+				}
+				-background {
+					$object.options.canvas configure -background $value
 				}
 				-axisfont {
 					$object.options.grid configure -font $value
@@ -457,10 +488,10 @@ Classy::BarChartDialog method _setscroll {args} {
 	set xrange [$object.options.chart configure -xrange]
 	set xwidth [expr [lindex $options(-xrange) 1] - [lindex $options(-xrange) 0]]
 	$object.options.hbar	set [expr [lindex $xrange 0]/double($xwidth)] [expr [lindex $xrange 1]/double($xwidth)]
-
 	set yrange [$object.options.chart configure -yrange]
 	set ywidth [expr [lindex $options(-yrange) 1] - [lindex $options(-yrange) 0]]
 	$object.options.vbar	set [expr 1.0-[lindex $yrange 1]/double($ywidth)] [expr 1.0-[lindex $yrange 0]/double($ywidth)]
+	$object.options.canvas raise Classy::BarChart
 }
 
 Classy::BarChartDialog method _getprint {var} {
@@ -498,3 +529,4 @@ Classy::BarChartDialog method print {} {
 	}
 	Classy::printdialog .classy__.printdialog -papersize $pagesize -getdata [list $object _getprint]
 }
+

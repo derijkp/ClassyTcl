@@ -29,11 +29,17 @@ if ![file exists $file] {
 	}
 	if ![Classy::yorn "Create application	\"$name\""] {exit}
 	file copy [file join $class::dir template] $file
-	file rename [file join $file template] [file join $file $name]
-	set file [file join $file $name]
+	file rename [file join $file template.tcl] [file join $file $name.tcl]
+	set file [file join $file $name.tcl]
 } elseif [file isdir $file] {
-	set file [file join $file $name]
+	set file [file join $file $name.tcl]
 }
 puts "Starting application \"$name\""
-eval exec {$file} -builder $argv &
+if {"$tcl_platform(platform)" != "windows"} {
+	eval exec {$file} -builder $argv &
+} else {
+	set dir [file dir [file dir [info library]]]
+	eval exec [list [file join $dir bin wish80.exe]] {$file} -builder $argv &
+}
 exit
+

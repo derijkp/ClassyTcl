@@ -117,3 +117,4 @@ Classy::Fold method close {} {
 Classy::Fold method _children {} {
 	return $object.content
 }
+

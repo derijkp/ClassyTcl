@@ -12,3 +12,4 @@ set auto_index(buttonpress) [list source [file join $dir Main.tcl]]
 set auto_index(calc) [list source [file join $dir Main.tcl]]
 set auto_index(decrlevel) [list source [file join $dir Main.tcl]]
 set auto_index(setval) [list source [file join $dir Main.tcl]]
+

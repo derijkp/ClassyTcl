@@ -52,3 +52,4 @@ pack .ce
 bind .ce <<Drag>> {DragDrop start %X %Y [.ce get];break}
 
 manualtest
+

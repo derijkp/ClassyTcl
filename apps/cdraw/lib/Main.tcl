@@ -10,8 +10,7 @@ oval_init
 arc_init
 set w $w.canvas
 select_start $w
-bind Classy::Canvas <Enter> [list focus $w]
-bind Classy::Canvas <Enter> [list focus $w]
+focus $w
 }
 
 proc mainw args {# ClassyTcl generated Toplevel
@@ -301,6 +300,7 @@ proc zoomdialog args {# ClassyTcl generated Dialog
 	$window persistent set 
 	return $window
 }
+
 
 
 

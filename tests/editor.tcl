@@ -47,3 +47,4 @@ test Classy::Editor {links} {
 catch {destroy .t}
 
 testsummarize
+

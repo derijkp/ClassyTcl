@@ -232,3 +232,4 @@ Classy::Default load
 atexit add {
 	catch {Classy::Default save}
 }
+

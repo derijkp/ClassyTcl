@@ -59,3 +59,4 @@ Classy::Message method redraw {} {
 	set w [Classy::window $object]
 	$w configure -width [expr [winfo width $object] - 2*[$w cget -bd]]
 }
+

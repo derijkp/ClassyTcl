@@ -18,8 +18,8 @@ test Classy::Dialog {create and test go button} {
 test Classy::Dialog {create and test default button} {
 	classyclean
 	Classy::Dialog .try
-	.try add go "Go" {puts stdout go;set ::try go} default
-	.try add test "Test" {puts stdout test;set ::try test}
+	.try add go "Go" {puts go;set ::try go} default
+	.try add test "Test" {puts test;set ::try test}
 	set ::try 1
 	update
 	event generate .try <Return>
@@ -206,3 +206,5 @@ test Classy::savefile {basic} {
 } {try}
 
 testsummarize
+
+

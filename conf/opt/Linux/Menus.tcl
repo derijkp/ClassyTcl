@@ -252,3 +252,4 @@ Classy::configmenu Classy::Test {menu used for testing} {
 	action "Test" {%W insert insert "Test: %W"} Alt-t
 }
 
+

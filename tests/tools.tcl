@@ -1,6 +1,9 @@
 if ![info exists classy_tools] {
 set classy_tools 1
-package require Class
+if [catch {package require Class}] {
+	lappend auto_path [file dir [file dir [pwd]]]
+	package require Class
+}
 catch {tk appname test}
 catch {package require ClassyTcl}
 catch {
@@ -13,6 +16,24 @@ if ![info exists testleak] {
 		set testleak [lindex $argv 0]
 	} else {
 		set testleak 0
+	}
+}
+
+catch {
+	destroy .classy__.error
+	toplevel .classy__.error
+	wm geometry .classy__.error +0+0
+	raise .classy__.error
+	text .classy__.error.text
+	pack .classy__.error.text -expand yes -fill both
+}
+
+proc display {e} {
+	puts $e
+	catch {
+		.classy__.error.text insert end "$e\n"
+		.classy__.error.text yview end
+		update
 	}
 }
 
@@ -30,54 +51,32 @@ proc classyclean {} {
 	Classy::initconf
 }
 
-#proc test {name description script expected {causeerror 0}} {
-#	global errors
-#	
-#	puts "testing $name: $description"
-#	proc tools__try {} $script
-#	set error [catch tools__try result]
-#	if $causeerror {
-#		if !$error {
-#			puts "test should cause an error\nresult is \n$result"
-#			lappend errors "$name:$description" "test should cause an error\nresult is \n$result"
-#			return
-#		}	
-#	} else {
-#		if $error {
-#			puts "test caused an error\nerror is \n$result\n"
-#			lappend errors "$name:$description" "test caused an error\nerror is \n$result\n"
-#			return
-#		}
-#	}
-#	if {"$result"!="$expected"} {
-#		puts "error: result is:\n$result\nshould be\n$expected"
-#		lappend errors "$name:$description" "error: result is:\n$result\nshould be\n$expected"
-#	}
-#	return
-#}
-
 proc test {name description script expected {causeerror 0} args} {
 	global errors testleak
 	
-	puts "testing $name: $description"
+	set e "testing $name: $description"
+	display $e
 	proc tools__try {} $script
 	set error [catch tools__try result]
 	if $causeerror {
 		if !$error {
-			puts "test should cause an error\nresult is \n$result"
+			set e "test should cause an error\nresult is \n$result"
+			display $e
 			lappend errors "$name:$description" "test should cause an error\nresult is \n$result"
 			return
 		}	
 	} else {
 		if $error {
-			puts "test caused an error\nerror is \n$result\n"
+			set e "test caused an error\nerror is \n$result\n"
+			display $e
 			lappend errors "$name:$description" "test caused an error\nerror is \n$result\n"
 			return
 		}
 	}
 	if {"$result"!="$expected"} {
-		puts "error: result is:\n$result\nshould be\n$expected"
-		lappend errors "$name:$description" "error: result is:\n$result\nshould be\n$expected"
+		set e "error: result is:\n$result\nshould be\n$expected"
+		display $e
+		lappend errors "$name:$description" $e
 	}
 	if $testleak {
 		set line1 [lindex [split [exec ps l [pid]] "\n"] 1]
@@ -120,20 +119,19 @@ proc testsummarize {} {
 			append error "\n$test  ----------------------------"
 			append error "\n$err"
 		}
-		puts $error
+		display $error
 		catch {
-			destroy .error
-			toplevel .error
-			wm geometry .error +0+0
-			raise .error
-			text .error.text
-			pack .error.text -expand yes -fill both
-			.error.text insert end $error
-			button .error.b -text Exit -command {destroy .error}
-			pack .error.b
-			wm geometry .error +[expr [winfo screenwidth .]/2]+[expr [winfo screenheight .]/2]
+			raise .classy__.error
+#			wm geometry .classy__.error +[expr [winfo screenwidth .]/2]+[expr [winfo screenheight .]/2]
+			toplevel .classy__.ask
+			message .classy__.ask.msg -text "There were errors"
+			button .classy__.ask.continue -text Continue -command {destroy .classy__.ask}
+			button .classy__.ask.exit -text Exit -command {exit}
+			grid .classy__.ask.msg - -sticky nwse
+			grid .classy__.ask.exit .classy__.ask.continue 
+			wm geometry .classy__.ask +[expr [winfo screenwidth .]/2]+[expr [winfo screenheight .]/2]
+			tkwait window .classy__.ask
 		}
-		tkwait window .error
 		unset errors
 	} else {
 		catch {destroy .final}

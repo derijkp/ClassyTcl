@@ -122,7 +122,7 @@ proc Classy::config_tool args {# ClassyTcl generated Frame
 	Classy::DynaTool $window.tool  \
 		-width 286 \
 		-type Classy::Config \
-		-height 37
+		-height 25
 	grid $window.tool -row 0 -column 0 -columnspan 3 -sticky nesw
 	grid columnconfigure $window 1 -weight 1
 	grid rowconfigure $window 2 -weight 1
@@ -139,7 +139,6 @@ if {"$level" == ""} {
 upvar #0 $var data
 set name $data(name)
 set data(window) $window
-putsvars window name var
 	# Parse this
 	$window.edit configure \
 		-command [varsubst window {set w [edit]
@@ -149,13 +148,13 @@ $w.editor link $window.value}]
 		-text "$data(help)"
 	$window.value configure \
 		-changedcommand [list set ::[set var](changed) 1]
-	bind $window.value <<Save>> [varsubst window {Classy::Config save [$window.tool cmdw]}]
 	bind $window.value <<Close>> [varsubst window {invoke w {
 set w [$window.tool cmdw]
 global $w
 if [info exists ${w}(close)] {eval [set ${w}(close)]}
 }
 break}]
+	bind $window.value <<Save>> [varsubst window {Classy::Config save [$window.tool cmdw]}]
 	$window.level configure \
 		-command [list Classy::Config changelevel $var $window]
 	$window.tool configure \
@@ -238,7 +237,6 @@ if {"$level" == ""} {
 upvar #0 $var data
 set data(window) $window
 set name $data(name)
-putsvars window name var
 	# Parse this
 	$window.edit configure \
 		-command [varsubst window {set w [edit]
@@ -413,7 +411,6 @@ if {"$level" == ""} {
 }
 ::Classy::Config load $opt(-type) $level $name $var
 set name [set ::${var}(name)]
-putsvars window name var
 $window.frame.advanced.content.text set Option
 $window.frame.advanced.content.pattern set *option
 $window.frame.advanced.content.descr set description
@@ -467,6 +464,8 @@ $window.top.level configure -list $list
 $window.top.level set $level
 	return $window
 }
+
+
 
 
 

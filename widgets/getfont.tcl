@@ -47,7 +47,7 @@ proc Classy::getfont {args} {
 		if {"$size"==""} {set size 12}
 		set style [lindex $font 2]
 		if {"$style"==""} {set style normal}
-		return [ClassyGetFont $family $size $style]
+		return [Classy::GetFont $family $size $style]
 	} else {
 		set ::Classy::temp ""
 		::Classy::Dialog .classy__.fontselect -help classy_font_select
@@ -93,3 +93,4 @@ proc Classy::createfont {fontname font} {
 }
 
 Classy::export getfont {}
+

@@ -31,3 +31,4 @@ proc ::Classy::WindowBuilder::generate_Classy::MultiFrame {object base} {
 	append body "\t[$object gridwconf $base]\n"
 	return $body
 }
+

@@ -94,7 +94,9 @@ Classy::ScrolledText method redraw {} {
 	} else {
 		grid forget $object.yscroll
 	}
+	bind Classy::ScrolledText <Configure> {}
 	update idletasks
+	bind Classy::ScrolledText <Configure> {Classy::todo %W redraw}
 	set redraw 0
 }
 
@@ -109,4 +111,5 @@ Classy::ScrolledText method yset {args} {
 	eval $object.yscroll set $args
 	if !$redraw {Classy::todo $object redraw}
 }
+
 

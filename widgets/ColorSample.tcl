@@ -107,3 +107,4 @@ Classy::ColorSample method get {} {
 	return $color
 }
 
+

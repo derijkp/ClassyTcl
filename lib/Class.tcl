@@ -745,6 +745,9 @@ namespace eval ::class {
 	set parent(Class) ""
 }
 
+if 0 {
+proc Class {} {}
+}
 proc ::Class {cmd args} {
 	if [regexp {^\.} $cmd] {set args [concat $cmd $args];set cmd new}
 	if {"[info commands ::class::Class,,cm,${cmd}]" != ""} {
@@ -941,4 +944,5 @@ Class method trace {command} {
 }
 # this is for C and Tcl implementation again
 catch {namespace import ::class::private ::class::privatevar ::class::setprivate ::class::getprivate}
+
 

@@ -9,3 +9,4 @@ eval edit [lsort [glob lib/*.tcl]] [lsort [glob widgets/*.tcl]] \
 eval edit try.tcl st [glob tests/*.tcl]
 eval edit [lsort [glob lib/*.tcl]] [lsort [glob widgets/*.tcl]] \
     [lsort [glob src/*.c]] src/Makefile.in [glob tests/*.tcl]
+

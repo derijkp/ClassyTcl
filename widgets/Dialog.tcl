@@ -343,3 +343,4 @@ Classy::Dialog classmethod destroy {} {
 	rename ::Classy::DialogButtonDown {}
 }
 
+

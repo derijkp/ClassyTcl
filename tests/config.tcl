@@ -12,3 +12,4 @@ test Classy::config {basic} {
 } {}
 
 testsummarize
+

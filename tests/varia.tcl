@@ -46,6 +46,7 @@ test Classy::OptionBox {basic} {
 	.try get
 } {t2}
 
+if {"$::tcl_platform(platform)" != "windows"} {
 test Classy::FontSelector {basic} {
 	classyclean
 	Classy::FontSelect .try
@@ -58,6 +59,20 @@ test Classy::getfont {basic} {
 	classyclean
 	Classy::getfont -font {helvetica 16 {bold roman}}
 } {helvetica 16 {bold roman}}
+} else {
+test Classy::FontSelector {basic} {
+	classyclean
+	Classy::FontSelect .try
+	pack .try -fill both -expand yes
+	.try set {Arial 16 {bold}}
+	.try get
+} {Arial 16 {bold roman}}
+
+test Classy::getfont {basic} {
+	classyclean
+	Classy::getfont -font {Arial 16}
+} {Arial 16 { normal}}
+}
 
 test Classy::RepeatButton {basic} {
 	catch {rename Classy::RepeatButton {}}
@@ -156,3 +171,4 @@ test Classy::MultiFrame {basic} {
 } {1}
 
 testsummarize
+

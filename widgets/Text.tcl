@@ -773,3 +773,4 @@ proc Classy::Text_KeyExtend {w index} {
 	::class::Tk_$w tag add sel $first $last
 	::class::Tk_$w tag remove sel $last end
 }
+

@@ -43,3 +43,4 @@ bindtags $w [list Line $w Classy::Menu_MainMenu Classy::Canvas Canvas .mainw all
 set status($w,type) line
 }
 
+

@@ -126,3 +126,4 @@ Classy::SaveDialog method startdrag {} {
 			SaveDialog \{$object $file\} \
 			mem_indirect [list [concat $object [eval $transfercommand]]]"
 }
+

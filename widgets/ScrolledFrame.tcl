@@ -107,7 +107,9 @@ Classy::ScrolledFrame method redraw {} {
 	grid rowconfigure $object 0 -weight 1
 	grid columnconfigure $object.view 0 -weight 1
 	grid rowconfigure $object.view 0 -weight 1
+	bind Classy::ScrolledFrame <Configure> {}
 	update idletasks
+	bind Classy::ScrolledFrame <Configure> {Classy::todo %W redraw}
 	$object _sethbar
 	$object _setvbar
 }
@@ -206,4 +208,5 @@ Classy::ScrolledFrame method _setvbar {args} {
 Classy::ScrolledFrame method _children {} {
 	return [winfo children $object.view.frame]
 }
+
 

@@ -28,3 +28,4 @@ Classy::configmenu MainMenu {Main application menu} {
 	}
 
 }
+

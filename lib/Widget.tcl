@@ -39,6 +39,7 @@
 #}
 # Next is to get the attention of auto_mkindex
 if 0 {
+proc Widget {} {}
 proc ::Widget {} {}
 }
 
@@ -532,3 +533,4 @@ Widget method destroy {} {
 	}
 	catch {::Tk::destroy $object}
 }
+

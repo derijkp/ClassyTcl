@@ -43,3 +43,4 @@ proc ::Classy::WindowBuilder::generate_Classy::Topframe {object base} {
 
 set ::Classy::WindowBuilder::parents(Classy::Topframe) 1
 
+

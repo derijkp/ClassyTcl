@@ -292,3 +292,4 @@ Classy::FileSelect method _command {} {
 		uplevel #0 $command [list [$object get]]
 	}
 }
+

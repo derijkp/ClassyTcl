@@ -29,3 +29,4 @@ proc mainw args {# ClassyTcl generated Toplevel
 	Classy::DynaMenu attachmainmenu MainMenu $window
 	return $window
 }
+

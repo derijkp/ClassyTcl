@@ -279,3 +279,4 @@ Classy::Entry method _redrawentry {} {
 		return vertical
 	}
 }
+

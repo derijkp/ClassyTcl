@@ -14,3 +14,4 @@ proc ::Classy::WindowBuilder::edit_Classy::CmdWidget {object w} {
 	} 12
 }
 
+

@@ -46,3 +46,4 @@ array set ::Classy::WindowBuilder::options {
 	-order {Display order}
 	-data {Display line}
 }
+

@@ -90,6 +90,8 @@ test Classy::LineChart {create and configure} {
 test Classy::LineChartDialog {create and configure} {
 	classyclean
 	Classy::ChartGrid destroy
+	Classy::LineChart destroy
+	Classy::LineChartDialog destroy
 	catch {rename try {}}
 	Classy::LineChartDialog .try
 	.try dataset Try {1 5 2 6 3 5 4 5 5 4 6 5 7 6 8 7}
@@ -100,3 +102,4 @@ test Classy::LineChartDialog {create and configure} {
 } {}
 
 testsummarize
+

@@ -212,7 +212,7 @@ Classy::BarChart method _create {name num} {
 		set color black
 	}
 	set tag($name) [$canvas create polygon 1 1 2 2 3 3 -outline black -fill $color \
-		-tags [list $options(-tag) classy::barchart data]]
+		-tags [list $options(-tag) Classy::BarChart data]]
 }
 
 
@@ -341,7 +341,7 @@ Classy::BarChart method _drawlegend {} {
 	}
 	set temp [string trimright $temp "\n"]
 	set id [$canvas create text [expr $legendx+10] $legendy -text $temp \
-		-tags [list $options(-tag) $options(-tag)::legend classy::barchart] \
+		-tags [list $options(-tag) $options(-tag)::legend Classy::BarChart] \
 		-anchor nw -font $options(-legendfont)]
 	set bbox [$canvas bbox $options(-tag)::legend]
 	set h [expr ([lindex $bbox 3]-[lindex $bbox 1])/[llength $names]]
@@ -351,10 +351,10 @@ Classy::BarChart method _drawlegend {} {
 		set conf [$canvas itemconfigure $tag($name)]
 		set conf [lmerge [lmanip subindex $conf 0] [lmanip subindex $conf 4]]
 		set temp [expr $legendx+10]
-		eval $options(-canvas) create polygon $legendx $y $temp $y $temp [expr $y+$hs] $legendx [expr $y+$hs] $conf {-tags [list $options(-tag) $options(-tag)::legend classy::barchart]}
+		eval $options(-canvas) create polygon $legendx $y $temp $y $temp [expr $y+$hs] $legendx [expr $y+$hs] $conf {-tags [list $options(-tag) $options(-tag)::legend Classy::BarChart]}
 		set y [expr $y+$h]
 	}
-	set temp [eval $canvas create rectangle [$canvas bbox $options(-tag)::legend] {-fill white -tags [list $options(-tag) $options(-tag)::legend classy::barchart]}]
+	set temp [eval $canvas create rectangle [$canvas bbox $options(-tag)::legend] {-fill white -tags [list $options(-tag) $options(-tag)::legend Classy::BarChart]}]
 	$canvas lower $temp $id
 }
 
@@ -403,7 +403,7 @@ Classy::BarChart method _drawlabels {} {
 	}
 	foreach label $labels {
 		$canvas create text $x $y -anchor nw -text $label -font $options(-labelfont) \
-			-tags [list $options(-tag) $options(-tag)::labels classy::barchart]
+			-tags [list $options(-tag) $options(-tag)::labels Classy::BarChart]
 		set x [expr $x + $xscale*$gap]
 	}
 }
@@ -496,3 +496,4 @@ Classy::BarChart method redraw {args} {
 	$object _drawlabels
 	::Classy::busy remove
 }
+
