@@ -43,35 +43,12 @@ The ClassyTcl distribution contains some example applications:
    * cfiles: unfinished: very early stage file manager
    * ccenter: unfinished: very early stage program manager
 
-Installation
-------------
-You should be able to obtain the latest version of ClassyTcl and ExtraL 
-via www on url http://rrna.uia.ac.be/classytcl/ or via anonymous ftp
-on rrna.uia.ac.be. in the directory /pub/tcl
-
-Binary packages
-
-A binary ClassyTcl package can be "installed" by placing it where Tcl can find
-it. A binary package does not necesarily contain compiled code: If no 
-compiled version (.so, .dll) is available, a Tcl-only version will be used.
-
-Sources
-
-The Tcl script makedist.tcl creates a package distribution. If no compiled 
-version (.so, .dll) is available, a Tcl-only version will be created.
-
-Compiled packages for most Unix platform should be created using the following 
-steps:
-cd ClassyTcl/src
-./configure clean
-./configure distclean
-./configure --with-tcl=<path of tcl distribution>
-make
-cd ..
-./makedist.tcl
-
 Use
 ---
+
+You should be able to obtain the latest versions of ClassyTcl and ExtraL on
+our server rrna.uia.ac.be via WWW or anonymous ftp (directory /pub/tcl).
+Both Extral and ClassyTcl are implemented as loadable packages.
 
 The ClassyTcl object systen can be used by putting the directories (after
 unpacking) somewhere appropriate and using the command
@@ -84,19 +61,6 @@ defaults and configuration options.
 
 To write a new application, you can try out the builder by starting the
 program cbuild in the bin directory.
-
-Porting to other platforms
---------------------------
-The Tcl version should work anywhere Tcl works. The Tcl version will
-be used when no shared object file or dll is found. You can create
-binaries for other Unix platforms using the following steps:
-cd ClassyTcl/src
-./configure clean
-./configure distclean
-./configure
-make
-cd ..
-./makedist.tcl
 
 ClassyTcl widgets and commands
 ------------------------------
@@ -181,14 +145,6 @@ Tk improvements
    * ScrolledText : ClassyTcl Text with auto scroll bars
    * Text : text widget with undo/redo and linking (~multiple views)
    * Toplevel : toplevel with geometry management and destroy command
-
-Contributions
--------------
-
-If you have fixed bugs, made some nice additions to ClassyTcl widgets, etc.,
-you can send them to me, and I will consider incorporating them in new
-releases. Thanks to the people that have already contributed:
- - Ged Airey <gla@airey.demon.co.uk>
 
 How to contact me
 -----------------

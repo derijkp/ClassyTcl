@@ -3,37 +3,6 @@
 exec wish8.0 "$0" "$@"
 source tools.tcl
 
-test Classy::parseopt {basic} {
-	Classy::parseopt {-a -b try} opt {
-		-a {0 1} 0
-		-b {} {}
-		-c {0 1} 0
-	}
-	set list ""
-	foreach name [lsort [array names opt]] {
-		lappend list $name $opt($name)
-	}
-	set list
-} {-a 1 -b try -c 0}
-
-test Classy::parseopt {basic} {
-	Classy::parseopt {-a b} opt {
-		-a {a b} c
-		-b {a b} c
-	}
-	set list ""
-	foreach name [lsort [array names opt]] {
-		lappend list $name $opt($name)
-	}
-	set list
-} {-a b -b c}
-
-test Classy::parseopt {error} {
-	Classy::parseopt {-a c} opt {
-		-a {a b} c
-	}
-} {Incorrect value "c" for option -a: must be one of: a b} 1
-
 test Classy::Paned {basic} {
 	classyclean
 	Classy::Paned .try -window .l1

@@ -154,30 +154,41 @@ if {"[info commands ::Tk::focus]" == ""} {
 frame .classy__
 entry .classy__.dummy
 button .classy__.dummyb
-
-source [file join $::class::dir lib Widget.tcl]
 source [file join [set ::class::dir] lib conf.tcl]
 source [file join [set ::class::dir] lib tools.tcl]
 option add *ColorList {{blue cyan green yellow orange red magenta} {blue3 cyan3 green3 yellow3 orange3 red3 magenta3} {black gray20 gray40 gray50 gray60 gray80 white}} widgetDefault
-
 Classy::initconf
+
 if {[option get . patchTk PatchTk]==1} {
 	source [file join [set ::class::dir] patches patchtk.tcl]
 	source [file join [set ::class::dir] patches miscpatches.tcl]
 }
+
 # ----------------------------------------------------------------------
 # Change the bgerror command
 # ----------------------------------------------------------------------
-
 source [file join $::class::dir lib error.tcl]
 
 # ----------------------------------------------------------------------
-# class to command table (used in Builder and Config)
+# class to coommand table (used in Builder and Config)
 # ----------------------------------------------------------------------
 array set ::Classy::cmds {
+	Frame frame
+	Entry entry
+	Label label
+	Button button
+	Checkbutton checkbutton
+	Radiobutton radiobutton
+	Menubutton menubutton
+	Message message
+	Scrollbar scrollbar
+	Listbox listbox
+	Text text
+	Canvas canvas
+	Scale scale
+	Menu menu
+	Menubutton menubutton
 	Classy::Topframe frame
 }
 
-atexit add {
-	catch {eval destroy [winfo children .]}
-}
+

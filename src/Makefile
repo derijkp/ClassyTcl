@@ -17,7 +17,7 @@ CC = gcc
 DEFS =  -DHAVE_UNISTD_H=1 -DHAVE_LIMITS_H=1 -DSTDC_HEADERS=1 -DHAVE_SYS_TIME_H=1 -DTIME_WITH_SYS_TIME=1 
 
 SHLIB_LD = gcc -shared
-LIBS = -L/usr/X11R6/lib -lX11 -ldl  -lm
+LIBS = -L/usr/X11R6/lib -lX11 -ldl  -lieee -lm
 SHLIB_CFLAGS = -fPIC
 SHLIB_LD_LIBS = 
 SHLIB_SUFFIX = .so

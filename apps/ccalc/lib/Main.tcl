@@ -267,6 +267,14 @@ foreach w [winfo children $window] {
 $window.entry set 0
 set data(new) 1
 	return $window
+	return $window
+	return $window
+	return $window
+	return $window
+	return $window
+	return $window
+	return $window
+	return $window
 }
 
 proc buttonpress w {

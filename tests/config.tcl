@@ -4,7 +4,7 @@ exec wish8.0 "$0" "$@"
 
 source tools.tcl
 
-test Classy::Config {basic} {
+test Classy::config {basic} {
 	classyclean
 	Classy::Config dialog
 	update idletasks
@@ -13,5 +13,3 @@ test Classy::Config {basic} {
 
 testsummarize
 
-Classy::Config dialog -node {Menus Classy::Editor} -level appdef
-Classy::Config dialog -node {Toolbars Classy::Editor} -level appuser

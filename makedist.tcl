@@ -10,9 +10,9 @@ if {[llength $argv] == 0} {
 }
 
 # $Format: "\tset version 0.$ProjectMajorVersion$"$
-	set version 0.1
+	set version 0.2
 # $Format: "\tset minorversion $ProjectMinorVersion$"$
-	set minorversion 7
+	set minorversion 1
 
 set targetdir [file join $targetdir ClassyTcl-$tcl_platform(os)-$version.$minorversion]
 puts "Building binary distribution in $targetdir"

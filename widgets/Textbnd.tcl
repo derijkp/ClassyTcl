@@ -45,9 +45,6 @@
 # The code below creates the default class bindings for entries.
 #-------------------------------------------------------------------------
 
-bind Classy::Text <<Empty>> {
-	catch {%W delete 1.0 end}
-}
 bind Classy::Text <<Drop>> {
 	catch {%W textinsert [DragDrop get]}
 }
@@ -213,7 +210,7 @@ bind Classy::Text <<SpecialFocusPrev>> {
 bind Classy::Text <Control-i> {
 	%W textinsert \t
 }
-bind Classy::Text <<Return>> {
+bind Classy::Text <Return> {
 	%W textinsert \n
 }
 bind Classy::Text <<Delete>> {

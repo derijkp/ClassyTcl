@@ -4,7 +4,6 @@
 # ----------------- Peter De Rijk
 #
 # Tree
-# Some code contributed by Ged Airey <gla@airey.demon.co.uk>
 # ----------------------------------------------------------------------
 #doc Tree title {
 #Tree
@@ -212,11 +211,11 @@ Classy::Tree method _drawnode {node} {
 		set y [expr {$y + $height + $pady}]
 		switch $ca(t) {
 			f {
-				set ca(s) [$canvas create image $x $ypos -image $minusicon \
+				set ca(s) [$canvas create image $x $ypos -image $plusicon \
 					-tags [list $tag classy::Tree $name symbol]]
 			}
 			c {
-				set ca(s) [$canvas create image $x $ypos -image $plusicon \
+				set ca(s) [$canvas create image $x $ypos -image $minusicon \
 					-tags [list $tag classy::Tree $name symbol]]
 			}
 		}
@@ -274,23 +273,19 @@ Classy::Tree method _redraw {} {
 	set fg [$canvas cget -selectforeground]
 	foreach node $selection {
 		if ![info exists data($node)] continue
-		if [catch {
-			set bbox [$canvas bbox [structlget $data($node) i]]
-			set x1 [lindex $bbox 0]
-			set y1 [lindex $bbox 1]
-			set item [structlget $data($node) ti]
-			set bbox [$canvas bbox $item]
-			$canvas itemconfigure $item -fill $fg
-			set x2 [lindex $bbox 2]
-			set y2 [lindex $bbox 3]
-			if {"$bbox" != ""} {
-				$canvas create rectangle $x1 $y1 $x2 $y2 \
-					-tags [list $options(-tag) $options(-tag)_selection] \
-					-fill $bg -outline $bg
+		set bbox [$canvas bbox [structlget $data($node) i]]
+		set x1 [lindex $bbox 0]
+		set y1 [lindex $bbox 1]
+		set item [structlget $data($node) ti]
+		set bbox [$canvas bbox $item]
+		$canvas itemconfigure $item -fill $fg
+		set x2 [lindex $bbox 2]
+		set y2 [lindex $bbox 3]
+		if {"$bbox" != ""} {
+			$canvas create rectangle $x1 $y1 $x2 $y2 \
+				-tags [list $options(-tag) $options(-tag)_selection] \
+				-fill $bg -outline $bg
 			}
-		}] {
-			set selection [lremove $selection $node]
-		}
 	}
 	$canvas lower $options(-tag)_selection
 	::Classy::busy remove
@@ -543,7 +538,6 @@ Classy::Tree method selection {{cmd {}} args} {
 		set {set selection $args}
 		remove {set selection [llremove $selection $args]}
 		clear {set selection ""}
-		default {return -code error "Unknown option \"$cmd\""}
 	}
 	Classy::todo $object _redraw
 }
@@ -584,40 +578,5 @@ Classy::Tree method stopedit {} {
 	set canvas $options(-canvas)
 	destroy $canvas.classy_edit
 	$canvas delete $options(-tag)_edit
-}
-
-# Code contributed by Ged Airey <gla@airey.demon.co.uk>
-# -----------------------------------------------------
-
-Classy::Tree method settext {theNode theText} {
-	private $object data options
-	array set d $data($theNode)
-	set d(txt) $theText
-	set data($theNode) [array get d]
-	Classy::todo $object _redraw
-}
-
-Classy::Tree method gettext {theNode} {
-	private $object data options
-	array set d $data($theNode)
-	return $d(txt)
-}
-
-Classy::Tree method movenode {cmd node} {
-	private $object data
-	set aParent [$object parentnode $node]
-	array set aParentArray $data($aParent)
-	set aParentNodeList $aParentArray(l)
-	set aNodePos [lsearch $aParentNodeList $node]
-	set aLastNodePos [llength $aParentNodeList]
-	switch $cmd {
-		up {if {$aNodePos == 0} {return -1}; set aNewNodePos [incr aNodePos -1]}
-		down {if {$aNodePos == $aLastNodePos} {return -1}; set aNewNodePos [incr aNodePos]}
-	}
-	set aParentNodeList [lreplace $aParentNodeList $aNodePos $aNodePos]
-	set aParentNodeList [linsert $aParentNodeList $aNewNodePos $node]
-	set aParentArray(l) $aParentNodeList
-	set data($aParent) [array get aParentArray]
-	Classy::todo $object _redraw
 }
 

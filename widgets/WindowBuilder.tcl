@@ -599,7 +599,7 @@ Classy::WindowBuilder method open {file function} {
 	}
 	$object parsecode $data(code)
 	$object startedit $data(base)
-	Classy::todo $object select $data(base)
+	Classy::todo select $data(base)
 }
 
 Classy::WindowBuilder method create {code} {
@@ -612,7 +612,7 @@ Classy::WindowBuilder method create {code} {
 		{# ClassyTcl generated Dialog}  {
 			set data(type) dialog
 			set window $object.work
-			foreach line [splitesccomplete $wincode] {
+			foreach line [Extral::splitesccomplete $wincode] {
 				if [string match {# ClassyTcl*} $line] {
 					set exec 0
 				} elseif [string match "\t# Parse*" $line] {
@@ -626,7 +626,7 @@ Classy::WindowBuilder method create {code} {
 		{# ClassyTcl generated Toplevel}  {
 			set data(type) toplevel
 			set window $object.work
-			foreach line [splitesccomplete $wincode] {
+			foreach line [Extral::splitesccomplete $wincode] {
 				if [string match {# ClassyTcl*} $line] {
 					set exec 0
 				} elseif [string match "\t# Parse*" $line] {
@@ -641,7 +641,7 @@ Classy::WindowBuilder method create {code} {
 			set data(type) frame
 			Classy::Toplevel $object.work -resize {2 2}
 			set window $object.work.frame
-			foreach line [splitesccomplete $wincode] {
+			foreach line [Extral::splitesccomplete $wincode] {
 				if [string match {# ClassyTcl*} $line] {
 					set exec 0
 				} elseif [string match "\t# Parse*" $line] {
@@ -665,7 +665,7 @@ Classy::WindowBuilder method parsecode {code {window {}}} {
 	private $object data
 	if {"$window" == ""} {
 		set window $data(base)
-		set list [splitcomplete [lindex $code 3]]
+		set list [Extral::splitcomplete [lindex $code 3]]
 		# window
 		set line [lindex $list 1]
 		set data(options,window) [lindex [lindex $line end] 2]
@@ -708,7 +708,7 @@ Classy::WindowBuilder method parsecode {code {window {}}} {
 		}
 	} else {
 		set parse ""
-		set list [splitcomplete $code]
+		set list [Extral::splitcomplete $code]
 	}
 	set data(opt-menuwin,$window) ""
 	set i 0
@@ -828,7 +828,6 @@ Classy::WindowBuilder method getoptions {base args} {
 	if [info exists ::Classy::cmds($type)] {
 		set cmd [set ::Classy::cmds($type)]
 	} else {
-		if ![regexp ^Classy:: $type] {set type [string tolower $type]}
 		set cmd $type
 	}
 	$cmd .classy__.classy_temp
@@ -1049,7 +1048,6 @@ Classy::WindowBuilder method generate {list} {
 			if [info exists ::Classy::cmds($type)] {
 				set cmd [set ::Classy::cmds($type)]
 			} else {
-				if ![regexp ^Classy:: $type] {set type [string tolower $type]}
 				set cmd $type
 			}
 			set outw [$object outw $base]

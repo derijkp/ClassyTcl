@@ -1119,8 +1119,12 @@ Classy::Editor method _reconfigure {} {
 			catch {[::Classy::window $w] configure $option [Classy::optionget $w $name $class]}
 		}
 	}
+	if [winfo exists $object.find] {
+		Classy::Configurator _reconfigure $object.find
+	}
 	[::Classy::window $object] configure -highlightthickness 0 -borderwidth 0
 	eval grid forget [winfo children $object]
+	catch {Classy::Configurator _reconfigure $object.tool}
 	set row 1
 	grid $object.tool -row 0 -column 0 -columnspan 2 -sticky we
 	grid rowconfigure $object 0 -weight 0
