@@ -1,15 +1,19 @@
+#ClassyTcl menu configuration file
+
 Classy::configmenu Classy::Editor {menu used in the ClassyTcl Editor} {
 menu file "File" {
 	action Load "Open file" {eval %W load [Classy::selectfile -title Open -selectmode persistent]}
 	action LoadNext "Open next" "%W loadnext"
 	action Save "Save" "%W save"
-	action SaveAs "Save as" "%W savebox"
+	action SaveAs "Save as" "%W savedialog"
 	action Reopen "Reopen" "%W reopenlist"
 	action Editor "New editor" "edit newfile"
 	action Cmd "Command window" {Classy::cmd}
-	separator
 	action SaveState "Save state" {savestate}
-	action Configure "Customise application" {Classy::Configurator dialog}
+	separator
+	action Configure "Customise application" {Classy::Config dialog}
+	action ConfigureMenu "Customise menu" {Classy::Config config menu Classy::Editor}
+	action ConfigureTool "Customise toolbar" {Classy::Config config tool Classy::Editor}
 	action Close "Close" "%W close"
 	action Exit "Exit" "exit"
 }
@@ -22,7 +26,7 @@ menu edit "Edit" {
 	action ClearUndo "Clear undo buffer" "%W clearundo"
 }
 menu find "Find" {
-	action Goto "Goto line" {Classy::InputBox %W.goto -label "Goto line" -title Goto -buttontext Goto -command {%W gotoline [%W.goto get]}}
+	action Goto "Goto line" {Classy::InputDialog %W.goto -label "Goto line" -title Goto -buttontext Goto -command {%W gotoline}}
 	action Find "Find" "%W finddialog"
 	action FindNext "Find next" "%W findsel -forwards"
 	action ReplaceFindNext "Replace & Find next" "%W replace-find -forwards"
@@ -47,7 +51,7 @@ menu tools "Tools" {
 	action IndentOut "Indent out" "%W indent -1"
 	action Comment "Comment" "%W comment add" Alt-numbersign
 	action DelComment "Remove comment" "%W comment remove" Control-Alt-numbersign
-	action SetTabs "Set tab stops" {Classy::InputBox %W.tabstops -label "Tab stops" -title Tabstops -buttontext Set -command {%W configure -tabs [%W.tabstops get]}}
+	action SetTabs "Set tab stops" {Classy::InputDialog %W.tabstops -label "Tab stops" -title Tabstops -buttontext Set -command {%W configure -tabs}}
 	separator
 	action Connect "Connect to" "%W connectto"
 	action ExecuteCmd "Execute Tcl command" "%W execute"
@@ -55,6 +59,4 @@ menu tools "Tools" {
 }
 activemenu macros "Macros" {%W getmacromenu}
 activemenu pattern "Pattern" {%W getpatternmenu}
-menu help "Help" {
-}
 }

@@ -13,7 +13,7 @@ set pwd [pwd]
 
 proc end {w} {
 	destroy $w
-	if {"[winfo children .]" == ".classy__editormenu"} {
+	if {"[winfo children .]" == ".classy__"} {
 		exit
 	}
 }
@@ -35,7 +35,7 @@ if {("$state" == "")||("$argv" != "")} {
 	set w .classy__edit1
 	catch {destroy $w}
 	toplevel $w -bd 0 -highlightthickness 0
-	wm protocol $w WM_DELETE_WINDOW "destroy $w"
+	wm protocol $w WM_DELETE_WINDOW "end $w"
 	Classy::Editor $w.editor -loadcommand "Classy::title $w" -closecommand "after idle \{end $w\}"
 	pack $w.editor -fill both -expand yes
 	eval $w.editor load $argv
@@ -46,7 +46,7 @@ if {("$state" == "")||("$argv" != "")} {
 		catch {destroy $w}
 		toplevel $w -bd 0 -highlightthickness 0
 		wm geometry $w $geom
-		wm protocol $w WM_DELETE_WINDOW "destroy $w"
+		wm protocol $w WM_DELETE_WINDOW "end $w"
 		Classy::Editor $w.editor -loadcommand "Classy::title $w" -closecommand "after idle \{end $w\}"
 		pack $w.editor -fill both -expand yes
 		eval $w.editor load $files
@@ -54,7 +54,6 @@ if {("$state" == "")||("$argv" != "")} {
 		incr num
 	}
 }
-
 
 proc edit {args} {
 	if {"$args"==""} {set args "Newfile"}

@@ -206,3 +206,13 @@ test Classy::savefile {basic} {
 } {try}
 
 testsummarize
+
+
+
+	source tools.tcl
+	classyclean
+	Classy::SelectDialog .try
+	.try configure -command puts
+	.try fill {hallo daar {Hoe gaat het?} ermee jo}
+	update
+	set ::try ""

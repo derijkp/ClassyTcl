@@ -21,9 +21,8 @@ proc ListBox {} {}
 
 bind Classy::ListBox <Configure> {Classy::todo %W redraw}
 bind Classy::ListBox <Visibility> {Classy::todo %W redraw}
-bind Classy::ListBox <<MExecute>> {
-	eval [%W cget -command] [%W get]
-}
+bind Classy::ListBox <<MExecute>> {%W command}
+bind Classy::ListBox <<Invoke>> {%W command}
 
 # ------------------------------------------------------------------
 #  Widget creation
@@ -165,5 +164,12 @@ Classy::ListBox method insert {args} {
 Classy::ListBox method delete {args} {
 	uplevel #0 $object.list delete $args
 	Classy::todo $object redraw
+}
+
+Classy::ListBox method command {} {
+	set command [getprivate $object options(-command)]
+	if {"$command" != ""} {	
+		uplevel #0 $command [list [$object get]]
+	}
 }
 
