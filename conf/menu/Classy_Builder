@@ -4,6 +4,7 @@ menu "File" {
 	action "Help directory" {%W configure -dir help} <<HelpDir>>
 	action "Select directory" {%W configure -dir [Classy::selectfile]} <<Dir>>
 	action "Customise" {Classy::Config dialog} <<Customise>>
+	action "Configuration description editor" {Classy::config_edit}
 	separator
 	action "Editor" "edit newfile" <<Editor>>
 	action "Command window" {Classy::cmd} <<Cmd>>

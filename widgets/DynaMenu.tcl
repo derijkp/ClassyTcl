@@ -182,6 +182,13 @@ Classy::DynaMenu classmethod define {menutype args} {
 Classy::DynaMenu classmethod types {{pattern *}} {
 	private $class menudata
 	set list ""
+	foreach dir $Classy::dirs {
+		foreach tool [dirglob [file join $dir menu] *] {
+			if [string match $pattern $tool] {
+				list_addnew list $tool
+			}
+		}
+	}
 	foreach tool [array names ::Classy::configmenu] {
 		if [string match $pattern $tool] {
 			list_addnew list $tool

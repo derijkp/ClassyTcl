@@ -145,21 +145,44 @@ Classy::FontSelect method set {{newfont {}}} {
 	if {"$newfont"==""} {
 		set newfont $options(-font)
 	}
-	set f [font actual $newfont]
-	array set opt $f
-	set family $opt(-family)
+#	set f [font actual $newfont]
+#	array set opt $f
+#	set family $opt(-family)
+#	set size $opt(-size)
+#	set underline $opt(-underline)
+#	set overstrike $opt(-overstrike)
+#	set weight $opt(-weight)
+#	set slant $opt(-slant)
+	set family [lindex $newfont 0]
+	set size [lindex $newfont 1]
+	set qualifiers [list_concat [lrange $newfont 2 end]]
+	set underline 0
+	set overstrike 0
+	set weight normal
+	set slant roman
+	foreach q $qualifiers {
+		switch $q {
+			underline {
+				set underline 1
+			}
+			overstrike {
+				set overstrike 1
+			}
+			bold {
+				set weight bold
+			}
+			italic {
+				set slant italic
+			}
+		}
+	}
 	set pos [lsearch -exact [$object.family get 0 end] $family]
 	$object.family activate $pos
 	$object.family selection clear 0 end
 	$object.family selection set $pos
 	$object.family see $pos
-	set size $opt(-size)
-	set underline $opt(-underline)
-	set overstrike $opt(-overstrike)
-	set weight $opt(-weight)
-	set slant $opt(-slant)
-	$object get
 	Classy::todo $object display
+	$object get
 }
 
 #doc {FontSelect command display} cmd {

@@ -258,6 +258,13 @@ Classy::DynaTool classmethod redraw {tooltype} {
 Classy::DynaTool classmethod types {{pattern *}} {
 	private $class tooldata
 	set list ""
+	foreach dir $Classy::dirs {
+		foreach tool [dirglob [file join $dir toolbar] *] {
+			if [string match $pattern $tool] {
+				list_addnew list $tool
+			}
+		}
+	}
 	foreach tool [array names ::Classy::configtoolbar] {
 		if [string match $pattern $tool] {
 			list_addnew list $tool

@@ -44,6 +44,23 @@ test Classy::NumEntry {create with configuration configure} {
 	.try cget -constraint
 } {int}
 
+test Classy::NumEntry {-warn 1} {
+	classyclean
+	Classy::NumEntry .try -label int -constraint int -warn 1
+	pack .try
+	.try set a
+	.try get
+} {a}
+
+test Classy::NumEntry {-warn 0} {
+	classyclean
+	Classy::NumEntry .try -label int -constraint int -warn 0
+	pack .try
+	.try set 1
+	.try set a
+	.try get
+} {1}
+
 test Classy::NumEntry {min} {
 	classyclean
 	Classy::NumEntry .try -label try -min 0 -max 10 -warn 0

@@ -106,15 +106,14 @@ menu "Options" {
 }
 menu,Classy_Builder {
 menu "File" {
-	action "Code dir" {%W configure -dir code} <<CodeDir>>
-	action "Configuration dir" {%W configure -dir config} <<ConfDir>>
-	action "Help dir" {%W configure -dir help} <<HelpDir>>
-	action "Application dir" {%W configure -dir {}} <<AppDir>>
-	action "Select dir" {%W configure -dir [Classy::selectfile -default Classy::Builder]} <<Dir>>
-	action "Save" {%W save} <<Save>>
+	action "Code directory" {%W configure -dir code} <<CodeDir>>
+	action "Help directory" {%W configure -dir help} <<HelpDir>>
+	action "Select directory" {%W configure -dir [Classy::selectfile]} <<Dir>>
+	action "Customise" {Classy::Config dialog} <<Customise>>
+	action "Configuration description editor" {Classy::config_edit}
+	separator
 	action "Editor" "edit newfile" <<Editor>>
 	action "Command window" {Classy::cmd} <<Cmd>>
-	separator
 	action "Close" {destroy %W} <<Close>>
 	action "Exit" {exit} <<Exit>>
 }

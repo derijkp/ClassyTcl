@@ -171,5 +171,12 @@ test Classy::Entry {-state} {
 	.try cget -label
 } {test}
 
+test Classy::Entry {-labelbackground} {
+	classyclean
+	Classy::Entry .try -label Test -labelbackground green
+	pack .try
+	.try cget -labelbackground
+} {green}
+
 testsummarize
 

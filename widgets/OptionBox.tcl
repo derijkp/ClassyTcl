@@ -50,7 +50,7 @@ Classy::OptionBox method init {args} {
 	# REM Configure initial arguments
 	# -------------------------------
 	if {"$args" != ""} {eval $object configure $args}
-	$object.label configure -bg [getprivate $object options(-labelbg)]
+	catch {$object.label configure -bg [getprivate $object options(-labelbackground)]}
 }
 
 # ------------------------------------------------------------------
@@ -63,11 +63,11 @@ Classy::OptionBox addoption -label {label Label {}} {
 	$object.label configure -text $value
 }
 
-#doc {OptionBox options -labelbg} option {-labelbg labelBg LabelBg} descr {
+#doc {OptionBox options -labelbackground} option {-labelbackground labelBackground LabelBackground} descr {
 # background color of label
 #}
-Classy::OptionBox addoption -labelbg {labelBg LabelBg gray} {
-	$object.label configure -bg $value
+Classy::OptionBox addoption -labelbackground {labelBackground LabelBackground gray} {
+	catch {$object.label configure -bg $value}
 }
 
 #doc {OptionBox options -orient} option {-orient orient Orient} descr {

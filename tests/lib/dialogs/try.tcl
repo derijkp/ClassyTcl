@@ -25,5 +25,7 @@ try method init args {
 	return $object
 }
 
+proc try2 try {
+puts $try
+}
 
-proc try2 {} {}

@@ -227,6 +227,11 @@ proc ::Classy::WindowBuilder::select_menu {object v option title} {
 	}
 }
 
+proc ::Classy::WindowBuilder::new_menu {v} {
+	set menu [$v.menutype get]
+	Classy::Config new menu appdef [list Menus Application] $menu
+}
+
 proc ::Classy::WindowBuilder::attredit_menu {object v option title {wide 0}} {
 	private $object current
 	frame $v
@@ -246,7 +251,7 @@ proc ::Classy::WindowBuilder::attredit_menu {object v option title {wide 0}} {
 		}
 	}]
 	button $v.edit -text "Edit menu" -command "Classy::Config dialog -key menu,\[$v.menutype get\] -level appdef"
-	button $v.new -text "New menu" -command "Classy::Config new menu appdef \[$v.menutype get\]"
+	button $v.new -text "New menu" -command "Classy::WindowBuilder::new_menu $v"
 	Classy::Entry $v.cmdw -width 2 -label "Menu window(s)"	-orient stacked \
 		-command "::Classy::WindowBuilder::menuset $object" \
 		-textvariable [privatevar $object data(opt-menuwin,$current(w))]

@@ -247,7 +247,7 @@ Classy::Entry addoption -label {label Label {}} {
 	private $object options
 	catch {destroy $object.label}
 	if {"$value" != ""} {
-		label $object.label -bg $options(-labelbg)
+		label $object.label -bg $options(-labelbackground)
 		pack $object.label -before $object.frame -side left -fill both
 		$object.label configure -text $value
 		if {"$options(-orient)"!="horizontal"} {
@@ -260,11 +260,11 @@ Classy::Entry addoption -label {label Label {}} {
 	return $value
 }
 
-#doc {Entry options -labelbg} option {-labelbg labelBg LabelBg} descr {
+#doc {Entry options -labelbackground} option {-labelbackground labelBackground LabelBackground} descr {
 # background color of label
 #}
-Classy::Entry addoption -labelbg {labelBg LabelBg gray} {
-	$object.label configure -bg $value
+Classy::Entry addoption -labelbackground {labelBackground LabelBackground gray} {
+	catch {$object.label configure -bg $value}
 }
 
 #doc {Entry options -command} option {-command command Command} descr {

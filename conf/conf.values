@@ -26,7 +26,7 @@ color,*Scale.sliderBackground lightBackground
 color,*Scrollbar.foreground Background
 color,*Scrollbar.activeForeground Background
 color,*Scrollbar.background lightBackground
-color,*LabelBg darkBackground
+color,*LabelBackground darkBackground
 font,*Font {helvetica 10}
 font,*BoldFont {helvetica 10 bold}
 font,*ItalicFont {helvetica 10 italic}

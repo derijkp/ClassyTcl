@@ -129,6 +129,15 @@ test Classy::OptionBox {basic} {
 	.try get
 } {t2}
 
+test Classy::OptionBox {-labelbackground} {
+	classyclean
+	Classy::OptionBox .try -label Try -variable try -orient vertical -labelbackground green
+	.try add t1 "T 1"
+	.try add t2 "T 2"
+	pack .try -fill x
+	.try cget -labelbackground
+} {green}
+
 test Classy::OptionBox {command} {
 	classyclean
 	set ::try ""
@@ -152,8 +161,8 @@ test Classy::FontSelector {basic} {
 
 test Classy::getfont {basic} {
 	classyclean
-	Classy::getfont -font {helvetica 16 {bold roman}}
-} {helvetica 16 {bold roman}}
+	Classy::getfont -font {times 16 {bold roman}}
+} {times 16 {bold roman}}
 } else {
 test Classy::FontSelector {basic} {
 	classyclean

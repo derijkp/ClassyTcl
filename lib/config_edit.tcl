@@ -263,6 +263,9 @@ proc Classy::config_edit_save {} {
 		puts $f [list $key $value]
 	}
 	close $f
+	if [string length $configedit(cmd)] {
+		uplevel #0 $configedit(cmd)
+	}
 }
 
 proc Classy::config_edit_getdef {dir pos} {
@@ -310,8 +313,12 @@ proc Classy::config_edit_create {} {
 	close $f
 }
 
-proc Classy::config_edit {file} {
+proc Classy::config_edit {{file {}} {cmd {}}} {
 	upvar #0 Classy::configedit configedit
+	if ![string length $file] {
+		set file [file join $::Classy::dir(appdef) conf.descr]
+	}
+	set configedit(cmd) $cmd
 	set configedit(file) $file
 	set w .classy__.configedit
 	catch {destroy $w}

@@ -563,9 +563,13 @@ Classy::WindowBuilder method open {file} {
 	global auto_index
 	private $object data current border
 	set c [cmd_split [file_read $file]]
+	set pos 0
 	foreach line $c {
 		if [string length $c] break
+		incr pos
 	}
+	incr pos
+	set code [join [lrange $c $pos end] \n]
 	if {"[lindex $line 1]" != "subclass"} {error "This is not a ClassyTcl Builder file"}
 	set type [lindex $line 0]
 	set function [lindex $line 2]
@@ -609,11 +613,11 @@ Classy::WindowBuilder method open {file} {
 #	catch {$object.code.book.methods.methods configure -content $data(methods)}
 	set data(function) $function
 	set data(file) $file
-	catch {
-		foreach w [$function info children] {catch {$w configure -destroycommand {}}}
+	if ![llength [info commands $function]] {
+		uplevel #0 source $file
+	} else {
+		uplevel #0 $code
 	}
-	catch {rename $function {}}
-	uplevel #0 source $file
 	set data(code) $code
 	catch {uplevel #0 $type subclass $function}
 	catch {uplevel #0 $code}

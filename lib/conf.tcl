@@ -233,55 +233,52 @@ proc Classy::getconf {file} {
 	return $result
 }
 
-proc Classy::newconfig {type level {name {}} {descr {}}} {
-	if {![string length $name]||![string length $descr]} {
+proc Classy::newconfig {type level {pos {}} {key {}} {descr {}}} {
+	if {![string length $pos]||![string length $key]||![string length $descr]} {
 		catch {destroy .classy__.temp}
 		Classy::Dialog .classy__.temp -title "New $type"
 		grid columnconfigure .classy__.temp.options 0 -weight 1
 		grid rowconfigure .classy__.temp.options 1 -weight 1
-		Classy::Entry .classy__.temp.options.name -label Name
-		grid .classy__.temp.options.name -sticky we
-		.classy__.temp.options.name set $name
+		Classy::Entry .classy__.temp.options.pos -label Position
+		grid .classy__.temp.options.pos -sticky we
+		.classy__.temp.options.pos set $pos
+		Classy::Entry .classy__.temp.options.key -label Key
+		grid .classy__.temp.options.key -sticky we
+		.classy__.temp.options.key set $key
 		Classy::Entry .classy__.temp.options.descr -width 25 -label Description
 		grid .classy__.temp.options.descr -sticky nswe
 		.classy__.temp.options.descr set "description of $type"
-		.classy__.temp add go "Go" "Classy::newconfig $type $level \[.classy__.temp.options.name get\] \[.classy__.temp.options.descr get\]" default
+		.classy__.temp add go "Go" "Classy::newconfig $type $level \[.classy__.temp.options.pos get\] \[.classy__.temp.options.key get\] \[.classy__.temp.options.descr get\]" default
 		return
 	}
-	if [inlist [Classy::DynaTool types] $name] {
-		error "Toolbar \"$name\" already exists"
-	}
 	catch {set ltype [structlist_get {color Colors font Fonts misc Misc mouse Mouse key Keys menu Menus toolbar Toolbars} $type]}
+	lappend pos $key
 	switch $type {
 		toolbar {
-			set file [file join $Classy::dir($level) init $ltype.conf]
-			set f [open $file a]
-			puts $f ""
-			puts $f "# Toolbars $name"
-			puts $f "# $descr"
-			puts $f [list toolbar $name {action Builder/question {Dummy tool} {Classy::msg "Just a dummy toolbar"}}]
-			close $f
-			Classy::DynaTool define $name {action Builder/question {Dummy tool} {Classy::msg "Just a dummy toolbar"}}
-			set node [list Toolbars $name]
-			Classy::Config dialod -reload -node $node -level appdef
+			if [inlist [Classy::DynaTool types] $key] {
+				error "Toolbar \"$key\" already exists"
+			}
+			set file [file join $Classy::dir($level) conf.descr]
+			set c [file_read $file]
+			set c [structlist_set $c $pos [list _menu $key $descr {}]]
+			file_write $file $c
+			Classy::Config dialog -node $pos -level appdef
 		}
 		menu {
-			set file [file join $Classy::dir($level) init $ltype.conf]
-			set f [open $file a]
-			puts $f ""
-			puts $f "# Menus $name"
-			puts $f "# $descr"
-			puts $f [list menu $name {menu "Menu" {}}]
-			close $f
-			Classy::DynaMenu define $name {menu "Menu" {}}
-			set node [list Menus $name]
-			Classy::Config dialog -reload -node $node -level appdef
+			if [inlist [Classy::DynaMenu types] $key] {
+				error "Toolbar \"$key\" already exists"
+			}
+			set file [file join $Classy::dir($level) conf.descr]
+			set c [file_read $file]
+			set c [structlist_set $c $pos [list _menu $key $descr {}]]
+			file_write $file $c
+			Classy::Config dialog -node $pos -level appdef
 		}
 		default {
 			error "Unkown type: \"$type\""
 		}
 	}
-	return $node
+	return $pos
 }
 
 proc Classy::Config {option args} {

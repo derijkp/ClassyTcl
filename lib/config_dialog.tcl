@@ -449,6 +449,7 @@ proc Classy::config_findkey {pos type key} {
 		if [regexp ^_ [lindex $value 0]] {
 			foreach {ctype ckey descr def} $value break
 			if {[string_equal $ckey $key]&&[string_equal $ctype $type]} {
+				lappend pos $field
 				return $pos
 			}
 		} else {
@@ -462,7 +463,9 @@ proc Classy::config_findkey {pos type key} {
 }
 
 proc Classy::config_gotokey {key} {
-	error "not yet"
+	regexp {^([^,]*),(.*)$} $key temp type key
+	set pos [Classy::config_findkey {} _$type $key]
+	Classy::config_gotoitem $pos
 }
 
 proc Classy::config_gotoitem {name} {
@@ -482,6 +485,14 @@ proc Classy::config_gotoitem {name} {
 	$w.list activate $pos
 	$w.list selection clear 0 end
 	$w.list selection set $pos
+}
+
+proc Classy::config_descredit {} {
+	upvar #0 Classy::config config
+	set file [file join $::Classy::dir(appdef) conf.descr]
+	foreach {pos w tail} $config(last) break
+	lappend pos $tail
+	Classy::config_edit $file "destroy .classy__.config; [list Classy::config_dialog $pos]"
 }
 
 proc Classy::config_dialog {{start {}}} {
@@ -511,6 +522,7 @@ proc Classy::config_dialog {{start {}}} {
 	$w add themes "Themes" [list Classy::config_selecttheme]
 	$w add saveas "Save as" [list Classy::config_saveasdialog]
 	$w add level "Select level" [list Classy::config_selectlevel]
+	$w add descr "Description ed" [list Classy::config_descredit]
 	set w $w.options.book
 	Classy::NoteBook $w -highlightthickness 0
 	pack $w -fill both -expand yes
