@@ -56,6 +56,8 @@ array set ::Classy::WindowBuilder::options {
 	-yscrollcommand {Code text}
 	-xlabelcommand {Code text}
 	-ylabelcommand {Code text}
+	-setxlabelcommand {Code text}
+	-setylabelcommand {Code text}
 	-getcommand {Code text}
 	-setcommand {Code text}
 	-browsecommand {Code text}
@@ -216,7 +218,7 @@ proc ::Classy::WindowBuilder::select_menu {object v option title} {
 	catch {destroy $w}
 	Classy::SelectDialog $w
 	$w fill [Classy::DynaMenu types]
-	$w configure -addcommand "Classy::Config newconfig menu appdef"
+	$w configure -addcommand "Classy::Config new menu appdef"
 	$w configure -deletecommand "puts"
 	set ::Classy::temp [Classy::select Menu [Classy::DynaMenu types]]
 	if {"$::Classy::temp" != ""} {
@@ -242,8 +244,8 @@ proc ::Classy::WindowBuilder::attredit_menu {object v option title {wide 0}} {
 			$v.menutype set $::Classy::temp
 		}
 	}]
-	button $v.edit -text "Edit menu" -command "Classy::Config config menu \[$v.menutype get\] appdef"
-	button $v.new -text "New menu" -command "Classy::Config newconfig menu appdef"
+	button $v.edit -text "Edit menu" -command "Classy::Config dialog -node \[list Menus \[$v.menutype get\]\] -level appdef"
+	button $v.new -text "New menu" -command "Classy::Config new menu appdef \[$v.menutype get\]"
 	Classy::Entry $v.cmdw -width 2 -label "Menu window(s)"	-orient stacked \
 		-command "::Classy::WindowBuilder::menuset $object" \
 		-textvariable [privatevar $object data(opt-menuwin,$current(w))]

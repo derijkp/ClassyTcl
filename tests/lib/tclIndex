@@ -19,4 +19,3 @@ set auto_index(test2) [list source [file join $dir try.tcl]]
 set auto_index(t2) [list source [file join $dir try.tcl]]
 set auto_index(testframe) [list source [file join $dir try.tcl]]
 set auto_index(trfr) [list source [file join $dir try.tcl]]
-

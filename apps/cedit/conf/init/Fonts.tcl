@@ -1,2 +1,0 @@
-#ClassyTcl font configuration file
-

@@ -115,7 +115,11 @@ proc Classy::fullpath {file} {
 
 # Classy::parseopt arguments variable list ?remain?
 # variable: name of array to set options in
-# list: each element is of the form {options {possible values} default}
+# list: lists posible options in the folowing format <br>
+# option {possible values} {default value} ...<br>
+# if {possible values} is empty, any value is ok.
+# if {possible values} is {0 1}, the option is considered a boolean (and consequently doesn't need 
+# an argument).
 # remain: remaining options
 proc Classy::parseopt {real variable possible {remain {}}} {
 	upvar $variable var
@@ -123,16 +127,26 @@ proc Classy::parseopt {real variable possible {remain {}}} {
 	set rem ""
 	catch {unset var}
 	foreach {option options default} $possible {
-		set pos [lsearch $real $option]
-		if {$pos!=-1} {
-			lpop real $pos
-			set value [lpop real $pos]
-			if {("$options"!="")&&([lsearch $options $value]==-1)} {
-				error "Incorrect value \"$value\" for option $option\nmust be one of: $options"
+		if {"$options" == "0 1"} {
+			set pos [lsearch $real $option]
+			if {$pos!=-1} {
+				lpop real $pos
+				set var($option) 1
+			} else {
+				set var($option) 0
 			}
-			set var($option) $value
 		} else {
-			set var($option) $default
+			set pos [lsearch $real $option]
+			if {$pos!=-1} {
+				lpop real $pos
+				set value [lpop real $pos]
+				if {("$options"!="")&&([lsearch $options $value]==-1)} {
+					error "Incorrect value \"$value\" for option $option: must be one of: $options"
+				}
+				set var($option) $value
+			} else {
+				set var($option) $default
+			}
 		}
 	}
 	if {"$real"!=""} {
@@ -364,49 +378,3 @@ proc Classy::orient {value} {
 	}
 }
 
-proc Classy::auto_mkindex {dir args} {
-	eval ::auto_mkindex $dir $args
-	global errorCode errorInfo
-	set oldDir [pwd]
-	cd $dir
-	set dir [pwd]
-	append index "\n# Addition of ClassyTcl classes defined in the directory\n"
-	if {$args == ""} {
-		set args *.tcl
-	}
-	foreach file [eval glob $args] {
-		set f ""
-		set error [catch {
-			set f [open $file]
-			while {[gets $f line] >= 0} {
-				if [regexp {#auto_index[ ]+([^ 	]*)} $line match Name] {
-					set Name [lindex [auto_qualify $Name "::"] 0]
-					append index "set [list auto_index($Name)]"
-					append index " \[list source \[file join \$dir [list $file]\]\]\n"
-				}
-			}
-			close $f
-		} msg]
-		if $error {
-			set code $errorCode
-			set info $errorInfo
-			catch {close $f}
-			cd $oldDir
-			error $msg $info $code
-		}
-	}
-	set f ""
-	set error [catch {
-		set f [open tclIndex a]
-		puts $f $index nonewline
-		close $f
-		cd $oldDir
-	} msg]
-	if $error {
-		set code $errorCode
-		set info $errorInfo
-		catch {close $f}
-		cd $oldDir
-		error $msg $info $code
-	}
-}

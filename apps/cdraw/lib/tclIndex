@@ -85,4 +85,4 @@ set auto_index(raise_objects) [list source [file join $dir config.tcl]]
 set auto_index(printdialog) [list source [file join $dir print.tcl]]
 set auto_index(rotate_switch) [list source [file join $dir rotate.tcl]]
 set auto_index(rotate_set) [list source [file join $dir rotate.tcl]]
-
+set auto_index(bitmap_insert) [list source [file join $dir bitmap.tcl]]

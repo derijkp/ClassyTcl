@@ -58,6 +58,7 @@ Classy::Text classmethod init {args} {
 
 	# REM Configure initial arguments
 	# -------------------------------
+	setprivate $object wpattern "(\[^A-Za-z0-9\]\[A-Za-z0-9\])|(\[A-Za-z0-9\]\[^A-Za-z0-9\])"
 	if {"$args" != ""} {eval $object configure $args}
 }
 
@@ -70,6 +71,14 @@ Classy::Text chainoptions {$object}
 #doc {Text options -changedcommand} option {-changedcommand changedcommand Changedcommand} descr {
 #}
 Classy::Text addoption -changedcommand {changedcommand Changedcommand {}}
+
+#doc {Text options -wordpattern option {-wordpattern wordPattern WordPattern} descr {
+#}
+Classy::Text addoption -wordpattern {wordPattern WordPattern {}} {
+	if {"$value" == ""} {
+		setprivate $object wpattern "(\[^A-Za-z0-9\]\[A-Za-z0-9\])|(\[A-Za-z0-9\]\[^A-Za-z0-9\])|(\[ \t\]\[^ \t\])|(\[^ \t\]\[ \t\])"
+	}
+}
 
 # ------------------------------------------------------------------
 #  Methods
@@ -425,10 +434,34 @@ Classy::Text method select {mode} {
 			Classy::Text_KeySelect $object [Classy::Text_UpDownLine $object 1]
 		}
 		wordstart {
-			Classy::Text_KeySelect $object [$w index {insert - 1c wordstart}]
+			set index [$w index insert]
+			set sindex [$w index "insert linestart"]
+			if {"$index" == "$sindex"} {
+				Classy::Text_KeySelect $object "$index - 1c lineend"
+			} else {
+				set nindex [$w search -backwards -regexp [getprivate $object wpattern] "insert-1c" 1.0]
+				if {("$nindex" == "")||[$w compare $nindex < $sindex]} {
+					Classy::Text_KeySelect $object $sindex
+				} else {
+					Classy::Text_KeySelect $object "$nindex + 1c"
+				}
+			}
+#			Classy::Text_KeySelect $object [$w index {insert - 1c wordstart}]
 		}
 		wordend {
-			Classy::Text_KeySelect $object [$w index {insert wordend}]
+			set index [$w index insert]
+			set sindex [$w index "insert lineend"]
+			if {"$index" == "$sindex"} {
+				Classy::Text_KeySelect $object "$index + 1c linestart"
+			} else {
+				set nindex [$w search -forward -regexp [getprivate $object wpattern] "insert" end]
+				if {("$nindex" == "")||[$w compare $nindex > $sindex]} {
+					Classy::Text_KeySelect $object $sindex
+				} else {
+					Classy::Text_KeySelect $object "$nindex + 1c"
+				}
+			}
+#			Classy::Text_KeySelect $object [$w index {insert wordend}]
 		}
 		uppara {
 			Classy::Text_KeySelect $object [Classy::Text_PrevPara $object insert]
@@ -499,10 +532,34 @@ Classy::Text method move {mode} {
 			Classy::Text_SetCursor $object [Classy::Text_UpDownLine $object 1]
 		}
 		wordstart {
-			Classy::Text_SetCursor $object [$w index {insert - 1c wordstart}]
+			set index [$w index insert]
+			set sindex [$w index "insert linestart"]
+			if {"$index" == "$sindex"} {
+				Classy::Text_SetCursor $object "$index - 1c lineend"
+			} else {
+				set nindex [$w search -backwards -regexp [getprivate $object wpattern] "insert-1c" 1.0]
+				if {("$nindex" == "")||[$w compare $nindex < $sindex]} {
+					Classy::Text_SetCursor $object $sindex
+				} else {
+					Classy::Text_SetCursor $object "$nindex + 1c"
+				}
+			}
+#			Classy::Text_SetCursor $object [$w index {insert - 1c wordstart}]
 		}
 		wordend {
-			Classy::Text_SetCursor $object [$w index {insert wordend}]
+			set index [$w index insert]
+			set sindex [$w index "insert lineend"]
+			if {"$index" == "$sindex"} {
+				Classy::Text_SetCursor $object "$index + 1c linestart"
+			} else {
+				set nindex [$w search -forward -regexp [getprivate $object wpattern] "insert" end]
+				if {("$nindex" == "")||[$w compare $nindex > $sindex]} {
+					Classy::Text_SetCursor $object $sindex
+				} else {
+					Classy::Text_SetCursor $object "$nindex + 1c"
+				}
+			}
+#			Classy::Text_SetCursor $object [$w index {insert wordend}]
 		}
 		uppara {
 			Classy::Text_SetCursor $object [Classy::Text_PrevPara $object insert]

@@ -1,3 +1,0 @@
-#Application misc configuration file
-
-

@@ -187,7 +187,7 @@ Classy::Default method load {{type {}} {file {}}} {
 # Without arguments, all default values are saved. If type
 # is given, only the defaults of type type will be saved.
 # If file is specified, the values will be saved to file rather
-# than the normal loacation.
+# than the normal location.
 #}
 Classy::Default method save {{type {}} {file {}}} {
 	if {"$type" == ""} {

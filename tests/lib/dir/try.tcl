@@ -85,8 +85,10 @@ puts ok
 		-destroycommand 
 	$window.button1 configure \
 		-command [varsubst window {$window.entry1 set try}]
+	Classy::DynaMenu attachmainmenu Try $window
 # ClassyTcl Finalise
 puts ok
+	return $window
 	return $window
 	return $window
 }
@@ -107,6 +109,7 @@ proc t args {# ClassyTcl generated Frame
 		-class Classy::Topframe
 	#Initialisation code
 }
+
 
 
 
