@@ -8,7 +8,7 @@ raise .
 }
 
 proc clean {} {
-	catch {Class destroy}
+#	catch {Class destroy}
 	catch {eval destroy [winfo children .]}
 	catch {. configure -menu {}}
 }

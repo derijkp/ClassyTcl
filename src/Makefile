@@ -1,3 +1,4 @@
+# Generated automatically from Makefile.in by configure.
 #
 # This file is a Makefile.  If it has the name "Makefile.in"
 # then it is a template for a Makefile;  to generate the actual Makefile,
@@ -10,21 +11,21 @@
 # to -g, change the following line:
 CFLAGS = -g -Wall
 
-TCL_SRC=	@TCL_SRC_DIR@
-TK_SRC =	@TK_SRC_DIR@
-CC = @CC@
-DEFS = @TK_DEFS@
+TCL_SRC=	/home/peter/tcl/tcl8.0
+TK_SRC =	/home/peter/tcl/tk8.0
+CC = gcc
+DEFS =  -DHAVE_UNISTD_H=1 -DHAVE_LIMITS_H=1 -DSTDC_HEADERS=1 -DHAVE_SYS_TIME_H=1 -DTIME_WITH_SYS_TIME=1 
 
-SHLIB_LD = @SHLIB_LD@
-LIBS = @TK_LIBS@
-SHLIB_CFLAGS = @SHLIB_CFLAGS@
-SHLIB_LD_LIBS = @SHLIB_LD_LIBS@
-SHLIB_SUFFIX = @SHLIB_SUFFIX@
-LD_FLAGS = @SHLIB_CFLAGS@
-X11_INCLUDES = @TK_XINCLUDES@
-X11_LIB_SWITCHES = @TK_XLIBSW@
-TCL_LIB_SPEC = @TCL_LIB_SPEC@
-TK_LIB_SPEC = @TK_LIB_SPEC@
+SHLIB_LD = gcc -shared
+LIBS = -L/usr/X11R6/lib -lX11 -ldl  -lm
+SHLIB_CFLAGS = -fPIC
+SHLIB_LD_LIBS = 
+SHLIB_SUFFIX = .so
+LD_FLAGS = -fPIC
+X11_INCLUDES = -I/usr/X11R6/include
+X11_LIB_SWITCHES = -L/usr/X11R6/lib -lX11
+TCL_LIB_SPEC = -L/usr/local/lib -ltcl8.0
+TK_LIB_SPEC = -L/usr/local/lib -ltk8.0
 
 CC_SWITCHES = $(CFLAGS) $(SHLIB_CFLAGS) $(DEFS) -I$(TCL_SRC)/unix -I$(TCL_SRC)/generic \
 			 -I${TK_SRC}/generic -I${TK_SRC}/xlib/X11 ${X11_INCLUDES}

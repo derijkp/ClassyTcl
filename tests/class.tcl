@@ -10,6 +10,11 @@ test class {create object 2 times} {
 	Class new try
 } {object "try" exists} 1
 
+test class {create object with short name} {
+	clean
+	Class new t
+} {t} 1
+
 test class {object destroy and recreate} {
 	clean
 	Class new try

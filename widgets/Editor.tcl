@@ -748,7 +748,7 @@ Classy::Editor method deletemacro {name} {
 }
 
 #doc {Editor command getmacromenu} cmd {
-#pathname macromenu 
+#pathname getmacromenu
 #} descr {
 #}
 Classy::Editor method getmacromenu {} {
@@ -768,6 +768,44 @@ Classy::Editor method getmacromenu {} {
 		lappend names $name
 	}
 	Classy::Default set app Classy::Editor_macros $names
+	return $data
+}
+
+#doc {Editor command pattern} cmd {
+#pathname pattern ?value?
+#} descr {
+#}
+Classy::Editor method pattern {args} {
+	private $object pattern
+	if {"$args" != ""} {
+		set pattern [lindex $args 0]
+	} else {
+		Classy::InputBox $object.pattern -label Pattern -textvariable [privatevar $object pattern]
+	}
+}
+
+#doc {Editor command getpatternmenu} cmd {
+#pathname getpatternmenu
+#} descr {
+#}
+Classy::Editor method getpatternmenu {} {
+	private $object pattern
+	if ![info exists pattern] {
+		set pattern {^proc |^Classy }
+	}
+	set data {action Pattern "Set pattern" "%W pattern"}
+	append data "\n"
+	set names ""
+	set index 1.0
+	set num 1
+	while 1 {
+		set r [$object.edit search -regexp -- $pattern $index end]
+		if {"$r" == ""} break
+		set line [$object.edit get "$r linestart" "$r lineend"]
+		append data [list action [list Pattern$num] $line [list %W see $r]]\n
+		incr num
+		set index "$r +1c"
+	}
 	return $data
 }
 

@@ -1,5 +1,27 @@
-package require Class
-classyinit test /home/peter/dev/test/
+Class subclass Test
+Test destroy
+
+Class classmethod try {a} {
+	puts "$class:$a"
+}
+Class method try {a} {
+	puts "$class:$object:$a"
+}
+Class new t
+puts [t try 2]
+t destroy
+Class subclass Test
+Test method destroy {} {
+	puts "destroy $class:$object"
+}
+Test new t
+puts [t try 2]
+Test method try {} {}
+time {t try} 1000
+Test destroy
+
+Tk appname test
+package require ClassyTcl
 
 set class {test class}
 set object {test object}

@@ -10,7 +10,7 @@ AC_INIT(classyInit.c)
 #--------------------------------------------------------------------
 
 AC_ARG_WITH(tcl, [  --with-tcl=DIR          Use Tcl 8.0 source tree from DIR],
-	TCL_SRC_DIR=$withval, TCL_SRC_DIR=`cd ../../tcl8.0/unix; pwd`)
+	TCL_SRC_DIR=$withval, TCL_SRC_DIR=`cd ../../tcl8.0; pwd`)
 if test ! -d $TCL_SRC_DIR; then
     AC_MSG_ERROR(Tcl directory $TCL_SRC_DIR doesn't exist)
 fi

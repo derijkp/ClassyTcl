@@ -53,6 +53,7 @@ menu tools "Tools" {
 	action Format "format" "%W format 76"
 }
 activemenu macros "Macros" {%W getmacromenu}
+activemenu pattern "Pattern" {%W getpatternmenu}
 }
 ## Help {menu used in the ClassyTcl help system} menu
 Classy::setoption *Classy::Help.Menu {

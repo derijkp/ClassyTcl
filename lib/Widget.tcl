@@ -174,7 +174,6 @@ proc ::class::setoption {class object option value} {
 # ------------------------------------------------------------------
 
 Class subclass Widget
-proc Widget [info args Widget] "if \[regexp {^\\.} \$cmd\] {set args \[concat \$cmd \$args\];set cmd new}\n[info body Widget]"
 
 #doc {Widget classmethod init} cmd {
 # init

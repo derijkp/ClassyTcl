@@ -266,7 +266,8 @@ proc ::class::subclass {class arg} {
 	regsub -all $class $body [list $child] body
 	proc ::$child {cmd args} $body
 
-	namespace eval ::$child {}
+#	???????????
+#	namespace eval ::$child {}
 
 	# copy methods
 	foreach cmd [info commands ::class::${class},,m,*] {
@@ -674,6 +675,7 @@ namespace eval ::class {
 }
 
 proc ::Class {cmd args} {
+	if [regexp {^\.} $cmd] {set args [concat $cmd $args];set cmd new}
 	if {"[info commands ::class::Class,,cm,${cmd}]" != ""} {
 		if [catch {leval ::class::Class,,cm,${cmd} Class $args} result] {
 			set error [::class::classerror Class Class $result $cmd $args]

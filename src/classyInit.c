@@ -10,17 +10,20 @@ extern int Classy_GetSaveFileCmd _ANSI_ARGS_((ClientData clientData,
 extern int Classy_GetFontCmd _ANSI_ARGS_((ClientData clientData,
 	Tcl_Interp *interp, int argc, char *argv[]));
 
+extern int Classy_ClassInit _ANSI_ARGS_((Tcl_Interp *interp));
+
 int
 Classy_Init(interp)
 	Tcl_Interp *interp;		/* Interpreter to add extra commands */
 {
 #ifdef BORLAND32
-	Tcl_CreateCommand(interp, "Classy__GetOpenFile", Classy_GetOpenFileCmd,
+	Tcl_CreateCommand(interp, "Classy::GetOpenFile", Classy_GetOpenFileCmd,
 		(ClientData) Tk_MainWindow(interp), (Tcl_CmdDeleteProc *)NULL);
-	Tcl_CreateCommand(interp, "Classy__GetSaveFile", Classy_GetSaveFileCmd,
+	Tcl_CreateCommand(interp, "Classy::GetSaveFile", Classy_GetSaveFileCmd,
 		(ClientData) Tk_MainWindow(interp), (Tcl_CmdDeleteProc *)NULL);
-	Tcl_CreateCommand(interp, "Classy__GetFont", Classy_GetFontCmd,
+	Tcl_CreateCommand(interp, "Classy::GetFont", Classy_GetFontCmd,
 		(ClientData) Tk_MainWindow(interp), (Tcl_CmdDeleteProc *)NULL);
 #endif
-	 return TCL_OK;
+	Classy_ClassInit(interp);
+	return TCL_OK;
 }
