@@ -149,6 +149,15 @@ test Classy::Canvas {coord undo} {
 	.try coord $id 1
 } {60.0 50.0}
 
+test Classy::Canvas {scale} {
+	classyclean
+	Classy::Canvas .try
+	pack .try -fill both -expand yes
+	set id [.try create polygon 10 10 10 20 20 10 -tags try]
+	.try scale try 0 0 2 2
+	.try coords $id
+} {20.0 20.0 20.0 40.0 40.0 20.0}
+
 test Classy::Canvas {coord undo and redo} {
 	classyclean
 	Classy::Canvas .try
@@ -800,6 +809,50 @@ test Classy::Canvas {save group} {
 	.try mitemcget all -tags
 } {{a _g4} {a _g4} {t0 _g5 _g6 _new} {t10 _g5 _g6 _new} {t20 _g7 _g6 _new} {t30 _g7 _g6 _new} {t40 _new}}
 
+test Classy::Canvas {simple save group and load twice} {
+	classyclean
+	Classy::Canvas .try
+	pack .try -fill both -expand yes
+	for {set i 0} {$i<3} {incr i} {
+		set pos [expr {10*$i}]
+		set id($i) [.try create text $pos $pos -text $pos -tags "t$pos"]
+	}
+	set g1 [.try group items $id(0) $id(1)]
+	set d [.try save]
+	.try delete all
+	.try create text 10 50 -text A -tags a
+	.try create text 10 50 -text A -tags a
+	.try group withtag a
+	.try load $d
+	.try addtag _test withtag _new
+	.try load $d
+	.try addtag _test withtag _new
+	.try mitemcget _test -tags
+} {{t0 _g3 _test} {t10 _g3 _test} {t20 _test} {t0 _g4 _new _test} {t10 _g4 _new _test} {t20 _new _test}}
+
+test Classy::Canvas {save group and load twice} {
+	classyclean
+	Classy::Canvas .try
+	pack .try -fill both -expand yes
+	for {set i 0} {$i<5} {incr i} {
+		set pos [expr {10*$i}]
+		set id($i) [.try create text $pos $pos -text $pos -tags "t$pos"]
+	}
+	set g1 [.try group items $id(0) $id(1)]
+	set g2 [.try group items $id(2) $id(3)]
+	set g3 [.try group tags $g1 $g2]
+	set d [.try save]
+	.try delete all
+	.try create text 10 50 -text A -tags a
+	.try create text 10 50 -text A -tags a
+	.try group withtag a
+	.try load $d
+	.try addtag _test withtag _new
+	.try load $d
+	.try addtag _test withtag _new
+	.try mitemcget _test -tags
+} {{t0 _g5 _g6 _test} {t10 _g5 _g6 _test} {t20 _g7 _g6 _test} {t30 _g7 _g6 _test} {t40 _test} {t0 _g8 _g9 _new _test} {t10 _g8 _g9 _new _test} {t20 _g10 _g9 _new _test} {t30 _g10 _g9 _new _test} {t40 _new _test}}
+
 test Classy::Canvas {print dialog} {
 	classyclean
 	Classy::Canvas .try
@@ -813,22 +866,69 @@ test Classy::Canvas {print dialog} {
 	manualtest
 } {}
 
-test Classy::Canvas {float width} {
+test Classy::Canvas {itemcget float width} {
 	classyclean
 	Classy::Canvas .try
 	pack .try -fill both -expand yes
 	set id [.try create line 20 10 60 50 -width 2.2]
 	.try zoom 2
-	.try width $id
+	.try itemcget $id -width
 } {2.2}
 
-test Classy::Canvas {font} {
+test Classy::Canvas {itemcget font} {
 	classyclean
 	Classy::Canvas .try
 	pack .try -fill both -expand yes
 	set id [.try create text 20 10 -text try -font {helvetica 10}]
 	.try zoom 2
-	.try font $id
+	.try itemcget $id -font
 } {helvetica 10}
+
+test Classy::Canvas {itemconfigure float width} {
+	classyclean
+	Classy::Canvas .try
+	pack .try -fill both -expand yes
+	set id [.try create line 20 10 60 50 -width 2.2]
+	.try zoom 2
+	.try itemconfigure $id -width
+} {-width {} {} 1 2.2}
+
+test Classy::Canvas {itemconfigure font} {
+	classyclean
+	Classy::Canvas .try
+	pack .try -fill both -expand yes
+	set id [.try create text 20 10 -text try -font {helvetica 10}]
+	.try zoom 2
+	.try itemconfigure $id -font
+} {-font {} {} {Helvetica -12} {helvetica 10}}
+
+test Classy::Canvas {fractional font size} {
+	classyclean
+	Classy::Canvas .try
+	pack .try -fill both -expand yes
+	set id [.try create text 20 10 -text try -font {helvetica 10.5}]
+	.try zoom 2
+	.try itemcget $id -font
+} {helvetica 10.5}
+
+test Classy::Canvas {zoom fractional font size} {
+	classyclean
+	Classy::Canvas .try
+	pack .try -fill both -expand yes
+	set id [.try create text 20 10 -text try -font {helvetica 10.5}]
+	.try zoom 2
+	.try itemcget $id -font
+} {helvetica 10.5}
+
+test Classy::Canvas {undo scale to fractional font size} {
+	classyclean
+	Classy::Canvas .try
+	pack .try -fill both -expand yes
+	set id [.try create text 10 10 -text "A" -tags try -font {helvetica 12}]
+	.try scale try 0 0 1.2 1.2
+	.try itemcget $id -font
+	.try undo
+	.try itemcget $id -font
+} {helvetica 12.0}
 
 testsummarize

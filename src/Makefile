@@ -11,8 +11,8 @@
 # to -g, change the following line:
 CFLAGS = -g -Wall
 
-TCL_SRC=	/home/peter/tcl/tcl8.0.4
-TK_SRC =	/home/peter/tcl/tk8.0.4
+TCL_SRC=	/usr/src/bs/BUILD/tcltk-8.0.4/tcl8.0.4
+TK_SRC =	/usr/src/bs/BUILD/tcltk-8.0.4/tk8.0.4
 CC = gcc
 DEFS =  -DHAVE_UNISTD_H=1 -DHAVE_LIMITS_H=1 -DSTDC_HEADERS=1 -DHAVE_SYS_TIME_H=1 -DTIME_WITH_SYS_TIME=1 
 
@@ -24,8 +24,8 @@ SHLIB_SUFFIX = .so
 LD_FLAGS = -fPIC
 X11_INCLUDES = -I/usr/X11R6/include
 X11_LIB_SWITCHES = -L/usr/X11R6/lib -lX11
-TCL_LIB_SPEC = -L/usr/local/lib -ltcl8.0${TCL_DBGX}
-TK_LIB_SPEC = -L/usr/local/lib -ltk8.0${TK_DBGX}
+TCL_LIB_SPEC = -L/usr/lib -ltcl8.0${TCL_DBGX}
+TK_LIB_SPEC = -L/usr/lib -ltk8.0${TK_DBGX}
 
 CC_SWITCHES = $(CFLAGS) $(SHLIB_CFLAGS) $(DEFS) -I$(TCL_SRC)/unix -I$(TCL_SRC)/generic \
 			 -I${TK_SRC}/generic -I${TK_SRC}/xlib/X11 ${X11_INCLUDES}
@@ -44,6 +44,10 @@ classytcl: tclAppInit.o $(CLASSYOBJS)
 
 classywish: tkAppInit.o $(CLASSYOBJS)
 	$(CC) $(CFLAGS) -o classywish tkAppInit.o $(CLASSYOBJS) ${TCL_LIB_SPEC} ${TK_LIB_SPEC} ${LIBS}
+
+install: 
+	../makedoc.tcl
+	../makedist.tcl /usr/lib /usr/bin
 
 clean:
 	rm -f *.o ../classy$(SHLIB_SUFFIX) ../win/*.csm ../win/tmp/* ../*.dll classywish classytcl

@@ -22,7 +22,6 @@
 #	Editor specific methods
 #}
 # These will be added to tclIndex by Classy::auto_mkindex
-#auto_index edit
 
 option add *Classy:Editor.KeySearchReopen Control-Alt-r widgetDefault
 option add *Classy::Editor.KeyMatchingBrackets "Alt-bracketleft" widgetDefault
@@ -1155,28 +1154,6 @@ Classy::Editor method redo {} {
 	$object.edit redo
 }
 
-proc Classy::title {w title} {
-	wm title $w $title
-	wm iconname $w $title
-}
-
-proc Classy::edit {args} {
-#	if {"$args"==""} {set args "Newfile"}
-	set w .classy__.edit
-	set num 1
-	while {[winfo exists $w$num] == 1} {incr num}
-	set w $w$num
-	catch {destroy $w}
-	toplevel $w -bd 0 -highlightthickness 0
-	wm protocol $w WM_DELETE_WINDOW "destroy $w"
-	Classy::Editor $w.editor -loadcommand "Classy::title $w" -closecommand "after idle \{destroy $w\}" -setgrid yes
-	pack $w.editor -fill both -expand yes
-	if {"$args"!=""} {
-		eval $w.editor load $args
-	}
-	return $w
-}
-
 Classy::Editor method _grepgoto {args} {
 	private $object grep
 	set w $object.grep
@@ -1271,3 +1248,28 @@ Classy::Editor method grep {} {
 	focus $w.options.pattern
 }
 
+proc Classy::title {w title} {
+	wm title $w $title
+	wm iconname $w $title
+}
+
+proc Classy::edit {args} {
+#	if {"$args"==""} {set args "Newfile"}
+	set w .classy__.edit
+	set num 1
+	while {[winfo exists $w$num] == 1} {incr num}
+	set w $w$num
+	catch {destroy $w}
+	toplevel $w -bd 0 -highlightthickness 0
+	wm protocol $w WM_DELETE_WINDOW "destroy $w"
+	Classy::Editor $w.editor -loadcommand "Classy::title $w" -closecommand "after idle \{destroy $w\}" -setgrid yes
+	pack $w.editor -fill both -expand yes
+	if {"$args"!=""} {
+		eval $w.editor load $args
+	}
+	return $w
+}
+
+proc edit {args} {
+	eval Classy::edit $args
+}

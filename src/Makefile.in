@@ -44,6 +44,10 @@ classytcl: tclAppInit.o $(CLASSYOBJS)
 classywish: tkAppInit.o $(CLASSYOBJS)
 	$(CC) $(CFLAGS) -o classywish tkAppInit.o $(CLASSYOBJS) ${TCL_LIB_SPEC} ${TK_LIB_SPEC} ${LIBS}
 
+install: 
+	../makedoc.tcl
+	../makedist.tcl @INSTALL_DIR@ @BIN_DIR@
+
 clean:
 	rm -f *.o ../classy$(SHLIB_SUFFIX) ../win/*.csm ../win/tmp/* ../*.dll classywish classytcl
 

@@ -147,6 +147,22 @@ test Classy::SelectDialog {add item} {
 	.try get
 } {ok}
 
+test Classy::SelectDialog {multiselect} {
+	classyclean
+	Classy::SelectDialog .try
+	.try configure -command {
+		set ::try 
+	}
+	.try configure -selectmode persistent
+	.try fill {hallo daar {Hoe gaat het?} ermee jo}
+	update
+	set ::try ""
+	.try selection set 1
+	.try selection set 3
+	.try invoke go
+	set ::try
+} {daar ermee}
+
 test Classy::yorn {basic} {
 	classyclean
 	Classy::yorn "answer yes please"

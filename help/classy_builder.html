@@ -22,12 +22,13 @@ You may not move the executable out of the application directory, as it
 uses its location to find its resources; However, links to this executable 
 will correctly start the application.
 <p>
-The newly created application contains one code file main.tcl with to functions:
-main and mainw. The function main is called by the startup script, and should
-always be present for the application to work. In this function, you can put
-all code to initialise the application. In the new app, main only invokes 
-the function mainw. The function mainw is a special function, which 
-will create a toplevel with an example menu and toolbar.
+The lib directory has two subdirectories named interface and code. The interface 
+subdirectory contains the code for all interface objects created by the builder.
+The code dir contains all other code. Initially the directory code contains one file
+with one function named "main". The function main is called by the startup script, 
+and should always be present for the application to work. In this function, you can put
+all code to initialise the application. In a new app, it will only create a mainw interface 
+object (in the interface directory) named .mainw.
 
 <h2>Editing an application</h2>
 An editing session on an application can be started in several ways:
@@ -47,7 +48,7 @@ editor on this function. Double cliking a file will start a text editor on
 the entire file.
 <p>
 Besides the plain Tcl functions, there are special interface functions. These 
-functions are used to create interface items such as dialogs, toplevels and 
+functions are used to create interface objects such as dialogs, toplevels and 
 frames. The functions are diplayed with a different icon in builder window, 
 and are edited graphically with the <a href="classy_windowbuilder.html">window 
 builder</a> (also started by double clicking). invoking an interface

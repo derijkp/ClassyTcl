@@ -38,7 +38,8 @@ Classy::Help method init {args} {
 	Classy::HTML $object.html -yscrollcommand "$object.vbar set" \
 		-state disabled -wrap word -cursor hand2 \
 		-width 10 -height 5 -relief sunken
-	$object.html bindlink <<Adjust>> {newhelp [%W linkat %x %y]}
+	$object.html bindlink <<Action>> "$object gethelp \[%W linkat %x %y\]"
+	$object.html bindlink <<Adjust>> {Classy::newhelp [%W linkat %x %y]}
 	scrollbar $object.vbar -orient vertical -command "$object.html yview"
 	Classy::DynaMenu attachmainmenu Classy::Help $object
 	Classy::DynaTool $object.tool -type Classy::Help

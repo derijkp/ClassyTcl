@@ -1,12 +1,8 @@
 <HEAD>
-<TITLE>
-Widget
-</TITLE>
+<TITLE>Widget</TITLE>
 </HEAD>
 <BODY>
-<h1>
-Widget
-</h1>
+<h1>Widget</h1>
 
  The Widget class is a subclass of <a href="Class.html">Class</a> that
  forms the basis of all widgets in ClassyTcl.
@@ -32,6 +28,19 @@ Widget
  The Widget methods are available to all instances of Widget or one
  of its subclasses.
 <dl><b><dt>
+ init
+</b><dd>
+ The Widget init method will normally be called using the "super init"
+ command in the init classmethod of one of its subclasses.
+ By default the Widget init method will create an object
+ with a frame as Tk base widget.<br>
+ If one argument is given, it will be used as the type of the base
+ widget of the new object, where the class (if possible) or bindtags
+ are adapted to the class name.<br>
+ If more than one argument is given, the args will be evaluated to
+ create the base widget of the object. In this case getting the class
+ and bindtags of the Tk widget right is the resonsability of the caller.
+<b><dt>
  objectName configure ?<u>option</u>? ?<u>value</u>? ?<u>option</u> <u>value</u> ...?
 </b><dd>
  Query or modify the configuration options of an widget (object).
@@ -76,19 +85,6 @@ Widget
  The Widget classmethods are only available to Widget or one
  of its subclasses, not to its instances.
 <dl><b><dt>
- init
-</b><dd>
- The Widget init classmethod will normally be called using the "super init"
- command in the init classmethod of one of its subclasses.
- By default the Widget init classmethod will create an object
- with a frame as Tk base widget.<br>
- If one argument is given, it will be used as the type of the base
- widget of the new object, where the class (if possible) or bindtags
- are adapted to the class name.<br>
- If more than one argument is given, the args will be evaluated to
- create the base widget of the object. In this case getting the class
- and bindtags of the Tk widget right is the resonsability of the caller.
-<b><dt>
  className addoption <u>option</u> <u>defaultlist</u> ?<u>body</u>?
 </b><dd>
  addoption is used to add an option to a class. The value of these options

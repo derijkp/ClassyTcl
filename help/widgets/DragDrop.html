@@ -1,12 +1,8 @@
 <HEAD>
-<TITLE>
-DragDrop
-</TITLE>
+<TITLE>DragDrop</TITLE>
 </HEAD>
 <BODY>
-<h1>
-DragDrop
-</h1>
+<h1>DragDrop</h1>
 
  subclass of <a href="../basic/Class.html">Class</a><br>
  DragDrop is not a widget and is not intended to produce instances. 
@@ -31,11 +27,11 @@ DragDrop
  Classy::DragDrop start x y value ?option value ...?<br>
 </b><dd>
  starts a drag. It clears all previously changed drag and drop settings to their
- default values or the ones supplied as options to the start method.
+ default values or the ones supplied as options to the start classmethod.
  x and y must be the x and y position of the pointer on the screen: you can
  use %X and %Y in the event command to get these.
  $value is the default value given for the drop if no type is specified.
- the options are the same as for the Classy::DragDrop configure method.
+ the options are the same as for the Classy::DragDrop configure classmethod.
 <b><dt>
  Classy::DragDrop configure ?option? ?value? ?option value...?<br>
 </b><dd>
@@ -62,13 +58,13 @@ DragDrop
  Classy::DragDrop get ?type?<br>
 </b><dd>
  returns the data associated with with the type $type of the current drag.
- If no type is given, the default value is returned (the data given to the start method.)
+ If no type is given, the default value is returned (the data given to the start classmethod.)
 <b><dt>
  Classy::DragDrop bind event ?command?
 </b><dd>
- with this method, bindings can be added to the current drag, eg. to change the transfer type
+ with this classmethod, bindings can be added to the current drag, eg. to change the transfer type
  in response to a keypress. Note that the command must come after the drag was
- started with the start method.
+ started with the start classmethod.
 <b><dt>
  Classy::DragDrop abort<br>
 </b><dd>
@@ -76,13 +72,13 @@ DragDrop
 <b><dt>
  Classy::DragDrop stop<br>
 </b><dd>
- make the drop. The user normally does not have to call this method, as it is
+ make the drop. The user normally does not have to call this classmethod, as it is
  usually called by the bindings of DragDrop.
 <b><dt>
  Classy::DragDrop move<br>
 </b><dd>
- This method is called while dragging. It updates the dragged window, and generates
- the Drag events. The user normally does not have to call this method, as it is
+ This classmethod is called while dragging. It updates the dragged window, and generates
+ the Drag events. The user normally does not have to call this classmethod, as it is
  usually called by the bindings of DragDrop.
 
 </body>

@@ -219,6 +219,16 @@ test Classy::OptionMenu {basic} {
 	.try get
 } {try 2}
 
+test Classy::OptionMenu {two} {
+	classyclean
+	Classy::OptionMenu .try -list {try {try 1} {try 2} {try 3} dfgsd\\1dfg xdg&dfj cfdgdsgh\\gdsf}
+	pack .try -fill x
+	Classy::OptionMenu .try2 -list {try {try 1} {try 2} {try 3} dfgsd\\1dfg xdg&dfj cfdgdsgh\\gdsf}
+	pack .try2 -fill x
+	.try set {try 2}
+	.try2 get
+} {try}
+
 test Classy::OptionMenu {command} {
 	classyclean
 	catch {unset ::try}

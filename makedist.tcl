@@ -8,6 +8,7 @@ exec tclsh8.0 "$0" ${1+"$@"}
 #	set targetdir [lindex $argv 0]
 #}
 
+cd [file dir [info script]]
 if ![file exists [file join lib Class.tcl]] {
 	puts stderr "ERROR: makedist.tcl must be run in the ClassyTcl developement directory"
 	exit 1
@@ -15,15 +16,16 @@ if ![file exists [file join lib Class.tcl]] {
 # $Format: "\tset currentversion 0.$ProjectMajorVersion$"$
 	set currentversion 0.3
 # $Format: "\tset patchLevel $ProjectMinorVersion$"$
-	set patchLevel 10
+	set patchLevel 12
 
 lappend auto_path [pwd]
 package require Extral
 package require -exact Class $currentversion
 
 set targetdir ClassyTcl-$tcl_platform(os)-$currentversion.$patchLevel
-if {[llength $argv] != 1} {
-	puts stderr "ERROR: format is \"makedist.tcl targetdirectory\""
+set len [llength $argv]
+if {($len != 1)&&($len != 2)} {
+	puts stderr "ERROR: format is \"makedist.tcl targetdirectory ?bindir?\""
 	puts stderr "Using this command a ClassyTcl package will the be build"
 	puts stderr "in the subdirectory \"$targetdir\" of the targetdirtory"
 	exit 1
@@ -86,6 +88,15 @@ proc clean {filemode dirmode dir} {
 			catch {file attributes [file join $targetdir template template.tcl] -permissions 0755}
 		}
 	}
+	if {$len == 2} {
+		set bindir [lindex  $argv 1]
+		exec ln -s $targetdir/bin/cbuild.tcl $bindir/cbuild
+		exec ln -s $targetdir/bin/convert0.1_to_0.2.tcl $bindir/convert0.1_to_0.2
+		exec ln -s $targetdir/apps/ccalc/ccalc.tcl $bindir/ccalc
+		exec ln -s $targetdir/apps/ccenter/ccenter.tcl $bindir/ccenter
+		exec ln -s $targetdir/apps/cdraw/cdraw.tcl $bindir/cdraw
+		exec ln -s $targetdir/apps/cedit/cedit.tcl $bindir/cedit
+		exec ln -s $targetdir/apps/cfiles/cfiles.tcl $bindir/cfiles
+		exec ln -s $targetdir/apps/ctester/ctester.tcl $bindir/ctester
+	}
 exit
-
-

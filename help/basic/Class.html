@@ -1,12 +1,8 @@
 <HEAD>
-<TITLE>
-Class
-</TITLE>
+<TITLE>Class</TITLE>
 </HEAD>
 <BODY>
-<h1>
-Class
-</h1>
+<h1>Class</h1>
 
  The class named Class forms the basis of the 
  <a href="../classy_object_system.html">ClassyTcl object system</a>. It is the
@@ -23,7 +19,7 @@ Class
 </b><dd>
  create a new instance (or object) with the name $<u>object</u> of class 
  ClassName. When the actual object is created,
- the init function of class ClassName will be invoked with the arguments
+ the init method of class ClassName will be invoked with the arguments
  given after $<u>object</u>.<br>
  Usually, the init method of the superclass
  must be invoked somehere in the init method with appropriate parameters.
@@ -43,15 +39,6 @@ Class
  if defined for the class, it will be invoked after the 
  desctruction of its children, but before destroying the class
  itself and and its instances.
-<b><dt>
- ClassName parent
-</b><dd>
- returns the name of the superclass or parent of the class ClassName.
-<b><dt>
- ClassName children
-</b><dd>
- returns the names of all children of the class ClassName.
- These include all instances and all direct subclasses of ClassName.
 <b><dt>
  ClassName method <u>name</u> <u>args</u> <u>body</u>
 </b><dd>
@@ -98,7 +85,7 @@ Class
 </dl><h2>
  Methods
 </h2>
- The methods defined by Class can be invoked from all objects.
+ The methods defined by Class can be invoked from all objects
 <dl><b><dt>
  pathName destroy
 </b><dd>

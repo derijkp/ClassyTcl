@@ -1,20 +1,17 @@
 <HEAD>
-<TITLE>
-Entry
-</TITLE>
+<TITLE>Entry</TITLE>
 </HEAD>
 <BODY>
-<h1>
-Entry
-</h1>
+<h1>Entry</h1>
 
  subclass of <a href="../basic/Widget.html">Widget</a><br>
  The ClassyTcl entry has all the options and commands of the Tk entry, but
  with a few extras
 <ul>
 <li>optional label
-<li>invoke command upon entry
+<li>invoke command upon pressing Enter
 <li>constraints
+<li>validate command (executed upon each change)
 <li>a <a href="DefaultMenu.html">DefaultMenu</a> can be added to
  store and reselecte values easily. These default values are stored
  by the <a href="Default.html">Default</a> system as type app.
@@ -24,8 +21,11 @@ Entry
 	Entry specific options
 </h2><dl><b><dt>Command-Line Name: -undosteps</b><b><dt>Database Name: undoSteps</b><b><dt>Database Class: UndoSteps</b><dd>
  gives the number of possible undo steps. Default is 200.
-<b><dt>Command-Line Name: -papersize</b><b><dt>Database Name: papeSize</b><b><dt>Database Class: PaperSize</b><dd>
+<b><dt>Command-Line Name: -papersize</b><b><dt>Database Name: paperSize</b><b><dt>Database Class: PaperSize</b><dd>
  determines the papersize
+<b><dt>Command-Line Name: -progresswindow</b><b><dt>Database Name: progressWindow</b><b><dt>Database Class: ProgressWindow</b><dd>
+ window in which progress of loading and saving can be shown; must be api compatible with
+ Classy::Progress
 <b><dt>Command-Line Name: -orient</b><b><dt>Database Name: orient</b><b><dt>Database Class: Orient</b><dd>
  determines the position of the label relative to the entry: horizontal or vertical
 <b><dt>Command-Line Name: -default</b><b><dt>Database Name: default</b><b><dt>Database Class: Default</b><dd>
@@ -35,7 +35,8 @@ Entry
  as type app. The default option gives the key for getting and 
  setting values.
 <b><dt>Command-Line Name: -label</b><b><dt>Database Name: label</b><b><dt>Database Class: Label</b><dd>
- text to be displayed in the entry label. If this is empty, no label will bne displayed.
+<b><dt>Command-Line Name: -labelbg</b><b><dt>Database Name: labelBg</b><b><dt>Database Class: LabelBg</b><dd>
+ background color of label
 <b><dt>Command-Line Name: -command</b><b><dt>Database Name: command</b><b><dt>Database Class: Command</b><dd>
  associate a command with the entry. When the Action key (usually Enter) is pressed 
  in the entry, the widget will invoke a Tcl command by concatenating the given 
@@ -45,6 +46,11 @@ Entry
 <b><dt>Command-Line Name: -constraint</b><b><dt>Database Name: constraint</b><b><dt>Database Class: Constraint</b><dd>
  the value in the entry must match the regular expression given here.
  No constraint is applied when it is set to the empty string.
+<b><dt>Command-Line Name: -validate</b><b><dt>Database Name: validate</b><b><dt>Database Class: Validate</b><dd>
+ This is a more general method to do validation of the entered value.
+ the command given in the validate option will be invoked with two parameters:
+ the old and the new value. The command must return 0 if the new value is ok, and
+ 1 if the new value is not ok.
 <b><dt>Command-Line Name: -labelwidth</b><b><dt>Database Name: labelWidth</b><b><dt>Database Class: LabelWidth</b><dd>
  width of the label
 <b><dt>Command-Line Name: -warn</b><b><dt>Database Name: warn</b><b><dt>Database Class: Warn</b><dd>

@@ -61,6 +61,8 @@ Classy::SelectDialog component renameentry {$object.options.rename}
 #  Widget options
 # ------------------------------------------------------------------
 
+Classy::SelectDialog chainoptions {$object.options.list}
+
 #doc {SelectDialog options -command} option {-command ? ?} descr {
 #}
 Classy::SelectDialog addoption -command {command Command {}} {}
@@ -140,7 +142,16 @@ Classy::SelectDialog method fill {names} {
 #} descr {
 #}
 Classy::SelectDialog method get {} {
-	return [$object.options.list get active]
+	set selection [$object curselection]
+	if ![llength $selection] {
+		return [$object.options.list get active]
+	} else {
+		set result  ""
+		foreach num $selection {
+			lappend result [$object.options.list get $num]
+		}
+		return $result
+	}
 }
 
 #doc {SelectDialog command set} cmd {
@@ -158,7 +169,7 @@ Classy::SelectDialog method set {name} {
 Classy::SelectDialog method _command {} {
 	set command [getprivate $object options(-command)]
 	if {"$command" != ""} {
-		set value [$object.options.list get active]
+		set value [$object get]
 		uplevel #0 $command [list $value]
 	}
 }

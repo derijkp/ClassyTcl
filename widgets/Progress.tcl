@@ -129,6 +129,7 @@ Classy::Progress method barconfigure {args} {
 Classy::Progress method _redraw {} {
 	private $object w current options
 	set ticks $options(-ticks)
+	if {$ticks == 0} {set ticks 1}
 	if {$current<0} {set current 0}
 	if {$current>$ticks} {set current $ticks}
 	set ratio [expr double($current)/$ticks]

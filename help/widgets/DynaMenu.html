@@ -1,12 +1,8 @@
 <HEAD>
-<TITLE>
-DynaMenu
-</TITLE>
+<TITLE>DynaMenu</TITLE>
 </HEAD>
 <BODY>
-<h1>
-DynaMenu
-</h1>
+<h1>DynaMenu</h1>
 
  subclass of <a href="../basic/Class.html">Class</a><br>
  DynaMenu is not a widget and is not intended to produce instances. 
@@ -67,9 +63,10 @@ DynaMenu delete menutype
  delete the current definition and all menus of $menutype
 
 <b><dt>
-DynaMenu menu menutype
+DynaMenu bindtag menutype
 </b><dd>
- returns the window name of the menu of type $menutype for use in a program.
+ returns the sequence to which all key-shortcuts for $menutype are bound.
+ add this to the bindtags of the window that must be controlled by the menu.
 
 <b><dt>
 DynaMenu popup menutype ?x y?

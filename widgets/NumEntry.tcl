@@ -84,16 +84,7 @@ Classy::NumEntry addoption -max {max Max {}}
 
 #doc {NumEntry options -constraint} option {-constraint constraint Constraint} descr {
 #}
-Classy::NumEntry addoption -constraint {constraint Constraint {^(-?)[0-9]*(\.?)[0-9]([Ee][-+])?[0-9]*(\.?)[0-9]*$}} {
-	if [string match $value int] {
-		set value {^(-?)[0-9]*$}
-	} elseif [string match $value float] {
-		set value {^(-?)[0-9]*(\.?)[0-9]*$}
-	} else {
-		set value {^(-?)[0-9]*(\.?)[0-9]([Ee][-+][0-9]*(\.?)[0-9]*)?$}
-	}
-	return $value
-}
+Classy::NumEntry addoption -constraint {constraint Constraint all} {}
 
 #doc {NumEntry options -state} option {-state state State} descr {
 #}
@@ -127,7 +118,20 @@ Classy::NumEntry method incr {number} {
 Classy::NumEntry method constrain {} {
 	private $object options previous previouscol
 	set warn $options(-warn)
-	set constraint $options(-constraint)
+	switch $options(-constraint) {
+		int {
+			set constraint {^(-?)[0-9]*$}
+		}
+		float {
+			set constraint {^(-?)[0-9]*(\.?)[0-9]*$}
+		}
+		all {
+			set constraint {^(-?)[0-9]*(\.?)[0-9]?([Ee][-+][0-9]*(\.?)[0-9]*)?$}
+		}
+		default {
+			set constraint $options(-constraint)
+		}
+	}
 	set min [getprivate $object options(-min)]
 	set max [getprivate $object options(-max)]
 	set value [$object get]

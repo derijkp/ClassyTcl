@@ -2,6 +2,7 @@
 # the next line restarts using tclsh \
 exec tclsh8.0 "$0" "$@"
 
+cd [file dir [info script]]
 package require Extral
 if {"$argv" == ""} {
 Extral::makedoc [lsort [glob widgets/*.tcl]] help/widgets "ClassyTcl widgets and commands"

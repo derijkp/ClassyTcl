@@ -304,10 +304,10 @@ Classy::HTML method geturl {url {query {}}} {
 		em     {style i}
 		h1     {size 24 weight bold style italic}
 		h2     {size 18 weight bold style italic}		
-		h3     {size 18 weight bold}	
-		h4     {size 16 weight bold}
-		h5     {size 14 weight bold}
-		h6     {size 14 style italic}
+		h3     {size 14 weight bold}	
+		h4     {size 14 weight bold}
+		h5     {size 12 weight bold}
+		h6     {size 12 style italic}
 		i      {style italic}
 		kbd    {family courier weight bold}
 		menu     {indent 1}
@@ -532,7 +532,8 @@ Classy::HTML method linkat {x y} {
 	set tags [$object tag names @$x,$y]
 	set link [lindex $tags [lsearch -glob $tags L:*]]
 	regsub L: $link {} link
-	return [$object fullurl $link]
+#	return [$object fullurl $link]
+	return $link
 }
 
 #doc {HTML command bindlink} cmd {

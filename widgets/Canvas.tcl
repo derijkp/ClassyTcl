@@ -18,7 +18,6 @@
 # Classy::Canvas reserves tags starting with an underscore (_) for internal
 # use (temporary tags, grouping etc.). You should not add or remove such tags, 
 # except for the group names returned by the group method.
-# they should be ignored
 #}
 #doc {Canvas command} h2 {
 #	Canvas specific methods
@@ -241,10 +240,12 @@ Classy::Canvas method undo {{action {}} args} {
 			set undo(steps) $options(-undosteps)
 		}
 		add {
+			if {[llength $args] != 2} {return -code error "wrong # args: should be \"$object undo add redocommand undocommand\""}
 			if ![info exists undo(pos)] {
 				lappend undo(redo) [list a [lindex $args 0]]
 				lappend undo(undo) [list a [lindex $args 1]]
 			}
+			return ""
 		}
 		0 -
 		off {
@@ -622,7 +623,15 @@ proc Classy::tag2items {object w tagOrId} {
 proc Classy::zoomfont {font zoom} {
 	set size [lindex $font 1]
 	if {"$size" == ""} {return $font}
-	set size [expr int(abs($size*$zoom))]
+	set size [expr {int($size*$zoom)}]
+	if {$size==0} {set size 1}
+	return [lreplace $font 1 1 $size]
+}
+
+proc Classy::scalefont {font scale} {
+	set size [lindex $font 1]
+	if {"$size" == ""} {return $font}
+	set size [expr {$size*$scale}]
 	if {$size==0} {set size 1}
 	return [lreplace $font 1 1 $size]
 }
@@ -670,11 +679,6 @@ Classy::Canvas method _font {font} {
 		set rfonts($fname) $font
 	}
 	return $fonts($font)
-}
-
-Classy::Canvas method font {id} {
-	private $object rfonts
-	return $rfonts([$object itemcget $id -font])
 }
 
 Classy::Canvas method _width {width} {
@@ -853,13 +857,25 @@ Classy::Canvas method itemconfigure {tagOrId args} {
 		if [info exists del($tagOrId)] {
 			return {}
 		} else {
-			return [$w itemconfigure $tagOrId]
+			foreach part [$w itemconfigure $tagOrId] {
+				set option [lindex $part 0]
+				if [inlist {-width -font} $option] {
+					lappend result [lreplace $part end end [$object itemcget $tagOrId $option]]
+				} else {
+					lappend result $part
+				}
+			}
+			return $result
 		}
 	} elseif {$len == 1} {
 		if [info exists del($tagOrId)] {
 			return {}
 		} else {
-			return [$w itemconfigure $tagOrId $args]
+			set result [$w itemconfigure $tagOrId $args]
+			if [inlist {-width -font} $args] {
+				set result [lreplace $result end end [$object itemcget $tagOrId $args]]
+			}
+			return $result
 		}
 	} else {
 		set fpos [lsearch $args -font]
@@ -917,7 +933,7 @@ Classy::Canvas method itemconfigure {tagOrId args} {
 				set width [lindex $args $wpos]
 				if ![info exists widths($width)] {
 					$object _width $width
-				}			
+				}
 				set args [lreplace $args $wpos $wpos $widths($width)]
 				set optionslist ""
 				set ws ""
@@ -933,6 +949,32 @@ Classy::Canvas method itemconfigure {tagOrId args} {
 		}
 	}
 	return {}
+}
+
+Classy::Canvas method itemcget {tagOrId option} {
+	switch -- $option {
+		-width {
+			private $object w itemw
+			set id [lindex $tagOrId 0]
+			if ![isint $id] {
+				set id [lindex [$w find withtag $tagOrId] 0]
+			}
+			if [info exists itemw($id)] {
+				return $itemw($id)
+			} else {
+				$w itemcget $id $option
+			}
+		}
+		-font {
+			private $object w
+			set font [$w itemcget $tagOrId -font]
+			return [lindex $font 2]
+		}
+		default {
+			private $object w
+			$w itemcget $tagOrId $option
+		}
+	}
 }
 
 Classy::Canvas method mitemcget {tagOrId option} {
@@ -1032,7 +1074,7 @@ Classy::Canvas method scale {tagOrId xOrigin yOrigin xScale yScale} {
 		set nf [catch {$w itemcget $citem -font} font]
 		if !$nf {
 			set font [lindex $font 2]
-			set newfont [Classy::zoomfont $font $yScale]
+			set newfont [Classy::scalefont $font $yScale]
 			$w itemconfigure $citem -font [$object _font $newfont]
 		}
 		if [info exists itemw($citem)] {
@@ -1861,7 +1903,7 @@ Classy::Canvas method save {{tag all}} {
 #}
 Classy::Canvas method load {c} {
 	if ![regexp {^header Classy::Canvas} $c] {error "wrong format"}
-	private $object w load data tag options
+	private $object w load data options
 	catch {unset load}
 	$w dtag _new
 	set pw $options(-progresswindow)
@@ -2045,7 +2087,6 @@ Classy::Canvas method print {{tag all}} {
 }
 
 Classy::Canvas method doprint {args} {
-putsvars args
 	private $object w data
 	array set print {
 		-tofile 0

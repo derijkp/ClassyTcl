@@ -120,7 +120,7 @@ Classy::Dialog addoption -help {help Help {}} {
 		catch {destroy $object.actions.help}
 	} else {
 		catch {button $object.actions.help -text "Help" -underline 0 }
-		$object.actions.help configure -command "help $value"
+		$object.actions.help configure -command "Classy::help $value"
 		pack $object.actions.help -side right -expand yes -padx 5 -pady 10
 		bind $object <<Help>> "$object invoke help"
 		bind $object <Control-h> "$object invoke help"
