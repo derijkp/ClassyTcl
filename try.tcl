@@ -1,3 +1,19 @@
+source app.tcl
+Builder .builder
+set object .builder
+set file lib/Main.tcl
+set function mainw
+set object .builder
+private $object data
+
+source cdraw.tcl
+Builder .try
+set object .try
+set file lib/Main.tcl
+set function mainw
+set object .try.dedit
+private $object data
+
 set data [Classy::config_get $level {}]
 
 source tools.tcl

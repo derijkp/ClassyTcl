@@ -40,11 +40,9 @@
 #	ChartGrid specific methods
 #} descr {
 #}
-# Next is to get the attention of auto_mkindex
-if 0 {
-proc ::Classy::ChartGrid {} {}
-proc ChartGrid {} {}
-}
+# These will be added to tclIndex by Classy::auto_mkindex
+#auto_index ::Classy::ChartGrid
+#auto_index ChartGrid
 
 # ------------------------------------------------------------------
 #  Widget creation

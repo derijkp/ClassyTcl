@@ -26,11 +26,8 @@
 #doc {Toplevel command} h2 {
 #	Toplevel specific methods
 #}
-# Next is to get the attention of auto_mkindex
-if 0 {
-proc ::Classy::Toplevel {} {}
-proc Toplevel {} {}
-}
+# These will be added to tclIndex by Classy::auto_mkindex
+#auto_index Toplevel
 
 # ------------------------------------------------------------------
 #  Widget creation

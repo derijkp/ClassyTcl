@@ -17,11 +17,9 @@
 #doc {Builder command} h2 {
 #	Builder specific methods
 #}
-# Next is to get the attention of auto_mkindex
-if 0 {
-proc ::Classy::Builder {} {}
-proc Builder {} {}
-}
+# Next is to get the attention of auto_mkindex \
+# These will be added to tclIndex by Classy::auto_mkindex
+#auto_index Builder
 
 # ------------------------------------------------------------------
 #  Widget creation
@@ -144,6 +142,15 @@ Classy::Builder method new {type {name {}}} {
 		$object.browse selection set $base
 		return
 	} else {
+		set c [splitcomplete [readfile $file]]
+		if {[lsearch -glob $c [list proc $name *]] != -1} {
+		} elseif {[lsearch -glob $c [list Classy::Toplevel subclass $name]] != -1} {
+			error "Toplevel \"$name\" exists in file \"$file\"!"
+		} elseif {[lsearch -glob $c [list Classy::Dialog subclass $name]] != -1} {
+			error "Dialog \"$name\" exists in file \"$file\"!"
+		} elseif {[lsearch -glob $c [list Classy::Topframe subclass $name]] != -1} {
+			error "Frame \"$name\" exists in file \"$file\"!"
+		}
 		if [info exists auto_index($name)] {
 			set file [lindex $auto_index($name) 1]
 			if ![Classy::yorn "function \"$name\" probably exists in file \"$file\"! continue anyway?"] return
@@ -152,53 +159,29 @@ Classy::Builder method new {type {name {}}} {
 	}
 	switch $type {
 		function {
-			$object infile set $file $name "proc [list $name] \{\} \{\}"
+			set f [open $file a]
+			puts $f "\nproc [list $name] \{\} \{\}"
+			close $f
 		}
-		dialog {
-			set code "proc [list $name] args \{# ClassyTcl generated Dialog"
-			append code "\n\tif \[regexp \{^\\.\} \$args] \{"
-			append code "\n\t\tset window \[lshift args\]"
-			append code "\n\t\} else \{"
-			append code "\n\t\tset window .$name"
-			append code "\n\t\}"
-			append code "\n\tClassy::parseopt \$args opt {}"
-			append code "\n\t# Create windows"
-			append code "\n\tClassy::Dialog \$window \\"
-			append code "\n\t\t-destroycommand \[list destroy \$window\]"
-			append code "\n\t# End windows"
-			append code "\n\}"
-			$object infile set $file $name $code
-		}
-		toplevel {
-			set code "proc [list $name] args \{# ClassyTcl generated Toplevel"
-			append code "\n\tif \[regexp \{^\\.\} \$args] \{"
-			append code "\n\t\tset window \[lshift args\]"
-			append code "\n\t\} else \{"
-			append code "\n\t\tset window .$name"
-			append code "\n\t\}"
-			append code "\n\tClassy::parseopt \$args opt {}"
-			append code "\n\t# Create windows"
-			append code "\n\tClassy::Toplevel \$window \\"
-			append code "\n\t\t-destroycommand \[list destroy \$window\]"
-			append code "\n\t# End windows"
-			append code "\n\}"
-			$object infile set $file $name $code
-		}
-		frame {
-			set code "proc [list $name] args \{# ClassyTcl generated Frame"
-			append code "\n\tif \[regexp \{^\\.\} \$args] \{"
-			append code "\n\t\tset window \[lshift args\]"
-			append code "\n\t\} else \{"
-			append code "\n\t\tset window .$name"
-			append code "\n\t\}"
-			append code "\n\tClassy::parseopt \$args opt {}"
-			append code "\n\t# Create windows"
-			append code "\n\tframe \$window \\"
-			append code "\n\t\t-class Classy::Topframe"
-			append code "\n\t# End windows"
-			append code "\n\}"
-			$object infile set $file $name $code
-		}
+		dialog {set cmd Dialog}
+		toplevel {set cmd Toplevel}
+		frame {set cmd Topframe}
+		default {error "unkown type: \"$type\"}
+	}
+	if {"$type" != "function"} {
+		set create \n[list Classy::$cmd subclass [list $name]]
+		set code "\n[list $name] classmethod init {args} \{"
+		append code \n\t[list super init]
+		append code "\n\tset window \$object"
+		append code \n\t[list if {"$args" == "___Classy::Builder__create"} {return $window}]
+		append code \n\t[list # Configure initial arguments]
+		append code \n\t[list if {"$args" != ""} {eval $window configure $args}]
+		append code "\n\treturn \$window"
+		append code \n\}
+		set f [open $file a]
+		puts $f \n$create
+		puts $f $code
+		close $f
 	}
 	set base [list $file $name $type]
 	set pnode [list $file {} file]
@@ -250,130 +233,191 @@ Classy::Builder method infile {cmd file args} {
 	private $object browse
 	switch $cmd {
 		get {
-			set name [lindex $args 0]
-			set f [open $file]
-			while {![eof $f]} {
-				set line [getcomplete $f]
-				if [string match "proc $name *" $line] {
-					close $f
-					return $line
+			set function [lindex $args 0]
+			set c [splitcomplete [readfile $file]]
+			set pos [lsearch -glob $c [list proc $function *]]
+			if {$pos != -1} {
+				return [lindex $c $pos]\n
+			} else {
+				set pos [lsearch -glob $c [list * subclass $function]]
+				if {$pos == -1} {
+					error "\"$function\" not found in file \"$file\""
 				}
+				set result [lindex $c $pos]\n
+				set pos [lsearch -glob $c [list $function classmethod init *]]
+				append result [lindex $c $pos]\n
+				set poss [lfind -glob $c [list $function addoption *]]
+				foreach pos $poss {
+					append result [lindex $c $pos]\n
+				}
+				set poss [lfind -glob $c [list $function method *]]
+				foreach pos $poss {
+					append result [lindex $c $pos]\n
+				}
+				return $result
 			}
-			close $f
-			error "proc \"$name\" not found in file \"$file\""
 		}
 		set {
-			set name [lindex $args 0]
+			set function [lindex $args 0]
 			set code [lindex $args 1]
-			file copy -force $file $file~
 			set done 0
-			set f [open $file~]
-			set o [open $file w]
-			while {![eof $f]} {
-				set line [getcomplete $f]
-				if [string match "proc $name *" $line] {
-					puts $o $code
-					set done 1
+			set c [splitcomplete [readfile $file]]
+			if [string match "proc *" $code] {
+				uplevel #0 $code
+				set pos [lsearch -glob $c [list proc $function *]]
+				if {$pos == -1} {
+					lappend c {} $code
 				} else {
-					puts $o $line
+					set c [lreplace $c $pos $pos $code]
+				}
+			} else {
+				set pos1 [lsearch -glob $c [list * subclass $function]]
+				if {$pos1 == -1} {
+					uplevel #0 $code
+					lappend c {} $code
+				} else {
+					regsub "^\[^\n\]+subclass $function\n" $code {} temp
+					uplevel #0 $temp
+					set pos [lsearch -glob $c [list $function classmethod init *]]
+					set c [lreplace $c $pos $pos]
+					set poss [lfind -glob $c [list $function addoption *]]
+					foreach pos $poss {
+						set c [lreplace $c $pos $pos]
+					}
+					set poss [lfind -glob $c [list $function method *]]
+					foreach pos $poss {
+						set c [lreplace $c $pos $pos]
+					}
+					set c [lreplace $c $pos1 $pos1 $code]
 				}
 			}
-			if !$done {
-				puts $o $code
-			}
-			close $o
-			close $f
+			$object infile _save $file $function $c
 			if [string match "proc *" $code] {
-				catch {auto_mkindex [file dirname $file] *.tcl}
-				catch {rename $name {}}
-				set ::auto_index($name) [list source $file]
+				catch {rename $function {}}
 			}
 		}
-		ls {
-			set f [open $file]
-			set result ""
-			while {![eof $f]} {
-				set line [getcomplete $f]
-				if [string match "proc *" $line] {
-					lappend result [lindex $line 1]
+		_save {
+			catch {file copy -force $file $file~}
+			set function [lindex $args 0]
+			set c [lindex $args 1]
+			set f [open $file w]
+			set space 0
+			foreach line $c {
+				if ![string length $line] {
+					if $space continue
+					set space 1
+				} else {
+					set space 0
 				}
+				puts $f $line
 			}
 			close $f
+			catch {Classy::auto_mkindex [file dirname $file] *.tcl}
+			set ::auto_index($function) [list source $file]
+		}
+		ls {
+			set c [splitcomplete [readfile $file]]
+			foreach line $c {
+				if {"[lindex $line 0]" == "proc"} {
+					lappend result [lindex $line 1]
+				} elseif {"[lindex $line 1]" == "subclass"} {
+					lappend result [lindex $line 2]
+				}
+			}
 			return $result
 		}
 		delete {
-			set name [lindex $args 0]
-			file copy -force $file $file~
-			set done 0
-			set f [open $file~]
-			set o [open $file w]
-			while {![eof $f]} {
-				set line [getcomplete $f]
-				if ![string match "proc $name *" $line] {
-					puts $o $line
+			set function [lindex $args 0]
+			set c [splitcomplete [readfile $file]]
+			set pos [lsearch -glob $c [list proc $function *]]
+			if {$pos != -1} {
+				set c [lreplace $c $pos $pos]
+			} else {
+				set pos [lsearch -glob $c [list * subclass $function]]
+				if {$pos == -1} {
+					error "\"$function\" not found in file \"$file\""
 				}
+				set c [lreplace $c $pos $pos]
+				set pos [lsearch -glob $c [list $function classmethod init *]]
+				set c [lreplace $c $pos $pos]
+				set poss [lfind -glob $c [list $function addoption *]]
+				set c [lsub $c -exclude $poss]
+				set poss [lfind -glob $c [list $function method *]]
+				set c [lsub $c -exclude $poss]
 			}
-			close $o
-			close $f
-			catch {auto_mkindex [file dirname $file] *.tcl}
-			catch {rename $name {}}
-			catch {unset ::auto_index($name)}
+			$object infile _save $file $function $c
+			catch {rename $function {}}
+			catch {unset ::auto_index($function)}
 		}
 		rename {
-			set name [lindex $args 0]
-			set newname [lindex $args 1]
+			set function [lindex $args 0]
+			set newfunction [lindex $args 1]
 			set ls [$object infile ls $file]
-			if {[lsearch $ls $newname] != -1} {
-				error "proc \"$newname\" already exists  in file \"$file\""
+			if {[lsearch $ls $newfunction] != -1} {
+				error "proc \"$newfunction\" already exists  in file \"$file\""
 			}
-			file copy -force $file $file~
-			set done 0
-			set f [open $file~]
-			set o [open $file w]
-			while {![eof $f]} {
-				set line [getcomplete $f]
-				if [string match "proc $name *" $line] {
-					regsub "^proc [list $name]" $line "proc [list $newname]" line
-					puts $o $line
-					catch {rename $name $newname}
-					catch {auto_mkindex [file dirname $file] *.tcl}
-					unset ::auto_index($name)
-					set ::auto_index($newname) [list source $file]
-				} else {
-					puts $o $line
+			if [string length [info commands $newfunction]] {
+				error "command \"$newfunction\" already exists"
+			}
+			set c [splitcomplete [readfile $file]]
+			set pos [lsearch -glob $c [list proc $function *]]
+			if {$pos != -1} {
+				regsub "^proc $function" [lindex $c $pos] "proc $newfunction" line
+				set c [lreplace $c $pos $pos $line]
+				uplevel #0 $line
+			} else {
+				set pos [lsearch -glob $c [list * subclass $function]]
+				if {$pos == -1} {
+					error "\"$function\" not found in file \"$file\""
+				}
+				regsub "subclass $function\$" [lindex $c $pos] "subclass $newfunction" line
+				set c [lreplace $c $pos $pos $line]
+				uplevel #0 $line
+				set pos [lsearch -glob $c [list $function classmethod init *]]
+				regsub "^$function " [lindex $c $pos] "$newfunction " line
+				set c [lreplace $c $pos $pos $line]
+				uplevel #0 $line
+				set poss [lfind -glob $c [list $function addoption *]]
+				set poss [concat $poss [lfind -glob $c [list $function method *]]]
+				foreach pos $poss {
+					regsub "^$function " [lindex $c $pos] "$newfunction " line
+					set c [lreplace $c $pos $pos $line]
+					uplevel #0 $line
 				}
 			}
-			close $o
-			close $f
+			$object infile _save $file $function $c
+			catch {rename $function {}}
+			catch {unset ::auto_index($function)}
 		}
 		add {
 			set code [lindex $args 0]
-			set func [lindex $code 1]
-			set funcs ""
-			foreach line [splitcomplete [readfile $file]] {
-				if [regexp {^proc } $line] {lappend funcs [lindex $line 1]}
-			}
-			if {[lsearch $funcs $func] != -1} {
-				set num 1
-				while {[lsearch $funcs $func#$num] != -1} {incr num}
-				set code [lreplace $code 1 1 $func#$num]
-				set func $func#$num
-			}
-			set f [open $file a]
-			puts $f $code
-			close $f
 			if [string match "proc *" $code] {
-				catch {auto_mkindex [file dirname $file] *.tcl}
-				set ::auto_index($func) [list source $file]
+				set function [lindex $code 1]
+			} else {
+				set split [splitcomplete $code]
+				set function [lindex [lindex $split 0] 2]
 			}
-			switch $browse(type) {
-				color - font - misc - key - mouse - menu - tool {
-					set pnode [list $file {} $browse(type)]
+			set funcs [$object infile ls $file]
+			if {[lsearch $funcs $function] != -1} {
+				set num 1
+				while {[lsearch $funcs $function#$num] != -1} {incr num}
+				set newfunction $function#$num
+				if [string match "proc *" $code] {
+					regsub "^proc $function" $code "proc $newfunction"
+				} else {
+					set newcode ""
+					foreach line $split {
+						regsub "subclass $function\$" $line "subclass $newfunction" line
+						regsub "^$function " $line "$newfunction " line
+						append newcode $line\n
+					}
+					set code $newcode
 				}
-				default {
-					set pnode [list $file {} file]
-				}
+				set function $newfunction
 			}
+			uplevel #0 $code
+			$object infile set $file $function $code
+			set pnode [list $file {} file]
 			$object closenode $pnode
 			$object opennode $pnode
 		}
@@ -394,7 +438,7 @@ Classy::Builder method delete {} {
 			file copy -force $file $file~
 			file delete $file
 			$object.browse deletenode $browse(base)
-			catch {auto_mkindex [file dirname $file] *.tcl}
+			catch {Classy::auto_mkindex [file dirname $file] *.tcl}
 			return $file
 		}
 		dir - color - font - misc - key - mouse - menu - tool {
@@ -426,24 +470,6 @@ Classy::Builder method copy {} {
 			clipboard clear
 			clipboard append $browse(clipb)
 			return $file
-		}
-		color - font - misc - key - mouse - menu - tool {
-			if {"[lindex $browse(base) 1]" == ""} {
-				set browse(clipbf) $file
-				set browse(clipb) [readfile $file]
-				clipboard clear
-				clipboard append $browse(clipb)
-				return $file
-			} else {
-				set browse(clipb) {}
-				set function $browse(name)
-				set work [$object infile get $file $function]
-				set browse(clipbf) {}
-				set browse(clipb) $work
-				clipboard clear
-				clipboard append $work
-				return $work
-			}
 		}
 		dir {
 			error "Cannot copy dir to clipboard"
@@ -574,7 +600,16 @@ Classy::Builder method opennode {args} {
 		set f [open $browse(file)]
 		while {![eof $f]} {
 			set line [gets $f]
-			if [regexp ^proc $line] {
+			if [regexp {^Classy::Toplevel subclass (.+)$} $line temp func] {
+				$object.browse addnode $root [list $browse(file) $func toplevel] \
+					-type end -text $func -image [Classy::geticon newtoplevel]
+			} elseif [regexp {^Classy::Dialog subclass (.+)$} $line temp func] {
+				$object.browse addnode $root [list $browse(file) $func dialog] \
+					-type end -text $func -image [Classy::geticon newdialog]
+			} elseif [regexp {^Classy::Topframe subclass (.+)$} $line temp func] {
+				$object.browse addnode $root [list $browse(file) $func frame] \
+					-type end -text $func -image [Classy::geticon newframe]
+			} elseif [regexp ^proc $line] {
 				if [info complete $line] {
 					set func [lindex "$line" 1]
 				} else {
@@ -604,7 +639,7 @@ Classy::Builder method _drawtree {} {
 	private $object options browse defdir
 	$object.browse clearnode {}
 	$object.browse configure -roottext [file tail $defdir]
-	catch {auto_mkindex $defdir *.tcl}
+	catch {Classy::auto_mkindex $defdir *.tcl}
 	catch {source [file join $defdir tclIndex]}
 	$object opennode {} [list $defdir {} dir]
 	$object.browse redraw
@@ -640,7 +675,8 @@ Classy::Builder method fedit {w file function type} {
 
 Classy::Builder method rename {args} {
 	if {"$args" == ""} {
-		$object.browse edit [lindex [$object.browse selection] 0] "$object rename [$object.browse selection]"
+		Classy::InputDialog $object.input -label "Rename \"[lindex [lindex [$object.browse selection] 0] 1]\" to" \
+			-command "$object rename [$object.browse selection]"
 		return
 	}
 	set src [lindex $args 0]

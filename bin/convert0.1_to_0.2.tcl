@@ -5,7 +5,8 @@ exec wish8.0 "$0" "$@"
 # ClassyTcl
 # --------- Peter De Rijk
 #
-package require ClassyTcl
+# $Format: "package require -exact ClassyTcl 0.$ProjectMajorVersion$"$
+package require -exact ClassyTcl 0.3
 set file [lindex $argv 0]
 
 proc convtool {src} {

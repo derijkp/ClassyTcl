@@ -22,11 +22,8 @@
 #doc {NoteBook command} h2 {
 #	NoteBook specific methods
 #}
-# Next is to get the attention of auto_mkindex
-if 0 {
-proc ::Classy::NoteBook {} {}
-proc NoteBook {} {}
-}
+# These will be added to tclIndex by Classy::auto_mkindex
+#auto_index NoteBook
 
 catch {option add *Classy::NoteBook.Background [Classy::realcolor darkBackground] widgetDefault}
 #option add *Classy::NoteBook.book.borderWidth 2 widgetDefault

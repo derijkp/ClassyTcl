@@ -100,7 +100,7 @@ proc ::Classy::WindowBuilder::attr_Scrollbar_scroll {object w args} {
 proc ::Classy::WindowBuilder::edit_Scrollbar {object w} {
 	::Classy::WindowBuilder::defattredit $object $w {
 		scroll "Scroll window" 0 -orient Orientation 0 -command Command 1
-	} 10
+	} 0
 }
 
 #

@@ -20,11 +20,8 @@
 #doc {FileSelect command} h2 {
 #	FileSelect specific methods
 #}
-# Next is to get the attention of auto_mkindex
-if 0 {
-proc ::Classy::FileSelect {} {}
-proc FileSelect {} {}
-}
+# These will be added to tclIndex by Classy::auto_mkindex
+#auto_index FileSelect
 
 if {"[Classy::Default get app Classy__FileSelect__curdir]"==""} {
 	Classy::Default set app Classy__FileSelect__curdir [pwd]

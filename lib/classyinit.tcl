@@ -6,8 +6,11 @@
 # of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 #
 # ---------------------------------------------------------------
-package require Extral 1.0
-package require Class 0.1
+package require Extral 1.1
+# $Format: "package require Class 0.$ProjectMajorVersion$"$
+package require Class 0.3
+package provide ClassyTcl $::class::version
+
 lappend auto_path [file join ${::class::dir} widgets] [file join ${::class::dir} dialogs]
 
 namespace eval ::Classy {}
@@ -69,10 +72,10 @@ if {"[info commands ::Tk::bind]" == ""} {
 			}
 			2 {
 				set result [::Tk::bind [lindex $args 0] [lindex $args 1]]
-				return [replace $result {{[::class::bind %W]} %W}]
+				return [replace $result {{[::class::_bind %W]} %W}]
 			}
 			3 {
-				set cmd [replace [lindex $args 2] {%W {[::class::bind %W]}}]
+				set cmd [replace [lindex $args 2] {%W {[::class::_bind %W]}}]
 				return [::Tk::bind [lindex $args 0] [lindex $args 1] $cmd]
 			}
 			default {
@@ -97,7 +100,7 @@ if {"[info commands send]" == ""} {
    }
 }
 
-proc class::bind {w} {
+proc class::_bind {w} {
 	if ![info exists ::class::rebind($w)] {
 		return $w
 	} else {

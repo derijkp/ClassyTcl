@@ -42,11 +42,8 @@
 #	LineChart specific methods
 #} descr {
 #}
-# Next is to get the attention of auto_mkindex
-if 0 {
-proc ::Classy::LineChart {} {}
-proc LineChart {} {}
-}
+# These will be added to tclIndex by Classy::auto_mkindex
+#auto_index LineChart
 
 # ------------------------------------------------------------------
 #  Widget creation

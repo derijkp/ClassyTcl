@@ -20,11 +20,8 @@
 #doc {Selector command} h2 {
 #	Selector specific methods
 #}
-# Next is to get the attention of auto_mkindex
-if 0 {
-proc ::Classy::Selector {} {}
-proc Selector {} {}
-}
+# These will be added to tclIndex by Classy::auto_mkindex
+#auto_index Selector
 
 catch {auto_load Classy::ScrolledText}
 option add *Classy::Selector.highlightThickness 0 widgetDefault
@@ -82,6 +79,13 @@ Classy::Selector addoption -command {command Command {}} {
 #doc {Entry options -label} option {-label label Label} descr {
 #}
 Classy::Selector addoption -label {label Label {}} {
+	Classy::todo $object redraw
+}
+
+#doc {Entry options -labelwidth} option {-labelwidth labelWidth LabelWidth} descr {
+# width of the label
+#}
+Classy::Selector addoption -labelwidth {labelWidth LabelWidth {}} {
 	Classy::todo $object redraw
 }
 
@@ -163,14 +167,14 @@ Classy::Selector method redraw {} {
 	set wide 0
 	switch [lindex $options(-type) 0] {
 		int {
-			Classy::NumEntry $object.value -label $title \
+			Classy::NumEntry $object.value -label $title -labelwidth $options(-labelwidth) \
 				-textvariable $var -command "$object _command" -orient $options(-orient)
 			grid $v.value -row 0 -column 0 -sticky nwe
 			grid columnconfigure $v 0 -weight 1
 			grid rowconfigure $object 0 -weight 1
 		}
 		line {
-			Classy::Entry $object.value -label $title \
+			Classy::Entry $object.value -label $title -labelwidth $options(-labelwidth) \
 				-textvariable $var -command "$object _command" -orient $options(-orient)
 			grid $v.value -row 0 -column 0 -sticky nwe
 			grid columnconfigure $v 0 -weight 1

@@ -11,11 +11,8 @@
 #} shortdescr {
 # select a file to open
 #}
-# Next is to get the attention of auto_mkindex
-if 0 {
-proc ::Classy::selectfile {} {}
-proc selectfile {} {}
-}
+# These will be added to tclIndex by Classy::auto_mkindex
+#auto_index selectfile
 #doc {selectfile selectfile} cmd {
 #selectfile ?option value ...?
 #} descr {

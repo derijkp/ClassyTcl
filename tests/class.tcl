@@ -1048,5 +1048,97 @@ test class {trace class} {
 	set ::try
 } {{Base info class} {Base trace {}}}
 
+test class {namespace of init} {
+	clean
+	Class subclass Try
+	Try classmethod init {} {
+		super init
+		set ::temp [namespace current]
+	}
+	Try .try
+	set ::temp
+} {::class}
+
+test class {info method args} {
+	clean
+	catch {Try destroy}
+	Class subclass Try
+	Try method test {a b c} {}
+	Try .try
+	Try info method args test
+} {a b c}
+
+test class {info method args inherited} {
+	clean
+	catch {Try destroy}
+	Class subclass Try
+	Try method test {a b c} {}
+	Try subclass Test
+	Test info method args test
+} {a b c}
+
+test class {info method body inherited} {
+	clean
+	catch {Try destroy}
+	Class subclass Try
+	Try method test {a b c} {puts ok}
+	Try subclass Test
+	Test info method body test
+} {puts ok}
+
+test class {info method default inherited} {
+	clean
+	catch {Try destroy}
+	Class subclass Try
+	Try method test {a b {c try}} {puts ok}
+	Try subclass Test
+	Test info method default test c v
+	set v
+} try
+
+test class {info method all} {
+	clean
+	catch {Try destroy}
+	Class subclass Try
+	Try method test {a b {c try}} {puts ok}
+	set result ""
+	lappend result [Try info method args test]
+	lappend result [Try info method body test]
+	Try info method default test c v
+	lappend result $v
+} {{a b c} {puts ok} try}
+
+test class {info classmethod all} {
+	clean
+	catch {Try destroy}
+	Class subclass Try
+	Try classmethod test {a b {c try}} {puts ok}
+	set result ""
+	lappend result [Try info classmethod args test]
+	lappend result [Try info classmethod body test]
+	Try info classmethod default test c v
+	lappend result $v
+} {{a b c} {puts ok} try}
+
+test class {info classmethod all inherited} {
+	clean
+	catch {Try destroy}
+	Class subclass Try
+	Try classmethod test {a b {c try}} {puts ok}
+	Try subclass Test
+	set result ""
+	lappend result [Test info classmethod args test]
+	lappend result [Test info classmethod body test]
+	Test info classmethod default test c v
+	lappend result $v
+} {{a b c} {puts ok} try}
+
+test class {info args destroy} {
+	clean
+	catch {Try destroy}
+	Class subclass Try
+	Try info method args destroy
+} {method "destroy" of Try" is defined in C} 1
+
 testsummarize
 

@@ -8,7 +8,8 @@ exec wish8.0 "$0" "$@"
 
 wm withdraw .
 tk appname cbuild
-package require ClassyTcl
+# $Format: "package require -exact ClassyTcl 0.$ProjectMajorVersion$"$
+package require -exact ClassyTcl 0.3
 
 if {"$argv" != ""} {
 	set file [lindex $argv 0]

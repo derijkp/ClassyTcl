@@ -30,11 +30,9 @@
 #doc {CmdWidget command} h2 {
 #	CmdWidget specific methods
 #}
-# Next is to get the attention of auto_mkindex
-if 0 {
-proc ::Classy::CmdWidget {} {}
-proc CmdWidget {} {}
-}
+# These will be added to tclIndex by Classy::auto_mkindex
+#auto_index ::Classy::CmdWidget
+#auto_index CmdWidget
 
 source [file join $::class::dir widgets CmdWidgetbnd.tcl]
 auto_load varsubst

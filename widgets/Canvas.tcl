@@ -23,11 +23,9 @@
 #doc {Canvas command} h2 {
 #	Canvas specific methods
 #}
-# Next is to get the attention of auto_mkindex
-if 0 {
-proc ::Classy::Canvas {} {}
-proc Canvas {} {}
-}
+# These will be added to tclIndex by Classy::auto_mkindex
+#auto_index ::Classy::Canvas
+#auto_index Canvas
 
 # ------------------------------------------------------------------
 #  Widget creation
@@ -69,6 +67,7 @@ Classy::Canvas classmethod init {args} {
 	set data(zoom) 1
 	set data(current) ""
 	set data(group) 0
+	$object width 1
 	# REM Create bindings
 	# --------------------
 	# REM Configure initial arguments
@@ -628,6 +627,7 @@ Classy::Canvas method zoom {{factor {}}} {
 		set widths($width) [expr {$width*$factor}]
 	}
 	foreach {item value} [array get itemw] {
+puts $item
 		$w itemconfigure $item -width $widths($value)
 	}
 	set data(zoom) $factor
@@ -772,6 +772,7 @@ Classy::Canvas method clear {} {
 	catch {unset del}
 	catch {unset data}
 	catch {unset widths}
+	$object width 1
 	catch {unset itemw}
 	foreach name [array names fonts] {
 		font delete $fonts($name)

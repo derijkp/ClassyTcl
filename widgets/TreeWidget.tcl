@@ -21,11 +21,8 @@
 #doc {TreeWidget command} h2 {
 #	TreeWidget specific methods
 #}
-# Next is to get the attention of auto_mkindex
-if 0 {
-proc ::Classy::TreeWidget {} {}
-proc TreeWidget {} {}
-}
+# These will be added to tclIndex by Classy::auto_mkindex
+#auto_index TreeWidget
 
 # ------------------------------------------------------------------
 #  Widget creation

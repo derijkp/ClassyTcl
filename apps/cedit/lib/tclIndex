@@ -11,3 +11,4 @@ set auto_index(savestate) [list source [file join $dir Main.tcl]]
 set auto_index(edit) [list source [file join $dir Main.tcl]]
 set auto_index(main) [list source [file join $dir Main.tcl]]
 
+# Addition of ClassyTcl classes defined in the directory

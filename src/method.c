@@ -922,25 +922,32 @@ int Classy_InfoMethodinfo(
 	}
 	method = (Method *)Tcl_GetHashValue(entry);
 	Tcl_ResetResult(interp);
-	if (method->proc == NULL) {
-		Tcl_AppendResult(interp,"method \"",name,
-			"\" of ",cmd , "\" is defined in C", (char *)NULL);
-		return TCL_ERROR;
-	}
 	if ((optionlen == 4) &&(strncmp(option,"body",4) == 0)) {
-		Tcl_VarEval(interp,"info body ::class::",Tcl_GetStringFromObj(class->class,NULL),",,m,",name,(char *)NULL);
+		if (method->proc == NULL) {
+			Tcl_AppendResult(interp,"method \"",name,"\" of ",cmd , "\" is defined in C", (char *)NULL);
+			return TCL_ERROR;
+		}
+		Tcl_VarEval(interp,"info body ",Tcl_GetStringFromObj(method->proc,NULL),(char *)NULL);
 		return TCL_OK;
 	} else if ((optionlen == 4) &&(strncmp(option,"args",4) == 0)) {
-		Tcl_VarEval(interp,"lrange [info args ::class::",Tcl_GetStringFromObj(class->class,NULL),",,m,",name,"] 2 end",(char *)NULL);
+		if (method->proc == NULL) {
+			Tcl_AppendResult(interp,"method \"",name,"\" of ",cmd , "\" is defined in C", (char *)NULL);
+			return TCL_ERROR;
+		}
+		Tcl_VarEval(interp,"lrange [info args ",Tcl_GetStringFromObj(method->proc,NULL),"] 2 end",(char *)NULL);
 		return TCL_OK;
 	} else if ((optionlen == 7) &&(strncmp(option,"default",7) == 0)) {
+		if (method->proc == NULL) {
+			Tcl_AppendResult(interp,"method \"",name,"\" of ",cmd , "\" is defined in C", (char *)NULL);
+			return TCL_ERROR;
+		}
 		if (argc != 4) {
 			Tcl_AppendResult(interp,"wrong # args: should be \"",
 				cmd,
-				" info method default arg varname\"", (char *)NULL);
+				" info method default name arg varname\"", (char *)NULL);
 			return TCL_ERROR;
 		}
-		Tcl_VarEval(interp,"info default ::class::",Tcl_GetStringFromObj(class->class,NULL),",,m,",name,
+		Tcl_VarEval(interp,"info default ",Tcl_GetStringFromObj(method->proc,NULL),
 			" ",Tcl_GetStringFromObj(argv[2],NULL)," ",Tcl_GetStringFromObj(argv[3],NULL), (char *)NULL);
 		return TCL_OK;
 	} else {
@@ -978,19 +985,19 @@ int Classy_InfoClassMethodinfo(
 		return TCL_ERROR;
 	}
 	if ((optionlen == 4) &&(strncmp(option,"body",4) == 0)) {
-		Tcl_VarEval(interp,"info body ::class::",Tcl_GetStringFromObj(class->class,NULL),",,cm,",name,(char *)NULL);
+		Tcl_VarEval(interp,"info body ",Tcl_GetStringFromObj(method->proc,NULL),(char *)NULL);
 		return TCL_OK;
 	} else if ((optionlen == 4) &&(strncmp(option,"args",4) == 0)) {
-		Tcl_VarEval(interp,"lrange [info args ::class::",Tcl_GetStringFromObj(class->class,NULL),",,cm,",name,"] 1 end",(char *)NULL);
+		Tcl_VarEval(interp,"lrange [info args ",Tcl_GetStringFromObj(method->proc,NULL),"] 1 end",(char *)NULL);
 		return TCL_OK;
 	} else if ((optionlen == 7) &&(strncmp(option,"default",7) == 0)) {
 		if (argc != 4) {
 			Tcl_AppendResult(interp,"wrong # args: should be \"",
 				Tcl_GetStringFromObj(class->class,NULL),
-				" info classmethod default arg varname\"", (char *)NULL);
+				" info classmethod default name arg varname\"", (char *)NULL);
 			return TCL_ERROR;
 		}
-		Tcl_VarEval(interp,"info default ::class::",Tcl_GetStringFromObj(class->class,NULL),",,cm,",name,
+		Tcl_VarEval(interp,"info default ",Tcl_GetStringFromObj(method->proc,NULL),
 			" ",Tcl_GetStringFromObj(argv[2],NULL)," ",Tcl_GetStringFromObj(argv[3],NULL), (char *)NULL);
 		return TCL_OK;
 	} else {

@@ -19,7 +19,7 @@ proc ::Classy::WindowBuilder::attr_Classy::Text_content {object w args} {
 proc ::Classy::WindowBuilder::attr_Classy::Text_xscroll {object w args} {
 	private $object data
 	if {"$args" == ""} {
-		return [lindex [$w cget -xscrollcommand] 0]
+		return [$object outw [lindex [$w cget -xscrollcommand] 0]]
 	} else {
 		set value [lindex $args 0]
 		if {"$value" != ""} {
@@ -40,7 +40,7 @@ proc ::Classy::WindowBuilder::attr_Classy::Text_xscroll {object w args} {
 proc ::Classy::WindowBuilder::attr_Classy::Text_yscroll {object w args} {
 	private $object data
 	if {"$args" == ""} {
-		return [lindex [$w cget -yscrollcommand] 0]
+		return [$object outw [lindex [$w cget -yscrollcommand] 0]]
 	} else {
 		set value [lindex $args 0]
 		if {"$value" != ""} {

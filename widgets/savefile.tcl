@@ -11,11 +11,6 @@
 #} shortdescr {
 # select a file name to save a file to
 #}
-# Next is to get the attention of auto_mkindex
-if 0 {
-proc ::Classy::savefile {} {}
-proc savefile {} {}
-}
 #doc {savefile savefile} cmd {
 #savefile ?option value ...?
 #} descr {
@@ -33,6 +28,8 @@ proc savefile {} {}
 #<dt>-help
 #</dl>
 #}
+# These will be added to tclIndex by Classy::auto_mkindex
+#auto_index savefile
 proc Classy::savefile {args} {
 	global tcl_platform
 	Classy::parseopt $args opt {

@@ -29,11 +29,8 @@
 #doc {Entry command} h2 {
 #	Entry specific methods
 #}
-# Next is to get the attention of auto_mkindex
-if 0 {
-proc ::Classy::Entry {} {}
-proc Entry {} {}
-}
+# These will be added to tclIndex by Classy::auto_mkindex
+#auto_index Entry
 
 option add *Classy::Entry.highlightThickness 0 widgetDefault
 option add *Classy::Entry*Frame.highlightThickness 0 widgetDefault

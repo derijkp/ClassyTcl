@@ -1,17 +1,13 @@
-proc main {args} {
-	mainw
+proc main args {
+mainw .mainw
+focus .mainw
 }
 
-
-proc mainw args {# ClassyTcl generated Toplevel
-	if [regexp {^\.} $args] {
-		set window [lshift args]
-	} else {
-		set window .mainw
-	}
-	Classy::parseopt $args opt {}
+Classy::Toplevel subclass mainw
+mainw classmethod init args {
+	super init
+	set window $object
 	# Create windows
-	Classy::Toplevel $window
 	Classy::DynaTool $window.maintool  \
 		-width 179 \
 		-type MainTool \
@@ -19,7 +15,7 @@ proc mainw args {# ClassyTcl generated Toplevel
 	grid $window.maintool -row 0 -column 0 -sticky new
 	grid columnconfigure $window 0 -weight 1
 	grid rowconfigure $window 1 -weight 1
-
+	if {"$args" == "___Classy::Builder__create"} {return $window}
 	# Parse this
 	$window configure \
 		-destroycommand "exit" \
@@ -27,6 +23,8 @@ proc mainw args {# ClassyTcl generated Toplevel
 	$window.maintool configure \
 		-cmdw [varsubst window {$window}]
 	Classy::DynaMenu attachmainmenu MainMenu $window
+	# Configure initial arguments
+	if {"$args" != ""} {eval $window configure $args}
 	return $window
 }
 

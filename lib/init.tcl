@@ -6,7 +6,12 @@
 # of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 #
 # =============================================================
-package require -exact Tcl 8.0
+package require Tcl 8.0
+# $Format: "set ::class::version 0.$ProjectMajorVersion$"$
+set ::class::version 0.3
+# $Format: "set ::class::patchlevel $ProjectMinorVersion$"$
+set ::class::patchlevel 3
+package provide Class $::class::version
 
 # Solve problems with auto_loading from namespaces
 # in patchlevels 0 and 1 of Tcl8.0
@@ -20,8 +25,10 @@ namespace eval ::class {
 	proc export {items cmds} {
 		eval $cmds
 		eval namespace export $items		
-		namespace eval [namespace parent] \
-			[list foreach item $items {namespace import ::class::$item}]
+		catch {
+			namespace eval [namespace parent] \
+				[list foreach item $items {namespace import ::class::$item}]
+		}
 	}
 }
 
@@ -29,8 +36,10 @@ namespace eval ::Classy {
 	proc export {items cmds} {
 		eval $cmds
 		eval namespace export $items		
-		namespace eval [namespace parent] \
-			[list foreach item $items {namespace import ::Classy::$item}]
+		catch {
+			namespace eval [namespace parent] \
+				[list foreach item $items {namespace import ::Classy::$item}]
+		}
 	}
 }
 

@@ -26,11 +26,8 @@
 #doc {Text command} h2 {
 #	Text specific methods
 #}
-# Next is to get the attention of auto_mkindex
-if 0 {
-proc ::Classy::Text {} {}
-proc Text {} {}
-}
+# These will be added to tclIndex by Classy::auto_mkindex
+#auto_index Text
 
 source [file join $::class::dir widgets Textbnd.tcl]
 update idletasks

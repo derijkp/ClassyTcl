@@ -18,11 +18,8 @@
 #doc {Paned options} h2 {
 #	Paned specific options
 #}
-# Next is to get the attention of auto_mkindex
-if 0 {
-proc ::Classy::Paned {} {}
-proc Paned {} {}
-}
+# These will be added to tclIndex by Classy::auto_mkindex
+#auto_index Paned
 
 option add *Classy::Paned.hcursor sb_h_double_arrow widgetDefault
 option add *Classy::Paned.vcursor sb_v_double_arrow widgetDefault

@@ -43,7 +43,10 @@ proc ::Classy::WindowBuilder::generate_Classy::Dialog {object base} {
 	private $object current data
 	set outw [$object outw $base]
 	set body ""
-	append body "\tClassy::Dialog $outw [$object getoptions $base -menu]\n"
+	set opt [eval $object getoptions $base -menu $data(options)]
+	if [llength $opt] {
+		append data(parse) "\t\$object configure $opt\n"
+	}
 	append body [$object generate [winfo children $base.options]]
 	append body [$object gridconf $base.options]
 	append body "\n"
@@ -140,26 +143,12 @@ proc ::Classy::WindowBuilder::generate_Classy::DialogButton {object base} {
 
 proc ::Classy::WindowBuilder::parse_Classy::Dialog {object base line} {
 	private $object data
-	regsub { default$} $line {} line
-	set pos [string first add $line]
-	incr pos 4
-	set line [string range $line $pos end]
-	set pos [string first " " $line]
-	set b [string range $line 0 [expr {$pos-1}]]
-	incr pos
-	set line [string range $line $pos end]
-	if {"[string index $line 0]" == "\{"} {
-		set pos [string first "\}" $line]
-		incr pos 2
-	} else {
-		set pos [string first " " $line]
-		incr pos
-	}
-	set command [string range $line $pos end]
+	if {"[lindex $line 1]" != "add"} return
+	set b [lindex $line 2]
+	set command [lindex $line 4]
 	switch -regexp -- $command {
 		{^".*"$} - {^\[.*\]$} {
 			set data(opt-command,$base.actions.$b) $command
 		}
 	}
 }
-

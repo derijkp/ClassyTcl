@@ -37,13 +37,11 @@
 # The Widget classmethods are only available to Widget or one
 # of its subclasses, not to its instances.
 #}
-# Next is to get the attention of auto_mkindex
-if 0 {
-proc Widget {} {}
-proc ::Widget {} {}
-}
+# These will be added to tclIndex by Classy::auto_mkindex
+#auto_index Widget
+#auto_index ::Widget
 
-package require Tk
+package require Tk 8.0
 
 # ----------------------------------------------------------------------
 # special commands

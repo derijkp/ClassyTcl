@@ -13,7 +13,7 @@ proc ::Classy::WindowBuilder::add_Classy::Canvas {object base args} {
 proc ::Classy::WindowBuilder::attr_Classy::Canvas_xscroll {object w args} {
 	private $object data
 	if {"$args" == ""} {
-		return [lindex [$w cget -xscrollcommand] 0]
+		return [$object outw [lindex [$w cget -xscrollcommand] 0]]
 	} else {
 		set value [lindex $args 0]
 		if {"$value" != ""} {
@@ -34,7 +34,7 @@ proc ::Classy::WindowBuilder::attr_Classy::Canvas_xscroll {object w args} {
 proc ::Classy::WindowBuilder::attr_Classy::Canvas_yscroll {object w args} {
 	private $object data
 	if {"$args" == ""} {
-		return [lindex [$w cget -yscrollcommand] 0]
+		return [$object outw [lindex [$w cget -yscrollcommand] 0]]
 	} else {
 		set value [lindex $args 0]
 		if {"$value" != ""} {

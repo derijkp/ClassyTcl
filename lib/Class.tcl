@@ -18,9 +18,9 @@
 # will normally not be used by itself to create objects.
 #}
 #}
-if 0 {
-proc Class {} {}
-}
+# These will be added to tclIndex by Classy::auto_mkindex
+#auto_index Class
+
 proc putsvars {args} {
 	foreach var $args {
 		puts [list set $var [uplevel set $var]]
@@ -43,8 +43,8 @@ if {"[info commands ::class::reinit]" != ""} {
 	set noc 0
 	::class::reinit
 } else {
-#	set noc 1
-#	source [file join $class::dir lib Class-tcl.tcl]
+	set noc 1
+	source [file join $class::dir lib Class-tcl.tcl]
 }
 # this is for C and Tcl implementation again
 catch {namespace import ::class::private ::class::privatevar ::class::setprivate ::class::getprivate}

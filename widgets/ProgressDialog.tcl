@@ -24,11 +24,8 @@
 #doc {ProgressDialog command} h2 {
 #	ProgressDialog specific methods
 #}
-# Next is to get the attention of auto_mkindex
-if 0 {
-proc ::Classy::ProgressDialog {} {}
-proc ProgressDialog {} {}
-}
+# These will be added to tclIndex by Classy::auto_mkindex
+#auto_index ProgressDialog
 
 # ------------------------------------------------------------------
 #  Widget creation

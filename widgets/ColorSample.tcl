@@ -22,11 +22,9 @@
 #	ColorSample specific methods
 #} descr {
 #}
-# Next is to get the attention of auto_mkindex
-if 0 {
-proc ::Classy::ColorSample {} {}
-proc ColorSample {} {}
-}
+# These will be added to tclIndex by Classy::auto_mkindex
+#auto_index ::Classy::ColorSample
+#auto_index ColorSample
 
 # ------------------------------------------------------------------
 #  Widget creation

@@ -20,11 +20,8 @@
 #doc {MultiListbox command} h2 {
 #	MultiListbox specific methods
 #}
-# Next is to get the attention of auto_mkindex
-if 0 {
-proc ::Classy::MultiListbox {} {}
-proc MultiListbox {} {}
-}
+# These will be added to tclIndex by Classy::auto_mkindex
+#auto_index MultiListbox
 
 bind Classy::MultiListbox <<Action>> {%W select [%W nearest %y]}
 bind Classy::MultiListbox <<Action-Motion>> {%W select [%W nearest %y]}

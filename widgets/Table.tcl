@@ -33,11 +33,8 @@
 #doc {Table command} h2 {
 #	Table specific methods
 #}
-# Next is to get the attention of auto_mkindex
-if 0 {
-proc ::Classy::Table {} {}
-proc Table {} {}
-}
+# These will be added to tclIndex by Classy::auto_mkindex
+#auto_index Table
 
 option add *GridWidth 1 widgetDefault
 
@@ -46,21 +43,24 @@ proc Classy::Tableobject {w args} {
 }
 
 bind Classy::Table <Configure> {%W _clear ; %W _redraw;break}
-bind Classy::Table <<Action>> {%W stopselect ; %W activate @%x,%y;break}
+bind Classy::Table <<Action>> {%W selection clear ; %W activate @%x,%y;break}
 bind Classy::Table <<Action-Motion>> {%W _selectmotion %W %x %y;break}
+bind Classy::Table <<Action-Leave>> {%W _autoscan;break}
+bind Classy::Table <<Action-Enter>> {%W _cancelrepeat;break}
+bind Classy::Table <<Action-ButtonRelease>> {%W _cancelrepeat;break}
 bind Classy::Table <<Cut>> {%W cut;break}
 bind Classy::Table <<Copy>> {%W copy;break}
 bind Classy::Table <<Paste>> {%W paste;break}
 bind Classy::Table <<PasteSpecial>> {%W pastespecial;break}
-bind Classy::Table <<TableUp>> {%W stopselect ; %W activate;break}
-bind Classy::Table <<TableDown>> {%W stopselect ; %W activate;break}
-bind Classy::Table <<TableLeft>> {%W stopselect ; %W activate;break}
-bind Classy::Table <<TableRight>> {%W stopselect ; %W activate;break}
+bind Classy::Table <<TableUp>> {%W selection clear ; %W activate;break}
+bind Classy::Table <<TableDown>> {%W selection clear ; %W activate;break}
+bind Classy::Table <<TableLeft>> {%W selection clear ; %W activate;break}
+bind Classy::Table <<TableRight>> {%W selection clear ; %W activate;break}
 bind Classy::Table <<SelectTableUp>> {%W movey -1 select;break}
 bind Classy::Table <<SelectTableDown>> {%W movey 1 select;break}
 bind Classy::Table <<SelectTableLeft>> {%W movex -1 select;break}
 bind Classy::Table <<SelectTableRight>> {%W movex 1 select;break}
-bind Classy::Table <<MExtend>> {%W startselect ; 	%W activate @%x,%y ;	break}
+bind Classy::Table <<MExtend>> {%W selection anchor ; 	%W activate @%x,%y ;	break}
 bind Classy::Table <<Return>> {%W activate;break}
 
 bind Classy::Table::single <<TableUp>> {[winfo parent %W] movey -1;break}
@@ -117,7 +117,6 @@ Classy::Table classmethod init {args} {
 	bindtags $object.edit [list $object.edit Classy::Table::single Classy::Text . all]
 	set data(edit) [$canvas create window -1000 -1000 -window $object.edit \
 		-width 1 -height 1 -anchor nw]
-
 	# REM set variables
 	# -----------------
 	set redrawing 0
@@ -150,7 +149,6 @@ Classy::Table classmethod init {args} {
 	set data(style,sel) [list -bg [option get $object selectBackground Foreground] \
 		-fg [option get $object selectForeground Background]]
 	destroy object.temp
-
 	# REM Configure initial arguments
 	# -------------------------------
 	if {"$args" != ""} {eval $object configure $args}
@@ -467,12 +465,12 @@ Classy::Table method set {index value} {
 		$object refreshcell $table_x $table_y
 		if {$error == 1} {error $res}
 	} else {
-		set prev [get ::[set data(var)]($table_y,$table_x) ""]
+		set prev [get ::[set data(var)]($table_x,$table_y) ""]
 		lappend undo(undo) [list $table_x $table_y $prev]
 		if [string length $value] {
-			set ::[set data(var)]($table_y,$table_x) $value
+			set ::[set data(var)]($table_x,$table_y) $value
 		} else {
-			catch {unset ::[set data(var)]($table_y,$table_x)}
+			catch {unset ::[set data(var)]($table_x,$table_y)}
 		}
 		$object refreshcell $table_x $table_y
 	}
@@ -490,7 +488,7 @@ Classy::Table method get {index} {
 			set new ""
 		}
 	} else {
-		set new [get ::[set data(var)]($table_y,$table_x) ""]
+		set new [get ::[set data(var)]($table_x,$table_y) ""]
 	}
 	return $new
 }
@@ -518,11 +516,11 @@ Classy::Table method undo {} {
 		$object refreshcell $table_x $table_y
 		if {$error == 1} {error $res}
 	} else {
-		set prev [get ::[set data(var)]($table_y,$table_x) ""]
+		set prev [get ::[set data(var)]($table_x,$table_y) ""]
 		if [string length $value] {
-			set ::[set data(var)]($table_y,$table_x) $value
+			set ::[set data(var)]($table_x,$table_y) $value
 		} else {
-			catch {unset ::[set data(var)]($table_y,$table_x)}
+			catch {unset ::[set data(var)]($table_x,$table_y)}
 		}
 		$object refreshcell $table_x $table_y
 	}
@@ -552,11 +550,11 @@ Classy::Table method redo {} {
 		$object refreshcell $table_x $table_y
 		if {$error == 1} {error $res}
 	} else {
-		set prev [get ::[set data(var)]($table_y,$table_x) ""]
+		set prev [get ::[set data(var)]($table_x,$table_y) ""]
 		if [string length $value] {
-			set ::[set data(var)]($table_y,$table_x) $value
+			set ::[set data(var)]($table_x,$table_y) $value
 		} else {
-			catch {unset ::[set data(var)]($table_y,$table_x)}
+			catch {unset ::[set data(var)]($table_x,$table_y)}
 		}
 		$object refreshcell $table_x $table_y
 	}
@@ -573,7 +571,7 @@ Classy::Table method refreshcell {table_x table_y} {
 			set new ""
 		}
 	} else {
-		set new [get ::[set data(var)]($table_y,$table_x) ""]
+		set new [get ::[set data(var)]($table_x,$table_y) ""]
 	}
 	set index [list $table_x $table_y]
 	if ![catch {$object _table2canvas $index} x] {
@@ -715,7 +713,7 @@ Classy::Table method movex {step args} {
 		if {"$args" != "select"} {
 			error "wrong syntax: should be \"$object movex step ?select?\""
 		}
-		$object startselect
+		$object selection anchor
 	}
 	set x $data(active)
 	set y [lpop x]
@@ -730,9 +728,15 @@ Classy::Table method movex {step args} {
 	if {$pos > [expr {$data(x,num)-1}]} {
 		set left [expr {$pos - $data(x,num)+1}]
 		$object xview scroll $left
+		if ![info exists data(select)] {
+			$object activate [list $x $y]
+		}
 	} elseif {$pos <= 0} {
 		set left [expr {0 - $pos - 1}]
 		$object xview scroll $left
+		if ![info exists data(select)] {
+			$object activate [list $x $y]
+		}
 	} else {
 		$object activate [list $x $y]
 	}
@@ -744,13 +748,12 @@ Classy::Table method movex {step args} {
 #
 #}
 Classy::Table method movey {step args} {
-putsvars step args
 	private $object options data
 	if [llength $args] {
 		if {"$args" != "select"} {
 			error "wrong syntax: should be \"$object movey step ?select?\""
 		}
-		$object startselect
+		$object selection anchor
 	}
 	set x $data(active)
 	set y [lpop x]
@@ -765,31 +768,18 @@ putsvars step args
 	if {$pos > [expr {$data(y,num)-1}]} {
 		set left [expr {$pos - $data(y,num)+1}]
 		$object yview scroll $left
+		if ![info exists data(select)] {
+			$object activate [list $x $y]
+		}
 	} elseif {$pos <= 0} {
 		set left [expr {0 - $pos - 1}]
 		$object yview scroll $left
+		if ![info exists data(select)] {
+			$object activate [list $x $y]
+		}
 	} else {
 		$object activate [list $x $y]
 	}
-}
-
-Classy::Table method startselect {args} {
-	private $object options data
-	if [info exists data(select)] return
-	if [llength $args] {
-		set index [lindex $args 0]
-		set data(select) [$object index $index]
-	} else {
-		set data(select) $data(active)
-	}
-	$object _edit {}
-	$object activate $data(active)
-}
-
-Classy::Table method stopselect {args} {
-	private $object data
-	catch {unset data(select)}
-	$object activate
 }
 
 #doc {Table command currenty} cmd {
@@ -841,6 +831,7 @@ Classy::Table method see {{index {}}} {
 			}
 			incr pos -1
 		}
+		incr pos
 		set data(y,start) $pos
 		Classy::todo $object _redraw
 	} elseif {$cy <= 0} {
@@ -865,6 +856,7 @@ Classy::Table method see {{index {}}} {
 			}
 			incr pos -1
 		}
+		incr pos
 		set data(x,start) $pos
 		Classy::todo $object _redraw
 	} elseif {$cx <= 0} {
@@ -892,6 +884,9 @@ Classy::Table method xview {args} {
 		moveto {
 			set fraction [lindex $args 1]
 			set pos [expr {int($fraction*$max)}]
+			set newpos [expr {$pos + [lindex $data(active) 0] - $data(x,start)}]
+			if {$newpos >= $options(-cols)} {set newpos [expr {$options(-cols)-1}]}
+			if {$newpos < $min} {set newpos $min}
 		}
 		scroll {
 			set number [lindex $args 1]
@@ -928,18 +923,19 @@ Classy::Table method xview {args} {
 				if {$newpos < $min} {set newpos $min}
 			} else {
 				set pos [expr {$pos + $number}]
+				set newpos [expr {$pos + [lindex $data(active) 0] - $data(x,start)}]
+				if {$newpos >= $options(-cols)} {set newpos [expr {$options(-cols)-1}]}
+				if {$newpos < $min} {set newpos $min}
 			}
 		}
 	}
 	if {$pos >= $max} {set pos [expr {$max-1}]}
 	if {$pos < $min} {set pos $min}
 	set data(x,start) $pos
-	Classy::todo $object _redraw
-	if [info exists y] {
-		if [info exists newpos] {
-			$object activate [list $newpos [lindex $data(active) 1]]
-		}
+	if [info exists newpos] {
+		$object activate [list $newpos [lindex $data(active) 1]]
 	}
+	Classy::todo $object _redraw
 	set end [expr {double($pos-$min+$size)/($max-$min)}]
 	if {$end > 1} {set end 1}
 	return [list [expr {double($pos-$min)/($max-$min)}] $end]
@@ -964,6 +960,9 @@ Classy::Table method yview {args} {
 		moveto {
 			set fraction [lindex $args 1]
 			set pos [expr {int($fraction*$max)}]
+			set newpos [expr {$pos + [lindex $data(active) 1] - $data(y,start)}]
+			if {$newpos >= $options(-rows)} {set newpos [expr {$options(-rows)-1}]}
+			if {$newpos < $min} {set newpos $min}
 		}
 		scroll {
 			set number [lindex $args 1]
@@ -1000,18 +999,24 @@ Classy::Table method yview {args} {
 				if {$newpos < $min} {set newpos $min}
 			} else {
 				set pos [expr {$pos + $number}]
+				set newpos [expr {$pos + [lindex $data(active) 1] - $data(y,start)}]
+				if {$newpos >= $options(-rows)} {set newpos [expr {$options(-rows)-1}]}
+				if {$newpos < $min} {set newpos $min}
 			}
 		}
 	}
 	if {$pos >= $max} {set pos [expr {$max-1}]}
 	if {$pos < $min} {set pos $min}
 	set data(y,start) $pos
-	Classy::todo $object _redraw
-	if [info exists x] {
-		if [info exists newpos] {
-			$object activate [list $x $newpos]
-		}
+	if [info exists newpos] {
+		$object activate [list [lindex $data(active) 0] $newpos]
 	}
+	Classy::todo $object _redraw
+#	if [info exists x] {
+#		if [info exists newpos] {
+#			$object activate [list $x $newpos]
+#		}
+#	}
 	set end [expr {double($pos-$min+$size)/($max-$min)}]
 	if {$end > 1} {set end 1}
 	return [list [expr {double($pos-$min)/($max-$min)}] $end]
@@ -1164,7 +1169,6 @@ Classy::Table method activate {{index {}}} {
 			$object _redrawcell $cell
 		}
 	}
-putsvars active
 	set data(active) $active
 }
 
@@ -1218,7 +1222,7 @@ Classy::Table method _edit {index} {
 				set new ""
 			}
 		} else {
-			set new [get ::[set data(var)]($table_y,$table_x) ""]
+			set new [get ::[set data(var)]($table_x,$table_y) ""]
 		}
 		set data(prevvalue) $new
 		$object.edit insert end $new
@@ -1595,6 +1599,18 @@ Classy::Table method selection {option args} {
 				$object _redrawcell $cell
 			}
 		}
+		anchor {
+			private $object options data
+			if [info exists data(select)] return
+			if [llength $args] {
+				set index [lindex $args 0]
+				set data(select) [$object index $index]
+			} else {
+				set data(select) $data(active)
+			}
+			$object _edit {}
+			$object activate $data(active)
+		}
 		clear {
 			catch {unset data(select)}
 			set len [llength $args]
@@ -1953,14 +1969,12 @@ Classy::Table method _drawvalues {sx sy} {
 	}
 	set ex $data(x,num)
 	set ey $data(y,num)
-	set x 0
-	set table_x $options(-colorigin)
-	set titlecolstodo $options(-titlecols)
-	while {$x < $ex} {
-		if {$titlecolstodo == 0} {
-			set table_x $sx
-		}
-		incr titlecolstodo -1
+	# active
+	set ax [$object _table2canvas $data(active)]
+	set ay [lpop ax]
+	if {($ax >= 0)&&($ax < $ex)} {
+		set x $ax
+		set table_x [lindex $data(active) 0]
 		set y 0
 		set table_y $options(-roworigin)
 		set titlerowstodo $options(-titlerows)
@@ -1977,15 +1991,79 @@ Classy::Table method _drawvalues {sx sy} {
 					set new ""
 				}
 			} else {
-				set new [get [set var]($table_y,$table_x) ""]
+				set new [get [set var]($table_x,$table_y) ""]
 			}
 			$canvas itemconfigure $data(fg,$x,$y) -text $new
 			incr y
 			incr table_y
 		}
-		update
-		if !$redrawing {
-			return
+	}
+	if {($ay >= 0)&&($ay < $ey)} {
+		set y $ay
+		set table_y [lindex $data(active) 1]
+		set x 0
+		set table_x $options(-colorigin)
+		set titlecolstodo $options(-titlecols)
+		while {$x < $ex} {
+			if {$titlecolstodo == 0} {
+				set table_x $sx
+			}
+			incr titlecolstodo -1
+			if {$x != $ax} {
+				if $command {
+					set code [catch {uplevel #0 $options(-command) $object $table_x $table_y} new]
+					if {$code == 1} {
+						set new "ERROR: $new"
+					} elseif {$code != 0} {
+						set new ""
+					}
+				} else {
+					set new [get [set var]($table_x,$table_y) ""]
+				}
+				$canvas itemconfigure $data(fg,$x,$y) -text $new
+			}
+			incr x
+			incr table_x
+		}
+	}
+	# all
+	set x 0
+	set table_x $options(-colorigin)
+	set titlecolstodo $options(-titlecols)
+	while {$x < $ex} {
+		if {$titlecolstodo == 0} {
+			set table_x $sx
+		}
+		incr titlecolstodo -1
+		if {$x != $ax} {
+			set y 0
+			set table_y $options(-roworigin)
+			set titlerowstodo $options(-titlerows)
+			while {$y < $ey} {
+				if {$titlerowstodo == 0} {
+					set table_y $sy
+				}
+				incr titlerowstodo -1
+				if {$y != $ay} {
+					if $command {
+						set code [catch {uplevel #0 $options(-command) $object $table_x $table_y} new]
+						if {$code == 1} {
+							set new "ERROR: $new"
+						} elseif {$code != 0} {
+							set new ""
+						}
+					} else {
+						set new [get [set var]($table_x,$table_y) ""]
+					}
+					$canvas itemconfigure $data(fg,$x,$y) -text $new
+				}
+				incr y
+				incr table_y
+			}
+			update
+			if !$redrawing {
+				return
+			}
 		}
 		incr x
 		incr table_x
@@ -2030,25 +2108,31 @@ Classy::Table method _selectmotion {w x y} {
 			return 1
 		}
 	}
-	$object startselect
-	$object _edit {}
+	$object selection anchor
 	set index [$object index @$x,$y]
+	set cx [$object _table2canvas $index]
+	set cy [lpop cx]
+	if {$cx < $options(-titlecols)} {
+		set index [lreplace $index 0 0 [expr {$data(x,start) - $options(-titlerows) + $cx}]]
+	}
+	if {$cy < $options(-titlerows)} {
+		set index [lreplace $index 1 1 [expr {$data(y,start) - $options(-titlecols) + $cy}]]
+	}
 	$object activate $index
 	$object see $index
+	$object _edit {}
 }
 
-Classy::Table method window {option args} {
-	switch -- $option {
-		configure {
-			array set opt 
-		}
-	}
+Classy::Table method _autoscan {} {
+	private $object data
+	set x [expr {[winfo pointerx $object] - [winfo rootx $object]}]
+	set y [expr {[winfo pointery $object] - [winfo rooty $object]}]
+	$object _selectmotion $object $x $y
+	set data(repeat) [after 50 $object _autoscan]
 }
 
-Classy::Table method _redrawselection {start {end {}}} {
-	private $object options data canvas
-	if ![string length $end] {
-		
-	}
+Classy::Table method _cancelrepeat {} {
+	private $object data
+	catch {after cancel $data(repeat)}
 }
 

@@ -21,11 +21,8 @@
 #doc {HTML command} h2 {
 #	HTML specific methods
 #}
-# Next is to get the attention of auto_mkindex
-if 0 {
-proc ::Classy::HTML {} {}
-proc HTML {} {}
-}
+# These will be added to tclIndex by Classy::auto_mkindex
+#auto_index HTML
 
 source [file join $::class::dir html_library-0.3 html_library.tcl]
 

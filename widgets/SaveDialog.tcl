@@ -20,11 +20,9 @@
 #doc {SaveDialog command} h2 {
 #	SaveDialog specific methods
 #}
-# Next is to get the attention of auto_mkindex
-if 0 {
-proc ::Classy::SaveDialog {} {}
-proc SaveDialog {} {}
-}
+# These will be added to tclIndex by Classy::auto_mkindex
+#auto_index SaveDialog
+#auto_index Classy::SaveDialog
 
 # ------------------------------------------------------------------
 #  Widget creation
@@ -113,7 +111,6 @@ Classy::SaveDialog method get {} {
 Classy::SaveDialog method set {value} {
 	$object.options.entry set $value
 }
-}
 
 #doc {SaveDialog command startdrag} cmd {
 #pathname startdrag 
@@ -127,3 +124,4 @@ Classy::SaveDialog method startdrag {} {
 			mem_indirect [list [concat $object [eval $transfercommand]]]"
 }
 
+}

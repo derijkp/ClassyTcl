@@ -22,11 +22,8 @@
 #doc {NumEntry command} h2 {
 #	NumEntry specific methods
 #}
-# Next is to get the attention of auto_mkindex
-if 0 {
-proc ::Classy::NumEntry {} {}
-proc NumEntry {} {}
-}
+# These will be added to tclIndex by Classy::auto_mkindex
+#auto_index NumEntry
 
 option add *Classy::NumEntry.highlightThickness 0 widgetDefault
 option add *Classy::NumEntry*Frame.highlightThickness 0 widgetDefault

@@ -17,11 +17,8 @@
 # Balloon is not meant to be instanciated; the command can can rather be used
 # directly from the class.
 #}
-# Next is to get the attention of auto_mkindex
-if 0 {
-proc ::Classy::Balloon {} {}
-proc Balloon {} {}
-}
+# These will be added to tclIndex by Classy::auto_mkindex
+#auto_index Balloon
 
 option add *Balloon.font {Helvetica 6 normal} widgetDefault
 option add *Balloon.text.background yellow widgetDefault

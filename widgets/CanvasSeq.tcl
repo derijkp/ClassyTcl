@@ -34,11 +34,9 @@
 #	CanvasSeq specific methods
 #} descr {
 #}
-# Next is to get the attention of auto_mkindex
-if 0 {
-proc ::Classy::CanvasSeq {} {}
-proc CanvasSeq {} {}
-}
+# These will be added to tclIndex by Classy::auto_mkindex
+#auto_index ::Classy::CanvasSeq
+#auto_index CanvasSeq
 
 # ------------------------------------------------------------------
 #  Widget creation

@@ -11,11 +11,8 @@
 #} shortdescr {
 # select yes or no
 #}
-# Next is to get the attention of auto_mkindex
-if 0 {
-proc ::Classy::yorn {} {}
-proc yorn {} {}
-}
+# These will be added to tclIndex by Classy::auto_mkindex
+#auto_index yorn
 #doc {yorn yorn} cmd {
 #yorn message ?option value ...?
 #} descr {

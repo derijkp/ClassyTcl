@@ -17,11 +17,8 @@
 #doc {ScrolledText command} h2 {
 #	ScrolledText specific methods
 #}
-# Next is to get the attention of auto_mkindex
-if 0 {
-proc ::Classy::ScrolledText {} {}
-proc ScrolledText {} {}
-}
+# These will be added to tclIndex by Classy::auto_mkindex
+#auto_index ScrolledText
 
 option add *Classy::ScrolledText.highlightThickness 0 widgetDefault
 catch {auto_load Classy::Text}

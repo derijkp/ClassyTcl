@@ -30,11 +30,8 @@
 # changed to the current cmdw (command widget). The cmdw of a menu can be
 # changed at any time. DynaMenu also handles key shortcuts.
 #}
-# Next is to get the attention of auto_mkindex
-if 0 {
-proc ::Classy::DynaMenu {} {}
-proc DynaMenu {} {}
-}
+# These will be added to tclIndex by Classy::auto_mkindex
+#auto_index DynaMenu
 
 option add *Classy::TopMenu.Button.padY 0 widgetDefault
 option add *Classy::TopMenu.Checkbutton.padY 1 widgetDefault

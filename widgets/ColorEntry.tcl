@@ -16,11 +16,9 @@
 # but has a display to show the color in the entry when the Enter key
 # is pressed.
 #}
-# Next is to get the attention of auto_mkindex
-if 0 {
-proc ::Classy::ColorEntry {} {}
-proc ColorEntry {} {}
-}
+# These will be added to tclIndex by Classy::auto_mkindex
+#auto_index ::Classy::ColorEntry
+#auto_index ColorEntry
 
 option add *Classy::ColorEntry.highlightThickness 0 widgetDefault
 option add *Classy::ColorEntry*Frame.highlightThickness 0 widgetDefault

@@ -14,10 +14,8 @@
 # creates a widget which behaves like a Tk button, but which repeats the 
 # associated command when the user keeps the button pressed.
 #}
-# Next is to get the attention of auto_mkindex
-if 0 {
-proc RepeatButton {} {}
-}
+# These will be added to tclIndex by Classy::auto_mkindex
+#auto_index RepeatButton
 
 bind Classy::RepeatButton <Any-Leave> {catch {unset ::Classy::repeat(%W)}}
 bind Classy::RepeatButton <Any-ButtonRelease> {catch {unset ::Classy::repeat(%W)}}

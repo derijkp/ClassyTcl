@@ -28,11 +28,9 @@
 # Dialogs</a>.
 #</dl>
 #}
-# Next is to get the attention of auto_mkindex
-if 0 {
-proc ::Classy::Default {} {}
-proc Default {} {}
-}
+# These will be added to tclIndex by Classy::auto_mkindex
+#auto_index ::Classy::Default
+#auto_index Default
 
 # ------------------------------------------------------------------
 #  Widget creation
@@ -161,7 +159,7 @@ Classy::Default method load {{type {}} {file {}}} {
 			foreach type [dirglob $dir *] {
 				private $object defaults_$type
 				if [file readable [file join $dir $type]] {
-					array set defaults_$type [readfile [file join $dir $type]]
+					catch {array set defaults_$type [readfile [file join $dir $type]]}
 				}
 			}
 		}

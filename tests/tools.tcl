@@ -5,7 +5,7 @@ if [catch {package require Class}] {
 	package require Class
 }
 catch {tk appname test}
-package require ClassyTcl
+catch {package require ClassyTcl}
 catch {
 wm geometry . +[expr [winfo screenwidth .]/2 - [winfo width .]/2]+[expr [winfo screenheight .]/2 - [winfo height .]/2]
 raise .

@@ -17,11 +17,8 @@
 #doc {ListBox command} h2 {
 #	ListBox specific methods
 #}
-# Next is to get the attention of auto_mkindex
-if 0 {
-proc ::Classy::ListBox {} {}
-proc ListBox {} {}
-}
+# These will be added to tclIndex by Classy::auto_mkindex
+#auto_index ListBox
 
 bind Classy::ListBox <Configure> {Classy::todo %W redraw}
 bind Classy::ListBox <Visibility> {Classy::todo %W redraw}

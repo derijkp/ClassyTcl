@@ -24,11 +24,9 @@
 #	Help specific methods
 #}
 # Next is to get the attention of auto_mkindex
-if 0 {
-proc ::Classy::Help {} {}
-proc Help {} {}
-proc help {} {}
-}
+# These will be added to tclIndex by Classy::auto_mkindex
+#auto_index Help
+#auto_index help
 
 laddnew ::Classy::help_path [file join $class::dir help]
 laddnew ::Classy::help_path [file join $Extral::dir docs]

@@ -24,11 +24,8 @@
 #doc {Progress command} h2 {
 #	Progress specific methods
 #}
-# Next is to get the attention of auto_mkindex
-if 0 {
-proc ::Classy::Progress {} {}
-proc Progress {} {}
-}
+# These will be added to tclIndex by Classy::auto_mkindex
+#auto_index Progress
 
 # ------------------------------------------------------------------
 #  Widget creation

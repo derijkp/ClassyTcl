@@ -98,7 +98,7 @@ set ::Classy::WindowBuilder::options(common) {
 proc ::Classy::WindowBuilder::attredit_line {object v option title {wide 0}} {
 	set var [privatevar $object attredit($v)]
 	set $var [$object attribute get $option]
-	Classy::Selector $v -type line -label $title \
+	Classy::Selector $v -type line -label $title -labelwidth $wide \
 		-command [varsubst {object v option} {
 			$object attribute setf? $option [$v get]
 		}] -variable $var
@@ -107,7 +107,7 @@ proc ::Classy::WindowBuilder::attredit_line {object v option title {wide 0}} {
 proc ::Classy::WindowBuilder::attredit_int {object v option title {wide 0}} {
 	set var [privatevar $object attredit($v)]
 	set $var [$object attribute get $option]
-	Classy::Selector $v -type int -label $title \
+	Classy::Selector $v -type int -label $title -labelwidth $wide \
 		-command [varsubst {object v option} {
 			$object attribute setf? $option [$v get]
 		}] -variable $var
@@ -270,14 +270,14 @@ proc ::Classy::WindowBuilder::defattredit {object w list wide {fill 1}} {
 	eval destroy [winfo children $w]
 	Classy::cleargrid $w
 	set row 0
-	foreach {option title resize } $list {
+	foreach {option title resize} $list {
 		set win $w.w$row
 		$object _createattributeedit $win $option $title $wide
 		grid $win -sticky nwse -row [incr row] -column 0
 		grid rowconfigure $w $row -weight $resize
 	}
 	grid columnconfigure $w 0 -weight 1
-	if $fill {grid rowconfigure $w [incr row] -weight 1}
+	if !$fill {grid rowconfigure $w [incr row] -weight 1}
 	return $row
 }
 

@@ -24,11 +24,9 @@
 #	DefaultMenu specific methods
 #} descr {
 #}
-# Next is to get the attention of auto_mkindex
-if 0 {
-proc ::Classy::DefaultMenu {} {}
-proc DefaultMenu {} {}
-}
+# These will be added to tclIndex by Classy::auto_mkindex
+#auto_index ::Classy::DefaultMenu
+#auto_index DefaultMenu
 
 # ------------------------------------------------------------------
 #  Widget creation

@@ -27,7 +27,14 @@ proc ::Classy::WindowBuilder::generate_Classy::Topframe {object base} {
 	private $object current data
 	set body ""
 	set outw [$object outw $base]
-	append body "\tframe $outw \\\n\t\t-class Classy::Topframe [$object getoptions $base]\n"
+	set opt [eval $object getoptions $base $data(options)]
+	if [llength $opt] {
+		append data(parse) "\t\$object configure $opt\n"
+	}
+	set opt [$object getoptions $base]
+	if [llength $opt] {
+		append body "\t\$object configure $opt\n"
+	}
 	append body [$object generatebindings $base $outw]
 	set children ""
 	foreach child [winfo children $base] {

@@ -17,11 +17,8 @@
 #doc {WindowBuilder command} h2 {
 #	WindowBuilder specific methods
 #}
-# Next is to get the attention of auto_mkindex
-if 0 {
-proc ::Classy::WindowBuilder {} {}
-proc WindowBuilder {} {}
-}
+# These will be added to tclIndex by Classy::auto_mkindex
+#auto_index WindowBuilder
 
 source [file join $::class::dir widgets WindowBuilderTypes.tcl]
 option add *Classy::WindowBuilder_select.background black widgetDefault
@@ -88,16 +85,16 @@ Classy::WindowBuilder classmethod init {args} {
 		$object.book configure -width 100 -height 100
 		$object.book propagate off
 		frame $object.edit
-		$object.book manage Special $object.edit -sticky nwse -command [list $object drawedit]
+		$object.book manage Attributes $object.edit -sticky nwse -command [list $object drawedit]
 		$object _createattributes $object.attr
-		$object.book manage Attributes $object.attr -sticky nwse -command [list $object attribute rebuild]
+		$object.book manage "All Attr." $object.attr -sticky nwse -command [list $object attribute rebuild]
 		$object _createbindings $object.bindings
 		$object.book manage Bindings $object.bindings -sticky nwse -command [list $object bindings rebuild]
 		$object _creategeometry $object.geom
 		$object.book manage Geometry $object.geom -sticky nwse
 		$object _createcode $object.code
 		$object.book manage Code $object.code -sticky nwse
-		$object.book select Special
+		$object.book select Attributes
 		frame $object.fcode
 			Classy::Text $object.fcode.text -wrap none -width 10 -height 10 -state disabled -cursor X_cursor \
 				-xscrollcommand [list $object.fcode.hscroll set] -yscrollcommand [list $object.fcode.vscroll set]
@@ -149,7 +146,6 @@ Classy::WindowBuilder method select {w} {
 	private $object current prev data
 	if {"$w" == ""} return
 	if [info exists data(redir,$w)] {set w $data(redir,$w)}
-	set window $data(base)
 	switch -glob -- $w {
 		{} {
 			set current(w) ""
@@ -162,8 +158,11 @@ Classy::WindowBuilder method select {w} {
 		"Select" {
 			return
 		}
-		{$window*} {
+		{$object*} {
+			set keep $object
+			set object $data(base)
 			eval set w $w
+			set object $keep
 		}
 	}
 	if [info exists data(redir,$w)] {set w $data(redir,$w)}
@@ -184,7 +183,7 @@ Classy::WindowBuilder method select {w} {
 	}
 	$object geometryset rebuild
 	switch [$object.book get] {
-		Attributes {$object attribute rebuild}
+		"All Attr." {$object attribute rebuild}
 		Bindings {$object bindings rebuild}
 	}
 	$object.current nocmdset [$object outw $w]
@@ -219,7 +218,16 @@ Classy::WindowBuilder method insertname {w} {
 	}
 }
 
+Classy::WindowBuilder method _baseexists {} {
+	private $object current
+	if ![info exists current(w)] {return 0}
+	if ![string length $current(w)] {return 0}
+	if ![winfo exists $current(w)] {return 0}
+	return 1
+}
+
 Classy::WindowBuilder method redraw {{always 0}} {
+	if ![$object _baseexists] return
 	$object _drawborders $always
 	$object _drawselectedw
 }
@@ -515,53 +523,49 @@ Classy::WindowBuilder method code {{function {}}} {
 		set function $data(function)
 	}
 	set data(parse) ""
-	if {"$data(type)" == "dialog"} {
-		set body "proc $function args \{# ClassyTcl generated Dialog\n"
-	} elseif {"$data(type)" == "toplevel"} {
-		set body "proc $function args \{# ClassyTcl generated Toplevel\n"
-	} else {
-		set body "proc $function args \{# ClassyTcl generated Frame\n"
-	}
-	append body "\tif \[regexp \{^\\.\} \$args] \{\n"
-	append body "\t\tset window \[lshift args\]\n"
-	append body "\t\} else \{\n"
-	append body "\t\tset window $data(options,window)\n"
-	append body "\t\}\n"
-	set list ""
-	foreach option [lremove $data(options) window] {
-		lappend list $option $data(options,$option,limit) $data(options,$option,def)
-	}
-	append body "\tClassy::parseopt \$args opt [list $list]\n"
+	set body "$function classmethod init args \{\n"
+	append body "\tsuper init\n"
 	append body "\t# Create windows\n"
 	append body [$object generate $base]
-	append body "\t# End windows\n"
+	append body "\t[list if {"$args" == "___Classy::Builder__create"} {return $object}]\n"
 	set init [string trimright [$object.code.book.f2.initialise get]]
-	if {"$init" != ""} {
+	if [string length $init] {
 		append body "# ClassyTcl Initialise\n"
 		append body $init
 		append body "\n"
 	}
-	if {"$data(parse)" != ""} {
+	if [string length $data(parse)] {
 		append body "\t# Parse this\n"
 		append body $data(parse)
 	}
 	set init [string trimright [$object.code.book.f3.finalise get]]
-	if {"$init" != ""} {
+	if [string length $init] {
 		append body "# ClassyTcl Finalise\n"
 		append body $init
 		append body "\n"
 	}
-	append body "\treturn \$window\n"
+	append body "\t# Configure initial arguments\n"
+	append body "\t[list if {"$args" != ""} {eval $object configure $args}]\n"
+	append body "\treturn \$object\n"
 	append body "\}"
+	foreach option $data(options) {
+		append body "\n\n"
+		append body [list $data(function) addoption $option [list $data(options,$option,name) $data(options,$option,class) $data(options,$option,def)] $data(options,$option,code)]
+	}
+	foreach method $data(methods) {
+		append body "\n\n"
+		append body [list $data(function) method $method $data(methods,$method,args) $data(methods,$method,code)]
+	}
 	catch {$object select $keep}
 	return $body
 }
 
 Classy::WindowBuilder method open {file function} {
+putsvars file function
 	global auto_index
 	private $object data current border
 	if [info exists data(base)] {
-		if ![Classy::yorn "Are you sure you want to abort the current editing session"] {
+		if ![Classy::yorn "Are you sure you want to abort editing the current object"] {
 			return 1
 		}
 	}
@@ -571,13 +575,67 @@ Classy::WindowBuilder method open {file function} {
 	catch {unset data}
 	catch {unset border}
 	set data(tags) [list Classy::WindowBuilder [DynaMenu bindtag Classy::WindowBuilder]]
+	set data(options) ""
+	set data(methods) ""
 	set data(opt) 1
 	set data(param) {}
-	set code [Classy::loadfunction $file $function]
+	set c [splitcomplete [readfile $file]]
+	set pos [lsearch -glob $c [list * subclass $function]]
+	set type [lindex [lindex $c $pos] 0]
+	set pos [lsearch -glob $c [list $function classmethod init *]]
+	set code [lindex $c $pos]
+	set poss [lfind -glob $c [list $function addoption *]]
+	foreach line [lsub $c $poss] {
+		set option [lindex $line 2]
+		lappend data(options) $option
+		set temp [lindex $line 3]
+		set data(options,$option,def) [lindex $temp 2]
+		set data(options,$option,name) [lindex $temp 0]
+		set data(options,$option,class) [lindex $temp 1]
+		set data(options,$option,code) [lindex $line 4]
+	}
+	catch {$object.code.book.options.options configure -content $data(options)}
+	set poss [lfind -glob $c [list $function method *]]
+	foreach line [lsub $c $poss] {
+		set method [lindex $line 2]
+		lappend data(methods) $method
+		set data(methods,$method,args) [lindex $line 3]
+		set data(methods,$method,code) [lindex $line 4]
+	}
+	catch {$object.code.book.methods.methods configure -content $data(methods)}
 	set data(function) $function
 	set data(file) $file
 	set data(code) $code
-	$object create $code
+	catch {uplevel #0 $type subclass $function}
+	catch {uplevel #0 $code}
+	switch -- $type {
+		Classy::Topframe {
+			set data(type) frame
+			Classy::Toplevel $object.work -resize {2 2}
+			set window $object.work.frame
+			uplevel #0 $function $window ___Classy::Builder__create
+			grid $window -row 0 -column 0 -sticky nsew
+			grid columnconfigure $object.work 0 -weight 1
+			grid rowconfigure $object.work 0 -weight 1
+			set data(base) $window
+		}
+		Classy::Dialog {
+			set data(type) dialog
+			set window $object.work
+			uplevel #0 $function $window ___Classy::Builder__create
+			set data(base) $object.work
+		}
+		Classy::Toplevel  {
+			set data(type) toplevel
+			set window $object.work
+			uplevel #0 $function $window ___Classy::Builder__create
+			set data(base) $object.work
+		}
+		default {
+			error "unknown type"
+		}
+	}
+	set data(class,$window) $type
 	update idletasks
 	set geom [Classy::Default get geometry $object.work.keep]
 	if {"$geom" != ""} {
@@ -602,109 +660,49 @@ Classy::WindowBuilder method open {file function} {
 	Classy::todo $object select $data(base)
 }
 
-Classy::WindowBuilder method create {code} {
-	private $object data
-	set wincode [lindex $code 3]
-	set start [string first "# Create windows" $wincode]
-	set wincode [string range $wincode $start end]
-	set exec 1
-	switch -regexp -- $code {
-		{# ClassyTcl generated Dialog}  {
-			set data(type) dialog
-			set window $object.work
-			foreach line [splitesccomplete $wincode] {
-				if [string match {# ClassyTcl*} $line] {
-					set exec 0
-				} elseif [string match "\t# Parse*" $line] {
-					set exec 1
-				} else {
-					if $exec {catch {eval $line}}
-				}
-			}
-			set data(base) $object.work
-		}
-		{# ClassyTcl generated Toplevel}  {
-			set data(type) toplevel
-			set window $object.work
-			foreach line [splitesccomplete $wincode] {
-				if [string match {# ClassyTcl*} $line] {
-					set exec 0
-				} elseif [string match "\t# Parse*" $line] {
-					set exec 1
-				} else {
-					if $exec {catch {eval $line}}
-				}
-			}
-			set data(base) $object.work
-		}
-		{# ClassyTcl generated Frame}  {
-			set data(type) frame
-			Classy::Toplevel $object.work -resize {2 2}
-			set window $object.work.frame
-			foreach line [splitesccomplete $wincode] {
-				if [string match {# ClassyTcl*} $line] {
-					set exec 0
-				} elseif [string match "\t# Parse*" $line] {
-					set exec 1
-				} else {
-					if $exec {catch {eval $line}}
-				}
-			}
-			grid $object.work.frame -row 0 -column 0 -sticky nsew
-			grid columnconfigure $object.work 0 -weight 1
-			grid rowconfigure $object.work 0 -weight 1
-			set data(base) $object.work.frame
-		}
-		default {
-			error "unknown type"
-		}
-	}
-}
-
 Classy::WindowBuilder method parsecode {code {window {}}} {
 	private $object data
 	if {"$window" == ""} {
 		set window $data(base)
-		set list [splitcomplete [lindex $code 3]]
-		# window
-		set line [lindex $list 1]
-		set data(options,window) [lindex [lindex $line end] 2]
-		#options
-		set line [lindex $list 2]
-		set data(options) ""
-		foreach {option limit def} [lindex $line 3] {
-			lappend data(options) $option
-			set data(options,$option,limit) $limit
-			set data(options,$option,def) $def
-		}
-		$object.code.book.options.options configure -content $data(options)
-		set epos end
-		# finalise
-		set pos [lsearch -regexp $list {^# ClassyTcl Finalise}]
-		set init ""
-		if {$pos != -1} {
-			set range [lrange $list [expr {$pos+1}] end]
-			lpop range
-			$object.code.book.f3.finalise set [join $range \n]
-			set list [lrange $list 0 [expr {$pos-1}]]
-			set epos [expr {$pos-1}]
-		} else {
-			$object.code.book.f3.finalise set {}
-		}
-		# parse
-		set pos [lsearch -regexp $list "^\t# Parse this"]
-		set parse ""
-		if {$pos != -1} {
-			set parse [lrange $list [expr {$pos+1}] $epos]
-			set epos [expr {$pos-1}]
-		}
+		set list [splitcomplete [lindex $code 4]]
+		set pos [lsearch -regexp $list "^\t# Configure initial arguments"]
+		incr pos -1
+		set list [lrange $list 0 $pos]
 		# initialise
 		set pos [lsearch -regexp $list {^# ClassyTcl Initialise}]
 		set init ""
 		if {$pos != -1} {
-			$object.code.book.f2.initialise set [join [lrange $list [expr {$pos+1}] $epos] \n]
+			set init [lrange $list [expr {$pos+1}] end]
+			foreach sep [list "\t# Parse this" {# ClassyTcl Finalise}] {
+				set pos [lsearch -regexp $init $sep]
+				if {$pos != -1} {incr pos -1 ; break}
+				set pos end
+			}
+			set init [lrange $init 0 $pos]
+			$object.code.book.f2.initialise set [join $init \n]
 		} else {
 			$object.code.book.f2.initialise set {}
+		}
+		# parse
+		set pos [lsearch -regexp $list "^\t# Parse this"]
+		if {$pos != -1} {
+			incr pos
+			set parse [lrange $list $pos end]
+			set pos [lsearch -regexp $parse "^\t?#"]
+			if {$pos != -1} {
+				incr pos -1
+				set parse [lrange $list 0 $pos]
+			}
+		} else {
+			set parse ""
+		}
+		# finalise
+		set pos [lsearch -regexp $list {^# ClassyTcl Finalise}]
+		if {$pos != -1} {
+			set range [lrange $list [expr {$pos+1}] end]
+			$object.code.book.f3.finalise set [join $range \n]
+		} else {
+			$object.code.book.f3.finalise set {}
 		}
 	} else {
 		set parse ""
@@ -714,86 +712,83 @@ Classy::WindowBuilder method parsecode {code {window {}}} {
 	set i 0
 	set len [llength $parse]
 	while {$i<$len} {
-		set line [lindex $parse $i]
-		switch -regexp -- $line {
-			{configure \\$} {
-				eval set w [lindex $line 0]
-				incr i
-				while {$i<$len} {
-					set line [lindex $parse $i]
-					set continue [regsub { \\$} $line {} line]
-					regexp "^\[\t \]*(-\[a-z\]+) (.*)$" $line temp option value
-					switch -regexp -- $value {
-						{^".*"$} - {^\[.*\]$} {
-							set data(opt$option,$w) $value
-						}
-						default {
-							catch {unset data(opt$option,$w)}
-						}
-					}
-					if !$continue break
-					incr i
+		set line [parsecommand [lindex $parse $i]]
+		if {"[lindex $line 0]" == "bind"} {
+			set keep $object
+			set object $window
+			eval set w [lindex $line 1]
+			set object $keep
+			set event [lindex $line 2]
+			set value [lindex $line 3]
+			switch -regexp -- $value {
+				{^".*"$} - {^\[.*\]$} {
+					set data(ev$event,$w) $value
+				}
+				default {
+					catch {unset data(ev$event,$w)}
+					bind $w $event [lindex $value 0]
 				}
 			}
-			{bind } {
-				set line [lindex $parse $i]
-				regexp "bind (\[^ \]+) (\[^ \]+) (.*)$" $line temp w event value
-				eval set w $w
+		} elseif {"[lindex $line 1]" == "configure"} {
+			set keep $object
+			set object $window
+			eval set w [lindex $line 0]
+			foreach {option value} [lrange $line 2 end] {
 				switch -regexp -- $value {
 					{^".*"$} - {^\[.*\]$} {
-						set data(ev$event,$w) $value
+						set data(opt$option,$w) $value
 					}
 					default {
-						catch {unset data(ev$event,$w)}
+						catch {unset data(opt$option,$w)}
 					}
 				}
+				catch {eval $w configure $option $value}
 			}
-			{Classy::DynaMenu attachmainmenu} {
-				set data(opt-mainmenu,$window) [lindex $line 2]
-				if {"[lindex $line 3]" != ""} {
-					if [info exists data(opt-menuwin,$window)] {
-						append data(opt-menuwin,$window) " "
-					}
-					append data(opt-menuwin,$window) [lindex $line 3]
+			set object $keep
+		} elseif {"[lrange $line 0 1]" == "Classy::DynaMenu attachmainmenu"} {
+			set data(opt-mainmenu,$window) [lindex $line 2]
+			if {"[lindex $line 3]" != ""} {
+				if [info exists data(opt-menuwin,$window)] {
+					append data(opt-menuwin,$window) " "
 				}
+				append data(opt-menuwin,$window) [lindex $line 3]
 			}
-			{\$window} {
-				regexp {\$window[^ ]*} $line base
-				eval set base $base
-				set type [$object itemclass $base]
-				if {"[info commands ::Classy::WindowBuilder::parse_$type]" == ""} {
-					auto_load ::Classy::WindowBuilder::parse_$type
-				}
-				if {"[info commands ::Classy::WindowBuilder::parse_$type]" != ""} {
-					::Classy::WindowBuilder::parse_$type $object $base $line
-				}
+			set keep $object
+			set object $window
+			catch {eval [eval concat $line]}
+			set object $keep
+		} elseif [string match {$object*} [lindex $line 0]] {
+			set base [lindex $line 0]
+			set keep $object
+			set object $window
+			eval set base $base
+			catch {eval [eval concat $line]}
+			set object $keep
+			set type [$object itemclass $base]
+			if {"[info commands ::Classy::WindowBuilder::parse_$type]" == ""} {
+				auto_load ::Classy::WindowBuilder::parse_$type
+			}
+			if {"[info commands ::Classy::WindowBuilder::parse_$type]" != ""} {
+				::Classy::WindowBuilder::parse_$type $object $base $line
 			}
 		}
 		incr i
 	}
 }
 
-Classy::WindowBuilder method restore {{base {}}} {
-	private $object current data
-	set data(code) [$object code]
-	if {"$base" == ""} {
-		set base $data(base)
-	}
-	$object select {}
-	$object stopedit $base
-}
-
 Classy::WindowBuilder method test {{param {}}} {
 	private $object current data
 	set data(code) [$object code]
-	set w $data(options,window)
+	set class [lindex $data(code) 0]
+	set w .[string tolower [string index $class 0]][string range $class 1 end]
 	catch {$w configure -destroycommand ""}
 	catch {destroy $w}
 	uplevel #0 $data(code)
 	if {"$data(type)" != "frame"} {
-		set w [eval $data(function) $param]
+		set w [eval $data(function) $w $param]
 		catch {$w configure -destroycommand ""}
 	} else {
+		catch {destroy $object.test}
 		Classy::Toplevel $object.test
 		eval $data(function) $object.test.frame $param
 		pack $object.test.frame -fill both -expand yes
@@ -832,7 +827,10 @@ Classy::WindowBuilder method getoptions {base args} {
 		set cmd $type
 	}
 	$cmd .classy__.classy_temp
-	foreach line [$base configure] defline [.classy__.classy_temp configure] {
+	foreach defline [.classy__.classy_temp configure] {
+		set defl([lindex $defline 0]) [lindex $defline 4]
+	}
+	foreach line [$base configure] {
 		if {[llength $line] != 5} continue
 		set option [lindex $line 0]
 		if {"$option" == "-class"} continue
@@ -840,7 +838,8 @@ Classy::WindowBuilder method getoptions {base args} {
 		if {($data(opt)&&[info exists data(opt$option,$base)])} {
 			append parse " \\\n\t\t$option $data(opt$option,$base)"
 		} else {
-			set def [lindex $defline 4]
+			set def ""
+			catch {set def $defl($option)}
 			set real [lindex $line 4]
 			if {"$def" != "$real"} {
 				if {"[option get $base [lindex $line 1] [lindex $line 2]]" != "$real"} {
@@ -910,11 +909,9 @@ Classy::WindowBuilder method current {args} {
 
 Classy::WindowBuilder method drawedit {} {
 	private $object current
-#update idletasks
 	eval destroy [winfo children $object.edit]
 	Classy::cleargrid $object.edit
-	if ![info exists current(w)] return
-	if {"$current(w)" == ""} return
+	if ![$object _baseexists] return
 	set type [$object itemclass $current(w)]
 	if {"[info commands ::Classy::WindowBuilder::edit_$type]" == ""} {
 		auto_load ::Classy::WindowBuilder::edit_$type
@@ -1018,13 +1015,13 @@ Classy::WindowBuilder method delete {{list {}}} {
 
 Classy::WindowBuilder method outw {base} {
 	private $object data
-	return [replace $base [list $data(base) {$window}]]
+	return [replace $base [list $data(base) {$object}]]
 }
 
 Classy::WindowBuilder method generatebindings {base outw} {
 	private $object data bindtags
 	set body ""
-	foreach event [bind $base] {
+	foreach event [$object bindings events $base] {
 		if [info exists data(ev$event,$base)] {
 			set binding $data(ev$event,$base)
 		} else {
@@ -1095,7 +1092,9 @@ Classy::WindowBuilder method recreate {} {
 	uplevel #0 $data(code)
 	catch {destroy $data(base)}
 	if {"$data(type)" == "frame"} {
+		catch {destroy $object.work}
 		Classy::Toplevel $object.work
+		update
 		set error [catch {$data(function) $data(base)} result]
 		set errorinfo $::errorInfo
 		grid $object.work.frame -row 0 -column 0 -sticky nsew
@@ -1103,6 +1102,7 @@ Classy::WindowBuilder method recreate {} {
 		grid rowconfigure $object.work 0 -weight 1
 		set data(base) $object.work.frame
 	} else {
+		update
 		set error [catch {$data(function) $data(base)} result]
 		set errorinfo $::errorInfo
 	}
@@ -1121,9 +1121,34 @@ Classy::WindowBuilder method save {} {
 		error "error: generated code not complete (contains unmatched braces, parentheses, ...)"
 	}
 	uplevel #0 $code
-	Classy::Builder infile set $file $function $code
-#	catch {auto_mkindex [file dirname $file] *.tcl}
+#	set c [splitcomplete [readfile $file]]
+#	set poss [lfind -glob $c [list $function addoption *]]
+#	set c [lsub $c -exclude $poss]
+#	set poss [lfind -glob $c [list $function method *]]
+#	set c [lsub $c -exclude $poss]
+#	set pos [lsearch -glob $c [list $function classmethod init *]]
+#	set c [lreplace $c $pos $pos $code]
+#	catch {file copy -force $file $file~}
+#	set f [open $file w]
+#	set space 0
+#	foreach line $c {
+#		if ![string length $line] {
+#			if $space continue
+#			set space 1
+#		} else {
+#			set space 0
+#		}
+#		puts $f $line
+#	}
+#	close $f
+#	catch {Classy::auto_mkindex [file dirname $file] *.tcl}
 #	set auto_index($function) [list source $file]
+	switch $data(type) {
+		toplevel {set type Toplevel}
+		frame {set type Topframe}
+		dialog {set type Dialog}
+	}
+	Builder infile set $file $function "Classy::$type subclass $function\n$code"
 	set result $function
 	return $result
 }
@@ -1283,110 +1308,6 @@ Classy::WindowBuilder method switch {p w col row} {
 		$object _place $w $p $col $row
 	}
 }
-
-#Classy::WindowBuilder method gridmovecol {p row from to} {
-#	foreach slave [grid slaves $p] {
-#		set info [grid info $slave]
-#		set slaves([structlget $info -row],[structlget $info -column]) $slave
-#	}
-#	if ![info exists slaves($row,$from)] return
-#	set colsize [grid size $p]
-#	set rowsize [lpop colsize]
-#	set w $slaves($row,$from)
-#	unset slaves($row,$from)
-#	if {$to < 0} {
-#		if {"[array names slaves *,$from]" == ""} return
-#		$object gridinsertcolumn $p 0
-#		grid $w -column 0 -row $row
-#	} elseif ![info exists slaves($row,$to)] {
-#		grid $w -column $to -row $row
-#	} else {
-#		set pos $row
-#		while ([info exists slaves($pos,$to)]) {
-#			grid configure $slaves($pos,$to) -row [expr {$pos+1}]
-#			incr pos
-#		}
-#		grid $w -column $to -row $row
-#	}
-#	if {"[grid slaves $p -column $from]" == ""} {
-#		$object gridremovecolumn $p $from
-#	}
-#}
-#
-#Classy::WindowBuilder method gridmoverow {p col from to} {
-#	foreach slave [grid slaves $p] {
-#		array set info [grid info $slave]
-#		for {set x 0} {$x < $info(-columnspan)} {incr x} {
-#			for {set y 0} {$y < $info(-rowspan)} {incr y} {
-#				set slaves([expr {$info(-row)+$y}],[expr {$info(-column)+$x}]) $slave
-#			}
-#		}
-#	}
-#	if ![info exists slaves($from,$col)] return
-#	set colsize [grid size $p]
-#	set rowsize [lpop colsize]
-#	set w $slaves($from,$col)
-#	set colspan [structlget [grid info $w] -columnspan]
-#	set rowspan [structlget [grid info $w] -rowspan]
-#	for {set x 0} {$x<$colspan} {incr x} {
-#		for {set y 0} {$y<$rowspan} {incr y} {
-#			unset slaves([expr {$from+$y}],[expr {$col+$x}])
-#			if [info exists slaves([expr {$col+$y}],[expr {$col+$x}])] {set free 0}
-#		}
-#	}
-#	if {$to < 0} {
-#		if {"[array names slaves $from,*]" == ""} return
-#		$object gridinsertrow $p 0
-#		grid $w -column $col -row 0
-#	} else {
-#		set free 1
-#		for {set x 0} {$x<$colspan} {incr x} {
-#			for {set y 0} {$y<$rowspan} {incr y} {
-#				if [info exists slaves([expr {$to+$y}],[expr {$col+$x}])] {set free 0}
-#			}
-#		}
-#		if $free {
-#			grid $w -column $col -row $to
-#		} elseif {$from<$to} {
-#			set pos $to
-#			while ([info exists slaves($pos,$col)]) {
-#				if {$pos == $from} break
-#				grid configure $slaves($pos,$col) -row [expr {$pos-1}] -column $col
-#				incr pos -1
-#			}
-#			grid $w -column $col -row $to
-#		} else {
-#			set pos $to
-#			while ([info exists slaves($pos,$col)]) {
-#				if {$pos == $from} break
-#				grid configure $slaves($pos,$col) -row [expr {$pos+1}] -column $col
-#				incr pos
-#			}
-#			grid $w -column $col -row $to
-#		}
-#	}
-#	if {"[grid slaves $p -row $from]" == ""} {
-#		$object gridremoverow $p $from
-#	}
-#}
-
-#Classy::WindowBuilder method gridremove {p col row} {
-#	if [info exists slave($row)] {
-#		set w $slave($row)	
-#		grid forget $w
-#	} else {
-#		set w ""
-#	}
-#	foreach slave [grid slaves $p -column $col] {
-#		set slave([structlget [grid info $slave] -row]) $slave
-#	}
-#	set pos $row
-#	while ([info exists slave($pos)]) {
-#		grid configure $slave($pos) -row [expr {$pos+1}]
-#		incr pos
-#	}
-#	return $w
-#}
 
 Classy::WindowBuilder method gridinsert {p col row} {
 	foreach slave [grid slaves $p -column $col] {
@@ -1671,7 +1592,7 @@ Classy::WindowBuilder method _creategeometry {w} {
 
 Classy::WindowBuilder method attribute {action args} {
 	private $object current data
-	if ![info exists current(w)] return
+	if ![$object _baseexists] return
 	set w $current(w)
 	set option [lindex $args 0]
 	switch -- $action {
@@ -1680,16 +1601,20 @@ Classy::WindowBuilder method attribute {action args} {
 			switch -regexp -- $value {
 				{^".*"$} - {^\[.*\]$} {
 					set data(opt$option,$w) $value
-					set window $data(base)
+					set keep $object
+					set object $data(base)
 					if [catch {eval set value $value} ::Classy::WindowBuilder::error] {
 						set value "dummy"
 					}
+					set object $keep
 				}
-				{\$window} {
-					set value "\[varsubst window [list $value]\]"
+				{\$object} {
+					set value "\[varsubst object [list $value]\]"
 					set data(opt$option,$w) $value
-					set window $data(base)
+					set keep $object
+					set object $data(base)
 					catch {eval set value $value} ::Classy::WindowBuilder::error
+					set object $keep
 				}
 				default {
 					catch {unset data(opt$option,$w)}
@@ -1704,7 +1629,7 @@ Classy::WindowBuilder method attribute {action args} {
 		}
 		get {
 			if [info exists data(opt$option,$w)] {
-				if [regexp "^\\\[varsubst window" $data(opt$option,$w)] {
+				if [regexp "^\\\[varsubst object" $data(opt$option,$w)] {
 					set len [string length $data(opt$option,$w)]
 					return [lindex [string range $data(opt$option,$w) 1 [expr {$len-2}]] 2]
 				} else {
@@ -1841,7 +1766,7 @@ Classy::WindowBuilder method _createattributes {w} {
 
 Classy::WindowBuilder method bindings {action args} {
 	private $object current data
-	if ![info exists current(w)] return
+	if ![$object _baseexists] return
 	set w $current(w)
 	set event [lindex $args 0]
 	switch -- $action {
@@ -1850,14 +1775,18 @@ Classy::WindowBuilder method bindings {action args} {
 			set value [string trimleft [string trimright [lindex $args 1]]]
 			switch -regexp -- $value {
 				{^".*"$} - {^\[.*\]$} {
-					set window $data(base)
+					set keep $object
+					set object $data(base)
 					catch {eval bind $w $event $value} ::Classy::err
+					set object $keep
 					set data(ev$event,$w) $value
 				}
-				{\$window} {
-					set window $data(base)
-					set value "\[varsubst window [list $value]\]"
+				{\$object} {
+					set keep $object
+					set object $data(base)
+					set value "\[varsubst object [list $value]\]"
 					catch {eval bind $w $event $value} ::Classy::err
+					set object $keep
 					set data(ev$event,$w) $value
 				}
 				default {
@@ -1877,7 +1806,7 @@ Classy::WindowBuilder method bindings {action args} {
 		get {
 			if [info exists data(ev$event,$w)] {
 				set value $data(ev$event,$w)
-				if [regexp "^\\\[varsubst window" $value] {
+				if [regexp "^\\\[varsubst object" $value] {
 					set len [string length $value]
 					return [lindex [string range $value 1 [expr {$len-2}]] 2]
 				} else {
@@ -1904,11 +1833,8 @@ Classy::WindowBuilder method bindings {action args} {
 			$v.value set [$object bindings get $event]
 		}
 		rebuild {
-#			if {"$current(w)" != ""} {
-#				$object.bindings.bindtags set [$object outw [getprivate $object bindtags($current(w))]]
-#			}
 			set cevent [$object.bindings.list get active]
-			set list [lsort [bind $w]]
+			set list [lsort [$object bindings events $w]]
 			$object.bindings.list delete 0 end
 			eval $object.bindings.list insert end $list
 			set pos [lsearch $list $cevent]
@@ -1917,6 +1843,18 @@ Classy::WindowBuilder method bindings {action args} {
 			} else {
 				$object bindings select [lindex $list 0]
 			}
+		}
+		events {
+			if [llength $args] {set w [lindex $args 0]}
+			set result ""
+			foreach name [array names data ev*,$w] {
+				regexp ^ev(.+),$w $name temp event
+				lappend result $event
+			}
+			foreach event [bind $w] {
+				lappend result $event
+			}
+			return [lsort [lremdup $result]]
 		}
 		default {
 			grid configure $current(w) $type $value
@@ -1929,11 +1867,6 @@ Classy::WindowBuilder method bindings {action args} {
 Classy::WindowBuilder method _createbindings {w} {
 	private $object current
 	frame $w
-#	Classy::Entry $w.bindtags -label "Bindtags" \
-#		-command "setprivate $object bindtags(\[$object current\])" -width 5
-#	if {"$current(w)" != ""} {
-#		$w.bindtags set [$object outw [getprivate $object bindtags($current(w))]]
-#	}
 	frame $w.b
 	button $w.delete -text "Delete event" -command "$object bindings set \[$w.list get active\]"
 	button $w.donew -text "New event" -command "$object.bindings.new set \[Classy::select Events \[lsort \[concat \[event info\] <<Drop>>\]\]\]"
@@ -1946,7 +1879,6 @@ Classy::WindowBuilder method _createbindings {w} {
 	scrollbar $w.scroll -orient vertical -command [list $w.list yview]
 	Classy::Paned $w.pane -orient horizontal -window $w.list
 	frame $w.edit
-#	grid $w.bindtags -row 0 -column 0 -columnspan 4 -sticky we
 	grid $w.b -row 1 -column 0 -columnspan 2 -sticky nwse
 	grid $w.list -row 2 -column 0 -sticky nwse
 	grid $w.scroll -row 2 -column 1 -sticky ns
@@ -1966,7 +1898,6 @@ Classy::WindowBuilder method _createbindings {w} {
 
 Classy::WindowBuilder method rename {args} {
 	private $object data current
-	set window $data(base)
 	if {[llength  $args]==2} {
 		set old [lindex $args 0]
 		set new [lindex $args 1]
@@ -1976,9 +1907,12 @@ Classy::WindowBuilder method rename {args} {
 	} else {
 		return -code error "wrong # args: should be \"$object rename ?old? new\""
 	}
-	if ![regexp {^\$window\.} $new] {return -code error "new name should be a child of \$window"}
+	if ![regexp {^\$object\.} $new] {return -code error "new name should be a child of \$object"}
+	set keep $object
+	set object $data(base)
 	eval set old $old
 	eval set new $new
+	set object $keep
 	if [winfo exists $new] {return -code error "window $new exists"}
 	set gridinfo [grid info $old]
 	set code [$object copy $old 0]
@@ -1994,7 +1928,7 @@ Classy::WindowBuilder method rename {args} {
 
 Classy::WindowBuilder method copy {{old {}} {clipboard 1}} {
 	private $object data current clipb
-	set window $data(base)
+#	set window $data(base)
 	if {"$old" == ""} {
 		set old $current(w)
 	}
@@ -2007,11 +1941,11 @@ Classy::WindowBuilder method copy {{old {}} {clipboard 1}} {
 		set data(opt) 1
 		set opt ""
 		foreach name [array names data *,$old] {
-			regsub ,$old $name ",\$window" newname
+			regsub ,$old $name ",\$object" newname
 			lappend opt $newname $data($name)
 		}
 		foreach name [array names data *,$old.*] {
-			regsub ,$old $name ",\$window" newname
+			regsub ,$old $name ",\$object" newname
 			lappend opt $newname $data($name)
 		}
 		set result [list $code $opt]
@@ -2036,14 +1970,16 @@ Classy::WindowBuilder method paste {{new {}} {code {}} {grid 1}} {
 	set opt [lindex $code 1]
 	set code [lindex $code 0]
 	set error [catch {
-		proc ::Classy::buildertemp window $code
+		proc ::Classy::buildertemp object $code
 		::Classy::buildertemp $new
 		$object parsecode $code $new
-		set window $new
+		set keep $object
+		set object $new
 		foreach {name value} $opt {
 			eval set name $name
 			set data($name) $value
 		}
+		set object $keep
 	} result]
 	catch {rename ::Classy::buildertemp {}}
 	if $error {
@@ -2060,7 +1996,7 @@ Classy::WindowBuilder method paste {{new {}} {code {}} {grid 1}} {
 
 Classy::WindowBuilder method cut {{old {}}} {
 	private $object data current
-	set window $data(base)
+#	set window $data(base)
 	if {"$old" == ""} {
 		set old $current(w)
 	}
@@ -2085,7 +2021,7 @@ Classy::WindowBuilder method drag {w x y} {
 
 Classy::WindowBuilder method drop {dst} {
 	private $object data current
-	set window $data(base)
+#	set window $data(base)
 	set border ""
 	if [regexp "^$object.work.classy__(c|r)" $dst temp border] {
 		if {"[winfo class $dst]" != "Classy::WindowBuilder_tool"} {
@@ -2109,7 +2045,10 @@ Classy::WindowBuilder method drop {dst} {
 			set dst $data(redir,$dst)
 		}
 		set outsrc [DragDrop get]
+		set keep $object
+		set object $data(base)
 		eval set src $outsrc
+		set object $keep
 		if {"$current(w)" == "$src"} {
 			Classy::todo $object select $src
 		}
@@ -2195,14 +2134,18 @@ Classy::WindowBuilder method _place {w parent col row} {
 	grid $w -column $col -row $row -in $parent -columnspan $colspan -rowspan $rowspan -sticky $sticky
 }
 
-Classy::WindowBuilder method _dialogoption {def limit option} {
+Classy::WindowBuilder method _dialogoption {option} {
 	private $object data
 	if ![regexp ^- $option] {set option "-$option"}
 	if {[lsearch $data(options) $option] != -1} return
 	lappend data(options) $option
-	set data(options,$option,def) $def
-	set data(options,$option,limit) $limit
+	set data(options,$option,def) {}
+	set data(options,$option,name) [string range $option 1 end]
+	set data(options,$option,class) [string toupper [string index $option 1]][string range $option 2 end]
+	set data(options,$option,code) {}
 	$object.code.book.options.options configure -content $data(options)
+	$object.code.book.options.options selection set end
+	$object.code.book.options.options activate end
 }
 
 Classy::WindowBuilder method _dialogoptiondelete {option} {
@@ -2210,18 +2153,64 @@ Classy::WindowBuilder method _dialogoptiondelete {option} {
 	if ![regexp ^- $option] {set option "-$option"}
 	set data(options) [lremove $data(options) $option]
 	catch {unset data(options,$option,def)}
-	catch {unset data(options,$option,limit)}
+	catch {unset data(options,$option,name)}
+	catch {unset data(options,$option,class)}
+	catch {unset data(options,$option,code)}
 	$object.code.book.options.options configure -content $data(options)
 }
 
+Classy::WindowBuilder method _optionbrowse {value} {
+	private $object data
+	set window $object.code
+	$window.book.options.edit.default configure \
+		-textvariable [privatevar $object data(options,$value,def)]
+	$window.book.options.edit.name configure \
+		-textvariable [privatevar $object data(options,$value,name)]
+	$window.book.options.edit.class configure \
+		-textvariable [privatevar $object data(options,$value,class)]
+	$window.book.options.edit.code configure \
+		-variable [privatevar $object data(options,$value,code)]
+}
+
+Classy::WindowBuilder method _dialogmethod {method} {
+	private $object data
+	if {[lsearch $data(methods) $method] != -1} return
+	lappend data(methods) $method
+	set data(methods,$method,args) {}
+	set data(methods,$method,code) {}
+	$object.code.book.methods.methods configure -content $data(methods)
+	$object.code.book.methods.methods selection set end
+	$object.code.book.methods.methods activate end
+}
+
+Classy::WindowBuilder method _dialogmethoddelete {method} {
+	private $object data
+	set data(methods) [lremove $data(methods) $method]
+	catch {unset data(methods,$method,args)}
+	catch {unset data(methods,$method,code)}
+	$object.code.book.methods.methods configure -content $data(methods)
+}
+
+Classy::WindowBuilder method _methodbrowse {value} {
+	private $object data
+	set window $object.code
+	$window.book.methods.edit.args configure \
+		-textvariable [privatevar $object data(methods,$value,args)]
+	$window.book.methods.edit.code configure \
+		-variable [privatevar $object data(methods,$value,code)]
+}
+
 Classy::WindowBuilder method _createcode {window} {
+	private $object data
 	frame $window
 	Classy::NoteBook $window.book 
 	grid $window.book -row 0 -column 0 -sticky nesw
+	# Options
+	# -------
 	frame $window.book.options
 	grid $window.book.options -row 0 -column 0 -in $window.book.book -sticky nesw
 	Classy::Paned $window.book.options.paned1 \
-		-window [varsubst window {$window.book.options.options}]
+		-window $window.book.options.options
 	grid $window.book.options.paned1 -row 1 -column 2 -sticky nesw
 	frame $window.book.options.buttons  \
 		-borderwidth 2 \
@@ -2233,14 +2222,8 @@ Classy::WindowBuilder method _createcode {window} {
 		-command "$object _dialogoptiondelete \[$window.book.options.options get\]" \
 		-text {Delete Option}
 	grid $window.book.options.buttons.delete -row 1 -column 1 -sticky nesw
-	Classy::Entry $window.book.options.buttons.window \
-		-label {Default Window} \
-		-highlightthickness 1 \
-		-textvariable [privatevar $object data(options,window)] \
-		-width 4
-	grid $window.book.options.buttons.window -row 0 -column 0 -columnspan 2 -sticky nesw
 	Classy::Entry $window.book.options.buttons.new \
-		-command [list $object _dialogoption {} {}] \
+		-command [list $object _dialogoption] \
 		-label {New Option} \
 		-highlightthickness 1 \
 		-width 4
@@ -2252,50 +2235,101 @@ Classy::WindowBuilder method _createcode {window} {
 	grid $window.book.options.edit -row 1 -column 3 -sticky nesw
 	Classy::Entry $window.book.options.edit.default \
 		-label {Default value} \
-		-orient vertical \
-		-highlightthickness 1 \
-		-width 4
+		-labelwidth 12
 	grid $window.book.options.edit.default -row 2 -column 3 -sticky nesw
-	Classy::Entry $window.book.options.edit.limit \
-		-label {Possible values} \
+	Classy::Entry $window.book.options.edit.name \
+		-label {Database Name} \
+		-labelwidth 12
+	grid $window.book.options.edit.name -row 3 -column 3 -sticky nesw
+	Classy::Entry $window.book.options.edit.class \
+		-label {Database Class} \
+		-labelwidth 12
+	grid $window.book.options.edit.class -row 4 -column 3 -sticky nesw
+	Classy::Selector $window.book.options.edit.code \
+		-label {Option code} \
 		-orient vertical \
-		-highlightthickness 1 \
+		-type text \
 		-width 4
-	grid $window.book.options.edit.limit -row 3 -column 3 -sticky new
+	grid $window.book.options.edit.code -row 5 -column 3 -sticky news
 	grid columnconfigure $window.book.options.edit 3 -weight 1
-	grid rowconfigure $window.book.options.edit 3 -weight 1
+	grid rowconfigure $window.book.options.edit 5 -weight 1
 	Classy::ListBox $window.book.options.options
 	$window.book.options.options configure \
-		-browsecommand [list invoke {object window value} {
-			$window.book.options.edit.default configure \
-				-textvariable [privatevar $object data(options,$value,def)]
-			$window.book.options.edit.limit configure \
-				-textvariable [privatevar $object data(options,$value,limit)]
-		} $object $window] \
+		-browsecommand [list $object _optionbrowse] \
 		-width 10
 	grid $window.book.options.options -row 1 -column 0 -sticky nesw
 	grid columnconfigure $window.book.options 3 -weight 1
 	grid rowconfigure $window.book.options 1 -weight 1
+	# Methods
+	# -------
+	frame $window.book.methods
+	grid $window.book.methods -row 0 -column 0 -in $window.book.book -sticky nesw
+	Classy::Paned $window.book.methods.paned1 \
+		-window $window.book.methods.methods
+	grid $window.book.methods.paned1 -row 1 -column 2 -sticky nesw
+	frame $window.book.methods.buttons  \
+		-borderwidth 2 \
+		-height 10 \
+		-relief groove \
+		-width 10
+	grid $window.book.methods.buttons -row 0 -column 0 -columnspan 4 -sticky nesw
+	button $window.book.methods.buttons.delete \
+		-command "$object _dialogmethoddelete \[$window.book.methods.methods get\]" \
+		-text {Delete Method}
+	grid $window.book.methods.buttons.delete -row 1 -column 1 -sticky nesw
+	Classy::Entry $window.book.methods.buttons.new \
+		-command [list $object _dialogmethod] \
+		-label {New Method} \
+		-highlightthickness 1 \
+		-width 4
+	grid $window.book.methods.buttons.new -row 1 -column 0 -sticky nesw
+	grid columnconfigure $window.book.methods.buttons 0 -weight 1
+	frame $window.book.methods.edit  \
+		-borderwidth 2 \
+		-relief groove
+	grid $window.book.methods.edit -row 1 -column 3 -sticky nesw
+	Classy::Entry $window.book.methods.edit.args \
+		-label {Arguments}
+	grid $window.book.methods.edit.args -row 2 -column 3 -sticky nesw
+	Classy::Selector $window.book.methods.edit.code \
+		-label {Code} \
+		-orient vertical \
+		-type text \
+		-width 4
+	grid $window.book.methods.edit.code -row 3 -column 3 -sticky news
+	grid columnconfigure $window.book.methods.edit 3 -weight 1
+	grid rowconfigure $window.book.methods.edit 3 -weight 1
+	Classy::ListBox $window.book.methods.methods
+	$window.book.methods.methods configure \
+		-browsecommand [list $object _methodbrowse] \
+		-width 10
+	grid $window.book.methods.methods -row 1 -column 0 -sticky nesw
+	grid columnconfigure $window.book.methods 3 -weight 1
+	grid rowconfigure $window.book.methods 1 -weight 1
+	# Finalise
+	# --------
 	frame $window.book.f3 
-	
 	Classy::Selector $window.book.f3.finalise  \
 		-type text -label Finalise
 	grid $window.book.f3.finalise -row 0 -column 0 -sticky nesw
 	grid columnconfigure $window.book.f3 0 -weight 1
 	grid rowconfigure $window.book.f3 0 -weight 1
 	frame $window.book.f2 
-	
+	# Initialise	
+	# ----------
 	Classy::Selector $window.book.f2.initialise  \
 		-type text -label Initialise
 	grid $window.book.f2.initialise -row 0 -column 0 -sticky nesw
 	grid columnconfigure $window.book.f2 0 -weight 1
 	grid rowconfigure $window.book.f2 0 -weight 1
 	$window.book manage Options $window.book.options
+	$window.book manage Methods $window.book.methods
 	$window.book manage Initialise $window.book.f2
 	$window.book manage Finalise $window.book.f3
 	$window.book select Finalise
 	grid columnconfigure $window 0 -weight 1
 	grid rowconfigure $window 0 -weight 1
+	$window.book select Methods
 }
 
 proc Classy::WindowBuilder_win {w} {

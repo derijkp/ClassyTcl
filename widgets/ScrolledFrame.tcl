@@ -20,11 +20,8 @@
 #doc {ScrolledFrame command} h2 {
 #	ScrolledFrame specific methods
 #}
-# Next is to get the attention of auto_mkindex
-if 0 {
-proc ::Classy::ScrolledFrame {} {}
-proc ScrolledFrame {} {}
-}
+# These will be added to tclIndex by Classy::auto_mkindex
+#auto_index ScrolledFrame
 
 bind Classy::ScrolledFrame <Configure> {Classy::todo %W redraw}
 

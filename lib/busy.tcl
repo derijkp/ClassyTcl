@@ -4,9 +4,9 @@
 #
 # busy command
 # ----------------------------------------------------------------------
-if 0 {
-proc busy {} {}
-}
+# These will be added to tclIndex by Classy::auto_mkindex
+#auto_index busy
+
 proc ::Classy::busy {{action {add}} args} {
 	switch $action {
 		remove {

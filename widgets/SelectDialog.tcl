@@ -27,11 +27,8 @@
 #doc {SelectDialog command} h2 {
 #	SelectDialog specific methods
 #}
-# Next is to get the attention of auto_mkindex
-if 0 {
-proc ::Classy::SelectDialog {} {}
-proc SelectDialog {} {}
-}
+# These will be added to tclIndex by Classy::auto_mkindex
+#auto_index SelectDialog
 
 # ------------------------------------------------------------------
 #  Widget creation

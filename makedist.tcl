@@ -3,18 +3,34 @@
 exec tclsh8.0 "$0" ${1+"$@"}
 #
 
-if {[llength $argv] == 0} {
-	set targetdir [file dir [pwd]]
-} else {
-	set targetdir [lindex $argv 0]
-}
+#if {[llength $argv] == 0} {
+#	set targetdir [file dir [pwd]]
+#} else {
+#	set targetdir [lindex $argv 0]
+#}
 
+if ![file exists [file join lib Class.tcl]] {
+	puts stderr "ERROR: makedist.tcl must be run in the ClassyTcl developement directory"
+	exit 1
+}
 # $Format: "\tset version 0.$ProjectMajorVersion$"$
 	set version 0.3
-# $Format: "\tset minorversion $ProjectMinorVersion$"$
-	set minorversion 2
+# $Format: "\tset patchLevel $ProjectMinorVersion$"$
+	set patchLevel 3
 
-set targetdir [file join $targetdir ClassyTcl-$tcl_platform(os)-$version.$minorversion]
+lappend auto_path [pwd]
+package require -exact Class $currentversion
+
+set targetdir ClassyTcl-$tcl_platform(os)-$currentversion.$patchLevel
+if {[llength $argv] != 1} {
+	puts stderr "ERROR: format is \"makedist.tcl targetdirectory\""
+	puts stderr "Using this command a ClassyTcl package will the be build"
+	puts stderr "in the subdirectory \"$targetdir\" of the targetdirtory"
+	exit 1
+}
+
+
+set targetdir [file join [lindex $argv 0] $targetdir]
 puts "Building binary distribution in $targetdir"
 
 proc clean {filemode dirmode dir} {
@@ -40,9 +56,9 @@ proc clean {filemode dirmode dir} {
 		error "Target build directory $targetdir exists"
 	}
 	file mkdir $targetdir
-	auto_mkindex lib *.tcl
-	auto_mkindex widgets *.tcl
-	auto_mkindex widgets/Builder *.tcl
+	Classy::auto_mkindex lib *.tcl
+	Classy::auto_mkindex widgets *.tcl
+	Classy::auto_mkindex widgets/Builder *.tcl
 	file copy apps bin conf dialogs help html_library-0.3 lib patches template widgets $targetdir
 	file copy README pkgIndex.tcl $targetdir
 	if [catch {file copy classy[info sharedlibextension] $targetdir}] {
@@ -56,14 +72,14 @@ proc clean {filemode dirmode dir} {
 		windows {
 			file mkdir [file join $targetdir visitors]
 			file copy visitors/visexport.dll visitors/visrotate.dll [file join $targetdir visitors]
-			eval file copy -force [glob [file join $targetdir conf opt Windows *.tcl]] \
-				[list [file join $targetdir conf init]]
+			eval file copy -force [glob [file join $targetdir conf themes Windows.conf]] \
+				[list [file join $targetdir conf init.conf]]
 		}
 		default {
 			file mkdir [file join $targetdir visitors]
 			file copy visitors/visrotate.so [file join $targetdir visitors]
-			eval file copy -force [glob [file join $targetdir conf opt Linux *.tcl]] \
-				[list [file join $targetdir conf init]]
+			eval file copy -force [glob [file join $targetdir conf themes Linux.conf]] \
+				[list [file join $targetdir conf init.conf]]
 			foreach file [glob [file join $targetdir bin *]] {
 				file attributes $file -permissions 0755
 			}

@@ -21,11 +21,9 @@
 #doc {Editor command} h2 {
 #	Editor specific methods
 #}
-# Next is to get the attention of auto_mkindex
-if 0 {
-proc ::Classy::Editor {} {}
-proc Editor {} {}
-}
+# These will be added to tclIndex by Classy::auto_mkindex
+#auto_index Editor
+#auto_index edit
 
 option add *Classy:Editor.KeySearchReopen Control-Alt-r widgetDefault
 option add *Classy::Editor.KeyMatchingBrackets "Alt-bracketleft" widgetDefault
@@ -36,7 +34,6 @@ option add *Classy::Editor.KeyDelComment "Control-Alt-numbersign" widgetDefault
 # ------------------------------------------------------------------
 #  Widget creation
 # ------------------------------------------------------------------
-
 Widget subclass Classy::Editor
 Classy::export Editor {}
 
@@ -1164,9 +1161,6 @@ proc Classy::title {w title} {
 	wm iconname $w $title
 }
 
-if 0 {
-proc edit {} {}
-}
 proc Classy::edit {args} {
 #	if {"$args"==""} {set args "Newfile"}
 	set w .classy__.edit
@@ -1184,5 +1178,5 @@ proc Classy::edit {args} {
 	return $w
 }
 
-catch {Classy::export edit {}}
+Classy::export edit {}
 

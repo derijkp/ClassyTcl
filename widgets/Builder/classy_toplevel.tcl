@@ -58,7 +58,10 @@ proc ::Classy::WindowBuilder::generate_Classy::Toplevel {object base} {
 	private $object current data
 	set body ""
 	set outw [$object outw $base]
-	append body "\tClassy::Toplevel $outw [$object getoptions $base -menu]\n"
+	set opt [eval $object getoptions $base -menu -destroycommand $data(options)]
+	if [llength $opt] {
+		append data(parse) "\t\$object configure $opt\n"
+	}
 	append body [$object generatebindings $base $outw]
 	set children ""
 	foreach child [winfo children $base] {

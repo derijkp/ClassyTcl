@@ -17,11 +17,8 @@
 #doc {yornDialog options} h2 {
 #	yornDialog specific options
 #}
-# Next is to get the attention of auto_mkindex
-if 0 {
-proc ::Classy::yornDialog {} {}
-proc yornDialog {} {}
-}
+# These will be added to tclIndex by Classy::auto_mkindex
+#auto_index yornDialog
 
 # ------------------------------------------------------------------
 #  Widget creation

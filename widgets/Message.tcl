@@ -21,11 +21,8 @@
 #doc {Message command} h2 {
 #	Message specific methods
 #}
-# Next is to get the attention of auto_mkindex
-if 0 {
-proc ::Classy::Message {} {}
-proc Message {} {}
-}
+# These will be added to tclIndex by Classy::auto_mkindex
+#auto_index Message
 
 bind Classy::Message <Configure> {
 	%W redraw

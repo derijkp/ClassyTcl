@@ -30,11 +30,8 @@
 # changed to the current cmdw (command widget). The cmdw of a toolbar can be
 # changed at any time.
 #}
-# Next is to get the attention of auto_mkindex
-if 0 {
-proc ::Classy::DynaTool {} {}
-proc DynaTool {} {}
-}
+# These will be added to tclIndex by Classy::auto_mkindex
+#auto_index DynaTool
 
 option add *Classy::DynaTool.Button.padY 0 widgetDefault
 option add *Classy::DynaTool.Checkbutton.padY 1 widgetDefault

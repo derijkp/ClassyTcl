@@ -4,11 +4,7 @@
 
 proc ::Classy::WindowBuilder::add_Classy::Table {object base args} {
 	private $object data
-	Classy::Table $base -rows 5 -cols 4 \
-		-getcommand {invoke {object w x y} {get ::table($x,$y) ""}} \
-		-setcommand {invoke {object w x y v} {set ::table($x,$y) $v}} \
-		-xlabelcommand {invoke {o w col} {return $col}} \
-		-ylabelcommand {invoke {o w row} {return $row}}
+	Classy::Table $base -rows 5 -cols 4
 	eval $base configure $args
 	return $base
 }
@@ -24,8 +20,52 @@ proc ::Classy::WindowBuilder::start_Classy::Table {object base} {
 proc ::Classy::WindowBuilder::edit_Classy::Table {object w} {
 	::Classy::WindowBuilder::defattredit $object $w {
 		-rows Rows 0 -cols Columns 0
-		-getcommand "Get command" 1 -setcommand "Set command" 1
-		-xlabelcommand "xlabelcommand" 1 -ylabelcommand "ylabelcommand" 1
-	} 12 0
+		-titlerows "Title rows" 0 -titlecols "Title cols" 0
+		-variable "Variable" 0
+		-command "Command" 1
+		yscroll "Vert. scrollbar" 0 xscroll "Hor. scrollbar" 0
+	} 11
+}
+
+proc ::Classy::WindowBuilder::attr_Classy::Table_xscroll {object w args} {
+	private $object data
+	if {"$args" == ""} {
+		return [$object outw [lindex [$w cget -xscrollcommand] 0]]
+	} else {
+		set value [lindex $args 0]
+		if {"$value" != ""} {
+			set data(opt-command,$value) "\"[$object outw $w] xview\""
+			set data(opt-xscrollcommand,$w) "\"[$object outw $value] set\""
+			$value configure -command "$w xview"
+			$w configure -xscrollcommand "$value set"
+		} else {
+			set scroll [lindex [$w cget -xscrollcommand] 0]
+			$scroll configure -command ""
+			$w configure -xscrollcommand ""
+			catch {unset data(opt-command,$value)}
+			catch {unset data(opt-xscrollcommand,$w)}
+		}
+	}
+}
+
+proc ::Classy::WindowBuilder::attr_Classy::Table_yscroll {object w args} {
+	private $object data
+	if {"$args" == ""} {
+		return [$object outw [lindex [$w cget -yscrollcommand] 0]]
+	} else {
+		set value [lindex $args 0]
+		if {"$value" != ""} {
+			set data(opt-command,$value) "\"[$object outw $w] yview\""
+			set data(opt-yscrollcommand,$w) "\"[$object outw $value] set\""
+			$value configure -command "$w yview"
+			$w configure -yscrollcommand "$value set"
+		} else {
+			set scroll [lindex [$w cget -yscrollcommand] 0]
+			$scroll configure -command ""
+			$w configure -yscrollcommand ""
+			catch {unset data(opt-command,$value)}
+			catch {unset data(opt-yscrollcommand,$w)}
+		}
+	}
 }
 

@@ -34,11 +34,9 @@
 #doc {Dialog command} h2 {
 #	Dialog specific methods
 #}
-# Next is to get the attention of auto_mkindex
-if 0 {
-proc ::Classy::Dialog {} {}
-proc Dialog {} {}
-}
+# These will be added to tclIndex by Classy::auto_mkindex
+#auto_index ::Classy::Dialog
+#auto_index Dialog
 
 option add *Classy::Dialog.options.relief raised widgetDefault
 option add *Classy::Dialog.options.highlightThickness 0 widgetDefault

@@ -12,11 +12,8 @@
 # select a color
 #getcolor
 #}
-# Next is to get the attention of auto_mkindex
-if 0 {
-proc ::Classy::getcolor {} {}
-proc getcolor {} {}
-}
+# These will be added to tclIndex by Classy::auto_mkindex
+#auto_index getcolor
 
 #doc {getcolor getcolor} cmd {
 #getcolor ?option value ...?

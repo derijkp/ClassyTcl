@@ -21,11 +21,8 @@
 #doc {OptionBox command} h2 {
 #	OptionBox specific methods
 #}
-# Next is to get the attention of auto_mkindex
-if 0 {
-proc ::Classy::OptionBox {} {}
-proc OptionBox {} {}
-}
+# These will be added to tclIndex by Classy::auto_mkindex
+#auto_index OptionBox
 
 option add *Classy::OptionBox.relief raised widgetDefault
 #option add *Classy::OptionBox.label.anchor w widgetDefault

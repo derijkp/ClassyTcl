@@ -18,11 +18,8 @@
 #doc {Browser command} h2 {
 #	Browser specific methods
 #}
-# Next is to get the attention of auto_mkindex
-if 0 {
-proc ::Classy::Browser {} {}
-proc Browser {} {}
-}
+# These will be added to tclIndex by Classy::auto_mkindex
+#auto_index Browser
 
 # ------------------------------------------------------------------
 #  Widget creation

@@ -11,11 +11,6 @@
 #} shortdescr {
 # returns a font selected by the user
 #}
-# Next is to get the attention of auto_mkindex
-if 0 {
-proc ::Classy::getfont {} {}
-proc getfont {} {}
-}
 #doc {getfont getfont} cmd {
 #getfont ?option value ...?
 #} descr {
@@ -25,6 +20,8 @@ proc getfont {} {}
 #<dt>-font
 #</dl>
 #}
+# These will be added to tclIndex by Classy::auto_mkindex
+#auto_index getfont
 proc Classy::getfont {args} {
 	global tcl_platform
 	if {("$tcl_platform(platform)"=="windows")&&("[option get . getFont GetFont]"=="Win")} {

@@ -21,11 +21,8 @@
 #doc {OptionMenu command} h2 {
 #	OptionMenu specific methods
 #}
-# Next is to get the attention of auto_mkindex
-if 0 {
-proc ::Classy::OptionMenu {} {}
-proc OptionMenu {} {}
-}
+# These will be added to tclIndex by Classy::auto_mkindex
+#auto_index OptionMenu
 
 # ------------------------------------------------------------------
 #  Widget creation
