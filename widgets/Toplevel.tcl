@@ -136,8 +136,10 @@ Classy::Toplevel method hide {} {
 #}
 Classy::Toplevel method place {} {
 	private $object options
-	set bx $::Classy::bx
-	set by $::Classy::by
+	set borderx [option get . borderX BorderX]
+	if ![isint $borderx] {set borderx 0}
+	set bordery [option get . borderY BorderY]
+	if ![isint $bordery] {set bordery 0}
 	set resize $options(-resize)
 	update idletasks
 	set keeppos 0
@@ -188,10 +190,10 @@ Classy::Toplevel method place {} {
 		set y [expr {[winfo pointery .]-$h/2}]
 		if {$x>$maxx} {set x $maxx}
 		if {$y>$maxy} {set y $maxy}
-#		if {$x<$bx} {set x $bx}
-		if {$x<0} {set x 0}
-		if {$y<$by} {set y $by}
+#		if {$x<0} {set x 0}
 #		if {$y<0} {set y 0}
+		if {$x<$borderx} {set x $borderx}
+		if {$y<$bordery} {set y $bordery}
 	}
 	wm geometry $object +1000000+1000000
 	if {"$::tcl_platform(platform)" != "windows"} {

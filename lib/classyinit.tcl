@@ -101,19 +101,6 @@ frame .classy__
 entry .classy__.dummy
 button .classy__.dummyb
 
-invoke {} {
-	catch {destroy .classy__.dummyt}
-	toplevel .classy__.dummyt
-	wm positionfrom .classy__.dummyt program
-	wm geometry .classy__.dummyt -10000-10000
-	update idletasks
-	set keep [winfo geometry .classy__.dummyt]
-	destroy .classy__.dummyt
-	foreach {w h x y} [split $keep x+] break
-	set Classy::bx [expr {$x+10000+$w-[winfo vrootwidth .]}]
-	set Classy::by [expr {$y+10000+$h-[winfo vrootheight .]}]
-}
-
 source [file join $::class::dir lib Widget.tcl]
 source [file join [set ::class::dir] lib tools.tcl]
 source [file join [set ::class::dir] lib conf.tcl]

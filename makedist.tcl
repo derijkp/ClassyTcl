@@ -16,7 +16,7 @@ if ![file exists [file join lib Class.tcl]] {
 # $Format: "\tset currentversion 0.$ProjectMajorVersion$"$
 	set currentversion 0.3
 # $Format: "\tset patchLevel $ProjectMinorVersion$"$
-	set patchLevel 20
+	set patchLevel 21
 
 lappend auto_path [pwd]
 package require Extral
@@ -90,13 +90,13 @@ proc clean {filemode dirmode dir} {
 	}
 	if {$len == 2} {
 		set bindir [lindex  $argv 1]
-		catch {exec ln -s $targetdir/bin/cbuild.tcl $bindir/cbuild}
-		catch {exec ln -s $targetdir/bin/convert0.1_to_0.2.tcl $bindir/convert0.1_to_0.2}
-		catch {exec ln -s $targetdir/apps/ccalc/ccalc.tcl $bindir/ccalc}
-		catch {exec ln -s $targetdir/apps/ccenter/ccenter.tcl $bindir/ccenter}
-		catch {exec ln -s $targetdir/apps/cdraw/cdraw.tcl $bindir/cdraw}
-		catch {exec ln -s $targetdir/apps/cedit/cedit.tcl $bindir/cedit}
-		catch {exec ln -s $targetdir/apps/cfiles/cfiles.tcl $bindir/cfiles}
-		catch {exec ln -s $targetdir/apps/ctester/ctester.tcl $bindir/ctester}
+		catch {file delete $bindir/cbuild}
+		exec ln -s $targetdir/bin/cbuild.tcl $bindir/cbuild
+		catch {file delete $bindir/convert0.1_to_0.2}
+		exec ln -s $targetdir/bin/convert0.1_to_0.2.tcl $bindir/convert0.1_to_0.2
+		foreach base {ccalc ccenter cdraw cedit cfiles ctester} {
+			catch {file delete $bindir/$base}
+			exec ln -s $targetdir/apps/$base/$base.tcl $bindir/$base
+		}
 	}
 exit

@@ -11,15 +11,15 @@
 # to -g, change the following line:
 CFLAGS = -g -Wall
 
-TCL_SRC=	/usr/src/bs/BUILD/tcltk-8.0.4/tcl8.0.4
-TK_SRC =	/usr/src/bs/BUILD/tcltk-8.0.4/tk8.0.4
-CC = gcc
+TCL_SRC=	/usr/src/bs/BUILD/tcltk-8.0.5/tcl8.0.5
+TK_SRC =	/usr/src/bs/BUILD/tcltk-8.0.5/tk8.0.5
+CC = gcc -pipe
 DEFS =  -DHAVE_UNISTD_H=1 -DHAVE_LIMITS_H=1 -DSTDC_HEADERS=1 -DHAVE_SYS_TIME_H=1 -DTIME_WITH_SYS_TIME=1 
 
-SHLIB_LD = gcc -shared
+SHLIB_LD = gcc -pipe -shared
 LIBS = -L/usr/X11R6/lib -lX11 -ldl  -lm
 SHLIB_CFLAGS = -fPIC
-SHLIB_LD_LIBS = 
+SHLIB_LD_LIBS = ${LIBS}
 SHLIB_SUFFIX = .so
 LD_FLAGS = -fPIC
 X11_INCLUDES = -I/usr/X11R6/include

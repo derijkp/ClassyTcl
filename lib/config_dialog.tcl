@@ -31,7 +31,6 @@ proc Classy::config_changed {{value {}}} {
 			$w configure -title $title
 		}
 		set config(changed) 0
-		catch {unset configchanged}
 	} else {
 		if ![get config(changed) 0] {
 			set w .classy__.config
@@ -402,9 +401,14 @@ proc Classy::config_level {level} {
 	upvar #0 Classy::config config
 	upvar #0 Classy::configdata configdata
 	upvar #0 Classy::configdefault configdefault
+	upvar #0 Classy::configchanged configchanged
 	if [get config(changed) 0] {
-		if ![Classy::yorn "Settings have changed: Are you sure you want do discard your new settings"] return
+		if ![Classy::yorn "Settings have changed: Are you sure you want do discard your new settings"] {
+			set config(level) $config(keeplevel)
+			return
+		}
 	}
+	set config(keeplevel) $level
 	set w .classy__.config
 	set title "User Configuration for application"
 	set config(level) $level
@@ -441,6 +445,7 @@ proc Classy::config_level {level} {
 	}
 	set config(orig) [array get configdata]
 	Classy::config_changed 0
+	catch {unset configchanged}
 	if [info exists config(last)] {
 		eval Classy::config_item $config(last)
 	}
@@ -502,6 +507,7 @@ proc Classy::config_descredit {} {
 proc Classy::config_dialog {{start {}}} {
 	upvar #0 Classy::config config
 	upvar #0 Classy::configdata configdata
+	upvar #0 Classy::configchanged configchanged
 	catch {destroy .classy__.config}
 	catch {unset config}
 	catch {unset configdata}
@@ -541,7 +547,9 @@ proc Classy::config_dialog {{start {}}} {
 	$w select [lindex $tabs 0]
 	set config(level) appuser
 	Classy::config_changed 0
+	catch {unset configchanged}
 	Classy::config_level appuser
+	set config(keeplevel) appuser
 	if [string length $start] {
 		Classy::config_gotoitem $start
 	}

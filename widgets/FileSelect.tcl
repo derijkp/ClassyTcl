@@ -202,8 +202,13 @@ Classy::FileSelect method refresh {} {
 	}
 	catch {eval lappend list [lsort [glob *]]}
 	# We need to get the directories which do not match the pattern!
+	if [string length $options(-dir)] {
+		set dir $options(-dir)
+	} else {
+		set dir .
+	}
 	foreach file $list {
-		if [file isdir $file] {
+		if [file isdir $dir/$file] {
 			$w.dirs insert end $file
 		} else {
 			if [string match $options(-filter) $file] {
@@ -218,7 +223,6 @@ Classy::FileSelect method refresh {} {
 	set file [file join $options(-dir) [file tail " "]]
 	$w.file nocmdset [string trimright $file]
 }
-
 
 #doc {FileSelect command get} cmd {
 #pathname get 

@@ -1001,4 +1001,24 @@ test Classy::Canvas {-selectstipple from file} {
 	string_equal [.try cget -selectstipple] @[Classy::getconf icons/selectstipple.xbm]
 } 1
 
+test Classy::Canvas {clear canvas} {
+	classyclean
+	Classy::Canvas .try
+	pack .try -fill both -expand yes
+	set id [.try create text 10 10 -text "A"]
+	.try itemconfigure $id -width 10
+	.try itemconfigure $id -width
+} {-width {} {} 0 10}
+
+test Classy::Canvas {select deleted} {
+	classyclean
+	Classy::Canvas .try
+	pack .try -fill both -expand yes
+	set id [.try create text 10 10 -text "A"]
+	set id2 [.try create text 20 20 -text "B"]
+	.try delete $id
+	.try selection add [list $id $id2]
+	.try bbox _sel
+} {16 14 25 26}
+
 testsummarize

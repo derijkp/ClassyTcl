@@ -191,6 +191,8 @@ int,*Button.padX 1
 int,*Button.padY 1
 int,*MenuButton.padX 1
 int,*MenuButton.padY 1
+int,*BorderX 0
+int,*BorderY 0
 anchor,*Checkbutton.anchor w
 text,*PaperSizes {
 			User      "595p 842p"

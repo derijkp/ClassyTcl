@@ -917,9 +917,11 @@ Classy::Canvas method itemconfigure {tagOrId args} {
 				}			
 				set args [lreplace $args $wpos $wpos $widths($width)]
 				foreach item $citems {
-					lappend ws $itemw($item)
-					set itemw($item) $width
-					set temp ""
+					if [info exists itemw($item)] {
+						lappend ws $itemw($item)
+						set itemw($item) $width
+						set temp ""
+					}
 					foreach option $options {
 						catch {lappend temp $option [$w itemcget $item $option]}
 					}
@@ -1540,6 +1542,8 @@ Classy::Canvas method selection {action {list {}}} {
 			foreach tag $list {
 				$w addtag _sel withtag $tag
 			}
+			# would be better, but not for performance
+#			$w dtag _del _sel
 			Classy::todo $object selection redraw
 			catch {$w itemconfigure all -stipple $options(-selectstipple)}
 			catch {$w itemconfigure all -outlinestipple $options(-selectstipple)}
@@ -2123,7 +2127,9 @@ Classy::Canvas method print {{tag all} args} {
 	}
 	set opts [list -papersize [list $width $height] \
 		-command [list $object doprint] -portrait $portrait]
-	set opts [eval {structlist_set $opts} $args]
+	if [llength $args] {
+		set opts [eval {structlist_set $opts} $args]
+	}
 	eval Classy_printdialog .classy__.printdialog $opts
 }
 

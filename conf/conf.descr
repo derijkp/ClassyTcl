@@ -588,6 +588,8 @@ Misc {
 		{Menu button padx} {_int *MenuButton.padX {Default Menu button padx color} 1}
 		{Menu button pady} {_int *MenuButton.padY {Default Menu button pady color} 1}
 		{Checkbutton anchor} {_anchor *Checkbutton.anchor {Default Checkbutton anchor color} w}
+		{Window border x} {_int *BorderX {space to leave from left side for window decoration} 0}
+		{Window border y} {_int *BorderY {space to leave from top for window decoration} 0}
 	}
 	Other {
 		Papersizes {_text *PaperSizes {possible papersizes} {
