@@ -1,0 +1,23 @@
+/* XPM */
+static char * copy[] = {
+"17 16 4 1",
+". c #000000",
+"# c #ffffff",
+"a c None",
+"b c #000080",
+"aaaaaaaaaaaaaaaaa",
+"a......aaaaaaaaaa",
+"a.####..aaaaaaaaa",
+"a.####.#.aaaaaaaa",
+"a.#..#.bbbbbbaaaa",
+"a.#####b####bbaaa",
+"a.#....b####b#baa",
+"a.#####b#..#bbbba",
+"a.#....b#######ba",
+"a.#####b#.....#ba",
+"a......b#######ba",
+"aaaaaaab#.....#ba",
+"aaaaaaab#######ba",
+"aaaaaaabbbbbbbbba",
+"aaaaaaaaaaaaaaaaa",
+"aaaaaaaaaaaaaaaaa"};

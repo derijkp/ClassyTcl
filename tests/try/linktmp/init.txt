@@ -1,0 +1,55 @@
+wm geometry . 100x100+600+100
+extinit extral itk
+lappend auto_path ~/work/peos/classes
+catch {option readfile scheme.resource startup}
+initdefaults
+
+puts stdout test
+proc opt {w} {
+    set list [$w configure]
+    lmanip extract $list {(-[^ ]+)}
+}
+proc debug {text} {
+    puts stdout $text
+}
+
+proc edit {args} {
+    set w .edit
+    set num 1
+    while {[winfo exists $w$num] == 1} {incr num}
+    set w $w$num
+    catch {destroy $w}
+    toplevel $w
+    Editor $w.edit -loadcommand "wm title $w"
+    pack $w.edit -fill both -expand yes
+    $w.edit.menu addaction file Close "destroy $w" A-q
+    $w.edit.menu bindto $w.edit.text
+    eval $w.edit load $args
+    wm geometry $w =20x10
+}
+
+proc pop {ulist} {
+    upvar $ulist list
+    if {[llength $list]==0} {return ""}
+    set end [llength $list]
+    incr end -1
+    set result [lindex $list $end]
+    incr end -1
+    set list [lrange $list 0 $end]
+    return $result
+}
+
+proc loadicons {} {
+    set files [glob icons/*.gif]
+    foreach file $files {
+        regexp {/([^.]+)\.gif$} $file temp name
+        image create photo icon:$name -file $file
+    }
+}
+
+loadicons
+
+
+
+
+

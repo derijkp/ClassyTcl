@@ -1,0 +1,22 @@
+/* XPM */
+static char * floppy[] = {
+"17 16 3 1",
+". c #808000",
+"# c #000000",
+"a c None",
+"aaaaaaaaaaaaaaaaa",
+"aaaaaaaaaaaaaaaaa",
+"aa##############a",
+"aa#.#aaaaaaaa#a#a",
+"aa#.#aaaaaaaa###a",
+"aa#.#aaaaaaaa#.#a",
+"aa#.#aaaaaaaa#.#a",
+"aa#.#aaaaaaaa#.#a",
+"aa#.#aaaaaaaa#.#a",
+"aa#..########..#a",
+"aa#............#a",
+"aa#..#########.#a",
+"aa#..######aa#.#a",
+"aa#..######aa#.#a",
+"aa#..######aa#.#a",
+"aaa#############a"};

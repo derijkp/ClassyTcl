@@ -1,0 +1,8 @@
+#!/home/peter/tcl/wish4/wish -f
+source init.tcl
+wm withdraw .
+eval edit $argv
+
+
+
+
