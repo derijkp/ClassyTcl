@@ -407,6 +407,52 @@ test Classy::Canvas {redo dtag} {
 	.try mitemcget new -tags
 } {}
 
+test Classy::Canvas {undo dchars} {
+	classyclean
+	Classy::Canvas .try
+	pack .try -fill both -expand yes
+	.try create text 50 50 -text "ABCDE" -tags try1
+	.try undo check
+	.try dchars try1 2 3
+	.try undo
+	.try itemcget try1 -text
+} {ABCDE}
+
+test Classy::Canvas {redo dchars} {
+	classyclean
+	Classy::Canvas .try
+	pack .try -fill both -expand yes
+	.try create text 50 50 -text "ABCDE" -tags try1
+	.try undo check
+	.try dchars try1 2 3
+	.try undo
+	.try redo
+	.try itemcget try1 -text
+} {ABE}
+
+test Classy::Canvas {undo insert} {
+	classyclean
+	Classy::Canvas .try
+	pack .try -fill both -expand yes
+	.try create text 50 50 -text "ACDE" -tags try1
+	.try undo check
+	.try insert try1 1 B
+	.try undo
+	.try itemcget try1 -text
+} {ACDE}
+
+test Classy::Canvas {redo insert} {
+	classyclean
+	Classy::Canvas .try
+	pack .try -fill both -expand yes
+	.try create text 50 50 -text "ACDE" -tags try1
+	.try undo check
+	.try insert try1 1 B
+	.try undo
+	.try redo
+	.try itemcget try1 -text
+} {ABCDE}
+
 test Classy::Canvas {delete lower undo} {
 	classyclean
 	Classy::Canvas .try

@@ -9,9 +9,7 @@ Classy::configmenu MainMenu {Main application menu} {
 		action Cmd "Command window" {Classy::cmd}
 		action Builder "Builder" {Classy::Builder .classy__.builder}
 		separator
-		action Configure "Customise application" {Classy::Config dialog}
-		action ConfigureMenu "Customise menu" {Classy::Config config menu MainMenu}
-		action ConfigureTool "Customise toolbar" {Classy::Config config tool MainTool}
+		action Configure "Configure application" {Classy::Config dialog}
 		action Exit "Exit" "exit"
 	}
 	menu edit "Edit" {
@@ -22,6 +20,10 @@ Classy::configmenu MainMenu {Main application menu} {
 		action Redo "Redo" {error "redo not implemented yet"}
 		action ClearUndo "Clear undo buffer" {error "clearundo not implemented yet"}
 	}
+	menu mode "Mode" {
+		action Text "Text" {text_start %W}
+		action Line "Line" {line_start %W}
+	}
 	menu help "Help" {
 		action Help "Application" {Classy::help application}
 		separator
@@ -29,4 +31,6 @@ Classy::configmenu MainMenu {Main application menu} {
 		action HelpHelp "Help" {Classy::help help}
 	}
 
+
 }
+

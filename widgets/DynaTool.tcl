@@ -309,10 +309,10 @@ Classy::DynaTool method cmdw {{cmdw {}}} {
 #doc {DynaTool invoke} cmd {
 #pathname invoke curtool index
 #} descr {
-# invoke the item given by $index in $curtool
+# invoke the item given by $index in the tool
 #}
-Classy::DynaTool method invoke {curtool index} {
-	$curtool invoke $index
+Classy::DynaTool method invoke {index} {
+	$object.b$index invoke
 }
 
 #doc {DynaTool reqwidth} cmd {

@@ -117,15 +117,15 @@ proc Classy::config_tool args {# ClassyTcl generated Frame
 		-text {Application user}
 	grid $window.level -row 1 -column 0 -sticky nesw
 	$window.level set {Application user}
-	Classy::DynaTool $window.dynatool1  \
+	Classy::DynaTool $window.tool  \
+		-width 286 \
 		-type Classy::Config \
-		-height 21 \
-		-width 286
-	grid $window.dynatool1 -row 0 -column 0 -columnspan 3 -sticky nesw
+		-height 37
+	grid $window.tool -row 0 -column 0 -columnspan 3 -sticky nesw
 	grid columnconfigure $window 1 -weight 1
 	grid rowconfigure $window 2 -weight 1
-	# End windows
 
+	# End windows
 # ClassyTcl Initialise
 set name $opt(-name)
 set level $opt(-level)
@@ -147,9 +147,16 @@ $w.editor link $window.value}]
 		-text "$data(help)"
 	$window.value configure \
 		-changedcommand [list set ::[set var](changed) 1]
+	bind $window.value <<Save>> [varsubst window {Classy::Config save [$window.tool cmdw]}]
+	bind $window.value <<Close>> [varsubst window {invoke w {
+set w [$window.tool cmdw]
+global $w
+if [info exists ${w}(close)] {eval [set ${w}(close)]}
+}
+break}]
 	$window.level configure \
 		-command [list Classy::Config changelevel $var $window]
-	$window.dynatool1 configure \
+	$window.tool configure \
 		-cmdw [varsubst window {$window}]
 # ClassyTcl Finalise
 $window.value set $data(c)
@@ -173,16 +180,8 @@ $window.level configure -list $list
 $window.level set $level
 $window.value textchanged 0
 set data(changed) 0
+	return $window
 }
-
-
-
-
-
-
-
-
-
 
 proc Classy::config_menu args {# ClassyTcl generated Frame
 	if [regexp {^\.} $args] {
@@ -217,14 +216,15 @@ proc Classy::config_menu args {# ClassyTcl generated Frame
 		-text {Application user}
 	grid $window.level -row 1 -column 0 -sticky nesw
 	$window.level set {Application user}
-	Classy::DynaTool $window.dynatool1  \
+	Classy::DynaTool $window.tool  \
+		-width 286 \
 		-type Classy::Config \
-		-height 21 \
-		-width 286
-	grid $window.dynatool1 -row 0 -column 0 -columnspan 3 -sticky nesw
+		-height 37
+	grid $window.tool -row 0 -column 0 -columnspan 3 -sticky nesw
 	grid columnconfigure $window 1 -weight 1
 	grid rowconfigure $window 2 -weight 1
 
+	# End windows
 # ClassyTcl Initialise
 set name $opt(-name)
 set level $opt(-level)
@@ -272,9 +272,16 @@ $w.editor link $window.value}]
 		action HelpClassyTcl "ClassyTcl" {Classy::help ClassyTcl}
 		action HelpHelp "Help" {Classy::help help}
 	}}
+	bind $window.value <<Close>> [varsubst window {invoke w {
+set w [$window.tool cmdw]
+global $w
+if [info exists ${w}(close)] {eval [set ${w}(close)]}
+}
+break}]
+	bind $window.value <<Save>> [varsubst window {Classy::Config save [$window.tool cmdw]}]
 	$window.level configure \
 		-command [list Classy::Config changelevel $var $window]
-	$window.dynatool1 configure \
+	$window.tool configure \
 		-cmdw [varsubst window {$window}]
 # ClassyTcl Finalise
 $window.value set $data(c)
@@ -298,11 +305,8 @@ $window.level configure -list $list
 $window.level set $level
 $window.value textchanged 0
 set data(changed) 0
+	return $window
 }
-
-
-
-
 
 proc Classy::config_frame args {# ClassyTcl generated Frame
 	if [regexp {^\.} $args] {

@@ -1167,6 +1167,9 @@ proc Classy::title {w title} {
 	wm iconname $w $title
 }
 
+if 0 {
+proc edit {} {}
+}
 proc Classy::edit {args} {
 #	if {"$args"==""} {set args "Newfile"}
 	set w .classy__.edit

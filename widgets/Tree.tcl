@@ -250,16 +250,22 @@ Classy::Tree method _redraw {} {
 		set ti [$canvas create text \
 				[expr {$options(-startx) + $width/2 + $options(-padtext)}] $options(-starty) \
 				-text $options(-roottext) -anchor w -font $font\
-				-tags [liszt $options(-tag) classy::Tree {}]]
+				-tags [list $options(-tag) classy::Tree {}]]
 		set data() [structlset $data() i $i ti $ti]
 	}
 	$object _drawnode {}
 	$canvas delete $options(-tag)_selection
-	foreach node [lremove $selection {}] {
-		set bbox [$canvas bbox $node]
+	foreach node $selection {
+		if ![info exists data($node)] continue
+		set bbox [$canvas bbox [structlget $data($node) i]]
+		set x1 [lindex $bbox 0]
+		set y1 [lindex $bbox 1]
+		set bbox [$canvas bbox [structlget $data($node) ti]]
+		set x2 [lindex $bbox 2]
+		set y2 [lindex $bbox 3]
 		if {"$bbox" != ""} {
-			eval $canvas create rectangle [$canvas bbox $node] \
-				{-tags [list $options(-tag) $options(-tag)_selection]} \
+			$canvas create rectangle $x1 $y1 $x2 $y2 \
+				-tags [list $options(-tag) $options(-tag)_selection] \
 				-fill [option get $canvas selectBackground SelectBackground] \
 				-outline [option get $canvas selectBackground SelectBackground]
 			}
@@ -501,9 +507,16 @@ Classy::Tree method children {node} {
 # </ul>
 #}
 Classy::Tree method selection {{cmd {}} args} {
-	private $object selection
+	private $object selection data
 	switch $cmd {
-		"" {return $selection}
+		"" {
+			set list ""
+			foreach el $selection {
+				if [info exists data($el)] {lappend list $el}
+			}
+			set selection $list
+			return $selection
+		}
 		add {eval laddnew selection $args}
 		set {set selection $args}
 		remove {set selection [llremove $selection $args]}

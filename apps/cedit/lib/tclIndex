@@ -6,7 +6,7 @@
 # element name is the name of a command and the value is
 # a script that loads the command.
 
-set auto_index(end) [list source [file join $dir main.tcl]]
-set auto_index(savestate) [list source [file join $dir main.tcl]]
-set auto_index(edit) [list source [file join $dir main.tcl]]
-set auto_index(main) [list source [file join $dir main.tcl]]
+set auto_index(end) [list source [file join $dir Main.tcl]]
+set auto_index(savestate) [list source [file join $dir Main.tcl]]
+set auto_index(edit) [list source [file join $dir Main.tcl]]
+set auto_index(main) [list source [file join $dir Main.tcl]]

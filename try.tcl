@@ -1,8 +1,8 @@
-source ccalc
+source cdraw
 set object .classy__.builder
 Classy::Builder .try
-set object .classy__.builder
-set window .classy__.builder.work
+set object .try
+set window .try.work
 
 proc t {} {
 	global data

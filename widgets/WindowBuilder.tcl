@@ -587,7 +587,7 @@ Classy::WindowBuilder method open {file function} {
 Classy::WindowBuilder method create {code} {
 	private $object data
 	set wincode [lindex $code 3]
-	set start [string first "# Create windows" $code]
+	set start [string first "# Create windows" $wincode]
 	set wincode [string range $wincode $start end]
 	set exec 1
 	switch -regexp -- $code {
@@ -1871,17 +1871,13 @@ Classy::WindowBuilder method bindings {action args} {
 			$object.bindings.list selection set active
 			eval destroy [winfo children $v]
 			Classy::cleargrid $v
-			label $v.label -text $event
-			grid $v.label -row 0 -column 0 -sticky we
-			button $v.change -text "Change binding" -command [varsubst {object v event} {
-				$object bindings setf? $event [string trimright [$v.value get 1.0 end]]
+			Classy::Selector $v.value -type text -label "binding to $event" -command [varsubst {object v event} {
+				$object bindings setf? $event [string trimright [$v.value get]]
 			}]
-			Classy::Text $v.value
-			grid $v.change -row 2 -column 0 -sticky we
-			grid $v.value -row 3 -column 0 -sticky nswe
+			grid $v.value -row 0 -column 0 -sticky nswe
 			grid columnconfigure $v 0 -weight 1
-			grid rowconfigure $v 3 -weight 1
-			$v.value insert end [$object bindings get $event]
+			grid rowconfigure $v 0 -weight 1
+			$v.value set [$object bindings get $event]
 		}
 		rebuild {
 #			if {"$current(w)" != ""} {

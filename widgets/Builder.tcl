@@ -396,13 +396,14 @@ Classy::Builder method infile {cmd file args} {
 				set num 1
 				while {[lsearch $funcs $func#$num] != -1} {incr num}
 				set code [lreplace $code 1 1 $func#$num]
+				set func $func#$num
 			}
 			set f [open $file a]
 			puts $f $code
 			close $f
 			if [string match "proc *" $code] {
 				catch {auto_mkindex [file dirname $file] *.tcl}
-				set ::auto_index($func#$num) [list source $file]
+				set ::auto_index($func) [list source $file]
 			}
 			switch $browse(type) {
 				color - font - misc - key - mouse - menu - tool {
@@ -437,17 +438,15 @@ Classy::Builder method delete {} {
 		dir - color - font - misc - key - mouse - menu - tool {
 			set function $browse(name)
 			$object infile delete $file $function
-			$object.browse selection set {}
+			$object.browse selection set [list $browse(file) {} file]
 			$object.browse deletenode $browse(base)
 			return $function
 		}
 		default {
 			set function $browse(name)
 			$object infile delete $file $function
-#			catch {auto_mkindex [file dirname $file] *.tcl}
-#			catch {unset auto_index($function)}
-			$object.browse selection set {}
 			$object.browse deletenode $browse(base)
+			$object.browse selection set [list $browse(file) {} file]
 			return $function
 		}
 	}
@@ -509,18 +508,22 @@ Classy::Builder method paste {{file {}}} {
 	if [file isdir $file] {
 		if {"$browse(clipbf)" == ""} {
 			set base [file join $file clipboard]
+			set ext .tcl
 		} else {
+			set ext [file extension $browse(clipbf)]
 			set tail [file tail $browse(clipbf)]
 			set base [file join $file [file root $tail]]
 		}
-		if [file exists $base.tcl] {
+		if [file exists $base$ext] {
 			set num 1
-			while {[file exists $base#$num.tcl]} {incr num}
+			while {[file exists $base#$num$ext]} {incr num}
 			set base $base#$num
 		}
-		writefile $base.tcl $browse(clipb)
-		$object closenode $browse(base)
-		$object opennode $browse(base)
+		set file $base$ext
+		writefile $file $browse(clipb)
+		$object.browse addnode $browse(base) [list $file {} file] -text [file tail $file] -image [Classy::geticon newfile]
+#		$object closenode $browse(base)
+#		$object opennode $browse(base)
 	} elseif {"$browse(clipbf)" != ""} {
 		error "Can only paste file in directory"
 	} else {
@@ -540,12 +543,18 @@ Classy::Builder method openendnode {base} {
 }
 
 Classy::Builder method selectnode {base} {
-	private $object browse
-	if {"$base" == ""} return
-	set browse(base) $base
-	set browse(file) [lindex $base 0]
-	set browse(name) [lindex $base 1]
-	set browse(type) [lindex $base 2]
+	private $object browse defdir
+	if {"$base" == ""} {
+		set browse(base) $base
+		set browse(file) $defdir
+		set browse(name) {}
+		set browse(type) dir
+	} else {
+		set browse(base) $base
+		set browse(file) [lindex $base 0]
+		set browse(name) [lindex $base 1]
+		set browse(type) [lindex $base 2]
+	}
 	$object.browse selection set $base
 }
 
@@ -656,6 +665,7 @@ Classy::Builder method opennode {args} {
 Classy::Builder method _drawtree {} {
 	private $object options browse defdir
 	$object.browse clearnode {}
+	$object.browse configure -roottext [file tail $defdir]
 	catch {auto_mkindex $defdir *.tcl}
 	catch {source [file join $defdir tclIndex]}
 	$object opennode {} [list $defdir {} dir]
@@ -711,10 +721,11 @@ Classy::Builder method rename {args} {
 	set dst [lindex $args 1]
 	switch [lindex $src 2] {
 		file {
+			set dst [file join [file dir $src] $dst]
 			file rename [lindex $src 0] $dst
 			set parent [$object.browse parentnode $src]
 			$object.browse deletenode $src
-			$object.browse addnode $parent [lreplace $src 0 $dst] -text [file tail $dst] -image [Classy::geticon newfile]
+			$object.browse addnode $parent [lreplace $src 0 0 $dst] -text [file tail $dst] -image [Classy::geticon newfile]
 		}
 		dir {
 		}

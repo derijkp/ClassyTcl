@@ -78,6 +78,9 @@ Classy::Canvas classmethod init {args} {
 
 Classy::Canvas chainoptions {$object}
 
+#doc {Entry options -undosteps} option {-undosteps undoSteps UndoSteps} descr {
+# gives the number of possible undo steps. Default is 40.
+#}
 Classy::Canvas	addoption -undosteps {undoSteps UndoSteps 40} {
 	private $object undo
 	set undo(redo) ""
@@ -89,6 +92,33 @@ Classy::Canvas	addoption -undosteps {undoSteps UndoSteps 40} {
 			incr undo(num) -1
 		}
 	}
+}
+
+#doc {Entry options -papersize} option {-papersize papeSize PaperSize} descr {
+# determines the papersize
+#}
+Classy::Canvas	addoption -papersize {papeSize PaperSize none} {
+	private $object w
+	if {[llength $value]==1} {
+		if {"$value" == "none"} {
+			$w coords _page -10000 -10000 0 0
+			$object configure -scrollregion {}
+			return
+		} else {
+			set orient p
+			set p $value
+			regexp {^(.+)(-l)$} $value temp p orient
+			set c [structlget [option get $object paperSizes PaperSizes] $p]
+			if {"$orient" == "-l"} {
+				set temp [list [lindex $c 1] [lindex $c 0]]
+				set c $temp
+			}
+		}
+	} else {
+		set c $value
+	}
+	$w configure -scrollregion "0 0 $c"
+	eval $w coords _page 0 0 $c
 }
 
 # ------------------------------------------------------------------
@@ -180,6 +210,16 @@ Classy::Canvas method undo {{action {}} args} {
 								lappend tags $tag
 								$w itemconfigure $item -tags $tags
 							}
+						}
+					}
+					dchars {
+						foreach {item pos text} [lindex $current 0] {
+							$w insert $item $pos $text
+						}
+					}
+					insert {
+						foreach {item pos len} [lindex $current 0] {
+							$w dchars $item $pos [expr {$pos+$len-1}]
 						}
 					}
 					itemconfigure {
@@ -298,6 +338,7 @@ Classy::Canvas method undo {{action {}} args} {
 		}
 		0 -
 		off {
+			$object undo clear
 			set data(undo) 0
 		}
 		1 -
@@ -327,7 +368,7 @@ Classy::Canvas method redo {} {
 	set len [llength $undo(redo)]
 	if {$undo(pos) == $len} {
 		unset undo(pos)
-		return -code error "No more undo steps"
+		return -code error "No more redo steps"
 	}
 	while 1 {
 		set current [lindex $undo(redo) $undo(pos)]
@@ -357,6 +398,16 @@ Classy::Canvas method redo {} {
 			dtag {
 				set data(undo) 0
 				eval $object dtag $current
+				set data(undo) 1
+			}
+			dchars {
+				set data(undo) 0
+				eval $object dchars $current
+				set data(undo) 1
+			}
+			insert {
+				set data(undo) 0
+				eval $object insert $current
 				set data(undo) 1
 			}
 			itemconfigure {
@@ -618,12 +669,20 @@ Classy::Canvas method clear {} {
 }
 
 Classy::Canvas method itemconfigure {tagOrId args} {
-	private $object w data
+	private $object w data del
 	set len [llength $args]
 	if {$len == 0} {
-		return [$w itemconfigure $tagOrId]
+		if [info exists del($tagOrId)] {
+			return {}
+		} else {
+			return [$w itemconfigure $tagOrId]
+		}
 	} elseif {$len == 1} {
-		return [$w itemconfigure $tagOrId $args]
+		if [info exists del($tagOrId)] {
+			return {}
+		} else {
+			return [$w itemconfigure $tagOrId $args]
+		}
 	} else {
 		set fpos [lsearch $args -font]
 		set wpos [lsearch $args -width]
@@ -1028,6 +1087,52 @@ Classy::Canvas method dtag {tagOrId {tagToDelete {}}} {
 		}
 	} else {
 		$w dtag $tagOrId $tagToDelete
+	}
+}
+
+Classy::Canvas method dchars {tagOrId first {last {}}} {
+	private $object w data
+	if {"$last" == ""} {
+		set last $first
+	}
+	if $data(undo) {
+		set citems [Classy::tag2items $object $w $tagOrId]
+		set list ""
+		foreach citem $citems {
+			set text [$w itemcget $citem -text]
+			set first [$w index $citem $first]
+			set last [$w index $citem $last]
+			set text [string range $text $first $last]
+			if {"$text" != ""} {
+				lappend list $citem $first $text
+				$w dchars $citem $first $last
+			}
+		}
+		if {"$list" != ""} {
+			$object addundo [list dchars $tagOrId $first $last] [list dchars $list]
+		}
+	} else {
+		$w dchars $tagOrId $first $last
+	}
+}
+
+Classy::Canvas method insert {tagOrId beforeThis string} {
+	private $object w data
+	if $data(undo) {
+		set citems [Classy::tag2items $object $w $tagOrId]
+		set list ""
+		set len [string length $string]
+		foreach citem $citems {
+			set pos [$w index $citem $beforeThis]
+			if {"$pos"==""} continue
+			lappend list $citem $pos $len
+			$w insert $citem $pos $string
+		}
+		if {"$list" != ""} {
+			$object addundo [list insert $tagOrId $beforeThis $string] [list insert $list]
+		}
+	} else {
+		$w insert $tagOrId $beforeThis $string
 	}
 }
 

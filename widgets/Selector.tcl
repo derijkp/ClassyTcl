@@ -189,6 +189,8 @@ Classy::Selector method redraw {} {
 				$w.editor.edit link $object.value
 			}]
 			Classy::ScrolledText $object.value -wrap none -width 5 -height 2
+			bind $object.value <<Save>> "$object.change invoke"
+			bind $object.value <<Empty>> "$object.value set {}"
 			grid $object.change -row 2 -column 0 -sticky we
 			grid $object.edit -row 2 -column 1 -sticky we
 			grid $object.value -row 3 -column 0 -sticky nswe -columnspan 2

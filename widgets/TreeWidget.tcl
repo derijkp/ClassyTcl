@@ -147,7 +147,11 @@ Classy::TreeWidget method _handlebars {} {
 Classy::TreeWidget method _action {x y} {
 	private $object options
 	set node [$object.tree node $x $y]
-	if {"$node" == ""} return
+	if {"$node" == ""} {
+		if {"$options(-endnodecommand)" == ""} return
+		uplevel #0 $options(-endnodecommand) [list $node]
+		return
+	}
 	switch [$object.tree type $node] {
 		end {
 			if {"$options(-endnodecommand)" == ""} return
