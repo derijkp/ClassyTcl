@@ -1,6 +1,6 @@
 #!/bin/sh
 # the next line restarts using wish \
-exec tclsh8.0 "$0" "$@"
+exec tclsh "$0" "$@"
 
 source tools.tcl
 
@@ -98,6 +98,15 @@ test class {Base destroy -> destroy method executed ?} {
 	set ::temp
 } {1}
 
+test class {destroy method error} {
+	clean
+	set ::temp 0
+	Base method destroy {} {error "test error" ; set ::temp 1}
+	Base new try
+	try destroy
+	set ::temp
+} {"test error" in destroy method of object "try" for class "Base"} 1
+
 test class {object destroy in method} {
 	clean
 	Base method try {} {
@@ -115,7 +124,8 @@ test class {object destroy in destroy} {
 		$object destroy
 	}
 	Test new try
-	try destroy
+	# this will give an error, but should destroy the object anyway
+	catch {try destroy}
 	info command try
 } {}
 
@@ -164,7 +174,7 @@ test class {object command} {
 	clean
 	Base new try
 	try
-} {no value given for parameter "cmd" to "try"} 1
+} {wrong # args: should be "try cmd args"} 1
 
 test class {object command} {
 	clean
@@ -203,32 +213,32 @@ test class {subclass cmd} {
 	clean
 	Base subclass Subclass
 	Subclass
-} {no value given for parameter "cmd" to "Subclass"} 1
+} {wrong # args: should be "Subclass cmd args"} 1
 
 test class {subclass methods} {
 	clean
 	Base subclass Subclass
 	Subclass info methods
-} {destroy info private trace}
+} {changeclass destroy info private trace}
 
 test class {try method} {
 	clean
 	Base method addclass {} {}
 	Base info methods
-} {addclass destroy info private trace}
+} {addclass changeclass destroy info private trace}
 
 test class {do not show _method} {
 	clean
 	Base method _test {} {}
 	Base info methods
-} {destroy info private trace}
+} {changeclass destroy info private trace}
 
 test class {do not show _method for instance} {
 	clean
 	Base method _test {} {}
 	Base new try
 	try try
-} {bad option "try": must be destroy, info, private, trace} 1
+} {bad option "try": must be changeclass, destroy, info, private, trace} 1
 
 test class {subclass destroy: test command} {
 	clean
@@ -280,7 +290,7 @@ test class {add method} {
 	clean
 	Base method nop {} {}
 	Base info methods
-} {destroy info nop private trace}
+} {changeclass destroy info nop private trace}
 
 test class {add method: works?} {
 	clean
@@ -308,7 +318,7 @@ test class {subclass inherits new methods} {
 	Base method nop {} {}
 	Base subclass Subclass
 	Subclass info methods
-} {destroy info nop private trace}
+} {changeclass destroy info nop private trace}
 
 test class {inherit method: works?} {
 	clean
@@ -619,7 +629,7 @@ test class {delete method: works?} {
 	Base method try {} {return ok}
 	Base deletemethod try
 	Base info methods
-} {destroy info private trace}
+} {changeclass destroy info private trace}
 
 test class {delete method: propagate works?} {
 	clean
@@ -627,7 +637,7 @@ test class {delete method: propagate works?} {
 	Base subclass Test
 	Base deletemethod try
 	Test info methods
-} {destroy info private trace}
+} {changeclass destroy info private trace}
 
 test class {delete classmethod: propagate works?} {
 	clean
@@ -762,7 +772,7 @@ test class {classmethod, method} {
 		return ok
 	}
 	Base info methods
-} {destroy info private trace}
+} {changeclass destroy info private trace}
 
 test class {classdestroy different from destroy: class} {
 	clean
@@ -903,7 +913,7 @@ test class {class in namespace: methods} {
 	::try::Test method set {arg} {setprivate $object try $arg}
 	::try::Test method get {} {getprivate $object try}
 	::try::Test info methods
-} {destroy get info private set trace}
+} {changeclass destroy get info private set trace}
 
 test class {class and instance in namespace: variables} {
 	clean
@@ -1288,6 +1298,58 @@ test class {classmethod definition error -> old still exists?} {
 	catch {Try classmethod test {try {}} {}}
 	Try test 1
 } {1}
+
+test class {bugfix: super in methods} {
+	clean
+	Class subclass Test
+	Test subclass STest
+	Class method amethod {} {
+	 return Class
+	}
+	Test method amethod {} {
+		return [list Test [super amethod]]
+	}
+	STest new stest 
+	stest amethod
+} {Test Class}
+
+test class {bugfix: super in classmethods} {
+	clean
+	Class subclass Test
+	Test subclass STest
+	Class classmethod amethod {} {
+	 return Class
+	}
+	Test classmethod amethod {} {
+		return [list Test [super amethod]]
+	}
+	STest amethod
+} {Test Class}
+
+test class {check two auto named objects} {
+	clean
+	Class subclass Test
+	set result [Test new]
+	lappend result [Test new #auto]
+	lappend result [Test new]
+	set result
+} {Class::o1 Class::o2 Class::o3}
+
+test class {changeclass} {
+	clean
+	Class subclass Test
+	Test subclass STest
+	Test method amethod {} {
+		return Test
+	}
+	STest method amethod {} {
+		return STest
+	}
+	set object [Test new]
+	set result [$object amethod]
+	$object changeclass STest
+	lappend result [$object amethod]
+} {Test STest}
 
 #test class {info args init} {
 #	clean

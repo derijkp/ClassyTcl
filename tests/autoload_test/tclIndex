@@ -11,3 +11,4 @@
 set auto_index(Test) [list source [file join $dir main.tcl]]
 set auto_index(::Class::Test,,m,getdata) [list source [file join $dir method.tcl]]
 set auto_index(::Class::Test,,cm,setdef) [list source [file join $dir method.tcl]]
+set auto_index(SubTest) [list source [file join $dir sub.tcl]]

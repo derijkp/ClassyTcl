@@ -22,6 +22,15 @@
  * defined below.
  */
 
+/* This EXTERN declaration is needed for Tcl < 8.0.3 */
+#ifndef EXTERN
+# ifdef __cplusplus
+#  define EXTERN extern "C"
+# else
+#  define EXTERN extern
+# endif
+#endif
+
 typedef struct Classy_HashEntry {
     struct Classy_HashEntry *nextPtr;	/* Pointer to next entry in this
 					 * hash bucket, or NULL for end of
@@ -103,18 +112,18 @@ typedef struct Classy_HashSearch {
 	(*((tablePtr)->findProc))(tablePtr, key)
 #define Classy_CreateHashEntry(tablePtr, key, newPtr) \
 	(*((tablePtr)->createProc))(tablePtr, key, newPtr)
-EXTERN void		Classy_DeleteHashEntry _ANSI_ARGS_((
+extern void		Classy_DeleteHashEntry _ANSI_ARGS_((
 			    Classy_HashEntry *entryPtr));
-EXTERN void		Classy_DeleteHashTable _ANSI_ARGS_((
+extern void		Classy_DeleteHashTable _ANSI_ARGS_((
 			    Classy_HashTable *tablePtr));
-EXTERN Classy_HashEntry *	Classy_FirstHashEntry _ANSI_ARGS_((
+extern Classy_HashEntry *	Classy_FirstHashEntry _ANSI_ARGS_((
 			    Classy_HashTable *tablePtr,
 			    Classy_HashSearch *searchPtr));
-EXTERN char *		Classy_HashStats _ANSI_ARGS_((Classy_HashTable *tablePtr));
-EXTERN void		Classy_InitHashTable _ANSI_ARGS_((Classy_HashTable *tablePtr));
-EXTERN Classy_HashEntry *	Classy_NextHashEntry _ANSI_ARGS_((
+extern char *		Classy_HashStats _ANSI_ARGS_((Classy_HashTable *tablePtr));
+extern void		Classy_InitHashTable _ANSI_ARGS_((Classy_HashTable *tablePtr));
+extern Classy_HashEntry *	Classy_NextHashEntry _ANSI_ARGS_((
 			    Classy_HashSearch *searchPtr));
-EXTERN Classy_HashEntry *Classy_Find_String_HashEntry _ANSI_ARGS_((
+extern Classy_HashEntry *Classy_Find_String_HashEntry _ANSI_ARGS_((
 			Classy_HashTable *tablePtr,
 			char *key,
 			int keylen));

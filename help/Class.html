@@ -87,6 +87,12 @@
 </h2>
  The methods defined by Class can be invoked from all objects
 <dl><b><dt>
+ pathName changeclass <u>newclass</u> ?...?
+</b><dd>
+ change the class of an instance (or object) with the name $<u>pathnName</u> to newclass
+ This can be useful to eg. change to a derived subclass (and back) based on data given
+ The command does not do any checking whether the class being changed to is compatible.
+<b><dt>
  pathName destroy
 </b><dd>
  destroys an object.

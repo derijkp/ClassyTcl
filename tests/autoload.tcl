@@ -1,6 +1,6 @@
 #!/bin/sh
 # the next line restarts using wish \
-exec tclsh8.0 "$0" "$@"
+exec tclsh "$0" "$@"
 
 source tools.tcl
 lappend auto_path autoload_test
@@ -16,10 +16,25 @@ test autoload {autoload method from object} {
 	try getdata
 } {3}
 
+test autoload {autoload method defined for superclass from object} {
+	catch {Test destroy}
+	SubTest new try 1
+	try add 2
+	try getdata
+} {3}
+
 test autoload {autoload classmethod from Class} {
 	catch {Test destroy}
 	Test setdef 2
 	Test new try
+	try add 2
+	try getdata
+} {4}
+
+test autoload {autoload classmethod defined for superclass from Class} {
+	catch {Test destroy}
+	SubTest setdef 2
+	SubTest new try
 	try add 2
 	try getdata
 } {4}

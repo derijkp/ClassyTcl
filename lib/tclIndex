@@ -6,17 +6,19 @@
 # element name is the name of a command and the value is
 # a script that loads the command.
 
-set auto_index(::Class::init) [list source [file join $dir init.tcl]]
 set auto_index(putsvars) [list source [file join $dir Class.tcl]]
 set auto_index(::Class::cmd_split) [list source [file join $dir tools.tcl]]
 set auto_index(::Class::auto_mkindex) [list source [file join $dir tools.tcl]]
+set auto_index(::Class::auto_load_method) [list source [file join $dir tools.tcl]]
 set auto_index(::Class::correctcmd) [list source [file join $dir Class-tcl.tcl]]
 set auto_index(::Class::classerror) [list source [file join $dir Class-tcl.tcl]]
 set auto_index(::Class::new) [list source [file join $dir Class-tcl.tcl]]
+set auto_index(::Class::changeclass) [list source [file join $dir Class-tcl.tcl]]
 set auto_index(::Class::subclass) [list source [file join $dir Class-tcl.tcl]]
 set auto_index(::Class::classdestroy) [list source [file join $dir Class-tcl.tcl]]
 set auto_index(::Class::objectdestroy) [list source [file join $dir Class-tcl.tcl]]
 set auto_index(super) [list source [file join $dir Class-tcl.tcl]]
+set auto_index(::Class::method_def) [list source [file join $dir Class-tcl.tcl]]
 set auto_index(::Class::propagatemethod) [list source [file join $dir Class-tcl.tcl]]
 set auto_index(::Class::propagatedeletemethod) [list source [file join $dir Class-tcl.tcl]]
 set auto_index(::Class::info_) [list source [file join $dir Class-tcl.tcl]]
@@ -37,6 +39,7 @@ set auto_index(::Class::Class,,cm,info) [list source [file join $dir Class-tcl.t
 set auto_index(::Class::Class,,m,destroy) [list source [file join $dir Class-tcl.tcl]]
 set auto_index(::Class::Class,,m,private) [list source [file join $dir Class-tcl.tcl]]
 set auto_index(::Class::Class,,m,info) [list source [file join $dir Class-tcl.tcl]]
+set auto_index(::Class::Class,,m,changeclass) [list source [file join $dir Class-tcl.tcl]]
 set auto_index(::Class::privatecmd) [list source [file join $dir Class-tcl.tcl]]
 set auto_index(::Class::classprivatecmd) [list source [file join $dir Class-tcl.tcl]]
 set auto_index(::Class::propagatevar) [list source [file join $dir Class-tcl.tcl]]
@@ -44,3 +47,9 @@ set auto_index(private) [list source [file join $dir Class-tcl.tcl]]
 set auto_index(privatevar) [list source [file join $dir Class-tcl.tcl]]
 set auto_index(setprivate) [list source [file join $dir Class-tcl.tcl]]
 set auto_index(getprivate) [list source [file join $dir Class-tcl.tcl]]
+set auto_index(::package::architecture) [list source [file join $dir package.tcl]]
+set auto_index(::package::init) [list source [file join $dir package.tcl]]
+
+# Addition of ClassyTcl classes defined in the directory
+set auto_index(::Class::Class,,cm,trace) [list source [file join $dir Class-tcl.tcl]]
+set auto_index(::Class::Class,,m,trace) [list source [file join $dir Class-tcl.tcl]]

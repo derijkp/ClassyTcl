@@ -36,12 +36,14 @@ Sources
 The Tcl script makedist.tcl creates a package distribution. If no compiled 
 version (.so, .dll) is available, a Tcl-only version will be created.
 
-Compiled packages for most Unix platform should be created using the following 
-steps:
-cd ClassyTcl/build
+Compiled packages should be created using the following steps in the package directory:
+(You can also build in any other directory, if you change the path to the configure command)
 ./configure
 make
 make install
+
+The configure command has several options that can be examined using
+/configure --help
 
 Use
 ---

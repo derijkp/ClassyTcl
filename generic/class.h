@@ -19,6 +19,15 @@
 #define TCL_STORAGE_CLASS DLLEXPORT
 #endif /* BUILD_Class */
 
+/* This EXTERN declaration is needed for Tcl < 8.0.3 */
+#ifndef EXTERN
+# ifdef __cplusplus
+#  define EXTERN extern "C"
+# else
+#  define EXTERN extern
+# endif
+#endif
+
 typedef struct Method {
 	int copy;
 	void *func;
@@ -58,19 +67,19 @@ typedef int Classy_Method _ANSI_ARGS_((Tcl_Interp *interp,
 	int argc,
 	Tcl_Obj *CONST argv[]));
 
-EXTERN int Classy_CreateClassMethod _ANSI_ARGS_((Tcl_Interp *interp,
+extern int Classy_CreateClassMethod _ANSI_ARGS_((Tcl_Interp *interp,
 	char *classname,
 	Tcl_Obj *name,
 	Classy_Method *func));
 
-EXTERN int Classy_CreateMethod _ANSI_ARGS_((Tcl_Interp *interp,
+extern int Classy_CreateMethod _ANSI_ARGS_((Tcl_Interp *interp,
 	char *classname,
 	Tcl_Obj *name,
 	Classy_Method *func));
 
-EXTERN Tcl_Obj *Classy_ObjectPrivateVar(
+extern Tcl_Obj *Classy_ObjectPrivateVar(
 	char *name,
 	char *var);
 
-EXTERN int Class_Init(
+extern int Class_Init(
 	Tcl_Interp *interp);

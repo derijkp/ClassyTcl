@@ -43,7 +43,9 @@ proc ::Class::classerror {class object result cmd arg} {
 	global errorInfo
 	set ::Class::error $result 
 	set ::Class::errorInfo $errorInfo 
-	if [regexp "called \"(.*)\" with too many arguments" $result temp fcmd] {
+	if [regexp "wrong # args: should be \"(\[^ \]*) " $result temp fcmd] {
+		set error "wrong # args: should be \"$object [Class::correctcmd $fcmd $cmd]\""
+	} elseif [regexp "called \"(.*)\" with too many arguments" $result temp fcmd] {
 		set error "wrong # args: should be \"$object [Class::correctcmd $fcmd $cmd]\""
 	} elseif [regexp "no value given for parameter \".*\" to \"(.*)\"" $result temp fcmd] {
 		set error "wrong # args: should be \"$object [Class::correctcmd $fcmd $cmd]\""
@@ -60,6 +62,8 @@ proc ::Class::classerror {class object result cmd arg} {
 	return $error
 }
 
+if {![info exists ::Class::objectnum]} {set ::Class::objectnum 1}
+
 #doc {Class cm new} cmd {
 # ClassName new <u>object</u> ?...?
 #} descr {
@@ -75,24 +79,35 @@ proc ::Class::classerror {class object result cmd arg} {
 proc ::Class::new {class arg} {
 #puts [list new $class $arg]
 	set object [lindex $arg 0]
-	regsub {^::} $object {} object
-	set namespace [namespace qualifiers $object]
-	if {"$namespace" != ""} {
-		namespace eval $namespace {}
-	}
-	if {"[info commands ::$object]" != ""} {
-		return -code error "command \"$object\" exists"
+	if {![llength $arg] || [string equal $object #auto]} {
+		set object Class::o$::Class::objectnum
+		incr ::Class::objectnum
+		set namespace Class
+	} else {
+		regsub {^::} $object {} object
+		set namespace [namespace qualifiers $object]
+		if {"$namespace" != ""} {
+			namespace eval $namespace {}
+		}
+		if {"[info commands ::$object]" != ""} {
+			return -code error "command \"$object\" exists"
+		}
 	}
 	set ::Class::parent($object) $class
 	set ::Class::${class},,child($object) 1
-	set body {
-		if [catch {uplevel ::Class::@class@,,m,${cmd} @class@ @object@ $args} result] {
-			return -code error -errorinfo [set ::errorInfo] [Class::classerror @class@ @object@ $result $cmd $args]
+	set body [format {
+		set error [catch {uplevel ::Class::%s,,m,${cmd} %s %s $args} result]
+		if {$error} {
+			if {[string match "invalid command name*" $result]} {
+				Class::auto_load_method %s m $cmd
+				set error [catch {uplevel ::Class::%s,,m,${cmd} %s %s $args} result]
+			}
+			if {$error} {
+				return -code error -errorinfo [set ::errorInfo] [Class::classerror %s %s $result $cmd $args]
+			}
 		}
 		return $result
-	}
-	regsub -all {@class@} $body [list $class] body
-	regsub -all {@object@} $body [list $object] body
+	} [list $class] [list $class] [list $object] [list $class] [list $class] [list $class] [list $object] [list $class] [list $object]]
 	proc ::$object {cmd args} $body
 #	set ::Class::current $class
 	if [info exists ::Class::${class},,init] {
@@ -114,6 +129,34 @@ proc ::Class::new {class arg} {
 	} else {
 		return $object
 	}
+}
+
+#doc {Class m changeclass} cmd {
+# pathName changeclass <u>newclass</u> ?...?
+#} descr {
+# change the class of an instance (or object) with the name $<u>pathnName</u> to newclass
+# This can be useful to eg. change to a derived subclass (and back) based on data given
+# The command does not do any checking whether the class being changed to is compatible.
+#}
+proc ::Class::changeclass {class object arg} {
+#puts [list new $class $arg]
+	set len [llength $arg]
+	if {$len != 1} {
+		return -code error "wrong # args: should be \"$object changeclass newclass\""
+	}
+	set newclass [lindex $arg 0]
+	auto_load $newclass
+	unset ::Class::${class},,child($object)
+	set ::Class::${newclass},,child($object) 1
+	set ::Class::parent($object) $newclass
+	set body [format {
+		if [catch {uplevel ::Class::%s,,m,${cmd} %s %s $args} result] {
+			return -code error -errorinfo [set ::errorInfo] [Class::classerror %s %s $result $cmd $args]
+		}
+		return $result
+	} [list $newclass] [list $newclass] [list $object] [list $newclass] [list $object]]
+	proc ::$object {cmd args} $body
+	return $object
 }
 
 #doc {Class cm subclass} cmd {
@@ -143,9 +186,16 @@ proc ::Class::subclass {class arg} {
 #	regsub -all " $class " $body " [list $child] " body
 	set body {
 		if [regexp {^\.} $cmd] {set args [concat $cmd $args];set cmd new}
-		if [catch {uplevel ::Class::@class@,,cm,${cmd} @class@ $args} result] {
-			set error [::Class::classerror @class@ @class@ $result $cmd $args]
-			return -code error -errorinfo [set ::errorInfo] $error
+		set error [catch {uplevel ::Class::@class@,,cm,${cmd} @class@ $args} result]
+		if {$error} {
+			if {[string match "invalid command name*" $result]} {
+				Class::auto_load_method @class@ cm $cmd
+				set error [catch {uplevel ::Class::@class@,,cm,${cmd} @class@ $args} result]
+			}
+			if {$error} {
+				set error [::Class::classerror @class@ @class@ $result $cmd $args]
+				return -code error -errorinfo [set ::errorInfo] $error
+			}
 		}
 		return $result
 	}
@@ -241,7 +291,11 @@ proc ::Class::objectdestroy {class object} {
 #puts "destroying object $object"
 	set current $class
 	while {"$current" != ""} {
-		catch {::Class::$current,,destroy $class $object}
+		if [catch {::Class::$current,,destroy $class $object} errorline] {
+			if {![string equal $errorline "invalid command name \"::Class::$current,,destroy\""]} {
+				lappend error "\"$errorline\" in destroy method of object \"$object\" for class \"$current\""
+			}
+		}
 		set current [set ::Class::parent($current)]
 	}
 	if [info exists ::Class::parent($object)] {
@@ -254,6 +308,9 @@ proc ::Class::objectdestroy {class object} {
 		unset $var
 	}
 	catch {rename ::$object {}}
+	if {[info exists error]} {
+		error [join $error \n]
+	}
 	return ""
 }
 
@@ -323,17 +380,26 @@ proc super {method args} {
 	}
 }
 
+proc ::Class::method_def {class method} {
+	set proc ::Class::${class},,m,${method}
+	if [catch {info body $proc} body] {
+		error "No method \"$method\" defined for class \"$class\""
+	}
+	regexp "^#(\[^\n\]+)" $body temp bclass
+	return $bclass
+}
+
 proc ::Class::propagatemethod {class type name args body} {
 	if ![info exists ::Class::${class},,subclass] {
 		return ""
 	}
 	foreach subclass [array names ::Class::${class},,subclass] {
-		set temp ::Class::${subclass},,$type,${name}
-		if {("[info commands $temp]" == "")||
-			([regexp "^#$class\n" [info body $temp]])} {
-			proc $temp $args $body
-			::Class::propagatemethod $subclass $type $name $args $body
+		if {![catch {::Class::method_def $subclass $name} defclass]} {
+			if {[string equal $subclass $defclass]} continue
 		}
+		set temp ::Class::${subclass},,$type,${name}
+		proc $temp $args $body
+		::Class::propagatemethod $subclass $type $name $args $body
 	}
 }
 
@@ -784,6 +850,11 @@ proc ::Class::Class,,m,private {class object args} {
 proc ::Class::Class,,m,info {class object args} {
 #Class
 	::Class::info_ $class $object $args
+}
+
+proc ::Class::Class,,m,changeclass {class object args} {
+#Class
+	::Class::changeclass $class $object $args
 }
 
 #

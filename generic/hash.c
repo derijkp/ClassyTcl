@@ -17,6 +17,9 @@
 
 #include "tcl.h"
 #include "hash.h"
+#include <string.h>
+#include <string.h>
+#include <stdlib.h>
 
 /*
  * When there are this many entries per bucket, on average, rebuild

@@ -25,6 +25,50 @@ proc Class::cmd_split {data} {
         return $result
 }
 
+proc Class::auto_mkindex_parse {file code} {
+	upvar index index
+	upvar definedhere definedhere
+	set c [Class::cmd_split $code]
+	catch {unset definedhere}
+	foreach line $c {
+		set first {}
+		regexp {[ \t\n]*([^ ]+)} $line temp first
+		if {"[string index $line 0]" == "#"} {
+			if {"[string range $line 0 10]" == "#auto_index"} {
+				set Name [lindex $line 1]
+				append index "set [list auto_index($Name)] \[list source \[file join \$dir [list $file]\]\]\n"
+			}
+		} elseif [string equal $first catch] {
+			Class::auto_mkindex_parse $file [lindex $line 1]
+		} elseif [regexp {^[ \t\n]*([^ ]+)[ \t]+([^ ]+)[ \t]+([^ ]+)} $line temp c cmd name] {
+			switch -- $cmd {
+				subclass {
+					set name [auto_qualify $name ::]
+					append index "set [list auto_index($name)] \[list source \[file join \$dir [list $file]\]\]\n"
+					set definedhere($name) 1
+				}
+				classmethod {
+					set c [auto_qualify $c ::]
+					if ![info exists definedhere($c)] {
+						set c [string trimleft $c :]
+						set name ::Class::${c},,cm,$name
+						append index "set [list auto_index($name)] \[list source \[file join \$dir [list $file]\]\]\n"
+					}
+				}
+				method {
+					set c [auto_qualify $c ::]
+					if ![info exists definedhere($c)] {
+						set c [string trimleft $c :]
+						set name ::Class::${c},,m,$name
+						append index "set [list auto_index($name)] \[list source \[file join \$dir [list $file]\]\]\n"
+					}
+				}
+			}			
+		}
+	}
+	
+}
+
 proc Class::auto_mkindex {dir args} {
 	global errorCode errorInfo
 	set oldDir [pwd]
@@ -43,41 +87,9 @@ proc Class::auto_mkindex {dir args} {
 		set f ""
 		set error [catch {
 			set f [open $file]
-			set c [Class::cmd_split [read $f]]
+			set code [read $f]
 			close $f
-			catch {unset definedhere}
-			foreach line $c {
-				if {"[string index $line 0]" == "#"} {
-					if {"[string range $line 0 10]" == "#auto_index"} {
-						set Name [lindex $line 1]
-						append index "set [list auto_index($Name)] \[list source \[file join \$dir [list $file]\]\]\n"
-					}
-				} elseif [regexp {^[ ]*([^ ]+)[ ]+([^ ]+)[ ]+([^ ]+)} $line temp c cmd name] {
-					switch -- $cmd {
-						subclass {
-							set name [auto_qualify $name ::]
-							append index "set [list auto_index($name)] \[list source \[file join \$dir [list $file]\]\]\n"
-							set definedhere($name) 1
-						}
-						classmethod {
-							set c [auto_qualify $c ::]
-							if ![info exists definedhere($c)] {
-								set c [string trimleft $c :]
-								set name ::Class::${c},,cm,$name
-								append index "set [list auto_index($name)] \[list source \[file join \$dir [list $file]\]\]\n"
-							}
-						}
-						method {
-							set c [auto_qualify $c ::]
-							if ![info exists definedhere($c)] {
-								set c [string trimleft $c :]
-								set name ::Class::${c},,m,$name
-								append index "set [list auto_index($name)] \[list source \[file join \$dir [list $file]\]\]\n"
-							}
-						}
-					}			
-				}
-			}
+			Class::auto_mkindex_parse $file $code
 		} msg]
 		if $error {
 			set code $errorCode
@@ -100,5 +112,13 @@ proc Class::auto_mkindex {dir args} {
 		catch {close $f}
 		cd $oldDir
 		error $msg $info $code
+	}
+}
+
+proc Class::auto_load_method {class type method} {
+	while 1 {
+		if {[auto_load ::Class::$class,,$type,$method]} break
+		if {[string equal $class Class]} break
+		set class [$class info parent]
 	}
 }

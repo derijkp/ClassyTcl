@@ -106,7 +106,7 @@ int Classy_ClassObjCmd(
 	Tcl_IncrRefCount(cmdObj);
 	entry = Classy_FindHashEntry(&(class->classmethods), cmdObj);
 	if (entry == NULL) {
-		error = Tcl_VarEval(interp,"auto_load ::Class::",Tcl_GetStringFromObj(class->class,NULL),",,cm,",cmd,(char *)NULL);
+		error = Tcl_VarEval(interp,"Class::auto_load_method ",Tcl_GetStringFromObj(class->class,NULL)," cm ",cmd,(char *)NULL);
 		if (error) {return error;}
 		entry = Classy_FindHashEntry(&(class->classmethods), cmdObj);
 	}
@@ -426,6 +426,7 @@ Classy_Method Classy_PrivateMethod;
 Classy_Method Classy_NewClassMethod;
 Classy_Method Classy_TraceMethod;
 Classy_Method Classy_ObjectDestroyObjCmd;
+Classy_Method Classy_ChangeclassMethod;
 
 int Classy_CreateClass(interp)
 	Tcl_Interp *interp;
@@ -462,6 +463,7 @@ int Classy_CreateClass(interp)
 	Classy_CreateMethod(interp,"::Class",Tcl_NewStringObj("info",4),Classy_InfoMethod);
 	Classy_CreateMethod(interp,"::Class",Tcl_NewStringObj("private",7),Classy_PrivateMethod);
 	Classy_CreateMethod(interp,"::Class",Tcl_NewStringObj("trace",5),Classy_TraceMethod);
+	Classy_CreateMethod(interp,"::Class",Tcl_NewStringObj("changeclass",11),Classy_ChangeclassMethod);
 	entry = Tcl_CreateHashEntry(&(class->methods),Tcl_NewStringObj("destroy",7),&new);
 	if (new == 1) {
 		method = (Method *)Tcl_Alloc(sizeof(Method));
