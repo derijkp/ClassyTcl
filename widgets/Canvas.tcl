@@ -1877,6 +1877,8 @@ proc ::Classy::Canvas_load_order {object w idata tags} {
 #}
 Classy::Canvas method save {{tag all}} {
 	private $object w save
+	set keepzoom [$object zoom]
+	$object zoom 1
 	$w dtag _new
 	catch {unset save}
 	lappend result header "Classy::Canvas-0.1"
@@ -1892,6 +1894,7 @@ Classy::Canvas method save {{tag all}} {
 		}
 	}
 	lappend result order $order
+	$object zoom $keepzoom
 	return $result
 }
 
@@ -1904,6 +1907,8 @@ Classy::Canvas method save {{tag all}} {
 Classy::Canvas method load {c} {
 	if ![regexp {^header Classy::Canvas} $c] {error "wrong format"}
 	private $object w load data options
+	set keepzoom [$object zoom]
+	$object zoom 1
 	catch {unset load}
 	$w dtag _new
 	set pw $options(-progresswindow)
@@ -1926,6 +1931,7 @@ Classy::Canvas method load {c} {
 		catch {::Classy::Canvas_load_$type $object $w $idata $tags}
 		if $usepw {$pw incr}
 	}
+	$object zoom $keepzoom
 	return {}
 }
 
@@ -1956,7 +1962,7 @@ Classy::Canvas method findgroup {tagOrId} {
 	private $object w data
 	set tags [$w gettags $tagOrId]
 	set poss [list_find -glob $tags _g*]
-	if {"$poss" != ""} {
+	if [llength $poss] {
 		return [lindex $tags [lindex $poss end]]
 	} else {
 		return {}

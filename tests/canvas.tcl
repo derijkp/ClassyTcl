@@ -697,6 +697,25 @@ test Classy::Canvas {save} {
 	.try mitemcget all -tags
 } {t4 t1 {t3 test} t2}
 
+test Classy::Canvas {save zoomed} {
+	classyclean
+	Classy::Canvas .try
+	pack .try -fill both -expand yes
+	.try create text 10 10 -text "A" -tags t1
+	.try itemconfigure t1 -fill green -font {helvetica 18.5 bold}
+	.try create text 20 20 -text "B" -tags t2
+	.try create text 30 30 -text "C" -tags {t3 test}
+	.try create line 10 10 60 50 -width 4 -tags t4
+	.try lower t4 t1
+	.try lower t3 t2
+	.try zoom 2
+	set d [.try save]
+	.try delete all
+	.try zoom 1
+	.try load $d
+	list [.try itemcget t1 -font] [.try coords t3]
+} {{helvetica 18.5 bold} {30.0 30.0}}
+
 test Classy::Canvas {don't save deleted} {
 	classyclean
 	Classy::Canvas .try
