@@ -11,7 +11,7 @@
 # See the file "license.terms" for information on usage and redistribution
 # of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 #
-# RCS: @(#) $Id: Makefile.in 1.2 Tue, 27 Jun 2000 10:03:21 +0200 peter $
+# RCS: @(#) $Id: Makefile.in 1.3 Tue, 08 Aug 2000 10:09:06 +0200 peter $
 
 #========================================================================
 # Edit the following few lines when writing a new extension
@@ -221,6 +221,7 @@ $(srcdir)/../lib/tclIndex: $(srcdir)/../lib/*.tcl
 	  exit; ) | $(TCLSH_PROG)
 
 doc:
+	TCLLIBPATH="$(srcdir)/../.." \
 	$(TCLSH_PROG) $(srcdir)/makedoc.tcl
 
 install: all install-binaries install-libraries install-doc
@@ -252,7 +253,7 @@ install-libraries: libraries
 		@LIB_LIBRARY@ "$(Class_LIB_FILE)" \
 		@LIBDIR@ "$(DESTDIR)$(libdir)" \
 		@TCLLIBDIR@ "$(DESTDIR)$(tcllibdir)/@PACKAGE@@VERSION@" \
-		@DATADIR@ "$(DESTDIR)$(datadir)" \
+		@DATADIR@ "$(DESTDIR)$(pkgdatadir)" \
 		@BINDIR@ "$(DESTDIR)$(bindir)"
 
 #========================================================================
@@ -430,12 +431,34 @@ uninstall-binaries:
 	  rm -f $(DESTDIR)$(libdir)/$$p; \
 	done
 
+uninstall:
+	@list='$(lib_BINARIES)'; for p in $$list; do \
+	  if test -f $$p; then \
+	    ext=`echo $$p|sed -e "s/.*\.//"`; \
+	    if test "x$$ext" = "xdll"; then \
+	        echo " rm -f $(DESTDIR)$(bindir)/$$p"; \
+	        rm -f $(DESTDIR)$(bindir)/$$p; \
+		lib=`basename $$p|sed -e 's/.[^.]*$$//'`.lib; \
+		if test -f $$lib; then \
+		    echo " rm -f $(DESTDIR)$(libdir)/$$lib"; \
+	            rm -f $(DESTDIR)$(libdir)/$$lib; \
+		fi; \
+	    else \
+		echo " rm -f $(DESTDIR)$(libdir)/$$p"; \
+	        rm -f $(DESTDIR)$(libdir)/$$p; \
+	    fi; \
+	  else :; fi; \
+	done
+	rm -rf $(DESTDIR)$(pkgtcllibdir)
+	rm -rf $(DESTDIR)$(pkgtcllibdir)
+	rm -rf $(DESTDIR)$(pkgdatadir)
+
 installdirs:
 	$(mkinstalldirs)  $(DESTDIR)$(libdir)
 	$(mkinstalldirs)  $(DESTDIR)$(bindir)
 	$(mkinstalldirs)  $(DESTDIR)$(pkglibdir)
 	$(mkinstalldirs)  $(DESTDIR)$(pkgtcllibdir)
-	$(mkinstalldirs)  $(DESTDIR)$(datadir)
+	$(mkinstalldirs)  $(DESTDIR)$(pkgdatadir)
 
 .PHONY: all binaries clean depend distclean doc install installdirs \
 libraries test

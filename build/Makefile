@@ -12,7 +12,7 @@
 # See the file "license.terms" for information on usage and redistribution
 # of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 #
-# RCS: @(#) $Id: Makefile 1.2 Tue, 27 Jun 2000 10:03:21 +0200 peter $
+# RCS: @(#) $Id: Makefile 1.3 Tue, 08 Aug 2000 10:09:06 +0200 peter $
 
 #========================================================================
 # Edit the following few lines when writing a new extension
@@ -85,7 +85,7 @@ SHELL = /bin/sh
 
 srcdir = .
 top_srcdir = .
-prefix = /usr/local
+prefix = /opt/tcltk/
 exec_prefix = ${prefix}
 
 bindir = ${exec_prefix}/bin
@@ -129,33 +129,33 @@ PACKAGE = Class
 VERSION = 0.4
 CC = cc
 CFLAGS_DEBUG = -g
-CFLAGS_DEFAULT = -O
-CFLAGS_OPTIMIZE = -O
+CFLAGS_DEFAULT = -O -D__NO_STRING_INLINES -D__NO_MATH_INLINES
+CFLAGS_OPTIMIZE = -O -D__NO_STRING_INLINES -D__NO_MATH_INLINES
 CLEANFILES = extratcl
 EXEEXT = 
-LDFLAGS_DEBUG = 
-LDFLAGS_DEFAULT = 
-LDFLAGS_OPTIMIZE = 
+LDFLAGS_DEBUG = @LDFLAGS_DEBUG@
+LDFLAGS_DEFAULT = @LDFLAGS_OPTIMIZE@
+LDFLAGS_OPTIMIZE = @LDFLAGS_OPTIMIZE@
 MAKE_LIB = ${SHLIB_LD} -o $@ $($@_OBJECTS) ${SHLIB_LDFLAGS} ${SHLIB_LD_LIBS}
 MAKE_SHARED_LIB = ${SHLIB_LD} -o $@ $($@_OBJECTS) ${SHLIB_LDFLAGS} ${SHLIB_LD_LIBS}
 MAKE_STATIC_LIB = ${STLIB_LD} $@ $($@_OBJECTS)
 OBJEXT = o
 RANLIB = :
 SHLIB_CFLAGS = -fPIC
-SHLIB_LD = gcc -pipe -shared
+SHLIB_LD = cc -shared
 SHLIB_LDFLAGS = 
-SHLIB_LD_LIBS = 
-STLIB_LD = 
-TCL_BIN_DIR = /usr/lib
-TCL_DEFS =  -DHAVE_GETCWD=1 -DHAVE_UNISTD_H=1 -DHAVE_SYS_TIME_H=1 -DTIME_WITH_SYS_TIME=1 -DHAVE_TM_ZONE=1 -DHAVE_TM_GMTOFF=1 -DHAVE_TIMEZONE_VAR=1 -DHAVE_ST_BLKSIZE=1 -DSTDC_HEADERS=1 -DNEED_MATHERR=1 -DRETSIGTYPE=void -DHAVE_SIGNED_CHAR=1 -DHAVE_SYS_IOCTL_H=1 
+SHLIB_LD_LIBS = -L/opt/tcltk/lib -ltclstub8.3${TCL_DBGX}
+STLIB_LD = ar cr
+TCL_BIN_DIR = /opt/tcltk/lib
+TCL_DEFS =  -DHAVE_UNISTD_H=1 -DHAVE_LIMITS_H=1 -DTCL_THREADS=1 -D_REENTRANT=1 -D_THREAD_SAFE=1 -DHAVE_GETCWD=1 -DHAVE_OPENDIR=1 -DHAVE_STRSTR=1 -DHAVE_STRTOL=1 -DHAVE_TMPNAM=1 -DHAVE_WAITPID=1 -DHAVE_UNISTD_H=1 -DHAVE_SYS_PARAM_H=1 -DUSE_TERMIOS=1 -DHAVE_SYS_TIME_H=1 -DTIME_WITH_SYS_TIME=1 -DHAVE_TM_ZONE=1 -DHAVE_TM_GMTOFF=1 -DHAVE_TIMEZONE_VAR=1 -DHAVE_ST_BLKSIZE=1 -DSTDC_HEADERS=1 -DNEED_MATHERR=1 -DHAVE_SIGNED_CHAR=1 -DHAVE_SYS_IOCTL_H=1 
 TCL_EXTRA_CFLAGS = 
 TCL_LD_FLAGS = -rdynamic
-TCL_LIBS = -ldl  -lm
+TCL_LIBS = -ldl  -lpthread -lieee -lm
 TCL_SHLIB_LD_LIBS = ${LIBS}
-TCL_SRC_DIR = /usr/src/RPM/BUILD/tcltk-8.0.5/tcl8.0.5
+TCL_SRC_DIR = /usr/src/redhat/BUILD/tcltk-8.3.1/tcl8.3.1
 TCL_DBGX = 
-TCL_STUB_LIB_FILE = 
-TCL_STUB_LIB_SPEC = 
+TCL_STUB_LIB_FILE = libtclstub8.3${TCL_DBGX}.a
+TCL_STUB_LIB_SPEC = -L/opt/tcltk/lib -ltclstub8.3${TCL_DBGX}
 TCL_TOOL_DIR_NATIVE = @TCL_TOOL_DIR_NATIVE@
 TCL_TOP_DIR_NATIVE = @TCL_TOP_DIR_NATIVE@
 TCL_UNIX_DIR_NATIVE = @TCL_UNIX_DIR_NATIVE@
@@ -164,15 +164,15 @@ INCLUDE_DIR_NATIVE = @INCLUDE_DIR_NATIVE@
 TCL_BMAP_DIR_NATIVE = @TCL_BMAP_DIR_NATIVE@
 TCL_PLATFORM_DIR_NATIVE = @TCL_PLATFORM_DIR_NATIVE@
 TCL_GENERIC_DIR_NATIVE = @TCL_GENERIC_DIR_NATIVE@
-TCLSH_PROG = /usr//bin/tclsh8.0
+TCLSH_PROG = /opt/tcltk//bin/tclsh8.3
 SHARED_BUILD = 1
-TCL_LIB_SPEC = -L/usr/lib -ltcl8.0${TCL_DBGX}
+TCL_LIB_SPEC = -L/opt/tcltk/lib -ltcl8.3${TCL_DBGX}
 
 AUTOCONF = autoconf
 
 LDFLAGS = $(LDFLAGS_DEFAULT)
 
-INCLUDES = -I"/usr//include"
+INCLUDES = -I"/opt/tcltk//include"
 
 EXTRA_CFLAGS = $(TCL_DEFS) $(PROTO_FLAGS) $(SECURITY_FLAGS) $(MEM_DEBUG_FLAGS) $(KEYSYM_FLAGS) $(NO_DEPRECATED_FLAGS) $(TCL_EXTRA_CFLAGS)
 
@@ -222,6 +222,7 @@ $(srcdir)/../lib/tclIndex: $(srcdir)/../lib/*.tcl
 	  exit; ) | $(TCLSH_PROG)
 
 doc:
+	TCLLIBPATH="$(srcdir)/../.." \
 	$(TCLSH_PROG) $(srcdir)/makedoc.tcl
 
 install: all install-binaries install-libraries install-doc
@@ -253,7 +254,7 @@ install-libraries: libraries
 		@LIB_LIBRARY@ "$(Class_LIB_FILE)" \
 		@LIBDIR@ "$(DESTDIR)$(libdir)" \
 		@TCLLIBDIR@ "$(DESTDIR)$(tcllibdir)/Class0.4" \
-		@DATADIR@ "$(DESTDIR)$(datadir)" \
+		@DATADIR@ "$(DESTDIR)$(pkgdatadir)" \
 		@BINDIR@ "$(DESTDIR)$(bindir)"
 
 #========================================================================
@@ -274,8 +275,8 @@ install-doc: doc
 #	    done
 	TCLLIBPATH="$(srcdir)/.." \
 	$(TCLSH_PROG) $(srcdir)/makedoc.tcl
-	$(mkinstalldirs) $(DESTDIR)$(pkgtcllibdir)/docs
-	$(INSTALL_DATA) $(srcdir)/../docs/* $(DESTDIR)$(pkgtcllibdir)/docs
+	$(mkinstalldirs) $(DESTDIR)$(pkgtcllibdir)/help
+	$(INSTALL_DATA) $(srcdir)/../help/* $(DESTDIR)$(pkgtcllibdir)/help
 
 test: binaries libraries
 	TCL_LIBRARY=$(TCL_LIBRARY_DIR) \
@@ -385,16 +386,16 @@ install-lib-binaries: installdirs
 	  if test -f $$p; then \
 	    ext=`echo $$p|sed -e "s/.*\.//"`; \
 	    if test "x$$ext" = "xdll"; then \
-	        echo " $(INSTALL_DATA) $$p $(DESTDIR)$(bindir)/$$p"; \
-	        $(INSTALL_DATA) $$p $(DESTDIR)$(bindir)/$$p; \
+	        echo " $(INSTALL) $$p $(DESTDIR)$(bindir)/$$p"; \
+	        $(INSTALL) $$p $(DESTDIR)$(bindir)/$$p; \
 		lib=`basename $$p|sed -e 's/.[^.]*$$//'`.lib; \
 		if test -f $$lib; then \
-		    echo " $(INSTALL_DATA) $$lib $(DESTDIR)$(libdir)/$$lib"; \
-	            $(INSTALL_DATA) $$lib $(DESTDIR)$(libdir)/$$lib; \
+		    echo " $(INSTALL) $$lib $(DESTDIR)$(libdir)/$$lib"; \
+	            $(INSTALL) $$lib $(DESTDIR)$(libdir)/$$lib; \
 		fi; \
 	    else \
-		echo " $(INSTALL_DATA) $$p $(DESTDIR)$(libdir)/$$p"; \
-	        $(INSTALL_DATA) $$p $(DESTDIR)$(libdir)/$$p; \
+		echo " $(INSTALL) $$p $(DESTDIR)$(libdir)/$$p"; \
+	        $(INSTALL) $$p $(DESTDIR)$(libdir)/$$p; \
 	    fi; \
 	  else :; fi; \
 	done
@@ -431,12 +432,34 @@ uninstall-binaries:
 	  rm -f $(DESTDIR)$(libdir)/$$p; \
 	done
 
+uninstall:
+	@list='$(lib_BINARIES)'; for p in $$list; do \
+	  if test -f $$p; then \
+	    ext=`echo $$p|sed -e "s/.*\.//"`; \
+	    if test "x$$ext" = "xdll"; then \
+	        echo " rm -f $(DESTDIR)$(bindir)/$$p"; \
+	        rm -f $(DESTDIR)$(bindir)/$$p; \
+		lib=`basename $$p|sed -e 's/.[^.]*$$//'`.lib; \
+		if test -f $$lib; then \
+		    echo " rm -f $(DESTDIR)$(libdir)/$$lib"; \
+	            rm -f $(DESTDIR)$(libdir)/$$lib; \
+		fi; \
+	    else \
+		echo " rm -f $(DESTDIR)$(libdir)/$$p"; \
+	        rm -f $(DESTDIR)$(libdir)/$$p; \
+	    fi; \
+	  else :; fi; \
+	done
+	rm -rf $(DESTDIR)$(pkgtcllibdir)
+	rm -rf $(DESTDIR)$(pkgtcllibdir)
+	rm -rf $(DESTDIR)$(pkgdatadir)
+
 installdirs:
 	$(mkinstalldirs)  $(DESTDIR)$(libdir)
 	$(mkinstalldirs)  $(DESTDIR)$(bindir)
 	$(mkinstalldirs)  $(DESTDIR)$(pkglibdir)
 	$(mkinstalldirs)  $(DESTDIR)$(pkgtcllibdir)
-	$(mkinstalldirs)  $(DESTDIR)$(datadir)
+	$(mkinstalldirs)  $(DESTDIR)$(pkgdatadir)
 
 .PHONY: all binaries clean depend distclean doc install installdirs \
 libraries test

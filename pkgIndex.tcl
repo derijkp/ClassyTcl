@@ -10,6 +10,6 @@
 # $Format: "package ifneeded Class 0.$ProjectMajorVersion$ \\"$
 package ifneeded Class 0.4 \
 	"[list namespace eval ::Class {}] ; [list set ::Class::execdir $dir] ; \
-	if \[file exists [file join $dir lib init.tcl]\] \
+	if \[[list file exists [file join $dir lib init.tcl]]\] \
 		\{[list source [file join $dir lib init.tcl]]\} \
 		else \{[list source [file join @TCLLIBDIR@ lib init.tcl]]\}"
