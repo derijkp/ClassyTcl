@@ -10,7 +10,7 @@
 namespace eval __temp [list set dir $dir]
 namespace eval __temp {
 	# $Format: "set version $ProjectVersion$"$
-set version 0.16
+set version 1.1
 	regsub -all {[ab]} $version {} version
 	set loadcmd {
 		package provide Class @version@
