@@ -37,7 +37,7 @@ proc DefaultMenu {} {}
 Widget subclass Classy::DefaultMenu
 Classy::export DefaultMenu {}
 
-bind Classy::DefaultMenu <<ButtonPress-Action>> "%W menu"
+bind Classy::DefaultMenu <<Action-ButtonPress>> "%W menu"
 bind Classy::DefaultMenu <Any-ButtonRelease> "%W _action"
 bind Classy::DefaultMenu <Motion> "%W _motion %X %Y"
 

@@ -18,7 +18,7 @@ bind Button <<Adjust>> {
 	tkButtonDown %W
 }
 
-bind Button <<ButtonRelease-Adjust>> {
+bind Button <<Adjust-ButtonRelease>> {
 	tkButtonUp %W
 }
 

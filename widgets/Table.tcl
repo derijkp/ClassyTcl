@@ -104,15 +104,12 @@ Classy::Table classmethod init {args} {
 
 	# REM set variables
 	# -----------------
-	private $object drow dcol redrawing setcommand getcommand xlabelcommand ylabelcommand
+	private $object drow dcol redrawing ylabelcommand
 	set redrawing 0
 	set drow(start) 0
 	set dcol(start) 0
 	set dcol(num) 0
 	set drow(num) 0
-	set setcommand ""
-	set getcommand ""
-	set xlabelcommand ""
 	set ylabelcommand ""
 
 	# REM Configure initial arguments
@@ -209,10 +206,7 @@ Classy::Table addoption -yscrollcommand {yScrollCommand ScrollCommand {}} {}
 # wishes to set the value itself (eg. in a text), it can return with a -code break, so
 # that its return value will not be used.
 #}
-Classy::Table addoption -getcommand {getCommand Command {}} {
-	private $object getcommand
-	set getcommand [replace $value {%% % %x \$::Classy::table(rcol) %y \$::Classy::table(rrow) %w \$::Classy::table(w) %W \$::Classy::table(object)}]
-}
+Classy::Table addoption -getcommand {getCommand Command {}} {}
 
 #doc {Table options -setcommand} option {-setcommand setcommand setcommand} descr {
 # gives the command that will be called to set a given cell to a new value. It must have the 
@@ -222,26 +216,20 @@ Classy::Table addoption -getcommand {getCommand Command {}} {
 # name of the currently associated cell, the row, the column and the new value.
 # If the setcommand fails, the previous value will be restored.
 #}
-Classy::Table addoption -setcommand {setCommand Command {}} {
-	private $object setcommand
-	set setcommand [replace $value [list %% % %x \$::Classy::table(rcol) %y \$::Classy::table(rrow) \
-		%w \$::Classy::table(w) %W \$::Classy::table(object) %v \$::Classy::table(value)]]
-}
+Classy::Table addoption -setcommand {setCommand Command {}} {}
 
 #doc {Table options -xlabelcommand} option {-xlabelCommand xLabelCommand Command} descr {
 # If this option is empty, no xlabels will be displayed.
 # Othwerwise, it gives the command that will be called to obtain the value of a given xlabel. 
 # It must have the following format:<br>
-# getcommand object w col<br>
+# xlabelcommand object w col<br>
 # The parameters given to the command when obtaining a value are the table objects name, the window
 # name of the currently associated cell and the column.<br>
 # The command normally returns the value to be shown in the given label. If the command
 # returns with a -code break, its return value will not be used to set the label.
 #}
 Classy::Table addoption -xlabelcommand {xLabelCommand Command {}} {
-	private $object dcol drow xlabelcommand
-	set xlabelcommand [replace $value [list %% % %x \$::Classy::table(rcol) \
-		%w \$::Classy::table(w) %W \$::Classy::table(object)]]
+	private $object dcol drow
 	eval destroy [winfo children $object.base]
 	set dcol(num) 0
 	set drow(num) 0
@@ -251,17 +239,14 @@ Classy::Table addoption -xlabelcommand {xLabelCommand Command {}} {
 # If this option is empty, no ylabels will be displayed.
 # Othwerwise, it gives the command that will be called to obtain the value of a given ylabel. 
 # It must have the following format:<br>
-# getcommand object w row<br>
+# ylabelcommand object w row<br>
 # The parameters given to the command when obtaining a value are the table objects name, the window
 # name of the currently associated cell and the row.<br>
 # The command normally returns the value to be shown in the given label. If the command
 # returns with a -code break, its return value will not be used to set the label.
 #}
-
 Classy::Table addoption -ylabelcommand {yLabelCommand Command {}} {
-	private $object dcol drow ylabelcommand
-	set ylabelcommand [replace $value [list %% % %y \$::Classy::table(rrow) \
-		%w \$::Classy::table(w) %W \$::Classy::table(object)]]
+	private $object dcol drow
 	eval destroy [winfo children $object.base]
 	set dcol(num) 0
 	set drow(num) 0
@@ -350,21 +335,16 @@ Classy::Table method rowsize {row args} {
 # set the value of the cell at $rrow and $rcol to $value
 #}
 Classy::Table method set {rrow rcol value} {
-	private $object options drow dcol data setcommand
-	set ::Classy::table(object) $object
-	set ::Classy::table(rrow) $rrow
-	set ::Classy::table(rcol) $rcol
+	private $object options drow dcol data
 	set col [expr {$rcol-$dcol(start)}]
 	set row [expr {$rrow-$drow(start)}]
-	set ::Classy::table(w) $object.base.e$row,$col
-	set ::Classy::table(value) $value
-	set error [catch {uplevel #0 $setcommand} res]
+	set error [catch {uplevel #0 $options(-setcommand) $object $object.base.e$row,$col $rrow $rcol [list $value]} res]
 	$object refreshcell $rrow $rcol
 	if $error {error $res}
 }
 
 Classy::Table method _set {w args} {
-	private $object options drow dcol data setcommand
+	private $object options drow dcol data
 	regexp {([0-9]+),([0-9]+)$} $w temp row col
 	switch $options(-type) {
 		text {
@@ -381,7 +361,7 @@ Classy::Table method _set {w args} {
 	set ::Classy::table(rcol) $rcol
 	set ::Classy::table(w) $object.base.e$row,$col
 	set ::Classy::table(value) $value
-	set error [catch {uplevel #0 $setcommand} res]
+	set error [catch {uplevel #0 $options(-setcommand) $object $object.base.e$row,$col $rrow $rcol [list $value]} res]
 	$object refreshcell $rrow $rcol
 	if $error {error $res}
 }
@@ -525,16 +505,12 @@ Classy::Table method movex {w step args} {
 }
 
 Classy::Table method refreshcell {rrow rcol} {
-	private $object options drow dcol data selection getcommand
-	set ::Classy::table(object) $object
-	set ::Classy::table(rrow) $rrow
-	set ::Classy::table(rcol) $rcol
+	private $object options drow dcol data selection
 	set col [expr {$rcol-$dcol(start)}]
 	set row [expr {$rrow-$drow(start)}]
 	set w $object.base.e$row,$col
-	set ::Classy::table(w) $w
 	if ![winfo exists $w] return
-	set code [catch {uplevel #0 $getcommand} new]
+	set code [catch {uplevel #0 $options(-getcommand) $object $w $rrow $rcol} new]
 	if {$code == 1} {
 		set new "ERROR: $new"
 	} elseif {$code != 0} {
@@ -638,7 +614,7 @@ Classy::Table method _drag {w x y} {
 #} descr {
 #}
 Classy::Table method _redraw {} {
-	private $object options drow dcol data xlabelcommand ylabelcommand
+	private $object options drow dcol data
 	set ::Classy::table(object) $object
 	if ![winfo exists $object.base.ypanelabel] {
 		frame $object.base.ypanelabel -class Classy::Table::ypane
@@ -746,7 +722,7 @@ Classy::Table method _redraw {} {
 	}
 
 	# labels
-	if {"$ylabelcommand" != ""} {
+	if {"$options(-ylabelcommand)" != ""} {
 		grid $object.base.ypanelabel -row 1 -column 0 -columnspan $dcol(num) -sticky nwse
 		if {$rownum > 0} {
 			for {set row $prevrow} {$row < $drow(num)} {incr row} {
@@ -769,7 +745,7 @@ Classy::Table method _redraw {} {
 		grid columnconfigure $object.base 0 -minsize 0
 		grid columnconfigure $object.base 1 -minsize 0
 	}
-	if {"$xlabelcommand" != ""} {
+	if {"$options(-xlabelcommand)" != ""} {
 		grid $object.base.xpanelabel -row 0 -column 1 -rowspan $drow(num) -sticky nwse
 		if {$colnum > 0} {
 			for {set col $prevcol} {$col < $dcol(num)} {incr col} {
@@ -824,14 +800,11 @@ Classy::Table method _redraw {} {
 	}
 
 	# labels
-	if {"$ylabelcommand" != ""} {
+	if {"$options(-ylabelcommand)" != ""} {
 		grid columnconfigure $object.base 0 -minsize $dcol(ls)
 		set rrow $drow(start)
 		for {set row 0} {$row < $drow(num)} {incr row} {
-			set w $object.base.yl$row
-			set ::Classy::table(w) $object.base.xl$col
-			set ::Classy::table(rrow) $rrow
-			set code [catch {uplevel #0 $ylabelcommand} new]
+			set code [catch {uplevel #0 $options(-ylabelcommand) $object $object.base.xl$col $rrow} new]
 			if {$code == 1} {
 				set new $rrow
 			} elseif {$code != 0} {
@@ -852,13 +825,11 @@ Classy::Table method _redraw {} {
 			incr rrow
 		}
 	}
-	if {"$xlabelcommand" != ""} {
+	if {"$options(-xlabelcommand)" != ""} {
 		grid rowconfigure $object.base 0 -minsize $drow(ls)
 		set rcol $dcol(start)
 		for {set col 0} {$col < $dcol(num)} {incr col} {
-			set ::Classy::table(w) $object.base.xl$col
-			set ::Classy::table(rcol) $rcol
-			set code [catch {uplevel #0 $xlabelcommand} new]
+			set code [catch {uplevel #0 $options(-xlabelcommand) $object $object.base.xl$col $rcol} new]
 			if {$code == 1} {
 				set new $rcol
 			} elseif {$code != 0} {
@@ -883,7 +854,7 @@ Classy::Table method _redraw {} {
 }
 
 Classy::Table method _refreshtable {} {
-	private $object options drow dcol data selection redrawing getcommand
+	private $object options drow dcol data selection redrawing
 	set ::Classy::table(object) $object
 	foreach var {w rrow rcol} {
 		upvar ::Classy::table($var) $var
@@ -898,7 +869,7 @@ Classy::Table method _refreshtable {} {
 			if {($rrow >= $options(-rows))||($rcol >= $options(-cols))} {
 				set new ""
 			} else {
-				set code [catch {uplevel #0 $getcommand} new]
+				set code [catch {uplevel #0 $options(-getcommand) $object $w $rrow $rcol} new]
 				if {$code == 1} {
 					set new "ERROR: $new"
 				} elseif {$code != 0} {

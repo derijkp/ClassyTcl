@@ -93,7 +93,7 @@ bind Classy::Text <<Action-Leave>> {
 bind Classy::Text <<Action-Enter>> {
 	tkCancelRepeat
 }
-bind Classy::Text <<ButtonRelease-Action>> {
+bind Classy::Text <<Action-ButtonRelease>> {
 	tkCancelRepeat
 }
 bind Classy::Text <<Control-Action>> {

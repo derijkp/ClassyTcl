@@ -1,6 +1,8 @@
 #Functions
 
 proc text_action {w x y} {
+puts text_action
+putsvars w x y
 global current
 $w select clear
 set x [$w canvasx $x]
@@ -24,8 +26,6 @@ set current(cur) [$w create text $x $y]
 $w focus $current(cur)
 $w icursor $current(cur) 0
 $w selection set $current(cur)
-$w undo check
-
 }
 
 proc text_start w {
@@ -33,7 +33,7 @@ global current status
 catch {unset current}
 $w selection set {}
 bindtags $w [list DrawText $w Classy::Menu_MainMenu Classy::Canvas Canvas .mainw all]
-set status(type) text
+set status($w,type) text
 }
 
 proc text_key {w value} {
@@ -49,7 +49,6 @@ switch $value {
 			clipboard append -displayof $w [string range $text $fpos $epos]
 			$w dchars $current(cur) $fpos $epos
 			$w select clear
-			$w undo check
 		}
 	}
 	copy {
@@ -67,7 +66,6 @@ switch $value {
 	}
 	backspace {
 		$w dchars $current(cur) [expr {[$w index $current(cur) insert]-1}]
-		$w undo check
 	}
 	delete {
 		if $select {
@@ -76,7 +74,6 @@ switch $value {
 		} else {
 			$w dchars $current(cur) insert
 		}
-		$w undo check
 	}
 	left {
 		if $select {$w select clear}
@@ -139,7 +136,6 @@ switch $value {
 	}
 	default {
 		$w insert $current(cur) insert $value
-		$w undo check
 	}
 }
 }
@@ -234,16 +230,6 @@ $w select to $current(cur) $npos
 
 }
 
-
-
-
-
-
-
-
-
-
-
 proc text_findline {text pos} {
 set spos [string last "\n" [string range $text 0 $pos]]
 set ppos [string last "\n" [string range $text 0 [expr {$spos-1}]]]
@@ -262,71 +248,3 @@ if {$dist == -1} {
 }
 return [list $ppos $spos $npos $nnpos]
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

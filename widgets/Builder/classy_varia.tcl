@@ -3,7 +3,10 @@
 #
 proc ::Classy::WindowBuilder::edit_Classy::Entry {object base} {
 	::Classy::WindowBuilder::defattredit $object $base {
-		-label Label 0 -textvariable Textvariable 0 -orient Orientation 0 -labelwidth Labelwidth 0 -command Command 1
+		-label Label 0 -textvariable Textvariable 0 
+		-orient Orientation 0 -labelwidth Labelwidth 0 
+		-default Default 0
+		-command Command 1
 	} 10 0
 }
 

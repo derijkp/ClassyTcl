@@ -22,8 +22,7 @@ Canvas
 </h2><dl><b><dt>
 pathname undo ?action? ?args?
 </b><dd>
- Without arguments, this method will undo the actions
- until the previous checkpoint is reached<br>
+ Without arguments, this method will undo the previous action
  When action is provided, it can have the following values
 <dl>
 <dt>check<dd>insert a checkpoint
@@ -73,6 +72,11 @@ pathname selection ?action? ?args?
 <dt>redraw<dd>redraw the selection
 </dl>
 <b><dt>
+pathname current ?item?
+</b><dd>
+ returns the current item. If current is given, it chabges the
+ the current item to the item given.
+<b><dt>
 pathname group searchcommand ?arg? ...
 </b><dd>
  creates a new group, consisting of items found by the searchcommand. searchcommand
@@ -85,5 +89,17 @@ pathname findgroup tagOrId
  returns the main group of an item: This is the last one the item was added to.
  If tagOrId is a tag  that  refers  to more than one item, the first
  (lowest) such item is used.
+<b><dt>
+pathname cut ?tagOrId?
+</b><dd>
+ copies a description of the objects given by tagOrId to the clipboard
+<b><dt>
+pathname copy ?tagOrId?
+</b><dd>
+ copies a description of the objects given by tagOrId to the clipboard
+<b><dt>
+pathname paste
+</b><dd>
+ creates new objects from a description put on the clipboard by the copy or cut method
 
 </body>

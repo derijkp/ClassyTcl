@@ -1,5 +1,5 @@
-source ctester
-set object .classy__.builder
+source cdraw
+set object .try
 Classy::Builder .try
 set object .try
 set window .try.work

@@ -3,27 +3,29 @@
 exec wish8.0 "$0" "$@"
 
 source tools.tcl
-set object .try
+set object .trys
 
-classyclean
-Classy::Canvas .try
-pack .try -fill both -expand yes
-set items ""
-time {
-for {set i 0} {$i<1000} {incr i} {
-	lappend items [.try create text $i 10 -text "A" -tags [list " test" try other a lot of]]
+if 0 {
+	classyclean
+	Classy::Canvas .try
+	pack .try -fill both -expand yes
+	set items ""
+	time {
+	for {set i 0} {$i<1000} {incr i} {
+		lappend items [.try create text $i 10 -text "A" -tags [list " test" try other a lot of]]
+	}
+	}
+	time {.try itemconfigure 50 -tags test}
+	time {.try itemconfigure 9000 -tags test}
+	time {.try create text $i 10 -text "A" -tags try}
+	
+	time {.try itemconfigure $items -font {helvetica 20 bold}}
+	time {.try itemconfigure all -font {helvetica 20 bold}}
+	time {.try itemconfigure try -font {helvetica 10}}
+	time {.try itemconfigure test -fill green}
+	time {.try itemconfigure test -font {helvetica 20 bold}}
+	.try selection add withtag try
 }
-}
-time {.try itemconfigure 50 -tags test}
-time {.try itemconfigure 9000 -tags test}
-time {.try create text $i 10 -text "A" -tags try}
-
-time {.try itemconfigure $items -font {helvetica 20 bold}}
-time {.try itemconfigure all -font {helvetica 20 bold}}
-time {.try itemconfigure try -font {helvetica 10}}
-time {.try itemconfigure test -fill green}
-time {.try itemconfigure test -font {helvetica 20 bold}}
-.try selection add withtag try
 
 test Classy::Canvas {create and configure} {
 	classyclean
@@ -46,6 +48,36 @@ test Classy::Canvas {zoom} {
 	.try coords $id
 } {20.0 20.0}
 
+test Classy::Canvas {coord} {
+	classyclean
+	Classy::Canvas .try
+	pack .try -fill both -expand yes
+	set id [.try create line 20 10 60 50 100 100 -width 4]
+	.try coord $id 1 90 50
+	.try coord $id 1
+} {90.0 50.0}
+
+test Classy::Canvas {coord undo} {
+	classyclean
+	Classy::Canvas .try
+	pack .try -fill both -expand yes
+	set id [.try create line 20 10 60 50 100 100 -width 4]
+	.try coord $id 1 90 50
+	.try undo
+	.try coord $id 1
+} {60.0 50.0}
+
+test Classy::Canvas {coord undo and redo} {
+	classyclean
+	Classy::Canvas .try
+	pack .try -fill both -expand yes
+	set id [.try create line 20 10 60 50 100 100 -width 4]
+	.try coord $id 1 90 50
+	.try undo
+	.try redo
+	.try coord $id 1
+} {90.0 50.0}
+
 test Classy::Canvas {create and configure} {
 	classyclean
 	Classy::Canvas .try
@@ -59,19 +91,45 @@ test Classy::Canvas {undo create} {
 	Classy::Canvas .try
 	pack .try -fill both -expand yes
 	set id [.try create text 10 10 -text "A"]
-	.try undo check
 	.try create text 20 20 -text "B"
 	.try undo
 	if {[.try find withtag all] != $id} error
 	set try 1
 } {1}
 
+test Classy::Canvas {undo create with check} {
+	classyclean
+	Classy::Canvas .try
+	pack .try -fill both -expand yes
+	set id [.try create text 10 10 -text "A"]
+	.try undo check start
+	.try create text 20 20 -text "B"
+	.try create text 30 30 -text "C"
+	.try undo check stop
+	.try undo
+	if {[.try find withtag all] != $id} error
+	set try 1
+} {1}
+
+test Classy::Canvas {undo and redo create with check} {
+	classyclean
+	Classy::Canvas .try
+	pack .try -fill both -expand yes
+	set id [.try create text 10 10 -text "A"]
+	.try undo check start
+	.try create text 20 20 -text "B"
+	.try create text 30 30 -text "C"
+	.try undo check stop
+	.try undo
+	.try redo
+	.try mitemcget all -text
+} {A B C}
+
 test Classy::Canvas {undo and redo create} {
 	classyclean
 	Classy::Canvas .try
 	pack .try -fill both -expand yes
 	set id [.try create text 10 10 -text "A"]
-	.try undo check
 	.try create text 20 20 -text "B"
 	.try undo
 	.try redo
@@ -83,9 +141,7 @@ test Classy::Canvas {undo itemconfigure} {
 	Classy::Canvas .try
 	pack .try -fill both -expand yes
 	set id [.try create text 10 10 -text "A" -tags try]
-	.try undo check
 	.try create text 20 20 -text "B" -tags try
-	.try undo check
 	.try itemconfigure $id -fill blue -font {helvetica 20 bold}
 	.try undo
 	.try itemcget $id -fill
@@ -96,9 +152,7 @@ test Classy::Canvas {redo itemconfigure} {
 	Classy::Canvas .try
 	pack .try -fill both -expand yes
 	set id [.try create text 10 10 -text "A" -tags try]
-	.try undo check
 	.try create text 20 20 -text "B" -tags try
-	.try undo check
 	.try itemconfigure $id -fill blue -font {helvetica 20 bold}
 	.try undo
 	.try redo
@@ -110,11 +164,8 @@ test Classy::Canvas {undo itemconfigure by tag} {
 	Classy::Canvas .try
 	pack .try -fill both -expand yes
 	.try create text 10 10 -text "A" -tags try
-	.try undo check
 	.try create text 20 20 -text "B" -tags try
-	.try undo check
 	.try create text 30 30 -text "C" -tags test
-	.try undo check
 	.try itemconfigure try -fill blue -font {helvetica 20 bold}
 	.try undo
 	.try itemcget try -fill
@@ -126,9 +177,7 @@ test Classy::Canvas {undo coords} {
 	pack .try -fill both -expand yes
 	set id [.try create text 10 10 -text "A"]
 	.try create text 20 20 -text "B"
-	.try undo check
 	.try coords $id 30 30
-	.try undo check
 	.try undo
 	.try coords $id
 } {10.0 10.0}
@@ -139,9 +188,7 @@ test Classy::Canvas {redo coords} {
 	pack .try -fill both -expand yes
 	set id [.try create text 10 10 -text "A"]
 	.try create text 20 20 -text "B"
-	.try undo check
 	.try coords $id 30 30
-	.try undo check
 	.try undo
 	.try redo
 	.try coords $id
@@ -154,9 +201,22 @@ test Classy::Canvas {undo move} {
 	set id [.try create text 10 10 -text "A" -tags try]
 	.try create text 20 20 -text "B" -tags try
 	.try create text 30 30 -text "C" -tags test
-	.try undo check
 	.try move try 10 0
 	.try move try 10 0
+	.try undo
+	.try coords $id
+} {10.0 10.0}
+
+test Classy::Canvas {undo 2 moves} {
+	classyclean
+	Classy::Canvas .try
+	pack .try -fill both -expand yes
+	set id [.try create text 10 10 -text "A" -tags try]
+	.try create text 20 20 -text "B" -tags try
+	.try create text 30 30 -text "C" -tags test
+	.try move try 10 0
+	.try move test 10 0
+	.try undo
 	.try undo
 	.try coords $id
 } {10.0 10.0}
@@ -168,7 +228,6 @@ test Classy::Canvas {redo move} {
 	set id [.try create text 10 10 -text "A" -tags try]
 	.try create text 20 20 -text "B" -tags try
 	.try create text 30 30 -text "C" -tags test
-	.try undo check
 	.try move try 10 0
 	.try move try 10 0
 	.try undo
@@ -183,9 +242,7 @@ test Classy::Canvas {undo scale} {
 	set id [.try create text 10 10 -text "A" -tags try]
 	.try create text 20 20 -text "B" -tags try
 	.try create text 30 30 -text "C" -tags test
-	.try undo check
 	.try create line 20 10 60 50 -width 4 -tags try
-	.try undo check
 	.try scale try 0 0 2 2
 	.try undo
 	.try coords $id
@@ -198,9 +255,7 @@ test Classy::Canvas {redo scale} {
 	set id [.try create text 10 10 -text "A" -tags try]
 	.try create text 20 20 -text "B" -tags try
 	.try create text 30 30 -text "C" -tags test
-	.try undo check
 	.try create line 20 10 60 50 -width 4 -tags try
-	.try undo check
 	.try scale try 0 0 2 2
 	.try undo
 	.try redo
@@ -216,7 +271,6 @@ test Classy::Canvas {undo rotate} {
 	.try create text 20 20 -text "B" -tags try
 	.try create text 30 30 -text "C" -tags test
 	.try create line 20 10 60 50 -width 4 -tags try
-	.try undo check
 	.try rotate try 0 0 -45
 	.try undo
 	.try coords try
@@ -231,7 +285,6 @@ test Classy::Canvas {redo rotate} {
 	.try create text 20 20 -text "B" -tags try
 	.try create text 30 30 -text "C" -tags test
 	.try create line 20 10 60 50 -width 4 -tags try
-	.try undo check
 	.try rotate try 0 0 -30
 	.try undo
 	.try redo
@@ -246,11 +299,10 @@ test Classy::Canvas {undo lower} {
 	.try itemconfigure try1 -fill blue -font {helvetica 20 bold}
 	.try create text 20 20 -text "B" -tags t2
 	.try create text 30 30 -text "C" -tags t3
-	.try undo check
 	.try create line 20 10 60 50 -width 4 -tags t4
-	.try undo check
 	.try lower t4 t1
 	.try lower t2 t1
+	.try undo
 	.try undo
 	.try mitemcget all -tags
 } {t1 t2 t3 t4}
@@ -263,9 +315,7 @@ test Classy::Canvas {redo lower} {
 	.try itemconfigure try1 -fill blue -font {helvetica 20 bold}
 	.try create text 20 20 -text "B" -tags t2
 	.try create text 30 30 -text "C" -tags t3
-	.try undo check
 	.try create line 20 10 60 50 -width 4 -tags t4
-	.try undo check
 	.try lower t4 t1
 	.try lower t2 t1
 	.try undo
@@ -281,11 +331,10 @@ test Classy::Canvas {undo raise} {
 	.try itemconfigure try1 -fill blue -font {helvetica 20 bold}
 	.try create text 20 20 -text "B" -tags t2
 	.try create text 30 30 -text "C" -tags t3
-	.try undo check
 	.try create line 20 10 60 50 -width 4 -tags t4
-	.try undo check
 	.try raise t1 t4
 	.try raise t1 t2
+	.try undo
 	.try undo
 	.try mitemcget all -tags
 } {t1 t2 t3 t4}
@@ -298,9 +347,7 @@ test Classy::Canvas {redo raise} {
 	.try itemconfigure try1 -fill blue -font {helvetica 20 bold}
 	.try create text 20 20 -text "B" -tags t2
 	.try create text 30 30 -text "C" -tags t3
-	.try undo check
 	.try create line 20 10 60 50 -width 4 -tags t4
-	.try undo check
 	.try raise t1 t4
 	.try raise t1 t2
 	.try undo
@@ -316,13 +363,9 @@ test Classy::Canvas {undo delete} {
 	.try itemconfigure try1 -fill blue -font {helvetica 20 bold}
 	.try create text 20 20 -text "B" -tags {t2 try}
 	.try create text 30 30 -text "C" -tags {t3 test}
-	.try undo check
 	.try create line 20 10 60 50 -width 4 -tags {t4 try}
-	.try undo check
 	.try lower t4 t1
-	.try undo check
 	.try lower t2 t1
-	.try undo check
 	.try delete try
 	.try undo
 	.try mitemcget all -tags
@@ -336,13 +379,9 @@ test Classy::Canvas {redo delete} {
 	.try itemconfigure try1 -fill blue -font {helvetica 20 bold}
 	.try create text 20 20 -text "B" -tags {t2 try}
 	.try create text 30 30 -text "C" -tags {t3 test}
-	.try undo check
 	.try create line 20 10 60 50 -width 4 -tags {t4 try}
-	.try undo check
 	.try lower t4 t1
-	.try undo check
 	.try lower t2 t1
-	.try undo check
 	.try delete try
 	.try undo
 	.try redo
@@ -357,7 +396,6 @@ test Classy::Canvas {undo addtag} {
 	.try create text 20 20 -text "B" -tags try
 	.try create text 30 30 -text "C" -tags {t3 try find}
 	.try create line 20 10 60 50 -width 4 -tags {t4 try find new}
-	.try undo check
 	.try addtag new withtag find
 	.try undo
 	.try mitemcget new -tags
@@ -371,7 +409,6 @@ test Classy::Canvas {redo addtag} {
 	.try create text 20 20 -text "B" -tags try
 	.try create text 30 30 -text "C" -tags {t3 try find}
 	.try create line 20 10 60 50 -width 4 -tags {t4 try find new}
-	.try undo check
 	.try addtag new withtag find
 	.try undo
 	.try redo
@@ -386,7 +423,6 @@ test Classy::Canvas {undo dtag} {
 	.try create text 20 20 -text "B" -tags try2
 	.try create text 30 30 -text "C" -tags {try3 find}
 	.try create line 20 10 60 50 -width 4 -tags {try4 find new}
-	.try undo check
 	.try dtag find new
 	.try undo
 	.try mitemcget new -tags
@@ -400,7 +436,6 @@ test Classy::Canvas {redo dtag} {
 	.try create text 20 20 -text "B" -tags try2
 	.try create text 30 30 -text "C" -tags {try3 find}
 	.try create line 20 10 60 50 -width 4 -tags {try4 find new}
-	.try undo check
 	.try dtag find new
 	.try undo
 	.try redo
@@ -412,7 +447,6 @@ test Classy::Canvas {undo dchars} {
 	Classy::Canvas .try
 	pack .try -fill both -expand yes
 	.try create text 50 50 -text "ABCDE" -tags try1
-	.try undo check
 	.try dchars try1 2 3
 	.try undo
 	.try itemcget try1 -text
@@ -423,7 +457,6 @@ test Classy::Canvas {redo dchars} {
 	Classy::Canvas .try
 	pack .try -fill both -expand yes
 	.try create text 50 50 -text "ABCDE" -tags try1
-	.try undo check
 	.try dchars try1 2 3
 	.try undo
 	.try redo
@@ -435,7 +468,6 @@ test Classy::Canvas {undo insert} {
 	Classy::Canvas .try
 	pack .try -fill both -expand yes
 	.try create text 50 50 -text "ACDE" -tags try1
-	.try undo check
 	.try insert try1 1 B
 	.try undo
 	.try itemcget try1 -text
@@ -446,7 +478,6 @@ test Classy::Canvas {redo insert} {
 	Classy::Canvas .try
 	pack .try -fill both -expand yes
 	.try create text 50 50 -text "ACDE" -tags try1
-	.try undo check
 	.try insert try1 1 B
 	.try undo
 	.try redo
@@ -461,11 +492,8 @@ test Classy::Canvas {delete lower undo} {
 	.try itemconfigure t1 -fill blue -font {helvetica 20 bold}
 	.try create text 20 20 -text "B" -tags {t2 try}
 	.try create text 30 30 -text "C" -tags {t3 test}
-	.try undo check
 	.try delete try
-	.try undo check
 	.try create line 20 10 60 50 -width 4 -tags t4
-	.try undo check
 	.try lower t4 t1
 	.try undo
 	.try mitemcget all -tags
@@ -478,12 +506,24 @@ test Classy::Canvas {selection} {
 	for {set i 0} {$i<1000} {incr i 10} {
 		.try create text $i $i -text $i -tags "t$i"
 	}
-#	.try selection add all
 	.try selection add t20 t30 t40 t50
 	.try selection clear
 	.try selection get
 	.try selection redraw
 } {}
+
+test Classy::Canvas {selection undo} {
+	classyclean
+	Classy::Canvas .try
+	pack .try -fill both -expand yes
+	for {set i 0} {$i<1000} {incr i 10} {
+		.try create text $i $i -text $i -tags "t$i"
+	}
+	.try selection add t20 t30 
+	.try selection add t40 t50
+	.try undo
+	.try mitemcget _sel -text
+} {20 30}
 
 test Classy::Canvas {save} {
 	classyclean
@@ -494,7 +534,6 @@ test Classy::Canvas {save} {
 	.try create text 20 20 -text "B" -tags t2
 	.try create text 30 30 -text "C" -tags {t3 test}
 	.try create line 10 10 60 50 -width 4 -tags t4
-	.try undo check
 	.try lower t4 t1
 	.try lower t3 t2
 	set d [.try save]
@@ -568,11 +607,12 @@ test Classy::Canvas {group} {
 	classyclean
 	Classy::Canvas .try
 	pack .try -fill both -expand yes
-	for {set i 0} {$i<50} {incr i 10} {
-		.try create text $i $i -text $i -tags "t$i"
+	for {set i 0} {$i<5} {incr i} {
+		set pos [expr {10*$i}]
+		set id($i) [.try create text $pos $pos -text $pos -tags "t$pos"]
 	}
-	set g1 [.try group items 4 5]
-	set g2 [.try group items 6 7]
+	set g1 [.try group items $id(0) $id(1)]
+	set g2 [.try group items $id(2) $id(3)]
 	set g3 [.try group tags $g1 $g2]
 	.try mitemcget all -tags
 } {{t0 _g1 _g3} {t10 _g1 _g3} {t20 _g2 _g3} {t30 _g2 _g3} t40}
@@ -581,11 +621,12 @@ test Classy::Canvas {save group} {
 	classyclean
 	Classy::Canvas .try
 	pack .try -fill both -expand yes
-	for {set i 0} {$i<50} {incr i 10} {
-		.try create text $i $i -text $i -tags "t$i"
+	for {set i 0} {$i<5} {incr i} {
+		set pos [expr {10*$i}]
+		set id($i) [.try create text $pos $pos -text $pos -tags "t$pos"]
 	}
-	set g1 [.try group items 4 5]
-	set g2 [.try group items 6 7]
+	set g1 [.try group items $id(0) $id(1)]
+	set g2 [.try group items $id(2) $id(3)]
 	set g3 [.try group tags $g1 $g2]
 	set d [.try save]
 	.try delete all
@@ -595,6 +636,21 @@ test Classy::Canvas {save group} {
 	.try load $d
 	.try mitemcget all -tags
 } {{a _g4} {a _g4} {t0 _g5 _g6 _new} {t10 _g5 _g6 _new} {t20 _g7 _g6 _new} {t30 _g7 _g6 _new} {t40 _new}}
+
+test Classy::Canvas {print dialog} {
+source tools.tcl
+	classyclean
+Builder .b
+	Classy::Canvas .try
+	.try configure -papersize A4
+	pack .try -fill both -expand yes
+	set id [.try create text 10 10 -text "A"]
+	.try create text 50 50 -text "B" -font {times 14 bold}
+	.try create line 20 10 60 50 -width 4
+	.try itemconfigure $id -text
+	.try printdialog
+	manualtest
+} {}
 
 
 testsummarize

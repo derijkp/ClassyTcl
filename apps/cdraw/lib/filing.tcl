@@ -1,33 +1,42 @@
 #Functions
 
-proc save w {
+proc filesave w {
 global status
-if ![info exists status(file)] {
-	set status(file) [Classy::savefile -title "Save as"]
+if ![info exists status($w,file)] {
+	saveas $w
+} else {
+	writefile $status($w,file) [$w save]
 }
-$w save $status(file)
 }
 
-proc load w {
+proc fileload w {
 global status
-set status(file) [Classy::selectfile -title Open -selectmode persistent]
-$w load $status(file)
-
+if {(![info exists status($w,file)])||("$status($w,file)" == "")} {
+	set init new.cld
+} else {
+	set init $status($w,file)
+}
+set temp [Classy::selectfile -title Open -selectmode persistent \
+	-defaultextension .cld \
+	-initialfile $init]
+if {"$temp" == ""} return
+set status($w,file) $temp
+$w load [readfile $status($w,file)]
 }
 
-proc saveas {} {
+proc saveas w {
 global status
-set status(file) [Classy::savefile -title Save as -selectmode persistent]
-$w save $status(file)
-
+if {(![info exists status($w,file)])||("$status($w,file)" == "")} {
+	set init new.cld
+} else {
+	set init $status($w,file)
 }
-
-
-
-
-
-
-
-
+set temp [Classy::savefile -title "Save as" \
+	-defaultextension .cld\
+	-initialfile $init]
+if {"$temp" == ""} return
+set status($w,file) $temp
+writefile $status($w,file) [$w save]
+}
 
 

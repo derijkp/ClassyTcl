@@ -169,7 +169,7 @@ proc mainw args {# ClassyTcl generated Toplevel
 	grid $window.opt.button2 -row 0 -column 1 -sticky nesw
 	button $window.opt.button3 \
 		-command exit \
-		-text cls
+		-text exit
 	grid $window.opt.button3 -row 0 -column 2 -sticky nesw
 	grid columnconfigure $window.opt 0 -weight 1
 
@@ -267,6 +267,7 @@ foreach w [winfo children $window] {
 }
 $window.entry set 0
 set data(new) 1
+	return $window
 	return $window
 	return $window
 	return $window
@@ -628,3 +629,4 @@ regsub {0+$} $value {} value
 regsub {\.$} $value {} value
 .mainw.entry nocmdset $value
 }
+

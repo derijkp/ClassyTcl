@@ -162,7 +162,11 @@ Classy::OptionBox method get {} {
 	} else {
 		set varname $options(-variable)
 	}
-	return [set ::$varname]
+	if ![catch {set result [set ::$varname]} result] {
+		return $result
+	} else {
+		return {}
+	}
 }
 
 #doc {OptionBox command items} cmd {

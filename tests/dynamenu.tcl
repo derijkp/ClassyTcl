@@ -47,4 +47,24 @@ test Classy::DynaMenu {redefine error} {
 	regexp {^error while defining menu; restored old} $error
 } {1}
 
+test Classy::DynaMenu {activemenu} {
+	classyclean
+	text .t -width 10 -height 5
+	pack .t -side left -fill both -expand yes
+	proc p {} {
+		return {{action OK {puts ok} Alt-a} Test_active}
+	}
+	Classy::DynaMenu define Test {
+		activemenu "Active" p
+	}
+	Classy::DynaMenu attachmainmenu Test .t
+	bindtags .t "Test_active [bindtags .t]"
+	update
+	proc p {} {
+		return {{action OK {puts ok} Alt-b} Test_active}
+	}
+	Classy::DynaMenu updateactive Test
+	bind Test_active
+} {<Alt-Key-b>}
+
 testsummarize

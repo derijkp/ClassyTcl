@@ -108,6 +108,27 @@ Classy::Config method saveinfile {file name code} {
 	close $f
 }
 
+Classy::Config method deleteinfile {file name} {
+	catch {file delete ${file}~}
+	if ![file exists $file] {writefile $file ""}
+	file rename $file ${file}~
+	set f [open ${file}~]
+	set o [open $file w]
+	while {![eof $f]} {
+		set line [Extral::getcomplete $f]
+		if [regexp {Classy::config} $line] {
+			set cname [lindex $line 1]
+			if {"$cname" != "$name"} {
+				puts $o $line
+			}
+		} else {
+			puts $o $line
+		}
+	}
+	close $o
+	close $f
+}
+
 Classy::Config method collect {level type} {
 	set file [file join $::Classy::dir($level) init $type.tcl]
 	if ![file exists $file] {return ""}
@@ -256,8 +277,8 @@ Classy::Config method load {type level name var} {
 				lappend data(names) $name
 				set data($name,option) $option
 				set data($name,value) $value
-				set data($name,descr) $descr
 				set data($name,type) $type
+				set data($name,descr) $descr
 			}
 		}
 		default {
@@ -315,7 +336,7 @@ Classy::Config method getbody {var} {
 	set body ""
 	set type $data(type)
 	switch $type {
-		font - color - misc - key - mouse {
+		font - color - key - mouse {
 			set body "Classy::config$type [list $data(name)] \{\n"
 			foreach name $data(names) {
 				if $data($name,#) {
@@ -324,6 +345,18 @@ Classy::Config method getbody {var} {
 					set rname $name
 				}
 				append body "\t[list $rname $data($name,option) $data($name,value) $data($name,descr)]\n"
+			}
+			append body "\}"
+		}
+		misc {
+			set body "Classy::config$type [list $data(name)] \{\n"
+			foreach name $data(names) {
+				if $data($name,#) {
+					set rname "#$name"
+				} else {
+					set rname $name
+				}
+				append body "\t[list $rname $data($name,option) $data($name,value) $data($name,type) $data($name,descr)]\n"
 			}
 			append body "\}"
 		}
@@ -363,6 +396,24 @@ Classy::Config method save {var {level {}} {named {}}} {
 	$object saveinfile $file $data(name) $body
 	set data(changed) 0
 	catch {$data(window).value textchanged 0}
+}
+
+Classy::Config method clear {var} {
+	upvar #0 $var data
+	set type $data(type)
+	set level $data(level)
+	if ![Classy::yorn "Delete $data(name) at level $data(level)"] return
+	switch $level {
+		appuser - appdef - user - def {
+			catch {set type [structlget {color Colors font Fonts misc Misc mouse Mouse key Keys menu Menus tool Toolbars} $type]}
+			set file [file join $::Classy::dir($level) init $type.tcl]
+		}
+		default {
+			set file $level
+		}
+	}
+	catch {$object deleteinfile $file $data(name)}
+	::Classy::Config restore $var $var
 }
 
 Classy::Config method redraw {var window} {
@@ -439,7 +490,8 @@ Classy::Config method saveas {var args} {
 Classy::Config method browselist {var window current} {
 	upvar #0 $var data
 	if {"$current" == ""} return
-	$window.frame.select configure -type [set ::${var}($current,type)] \
+	if ![info exists data($current,type)] return
+	$window.frame.select configure -type $data($current,type) \
 		-variable "::${var}($current,value)" \
 		-label $current -orient vertical
 	$window.frame.comment configure -variable "::${var}($current,#)"
@@ -479,17 +531,42 @@ Classy::Config method rename {var window new} {
 	$window.list selection set $pos
 }
 
+Classy::Config method change {var window} {
+	upvar #0 $var data
+	set data(changed) 1
+	set current [lindex [$window.list get] 0]
+	set name [$window.frame.advanced.content.text get]
+	if {"$name" != "$current"} {
+		if {[lsearch $data(names) $name] != -1} {
+			error "option \"$name\" exists"
+		}
+	}
+	set pos [lsearch $data(names) $current]
+	set data(names) [lreplace $data(names) $pos $pos $name]
+	set data($name,value) $data($current,value)
+	foreach field {option value descr type value} {
+		unset data($current,$field)
+	}
+	set data($name,option) [$window.frame.advanced.content.pattern get]
+	set data($name,descr) [$window.frame.advanced.content.descr get]
+	set data($name,type) [$window.frame.advanced.content.type get]
+	$window.list configure -content $data(names)
+	$window.list activate $pos
+	$window.list selection set $pos
+}
+
 Classy::Config method add {var window} {
 	upvar #0 $var data
 	set data(changed) 1
-	set num 1
-	while {[lsearch $data(names) "option $num"] != -1} {incr num}
-	set name "option $num"
+	set name [$window.frame.advanced.content.text get]
+	if {[lsearch $data(names) $name] != -1} {
+		error "pattern \"$name\" exists"
+	}
 	lappend data(names) $name
-	set data($name,option) *option
+	set data($name,option) [$window.frame.advanced.content.pattern get]
 	set data($name,value) ""
-	set data($name,descr) "description"
-	set data($name,type) line
+	set data($name,descr) [$window.frame.advanced.content.descr get]
+	set data($name,type) [$window.frame.advanced.content.type get]
 	$window.list configure -content $data(names)
 	$window.list activate end
 	$window.list selection set end
@@ -508,7 +585,12 @@ Classy::Config method move {dir var window} {
 	}
 	if {$to == -1} return
 	if {$to >= [llength $data(names)]} return
-	set data(names) [lreplace [lreplace $data(names) $pos $pos] $to 0 $current]
+	set data(names) [lreplace $data(names) $pos $pos]
+	if {$to == [llength $data(names)]} {
+		lappend data(names) $current
+	} else {
+		set data(names) [lreplace $data(names) $to -1 $current]
+	}
 	$window.list configure -content $data(names)
 	$window.list activate $to
 	$window.list selection set $to
@@ -569,13 +651,6 @@ Classy::Config method changelevel {var window} {
 			set data(window) $window
 		}
 	}		
-}
-
-Classy::Config method clear {var} {
-	upvar #0 $var data
-	foreach name $data(names) {
-		set data($name,#) 1
-	}
 }
 
 Classy::Config method open {w name} {

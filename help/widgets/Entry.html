@@ -22,7 +22,11 @@ Entry
 
 <h2>
 	Entry specific options
-</h2><dl><b><dt>Command-Line Name: -orient</b><b><dt>Database Name: orient</b><b><dt>Database Class: Orient</b><dd>
+</h2><dl><b><dt>Command-Line Name: -undosteps</b><b><dt>Database Name: undoSteps</b><b><dt>Database Class: UndoSteps</b><dd>
+ gives the number of possible undo steps. Default is 200.
+<b><dt>Command-Line Name: -papersize</b><b><dt>Database Name: papeSize</b><b><dt>Database Class: PaperSize</b><dd>
+ determines the papersize
+<b><dt>Command-Line Name: -orient</b><b><dt>Database Name: orient</b><b><dt>Database Class: Orient</b><dd>
  determines the position of the label relative to the entry: horizontal or vertical
 <b><dt>Command-Line Name: -default</b><b><dt>Database Name: default</b><b><dt>Database Class: Default</b><dd>
  If not empty, a <a href="DefaultMenu.html">DefaultMenu</a> will be 
@@ -43,6 +47,10 @@ Entry
  No constraint is applied when it is set to the empty string.
 <b><dt>Command-Line Name: -labelwidth</b><b><dt>Database Name: labelWidth</b><b><dt>Database Class: LabelWidth</b><dd>
  width of the label
+<b><dt>Command-Line Name: -warn</b><b><dt>Database Name: warn</b><b><dt>Database Class: Warn</b><dd>
+ The option -warn can be true or false. If it is false (or 0), the entry will
+ never contain a value not matching the constraint. It warn is true, it is possible
+ to enter a value not matching the constraint, but there will be visual warning.
 
 </dl><h2>
 	Entry specific methods
@@ -66,8 +74,5 @@ pathname command
 pathname constrain ?warn?
 </b><dd>
  check whether the value matches the regular expression given by the -constraint option
- The optional parameter warn can be either 1 or 0. If it is 0, the entry will
- never contain a value not matching the constraint. It warn is 1, it is possible
- to enter a value not matching the constraint, but there will be visual warning.
 
 </body>

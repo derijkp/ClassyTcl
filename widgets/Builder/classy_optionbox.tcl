@@ -37,7 +37,7 @@ proc ::Classy::WindowBuilder::edit_Classy::OptionBox {object w} {
 	frame $w.general
 	set base $current(w)
 	::Classy::WindowBuilder::defattredit $object $w.general {
-		-label Label 0 -orient Orientation 0 initialvalue "initial value" 0
+		-label Label 0 -variable Variable 0 -orient Orientation 0 initialvalue "initial value" 0
 	} 8
 	button $w.add -text "Add Field" \
 		-command [list ::Classy::WindowBuilder::edit_Classy::OptionBox_add $object $w $base]

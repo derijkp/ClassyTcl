@@ -12,7 +12,7 @@ proc Classy::patchtk {} {
 	}
 	array set map {
 		<Button-1> <<Action>>
-		<ButtonRelease-1> <<ButtonRelease-Action>>
+		<ButtonRelease-1> <<Action-ButtonRelease>>
 		<B1-Motion> <<Action-Motion>>
 		<B1-Leave> <<Action-Leave>>
 		<B1-Enter> <<Action-Enter>>
@@ -104,9 +104,9 @@ proc Classy::patchtk {} {
 		Text <<Escape>> <Escape>
 		Text <<MAdd>> <<MIcursor>>
 		Entry <<MAdd>> <<MIcursor>>
-		Entry <<MXPaste>> <<ButtonRelease-Adjust>>
-		Text <<MXPaste>> <<ButtonRelease-Adjust>>
-		Scale <<MXPaste>> <<ButtonRelease-Adjust>>
+		Entry <<MXPaste>> <<Adjust-ButtonRelease>>
+		Text <<MXPaste>> <<Adjust-ButtonRelease>>
+		Scale <<MXPaste>> <<Adjust-ButtonRelease>>
 		Scrollbar <<MAdd> <<MPosition>>
 	} {
 		set temp [bind $type $old]

@@ -8,17 +8,21 @@ test Classy::Table {create and configure} {
 	classyclean
 	Classy::Table .try
 	.try configure -xscrollcommand {.hbar set} -yscrollcommand {.vbar set} -getcommand {
-		if {%x == 1} {
-			%w configure -bg gray
-		} elseif {%y == 5} {
-			%w configure -bg yellow
-		} else {
-			%w configure -bg [%W cget -bg]
+		invoke {object w x y} {
+			if {$x == 1} {
+				$w configure -bg gray
+			} elseif {$y == 5} {
+				$w configure -bg yellow
+			} else {
+				$w configure -bg [$w cget -bg]
+			}
+			get ::d($x,$y)
 		}
-		get d(%y,%x)
 	} -setcommand {
-		if {"%v" == "error"} {error "some error"}
-		set d(%y,%x) %v
+		invoke {object w x y v} {
+			if {"$v" == "error"} {error "some error"}
+			set ::d($x,$y) $v
+		}
 	}
 	scrollbar .hbar -command {.try xview} -orient horizontal
 	scrollbar .vbar -command {.try yview} -orient vertical
@@ -29,7 +33,7 @@ test Classy::Table {create and configure} {
 	grid rowconfigure . 0 -weight 1
 	grid rowconfigure . 1 -weight 0
 
-	.try configure -xlabelcommand {echo "x %x"} -ylabelcommand {echo "y %y"} \
+	.try configure -xlabelcommand {invoke {object w col} {return "x $col"}} -ylabelcommand {invoke {object w row} {return "y $row"}} \
 		-rows 500 -cols 5
 	for {set row 0} {$row<600} {incr row} {
 		for {set col 0} {$col<10} {incr col} {

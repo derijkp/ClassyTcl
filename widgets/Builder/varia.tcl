@@ -26,7 +26,7 @@ proc ::Classy::WindowBuilder::add_checkbutton {object base args} {
 
 proc ::Classy::WindowBuilder::edit_Checkbutton {object w} {
 	::Classy::WindowBuilder::defattredit $object $w {
-		-variable Variable 0 -text Text 0 -image Image 0 -anchor Anchor 0 -command Command 1
+		-variable Variable 0 -text Text 0 -image Image 0 -anchor Anchor 0 -indicatoron Indicator 0 -command Command 1
 	} 8 0
 }
 
@@ -42,7 +42,7 @@ proc ::Classy::WindowBuilder::add_radiobutton {object base args} {
 
 proc ::Classy::WindowBuilder::edit_Radiobutton {object w} {
 	::Classy::WindowBuilder::defattredit $object $w {
-		-variable Variable 0 -value Value 0 -text Text 0 -image Image 0 -anchor Anchor 0 -command Command 1
+		-variable Variable 0 -value Value 0 -text Text 0 -image Image 0 -indicatoron Indicator 0 -anchor Anchor 0 -command Command 1
 	} 8 0
 }
 

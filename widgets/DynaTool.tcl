@@ -16,7 +16,7 @@
 # the DynaTool class in an easy and dynamic way.
 # DynaTool can handle several tooltypes.
 #<p>
-# Each tooltype is defined by a definition in a simple format. 
+# Each tooltype is defined by a <a href="../classy_dynatool.html">definition in a simple format</a>. 
 # DynaTool can create one or more toolbars for each
 # tooltype. When the definition of the tooltype is changed
 # all toolbars of that type will be changed accordingly.
@@ -132,7 +132,20 @@ Classy::DynaTool addoption -type {type Type {}} {
 			append data(checks) "$object.$key configure $command\n"
 			lappend data(slaves) $object.$key
 		} elseif {"$type"=="widget"} {
-			eval $id $object.$key
+			$id $object.$key
+			set command [lshift current]
+			regsub -all {%W} $command $cmdw tempcmd
+			regsub -all {%%} $tempcmd % tempcmd
+			eval $object.$key configure $tempcmd
+			append data(checks) "$object.$key configure $command\n"
+			update idletasks
+			lappend data(slaves) $object.$key
+		} elseif {"$type"=="tool"} {
+			set cmd [$id $object.$key]
+			if {"$cmdw" != ""} {
+				eval [replace $cmd [list %% % %W $cmdw]]
+			}
+			append data(checks) "$cmd\n"
 			update idletasks
 			lappend data(slaves) $object.$key
 		} elseif {"$type"=="label"} {
@@ -171,13 +184,14 @@ Classy::DynaTool addoption -width {width Width 0} {
 #doc {DynaTool define} cmd {
 #pathname define tooltype ?data?
 #} descr {
-# set the definition describing the tools that will be generated 
+# set the <a href="../classy_dynatool.html">definition describing the tools</a> that will be generated 
 # for $tooltype.
 # If data is not given, the toolbar definition for $tooltype will be returned.
 # Definition of toolbars is usually done in the
 # <a href="../classy_configure.html">configuration system</a>.
-# You will usually not invoke this method, as the maketool
-# method will automatically define a tooltype that isn't managed yet.
+# You will usually not invoke this method, as the definition of 
+# tooltype that isn't managed yet will be automatically fetched and defined
+# when creating a new toolbar.
 #}
 Classy::DynaTool classmethod define {tooltype {data {}}} {
 #putsvars tooltype data

@@ -26,7 +26,7 @@ Classy::configtool Classy::Builder {toolbar used in the ClassyTcl Builder} {
 	action newtoplevel "New Toplevel" {%W new toplevel}
 	action newdialog "New Dialog" {%W new dialog}
 	action newframe "New Frame" {%W new frame}
-	action newfile "New file" {%W new file}
+	action newfile "New file" {puts %W ; %W new file}
 	separator
 	action save "Save" {%W save}
 	action copy "Copy" {%W copy}
@@ -39,8 +39,8 @@ Classy::configtool Classy::WindowBuilder {toolbar used in the ClassyTcl WindowBu
 	action cut "Delete" {%W delete}
 	separator
 	action save "Save" {%W save}
-	action test "Test" {%W testparam}
-	action ftest "test without parameters" {%W test}
+	action test "Test" {%W test}
+	action ptest "Test with parameters" {%W testparam}
 	action recreate "Recreate Dialog" {%W recreate}
 	separator
 	action close "Close" {destroy %W}
@@ -79,6 +79,7 @@ Classy::configtool Classy::WindowBuilder_icons {Tk widget toolbar used in the Cl
 	action Builder/classy__fold {Fold} {%W add Classy::Fold}
 	action Builder/classy__fontselect {Font select} {%W add button -text "Select font" -command {set font [Classy::getfont]}}
 	action Builder/classy__colorselect {Color select} {%W add button -text "Select color" -command {set color [Classy::getcolor]}}
+	action Builder/classy__fileselect {File select} {%W add button -text "Select file" -command {set file [Classy::selectfile]}}
 	action Builder/classy__selector {Selector} {%W add Classy::Selector}
 	action Builder/classy__treewidget {Tree widget} {%W add Classy::TreeWidget}
 	action Builder/classy__browser {Browser} {%W add Classy::Browser}

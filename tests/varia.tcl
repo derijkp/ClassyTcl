@@ -13,6 +13,28 @@ test Classy::Paned {basic} {
 	manualtest
 } {}
 
+test Classy::Paned {reverse} {
+	classyclean
+	Classy::Paned .try -window .l2
+	listbox .l1
+	listbox .l2
+	grid .l1 .try .l2 -sticky nwse
+	grid columnconfigure . 0 -weight 1
+	manualtest
+} {}
+
+test Classy::Paned {vertical} {
+	classyclean
+	Classy::Paned .try -window .l1 -orient vertical
+	listbox .l1 -height 4
+	listbox .l2
+	grid .l1 -sticky nwse
+	grid .try -sticky nwse
+	grid .l2 -sticky nwse
+	grid rowconfigure . 2 -weight 1
+	manualtest
+} {}
+
 test Classy::OptionBox {basic} {
 	classyclean
 	Classy::OptionBox .try -label Try -variable try -orient vertical

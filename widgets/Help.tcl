@@ -68,10 +68,10 @@ Classy::Help classmethod init {args} {
 }
 
 Classy::Help private generalmenu {
-	action HelpHelp "Help on Help" {%W gethelp classy_help}
-	action HelpHelp "Tcl/Tk" {%W gethelp tcltk}
-	action HelpHelp "ClassyTcl" {%W gethelp ClassyTcl}
-	action HelpHelp "Extral" {%W gethelp Extral}
+	action "Help on Help" {%W gethelp classy_help} <<HelpHelp>>
+	action "Tcl/Tk" {%W gethelp tcltk} <<HelpTcl>>
+	action "ClassyTcl" {%W gethelp ClassyTcl} <<HelpClassyTcl>>
+	action "Extral" {%W gethelp Extral} <<HelpExtral>>
 }
 
 # ------------------------------------------------------------------
@@ -194,10 +194,10 @@ Classy::Help method getcontentsmenu {} {
 		set line [lindex $c $pos]
 		set len [llength $line]
 		if {($len > 0)&&($len < 6)} {
-			append contentsmenu "\t[list action None "$line" "$w yview [expr {$pos+1}].0"]\n"
+			append contentsmenu "\t[list action "$line" "$w yview [expr {$pos+1}].0"]\n"
 		}
 	}
-	set data "action TopHelp Top {%W see 1.0}\n$contentsmenu"
+	set data "action Top {%W see 1.0} <<TopHelp>>\n$contentsmenu"
 	return [list $data Classy::Help_contents]
 }
 

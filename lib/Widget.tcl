@@ -514,7 +514,6 @@ Widget classmethod _children {} {
 # objectName destroy
 #}
 Widget method destroy {} {
-puts "widget destroy $object"
 	if {"$object" == "."} {
 		exit
 	}

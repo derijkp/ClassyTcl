@@ -1,47 +1,68 @@
 #Application menu configuration file
 
 Classy::configmenu MainMenu {Main application menu} {
-	menu file "File" {
-		action Load "Open file" {load}
-		action Save "Save" {save}
-		action SaveAs "Save as" {saveas}
+	menu "File" {
+		action "Open file" {fileload %W} <<Load>>
+		action "Save" {filesave %W} <<Save>>
+		action "Save as" {saveas %W} <<SaveAs>>
+		action "Print" {%W print} <<Print>>
 		separator
-		action Clear "Clear page" {%W delete all}
+		action "Clear page" {
+			if [Classy::yorn "Are you absolutely sure you want to clear the page (no undo)"] {%W clear}
+		} <<Clear>>
 		separator
-		action Editor "Editor" {edit newfile}
-		action Cmd "Command window" {Classy::cmd}
-		action Builder "Builder" {Classy::Builder .classy__.builder}
-		action Configure "Customise application" {Classy::Config dialog}
-		action ConfigureMenu "Customise menu" {Classy::Config config menu MainMenu}
-		action ConfigureTool "Customise toolbar" {Classy::Config config tool MainTool}
-		action Exit "Exit" "exit"
+		action "Editor" {edit newfile} <<Editor>>
+		action "Command window" {Classy::cmd} <<Cmd>>
+		action "Builder" {Classy::Builder .classy__.builder} <<Builder>>
+		action "Customise application" {Classy::Config dialog} <<Customise>>
+		action "Customise menu" {Classy::Config config menu MainMenu} <<CustomiseMenu>>
+		action "Customise toolbar" {Classy::Config config tool MainTool} <<CustomiseTool>>
+		action "Exit" "exit" <<Exit>>
 	}
-	menu edit "Edit" {
-		action Cut "Cut" {error "cut not implemented yet"}
-		action Copy "Copy" {error "copy not implemented yet"}
-		action Paste "Paste" {error "paste not implemented yet"}
-		action Undo "Undo" {%W undo}
-		action Redo "Redo" {%W redo}
-		action ClearUndo "Clear undo buffer" {%W undo clear}
-	}
-	menu mode "Mode" {
-		action Text "Text" {text_start %W}
-		action Line "Line" {line_start %W}
-	}
-	menu help "Help" {
-		action Help "Application" {Classy::help application}
+	menu "Edit" {
+		action "Group" {group %W} <<Group>>
+		action "Ungroup" {ungroup %W} <<UnGroup>>
 		separator
-		action HelpClassyTcl "ClassyTcl" {Classy::help ClassyTcl}
-		action HelpHelp "Help" {Classy::help help}
+		action "Raise object" {raise_objects %W _sel} <<Raise>>
+		action "Lower object" {lower_objects %W _sel} <<Lower>>
+		action "Raise to top" {top_objects %W _sel} <<Top>>
+		action "Lower to bottom" {bottom_objects %W _sel} <<Bottom>>
+		separator
+		action "Delete" {delete %W} <<Delete>>
+		action "Cut" {%W cut _sel} <<Cut>>
+		action "Copy" {%W copy _sel} <<Copy>>
+		action "Paste" {%W paste} <<Paste>>
+		action "Undo" {%W undo} <<Undo>>
+		action "Redo" {%W redo} <<Redo>>
+		action "Clear undo buffer" {%W undo clear} <<ClearUndo>>
 	}
-
+	menu "Windows" {
+		action "Zoom" {zoomdialog} <<ZoomDialog>>
+		action "Configure objects" {configwindow} <<ConfigObjects>>
+	}
+	menu "Mode" {
+		action "Select" {select_start %W} <<Select>>
+		check "Rotate" {-variable status(%W,rotate) -command {rotate_set %W}} <<Rotate>>
+		action "Zoom" {zoom_start %W} <<Zoom>>
+		action "Text" {text_start %W} <<Text>>
+		action "Line" {line_start %W} <<Line>>
+		action "Polygon" {polygon_start %W} <<Polygon>>
+		action "Rectangle" {rectangle_start %W} <<Rectangle>>
+		action "Oval" {oval_start %W} <<Oval>>
+		action "Arc" {arc_start %W} <<Arc>>
+	}
+	menu "Help" {
+		action "Application" {Classy::help application} <<Help>>
+		separator
+		action "ClassyTcl" {Classy::help ClassyTcl} <<HelpClassyTcl>>
+		action "Help" {Classy::help help} <<HelpHelp>>
+	}
 
 
 
 
 
 }
-
 
 
 

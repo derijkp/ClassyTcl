@@ -36,15 +36,15 @@ option add *Classy::WindowBuilder_tool.highlightThickness 0 widgetDefault
 option add *Classy::WindowBuilder_tool.indel.background [option get . darkBackground DarkBackground] widgetDefault
 option add *Classy::WindowBuilder_tool.resize.background [option get . darkBackground DarkBackground] widgetDefault
 
-bind Classy::WindowBuilder_select <<ButtonPress-Action>> "\[Classy::WindowBuilder_win %W\] _sticky start %W %X %Y"
+bind Classy::WindowBuilder_select <<Action-ButtonPress>> "\[Classy::WindowBuilder_win %W\] _sticky start %W %X %Y"
 bind Classy::WindowBuilder_select <<Action-Motion>> "\[Classy::WindowBuilder_win %W\] _sticky motion %W %X %Y"
-bind Classy::WindowBuilder_select <<ButtonRelease-Action>> "\[Classy::WindowBuilder_win %W\] _sticky action %W %X %Y"
+bind Classy::WindowBuilder_select <<Action-ButtonRelease>> "\[Classy::WindowBuilder_win %W\] _sticky action %W %X %Y"
 bind Classy::WindowBuilder_tool <<Drop>> "\[Classy::WindowBuilder_win %W\] drop %W"
 
 bind Classy::WindowBuilder <<Adjust>> "\[Classy::WindowBuilder_win %W\] insertname %W"
 bind Classy::WindowBuilder <<Drag>> "\[Classy::WindowBuilder_win %W\] drag %W %X %Y"
 bind Classy::WindowBuilder <<Drop>> "\[Classy::WindowBuilder_win %W\] drop %W;break"
-bind Classy::WindowBuilder <<ButtonRelease-Action>> "\[Classy::WindowBuilder_win %W\] select %W"
+bind Classy::WindowBuilder <<Action-ButtonRelease>> "\[Classy::WindowBuilder_win %W\] select %W"
 bind Classy::WindowBuilder <Configure> "\[Classy::WindowBuilder_win %W\] _configure %W"
 
 # ------------------------------------------------------------------
@@ -150,7 +150,6 @@ Classy::WindowBuilder method select {w} {
 	set window $data(base)
 	switch -glob -- $w {
 		{} {
-			catch {unset current}
 			set current(w) ""
 			Classy::todo $object redraw
 			return
@@ -173,8 +172,13 @@ Classy::WindowBuilder method select {w} {
 		set current(p) $data(base)
 	} elseif [info exists data(parent,$w)] {
 		set current(p) $data(parent,$w)
-	} else {
+	} elseif {"[winfo manager $w]" == "grid"} {
 		set current(p) [winfo parent $w]
+	} else {
+		private $object border
+		if [info exists border(parent)] {
+			set current(p) $border(parent)
+		}
 	}
 	$object geometryset rebuild
 	switch [$object.book get] {
@@ -345,8 +349,7 @@ Classy::WindowBuilder method _drawselectedw {args} {
 			catch {place forget $w.classy__$name}
 		}
 	} else {
-		
-		array set current [grid info $selw]
+		if {"[winfo manager $selw]" == "grid"} {set grid 1} else {set grid 0}
 		set w $object.work
 		if ![winfo exists $w.classy__nw] {
 			foreach name {nw n ne e se s sw w} {
@@ -356,18 +359,21 @@ Classy::WindowBuilder method _drawselectedw {args} {
 			$w.classy__e configure -cursor sb_h_double_arrow
 			$w.classy__s configure -cursor sb_v_double_arrow
 		}
-		foreach name {n e s w} {
-			if {[string first $name $current(-sticky)] != -1} {
-				set current(sticky$name) 1
-			} else {
-				set current(sticky$name) 0
-			}
-			if $current(sticky$name) {
-				$w.classy__$name configure -bg [option get $w.classy__$name stickyBackground Background] \
-					-highlightbackground [option get $w.classy__$name stickyForeground Foreground]
-			} else {
-				$w.classy__$name configure -bg [option get $w.classy__$name nonstickyBackground Background] \
-					-highlightbackground [option get $w.classy__$name nonstickyForeground Foreground]
+		if $grid {
+			array set current [grid info $selw]
+			foreach name {n e s w} {
+				if {[string first $name $current(-sticky)] != -1} {
+					set current(sticky$name) 1
+				} else {
+					set current(sticky$name) 0
+				}
+				if $current(sticky$name) {
+					$w.classy__$name configure -bg [option get $w.classy__$name stickyBackground Background] \
+						-highlightbackground [option get $w.classy__$name stickyForeground Foreground]
+				} else {
+					$w.classy__$name configure -bg [option get $w.classy__$name nonstickyBackground Background] \
+						-highlightbackground [option get $w.classy__$name nonstickyForeground Foreground]
+				}
 			}
 		}
 		set sx [expr {([$w.classy__nw cget -width]+1)/2}]
@@ -550,6 +556,7 @@ Classy::WindowBuilder method code {{function {}}} {
 }
 
 Classy::WindowBuilder method open {file function} {
+putsvars file function
 	global auto_index
 	private $object data current border
 	if [info exists data(base)] {
@@ -673,12 +680,15 @@ Classy::WindowBuilder method parsecode {code {window {}}} {
 		set epos end
 		# finalise
 		set pos [lsearch -regexp $list {^# ClassyTcl Finalise}]
-		$object.code.book.f3.finalise delete 1.0 end
 		set init ""
 		if {$pos != -1} {
-			$object.code.book.f3.finalise insert end [join [lrange $list [expr {$pos+1}] end] \n]
+			set range [lrange $list [expr {$pos+1}] end]
+			lpop range
+			$object.code.book.f3.finalise set [join $range \n]
 			set list [lrange $list 0 [expr {$pos-1}]]
 			set epos [expr {$pos-1}]
+		} else {
+			$object.code.book.f3.finalise set {}
 		}
 		# parse
 		set pos [lsearch -regexp $list "^\t# Parse this"]
@@ -689,10 +699,11 @@ Classy::WindowBuilder method parsecode {code {window {}}} {
 		}
 		# initialise
 		set pos [lsearch -regexp $list {^# ClassyTcl Initialise}]
-		$object.code.book.f2.initialise delete 1.0 end
 		set init ""
 		if {$pos != -1} {
-			$object.code.book.f2.initialise insert end [join [lrange $list [expr {$pos+1}] $epos] \n]
+			$object.code.book.f2.initialise set [join [lrange $list [expr {$pos+1}] $epos] \n]
+		} else {
+			$object.code.book.f2.initialise set {}
 		}
 	} else {
 		set parse ""
@@ -1818,7 +1829,7 @@ Classy::WindowBuilder method _createattributes {w} {
 	bind $w.list <<Invoke>> [varsubst {w object} {
 		$object attribute select [$w.list get active]
 	}]
-	bind $w.list <<ButtonRelease-Action>> [varsubst {w object} {
+	bind $w.list <<Action-ButtonRelease>> [varsubst {w object} {
 		tkCancelRepeat
 		%W activate @%x,%y
 		$object attribute select [$w.list get active]
@@ -1943,7 +1954,7 @@ Classy::WindowBuilder method _createbindings {w} {
 	bind $w.list <<Invoke>> [varsubst {w object} {
 		$object bindings select [$w.list get active]
 	}]
-	bind $w.list <<ButtonRelease-Action>> [varsubst {w object} {
+	bind $w.list <<Action-ButtonRelease>> [varsubst {w object} {
 		tkCancelRepeat
 		%W activate @%x,%y
 		$object bindings select [$w.list get active]
@@ -2126,9 +2137,11 @@ Classy::WindowBuilder method drop {dst} {
 		$object rename $src [$object outw $newname]
 		set src $newname
 	}
-	if {"$newp" == "$current(p)"} {
-		if {"$border" == "r"} {incr col -1}
-		if {"$border" == "c"} {incr row -1}
+	if [info exists current(p)] {
+		if {"$newp" == "$current(p)"} {
+			if {"$border" == "r"} {incr col -1}
+			if {"$border" == "c"} {incr row -1}
+		}
 	}
 	if {$col == -1} {
 		$object _indelcol 0
@@ -2200,6 +2213,7 @@ Classy::WindowBuilder method _dialogoptiondelete {option} {
 
 Classy::WindowBuilder method _createcode {window} {
 	frame $window
+putsvars window
 	Classy::NoteBook $window.book 
 	grid $window.book -row 0 -column 0 -sticky nesw
 	frame $window.book.options
@@ -2262,19 +2276,15 @@ Classy::WindowBuilder method _createcode {window} {
 	grid rowconfigure $window.book.options 1 -weight 1
 	frame $window.book.f3 
 	
-	Classy::ScrolledText $window.book.f3.finalise  \
-		-height 5 \
-		-width 10 \
-		-wrap none
+	Classy::Selector $window.book.f3.finalise  \
+		-type text -label Finalise
 	grid $window.book.f3.finalise -row 0 -column 0 -sticky nesw
 	grid columnconfigure $window.book.f3 0 -weight 1
 	grid rowconfigure $window.book.f3 0 -weight 1
 	frame $window.book.f2 
 	
-	Classy::ScrolledText $window.book.f2.initialise  \
-		-height 5 \
-		-width 10 \
-		-wrap none
+	Classy::Selector $window.book.f2.initialise  \
+		-type text -label Initialise
 	grid $window.book.f2.initialise -row 0 -column 0 -sticky nesw
 	grid columnconfigure $window.book.f2 0 -weight 1
 	grid rowconfigure $window.book.f2 0 -weight 1

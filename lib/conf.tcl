@@ -69,27 +69,49 @@ proc Classy::doconfigmouse {} {
 		eval event add $event $keys
 	}
 	set list ""
-	foreach {name num} {Action 1 Adjust 2 Menu 3} {
-		regexp {[0-9]+} [event info <<$name>>] num
-		lappend list $name $num
-	}
-	foreach {name key} $list {
-		foreach combo {ButtonRelease ButtonPress} {
-			if {"[event info <<$combo-$name>>]" == ""} {
-				setevent <<$combo-$name>> <$combo-$key>
-			}
-		}
-		
+	foreach {name pre num} {Action {} 1 Adjust {} 2 Menu {} 3 MAdd Control- 1 MExtend Shift- 1} {
+		regexp {^<(.*)([0-9]+)>$} [event info <<$name>>] temp pre num
+		regsub {Button-} $pre {} pre
 		foreach combo {
-			Motion Leave Enter ButtonRelease ButtonPress
+			ButtonRelease ButtonPress
 		} {
-			if {"[event info <<$name-$combo>>]" == ""} {
-				setevent <<$name-$combo>> <B$key-$combo>
-			}
+			setevent <<$name-$combo>> <${pre}$combo-$num>
+		}
+		foreach combo {
+			Motion Leave Enter
+		} {
+			setevent <<$name-$combo>> <${pre}B$num-$combo>
 		}
 	}
 }
 
+#proc Classy::doconfigmouse {} {
+#	foreach {event keys} [array get ::Classy::configmouse] {
+#		event delete $event
+#		eval event add $event $keys
+#	}
+#	set list ""
+#	foreach {name num} {Action 1 Adjust 2 Menu 3} {
+#		regexp {[0-9]+} [event info <<$name>>] num
+#		lappend list $name $num
+#	}
+#	foreach {name key} $list {
+#		foreach combo {ButtonRelease ButtonPress} {
+#			if {"[event info <<$combo-$name>>]" == ""} {
+#				setevent <<$combo-$name>> <$combo-$key>
+#			}
+#		}
+#		
+#		foreach combo {
+#			Motion Leave Enter ButtonRelease ButtonPress
+#		} {
+#			if {"[event info <<$name-$combo>>]" == ""} {
+#				setevent <<$name-$combo>> <B$key-$combo>
+#			}
+#		}
+#	}
+#}
+#
 proc Classy::realcolor {color} {
 	if {[lsearch {Background DarkBackground LightBackground Foreground activeBackground activeForeground disabledForeground selectBackground selectForeground selectColor HighlightBackground HighlightColor} $color] != -1} {
 		set color [option get . $color $color]
@@ -175,6 +197,30 @@ proc setevent {event args} {
 	if {[llength $args]&&("$args" != {{}})} {
 		eval event add $event $args
 	}
+}
+
+proc Classy::getbitmap {name {reload {}}} {
+	if [info exists ::Classy::bitmaps($name)] {
+		if {"$reload" == ""} {
+			return $::Classy::bitmaps($name)
+		} else {
+			unset ::Classy::bitmaps($name)
+		}
+	}
+	set file ""
+	foreach type {appuser appdef user def} {
+		set base [file join $::Classy::dir($type) icons $name]
+		foreach type {{} .xbm} {
+			if [file readable $base$type] {
+				set file $base$type
+			}
+		}
+	}
+	if {"$file" == ""} {
+		error "Could not find bitmap \"$name\""
+	}
+	set ::Classy::bitmaps($name) "@$file"
+	return "@$file"
 }
 
 proc Classy::geticon {name {reload {}}} {

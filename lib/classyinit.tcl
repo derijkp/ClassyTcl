@@ -8,7 +8,7 @@
 # ---------------------------------------------------------------
 package require Extral 0.96
 package require Class 0.1
-lappend auto_path [file join ${::class::dir} widgets]
+lappend auto_path [file join ${::class::dir} widgets] [file join ${::class::dir} dialogs]
 option add *ColorList {{blue cyan green yellow orange red magenta} {blue3 cyan3 green3 yellow3 orange3 red3 magenta3} {black gray20 gray40 gray50 gray60 gray80 white}} widgetDefault
 
 namespace eval ::Classy {}
@@ -44,11 +44,10 @@ if {"[info commands ::Tk::destroy]" == ""} {
 			if {"$w" == ".classy__"} continue
 			if {"[info commands ::class::Tk_$w]" != ""} {
 				catch {$w destroy}
-			} else {
-				foreach c [info commands ::class::Tk_$w.*] {
-					regexp {^::class::Tk_(.*)$} $c temp child
-					catch {$child destroy}
-				}
+			}
+			foreach c [info commands ::class::Tk_$w.*] {
+				regexp {^::class::Tk_(.*)$} $c temp child
+				catch {$child destroy}
 			}
 		}
 		eval ::Tk::destroy [lremove $args .classy__]

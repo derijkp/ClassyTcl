@@ -60,6 +60,7 @@ proc ::Classy::WindowBuilder::generate_Classy::Dialog {object base} {
 			append data(parse) "\n"
 		}
 	}
+	append data(parse) "\t$outw persistent set [$base persistent]\n"
 	if [info exists data(opt-mainmenu,$base)] {
 		if {"$data(opt-mainmenu,$base)" != ""} {
 			if {"$data(opt-menuwin,$base)" != ""} {
@@ -89,8 +90,6 @@ proc ::Classy::WindowBuilder::Dialog_addbutton {object base} {
 }
 
 proc ::Classy::WindowBuilder::attr_Classy::DialogButton_name {object w args} {
-puts buttonname
-putsvars object w args
 	private $object data
 	if {"$args" == ""} {
 		return [lindex [split $w {\.}] end]
@@ -98,9 +97,28 @@ putsvars object w args
 		set value [lindex $args 0]
 		set split [split $w {\.}]
 		[winfo toplevel $w] rename [lindex $split end] $value
-		set w [join [lreplace $split end end $value] .]
-		set data(class,$w) Classy::DialogButton
-		bindtags $w $data(tags)
+		set nw [join [lreplace $split end end $value] .]
+		set data(class,$nw) Classy::DialogButton
+		bindtags $nw $data(tags)
+		unset data(class,$w)
+	}
+}
+
+proc ::Classy::WindowBuilder::attr_Classy::DialogButton_persistent {object w args} {
+	private $object data
+	set split [split $w {\.}]
+	set l [lpop split]
+	lpop split
+	set parent [join $split .]
+	set list [$parent persistent]
+	if {"$args" == ""} {
+		return [inlist $list $l]
+	} else {
+		if $args {
+			$parent persistent add $l
+		} else {
+			$parent persistent remove $l
+		}
 	}
 }
 
@@ -108,24 +126,35 @@ proc ::Classy::WindowBuilder::edit_Classy::DialogButton {object w} {
 	set c [$object current]
 	eval destroy [winfo children $w]
 	::Classy::WindowBuilder::defattredit $object $w {
-		-text Text 0 -default Default 0 name Name 0 -command Command 1
+		-text Text 0 -default Default 0 persistent Persistent 0 name Name 0 -command Command 1
 	} 12 0
 }
 
 proc ::Classy::WindowBuilder::generate_Classy::DialogButton {object base} {
-	error "Cannot copy Dialog buttons, use dialog itself"
+	error "Cannot copy Dialog buttons, use configuration of dialog"
 }
 
 proc ::Classy::WindowBuilder::parse_Classy::Dialog {object base line} {
 	private $object data
-	set pos [string first "\"" $line]
-	set end [string last "\"" $line]
-	if {$pos == -1} {
-		set pos [string first "\[" $line]
-		set end [string last "\]" $line]
+	regsub { default$} $line {} line
+	set pos [string first add $line]
+	incr pos 4
+	set line [string range $line $pos end]
+	set pos [string first " " $line]
+	set b [string range $line 0 [expr {$pos-1}]]
+	incr pos
+	set line [string range $line $pos end]
+	if {"[string index $line 0]" == "\{"} {
+		set pos [string first "\}" $line]
+		incr pos 2
+	} else {
+		set pos [string first " " $line]
+		incr pos
 	}
-	if {$pos == -1} return
-	set command [string range $line $pos $end]
-	regexp {add ([^ ]+)} $line temp b
-	set data(opt-command,$base.actions.$b) $command
+	set command [string range $line $pos end]
+	switch -regexp -- $command {
+		{^".*"$} - {^\[.*\]$} {
+			set data(opt-command,$base.actions.$b) $command
+		}
+	}
 }

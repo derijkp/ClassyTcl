@@ -1,0 +1,111 @@
+<HTML>
+<HEAD>
+   <TITLE>ClassyTcl menu definition</TITLE>
+</HEAD>
+<BODY>
+
+<H1>ClassyTcl menu definition</H1>
+The contents of the menus managed by <a href="widgets/DynaMenu.html">DynaMenu</a> in
+ <a href="ClassyTcl.html">ClassyTcl</a> are determined by a menu definition. Which
+definition is used for a type of toolbar is determined in the the 
+<a href="../classy_configure.html">configuration system</a>.
+<p>
+A menu definition consists of a number of lines. Each line specifies one menu item, 
+and starts with a word describing the type of item. The rest of the line contains 
+a list of parameters. If a parameter contains spaces, it must be surrounded with 
+curly braces ({}) or double quotes (""). A parameter enclosed in curly braces can 
+also span multiple lines. A line can be commented out by starting with a hash 
+character (#). It is possible to create hierarchical menus with the type menu that 
+will create submenus
+The following menu item types are supported:
+
+<h2>action</h2>
+This creates a menu item from which a command can be invoked. It has the 
+following parameters:
+<ol>
+<li><b>Text</b>: This text will be displayed in the menu item
+<li><b>command</b>: This command will be executed when the item is invoked. 
+Each menu has an attached cmdw (commmand window) where actions invoked from the menu
+will take place. If the command contains <b>%W</b> it will be replaced with the 
+cmdw of the current menu. This can be necessary if one menu definition is used
+for several menus, eg. a number of editor windows, where each menu should invoke
+commands on the editor widget in the same window.
+<li><b>?short-cut?</b>: optional key short-cut that can be used to invoke this menu 
+item from the cmdw. It can either be a Tcl key event (eg. &lt;Up&gt;, &lt;Alt-a&gt;, &lt;F2&gt;) or a 
+virtual event (eg. &lt;&lt;Up&gt;&gt;, &lt;&lt;Print&gt;&gt;).
+</ol>
+A typical example would be:<br>
+<code>action "Save" {filesave %W} <<Save>></code>
+
+<h2>tool</h2>
+This actually calls a procedure written by the developer to create any type of tool.
+It only has two parameters:
+<ol>
+<li><b>name</b>: The name of the procdedure to call to create the tool. The procedure
+will be called with one argument: the name of widget to be created. It must return a
+line that can be executed to initialise the widget for an other cmdw. In this line,
+%W will be replaced by the name of the cmdw before execution.
+<li><b>help</b>: Text that will appear in the balloon help that will popup if the
+mousepointer stays above the botton without invoking it.
+</ol>
+A typical example would be:<br>
+<code>tool zoomtool "Zoom"</code>
+
+<h2>separator</h2>
+This tool takes no parameters, and just creates a little extra space to separate 
+different bloks of tools.
+
+<h2>check</h2>
+check creates a checkbutton. This is typically used to change a variable to
+an on or off value. It can also execute a command. It has the following parameters:
+<ol>
+<li><b>id</b>: same as above
+<li><b>help</b>: same as above
+<li><b>options</b>: A number of options as can be given when configuring the Tcl 
+checkbutton. <b>%W</b> will be replaced by the name of the cmdw of the current toolbar.
+</ol>
+A typical example would be:<br>
+<code>check checked "Checked" {-variable checked -command {puts %W:$checked}}</code>
+
+<h2>radio</h2>
+radio creates a checkbutton. This is typically used to change a variable to
+one of several values. It can also execute a command. It has the following parameters:
+<ol>
+<li><b>id</b>: same as above
+<li><b>help</b>: same as above
+<li><b>options</b>: A number of options as can be given when configuring the Tcl 
+radiobutton. <b>%W</b> will be replaced by the name of the cmdw of the current toolbar.
+</ol>
+A typical example would be:<br>
+<code>
+radio opt1 "opt1" {-variable opt -value opt1 -command {puts %W:$opt}}<br>
+radio opt2 "opt2" {-variable opt -value opt2 -command {puts %W:$opt}}
+</code>
+
+<h2>widget</h2>
+widget can create any widget as a tool. It has the following parameters.
+<ol>
+<li><b>widget command</b>: This command is invoked to create the widget. The command
+will be invoked with one argument: the name of the widget to be created.
+<li><b>help</b>: same as above
+<li><b>options</b>: A number of options. The widget created will be configured using
+these options. <b>%W</b> will be replaced by the name of the cmdw of the current toolbar.
+</ol>
+An example would be:<br>
+<code>
+widget Entry "Entry" {-command {invoke v {puts %W:$v}}}
+</code>
+
+<h2>label</h2>
+creates a toollabel that just displays an icon or text. It has the following parameters.
+<ol>
+<li><b>id</b>: same as above
+<li><b>help</b>: same as above
+</ol>
+A typical example would be:<br>
+<code>
+label label "Just a label"
+</code>
+
+</BODY>
+</HTML>

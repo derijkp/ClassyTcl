@@ -86,10 +86,10 @@ bind Classy::CmdWidget <<Action-Leave>> {
 bind Classy::CmdWidget <<Action-Enter>> {
 	tkCancelRepeat
 }
-bind Classy::CmdWidget <<ButtonRelease-Action>> {
+bind Classy::CmdWidget <<Action-ButtonRelease>> {
 	tkCancelRepeat
 }
-bind Text <<ButtonRelease-Adjust>> {
+bind Text <<Adjust-ButtonRelease>> {
 	if {!$tkPriv(mouseMoved) || $tk_strictMotif} {
 		tkTextPaste %W %x %y
 	}

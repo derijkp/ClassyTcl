@@ -38,7 +38,7 @@ canvas .classy__.temp
 if ![catch {.classy__.temp create line 10 10 10 10 -activefill red}] {
 	set Classy::dashpatch 1
 } else {
-	set Classy::dashpatch 1
+	set Classy::dashpatch 0
 }
 
 Widget subclass Classy::Canvas
@@ -50,20 +50,24 @@ Classy::Canvas classmethod init {args} {
 	set w $data(w)
 	set data(page) [$w create rectangle -10000 -10000 0 0 -fill white -outline white -tags _page]
 	set del($data(page)) _page
-	set data(sel) [$w create rectangle -10000 -10000 -10000 -10000 -outline red -tags {_selection _h}]
+	set data(sel) [$w create rectangle -10000 -10000 -10000 -10000 -outline red -tags {_selection _h _selbd}]
 	set del($data(sel)) _sel
-	set data(cur) [$w create rectangle -10000 -10000 -10000 -10000 -outline blue -tags {_cur _h}]
+	set data(cur) [$w create rectangle -10000 -10000 -10000 -10000 -outline blue -tags {_cur _h _selbd}]
 	set del($data(cur)) _sel
+	set data(selector) [$w create rectangle -10000 -10000 -10000 -10000 -outline red -tags _selector]
+	set del($data(selector)) _sel
+	set data(ind) 0
 	# REM Initialise options and variables
 	# ------------------------------------
 	set undo(prevact) ""
 	if [info exists undo] {unset undo}
 	set data(undo) 1
-	set undo(num) 0
 	set undo(undo) ""
 	set undo(redo) ""
+	set undo(steps) 200
 	set currentname 1
 	set data(zoom) 1
+	set data(current) ""
 	set data(group) 0
 	# REM Create bindings
 	# --------------------
@@ -85,40 +89,39 @@ Classy::Canvas	addoption -undosteps {undoSteps UndoSteps 200} {
 	private $object undo
 	set undo(redo) ""
 	if {$value<1} {set value 1}
-	if {$undo(num)>$value} {
-		if {"[lindex $undo(list) 0]"==""} {lshift undo(list)}
-		while {$undo(num)> $value} {
-			while {"[lshift undo(list)]"!=""} {}
-			incr undo(num) -1
-		}
+	if {[llength $undo(undo)]>$value} {
+		set pos [expr {[llength $undo(undo)]-$value+1}]
+		set undo(undo) [lrange $undo(undo) $pos end]
+		set undo(redo) [lrange $undo(redo) $pos end]
 	}
+	set undo(steps) $value
 }
 
 #doc {Entry options -papersize} option {-papersize papeSize PaperSize} descr {
 # determines the papersize
 #}
-Classy::Canvas	addoption -papersize {papeSize PaperSize none} {
-	private $object w
-	if {[llength $value]==1} {
-		if {"$value" == "none"} {
-			$w coords _page -10000 -10000 0 0
-			$object configure -scrollregion {}
-			return
-		} else {
-			set orient p
-			set p $value
-			regexp {^(.+)(-l)$} $value temp p orient
-			set c [structlget [option get $object paperSizes PaperSizes] $p]
-			if {"$orient" == "-l"} {
-				set temp [list [lindex $c 1] [lindex $c 0]]
-				set c $temp
-			}
+Classy::Canvas	addoption -papersize {papeSize PaperSize {}} {
+	private $object w data
+	set len [llength $value]
+	if {$len == 0} {
+		$w coords _page -10000 -10000 0 0
+		$object configure -scrollregion {}
+		return
+	} elseif {$len==1} {
+		set orient p
+		set p $value
+		regexp {^(.+)(-l|-p)$} $value temp p orient
+		set c [structlget [option get $object paperSizes PaperSizes] $p]
+		if {"$orient" == "-l"} {
+			set temp [list [lindex $c 1] [lindex $c 0]]
+			set c $temp
 		}
 	} else {
 		set c $value
 	}
-	$w configure -scrollregion "0 0 $c"
 	eval $w coords _page 0 0 $c
+	$w scale _page 0 0 $data(zoom) $data(zoom)
+	$w configure -scrollregion [$w coords _page]
 }
 
 # ------------------------------------------------------------------
@@ -145,8 +148,7 @@ Classy::Canvas chainallmethods {$object} canvas
 #doc {Canvas command undo} cmd {
 #pathname undo ?action? ?args?
 #} descr {
-# Without arguments, this method will undo the actions
-# until the previous checkpoint is reached<br>
+# Without arguments, this method will undo the previous action
 # When action is provided, it can have the following values
 #<dl>
 #<dt>check<dd>insert a checkpoint
@@ -161,9 +163,9 @@ Classy::Canvas method undo {{action {}} args} {
 	private $object w data undo del
 	switch $action {
 		"" {
+			$w delete _ind
 			if ![info exists undo(pos)] {
 				set undo(pos) [expr {[llength $undo(undo)]-1}]
-				if {"[lindex $undo(undo) $undo(pos)]" == ""} {incr undo(pos) -1}
 			} else {
 				incr undo(pos) -1
 			}
@@ -171,165 +173,38 @@ Classy::Canvas method undo {{action {}} args} {
 				set undo(pos) 0
 				return -code error "No more undo steps"
 			}
-			while 1 {
-				set current [lindex $undo(undo) $undo(pos)]
-				if {"$current"==""} break
-				set action [lshift current]
-				switch $action {
-					create {
-						set item [lindex $current 0]
-						set del($item) [$w gettags $item]
-						$w itemconfigure $item -tags {_del _h}
-						$w move $item -10000 -10000
-						$w lower $item
-					}
-					delete {
-						set items [lindex $current 0]
-						set poss [lindex $current 1]
-						set i [llength $items]
-						incr i -1
-						for {} {$i > -1} {incr i -1} {
-							set item [lindex $items $i]
-							$w itemconfigure $item -tags $del($item)
-							$w move $item 10000 10000
-							$w lower $item [lindex $poss $i]
-							unset del($item)
-						}
-					}
-					addtag {
-						foreach {tag items} $current {
-							foreach item $items {
-								$w dtag $item $tag
-							}
-						}
-					}
-					dtag {
-						foreach {items tag} $current {
-							foreach item $items {
-								set tags [$w gettags $item]
-								lappend tags $tag
-								$w itemconfigure $item -tags $tags
-							}
-						}
-					}
-					dchars {
-						foreach {item pos text} [lindex $current 0] {
-							$w insert $item $pos $text
-						}
-					}
-					insert {
-						set len [lindex $current 0]
-						foreach {item pos} [lindex $current 1] {
-							$w dchars $item $pos [expr {$pos+$len-1}]
-						}
-					}
-					itemconfigure {
-						private $object itemw
-						foreach item [lindex $current 0] args [lindex $current 1] width [lindex $current 2] {
-							eval $w itemconfigure $item $args
-							if {"$width" != ""} {
-								set itemw($item) $width
-							} else {
-								catch {unset itemw($item)}
-							}
-						}
-					}
-					coords {
-						set templist ""
-						foreach item [lindex $current 0] coords [lindex $current 1]  {
-							eval $w coords $item $coords
-						}
-					}
-					move {
-						foreach {tagOrId xAmount yAmount} $current {
-							$w move $tagOrId [expr -$xAmount] [expr -$yAmount]
-						}
-					}
-					scale {
-						foreach {tagOrId xOrigin yOrigin xScale yScale} $current {
-							set data(undo) 0
-							$object scale $tagOrId $xOrigin $yOrigin [expr {1/$xScale}] [expr {1/$yScale}]
-							set data(undo) 1
-						}
-					}
-					zoom {
-						set zoom [lindex $current 0]
-						set data(undo) 0
-						$object zoom $zoom
-						set data(undo) 1
-					}
-					rotate {
-						foreach {tagOrId x y a} $current {
-							$w visitor rotate $tagOrId \
-								-xcenter $x -ycenter $y -angle [expr -$a]
-						}
-					}
-					lower {
-						set items [lindex $current 0]
-						set poss [lindex $current 1]
-						set i [llength $items]
-						incr i -1
-						for {} {$i > -1} {incr i -1} {
-							set pos [lindex $poss $i]
-							if {"$pos" != ""} {
-								$w lower [lindex $items $i] $pos
-							} else {
-								$w raise [lindex $items $i]
-							}
-						}
-					}
-					raise {
-						set items [lindex $current 0]
-						set poss [lindex $current 1]
-						set i [llength $items]
-						incr i -1
-						for {} {$i > -1} {incr i -1} {
-							set pos [lindex $poss $i]
-							if {"$pos" != ""} {
-								$w lower [lindex $items $i] $pos
-							} else {
-								$w raise [lindex $items $i]
-							}
-						}
-					}
-					a {
-						set undo(busy) 1
-						uplevel #0 [lindex $current 0]
-						unset undo(busy)
-					}
-				}
-				incr undo(pos) -1
-				if {$undo(pos) == -1} {
-					set undo(pos) 0
-					break
-				}
-			}
-			return 1
+			$object _undoone [lindex $undo(undo) $undo(pos)]
 		}
 		check {
-			if $data(undo) {
-				private $object options
-				if {"[lindex $undo(undo) end]"==""} return
-				lappend undo(undo) {}
-				lappend undo(redo) {}
-				incr undo(num)
-				if {$undo(num)>$options(-undosteps)} {
-					if {"[lindex $undo(undo) 0]"==""} {lshift undo(undo)}
-					while {"[lshift undo(undo)]"!=""} {lshift undo(redo)}
-					incr undo(num) -1
+			if {"$args" == "start"} {
+				set undo(check) [llength $undo(undo)]
+			} elseif {"$args" == "stop"} {
+				if ![info exists undo(check)] {
+					error "\"$object undo check start\" must be called first"
 				}
+				set list [lrange $undo(undo) $undo(check) end]
+				if {"$list" == ""} return
+				set undo(undo) [lrange $undo(undo) 0 [expr {$undo(check)-1}]]
+				lappend undo(undo) [list check $list]
+				set list [lrange $undo(redo) $undo(check) end]
+				set undo(redo) [lrange $undo(redo) 0 [expr {$undo(check)-1}]]
+				lappend undo(redo) [list check $list]
+				unset undo(check)
+			} else {
+				error "invalid option \"$args\": must be start or stop"
 			}
 		}
 		clear {
+			private $object options
 			foreach name [array names del] {
 				if [inlist {_page _sel} $del($name)] continue
 				$w delete $del($name)
 				unset del($name)
 			}
 			if [info exists undo] {unset undo}
-			set undo(num) 0
 			set undo(undo) ""
 			set undo(redo) ""
+			set undo(steps) $options(-undosteps)
 		}
 		add {
 			if ![info exists undo(pos)] {
@@ -352,6 +227,173 @@ Classy::Canvas method undo {{action {}} args} {
 	}
 }
 
+Classy::Canvas method _undoone {current} {
+	private $object w data undo del
+	set action [lshift current]
+	switch $action {
+		check {
+			set list [lindex $current 0]
+			set i [expr {[llength $list]-1}]
+			for {} {$i>=0} {incr i -1} {
+				set item [lindex $list $i]
+				if {"[lindex $item 0]" == "check"} {error "checks nested: cannot be redone"}
+				$object _undoone $item
+			}
+		}
+		create {
+			set item [lindex $current 0]
+			set del($item) [$w gettags $item]
+			$w itemconfigure $item -tags {_del _h}
+			$w move $item -10000 -10000
+			$w lower $item
+		}
+		delete {
+			set items [lindex $current 0]
+			set poss [lindex $current 1]
+			set i [llength $items]
+			incr i -1
+			for {} {$i > -1} {incr i -1} {
+				set item [lindex $items $i]
+				$w itemconfigure $item -tags $del($item)
+				$w move $item 10000 10000
+				$w lower $item [lindex $poss $i]
+				unset del($item)
+			}
+		}
+		addtag {
+			foreach {tag items} $current {
+				foreach item $items {
+					$w dtag $item $tag
+				}
+			}
+		}
+		dtag {
+			foreach {items tag} $current {
+				foreach item $items {
+					set tags [$w gettags $item]
+					lappend tags $tag
+					$w itemconfigure $item -tags $tags
+				}
+			}
+		}
+		dchars {
+			foreach {item pos text} [lindex $current 0] {
+				$w insert $item $pos $text
+			}
+		}
+		insert {
+			set len [lindex $current 0]
+			foreach {item pos} [lindex $current 1] {
+				$w dchars $item $pos [expr {$pos+$len-1}]
+			}
+		}
+		itemconfigure {
+			private $object itemw
+			foreach item [lindex $current 0] args [lindex $current 1] width [lindex $current 2] {
+				eval $w itemconfigure $item $args
+				if {"$width" != ""} {
+					set itemw($item) $width
+				} else {
+					catch {unset itemw($item)}
+				}
+			}
+		}
+		coords {
+			set templist ""
+			foreach item [lindex $current 0] coords [lindex $current 1]  {
+				eval $w coords $item $coords
+			}
+		}
+		coord {
+			set templist ""
+			set pos [lindex $current 1]
+			set pos1 [expr {2*$pos}]
+			set pos2 [expr {$pos1+1}]
+			foreach item [lindex $current 0] coords [lindex $current 2]  {
+				set fcoords [$w coords $item]
+				eval $w coords $item [lreplace $fcoords $pos1 $pos2 [lindex $coords 0] [lindex $coords 1]]
+			}
+		}
+		move {
+			foreach {tagOrId xAmount yAmount} $current {
+				$w move $tagOrId [expr -$xAmount] [expr -$yAmount]
+				if {"$tagOrId"=="_sel"} {
+					$w move _selbd [expr -$xAmount] [expr -$yAmount]
+				}
+			}
+		}
+		scale {
+			foreach {tagOrId xOrigin yOrigin xScale yScale} $current {
+				set data(undo) 0
+				$object scale $tagOrId $xOrigin $yOrigin [expr {1/$xScale}] [expr {1/$yScale}]
+				set data(undo) 1
+			}
+		}
+		zoom {
+			set zoom [lindex $current 0]
+			set data(undo) 0
+			$object zoom $zoom
+			set data(undo) 1
+		}
+		rotate {
+			foreach {tagOrId x y a} $current {
+				$w visitor rotate $tagOrId \
+					-xcenter $x -ycenter $y -angle [expr -$a]
+			}
+		}
+		lower {
+			set items [lindex $current 0]
+			set poss [lindex $current 1]
+			set i [llength $items]
+			incr i -1
+			for {} {$i > -1} {incr i -1} {
+				set pos [lindex $poss $i]
+				if {"$pos" != ""} {
+					$w lower [lindex $items $i] $pos
+				} else {
+					$w raise [lindex $items $i]
+				}
+			}
+		}
+		raise {
+			set items [lindex $current 0]
+			set poss [lindex $current 1]
+			set i [llength $items]
+			incr i -1
+			for {} {$i > -1} {incr i -1} {
+				set pos [lindex $poss $i]
+				if {"$pos" != ""} {
+					$w lower [lindex $items $i] $pos
+				} else {
+					$w raise [lindex $items $i]
+				}
+			}
+		}
+		a {
+			set undo(busy) 1
+			uplevel #0 [lindex $current 0]
+			unset undo(busy)
+		}
+		selection {
+			set data(undo) 0
+			$object selection set [lindex $current 0]
+			set data(undo) 1
+			Classy::todo $object selection redraw
+		}
+		current {
+			set data(undo) 0
+			eval $object current [lindex $current 0]
+			set data(undo) 1
+		}
+		xview {
+			$w xview moveto [lindex [lindex $current 0] 0]
+		}
+		yview {
+			$w yview moveto [lindex [lindex $current 0] 0]
+		}
+	}
+}
+
 #doc {Canvas command redo} cmd {
 #pathname redo 
 #} descr {
@@ -361,109 +403,131 @@ Classy::Canvas method redo {} {
 	private $object w data undo del
 	if ![info exists undo(pos)] {
 		return -code error "Nothing to redo"
-	} else {
-		if {"[lindex $undo(redo) $undo(pos)]" ==""} {
-			incr undo(pos)
-		}
 	}
+	$object _redoone [lindex $undo(redo) $undo(pos)]
+	incr undo(pos)
 	set len [llength $undo(redo)]
 	if {$undo(pos) == $len} {
 		unset undo(pos)
-		return -code error "No more redo steps"
 	}
-	while 1 {
-		set current [lindex $undo(redo) $undo(pos)]
-		if {"$current"==""} break
-		set action [lshift current]
-		switch $action {
-			create {
-				set item [lindex $current 0]
-				$w itemconfigure $item -tags $del($item)
-				unset del($item)
-				$w move $item 10000 10000
-				$w raise $item
-			}
-			delete {
-				set items [lindex $current 0]
-				foreach item $items {
-					set del($item) [$w gettags $item]
-					$w itemconfigure $item -tags {_del _h}
-					$w move $item -10000 -10000
-				}
-			}
-			addtag {
-				set data(undo) 0
-				eval $object addtag [lindex $current 0] [lindex $current 1] [lindex $current 2]
-				set data(undo) 1
-			}
-			dtag {
-				set data(undo) 0
-				eval $object dtag $current
-				set data(undo) 1
-			}
-			dchars {
-				set data(undo) 0
-				eval $object dchars $current
-				set data(undo) 1
-			}
-			insert {
-				set data(undo) 0
-				eval $object insert $current
-				set data(undo) 1
-			}
-			itemconfigure {
-				set data(undo) 0
-				eval $object itemconfigure [lindex $current 0] [lindex $current 1]
-				set data(undo) 1
-			}
-			coords {
-				set data(undo) 0
-				eval $object coords [lindex $current 0] [lindex $current 1]
-				set data(undo) 1
-			}
-			move {
-				foreach {tagOrId xAmount yAmount} $current {
-					$w move $tagOrId $xAmount $yAmount
-				}
-			}
-			scale {
-				foreach {tagOrId xOrigin yOrigin xScale yScale} $current {
-					set data(undo) 0
-					$object scale $tagOrId $xOrigin $yOrigin $xScale $yScale
-					set data(undo) 1
-				}
-			}
-			zoom {
-				set zoom [lindex $current 0]
-				set data(undo) 0
-				$object zoom $zoom
-				set data(undo) 1
-			}
-			rotate {
-				foreach {tagOrId x y a} $current {
-					$w visitor rotate $tagOrId -xcenter $x -ycenter $y -angle $a
-				}
-			}
-			lower {
-				set data(undo) 0
-				$object lower [lindex $current 0] [lindex $current 1]
-				set data(undo) 1
-			}
-			raise {
-				set data(undo) 0
-				$object raise [lindex $current 0] [lindex $current 1]
-				set data(undo) 1
-			}
-			a {
-				set undo(busy) 1
-				uplevel #0 [lindex $current 1]
-				unset undo(busy)
+}
+
+Classy::Canvas method _redoone {current} {
+	private $object w data undo del
+	set action [lshift current]
+	switch $action {
+		check {
+			foreach item [lindex $current 0] {
+				$object _redoone $item
 			}
 		}
-		incr undo(pos)
-		if {$undo(pos) == $len} {
-			unset undo(pos)
-			break
+		create {
+			set item [lindex $current 0]
+			$w itemconfigure $item -tags $del($item)
+			unset del($item)
+			$w move $item 10000 10000
+			$w raise $item
+		}
+		delete {
+			set items [lindex $current 0]
+			foreach item $items {
+				set del($item) [$w gettags $item]
+				$w itemconfigure $item -tags {_del _h}
+				$w move $item -10000 -10000
+			}
+		}
+		addtag {
+			set data(undo) 0
+			eval $object addtag [lindex $current 0] [lindex $current 1] [lindex $current 2]
+			set data(undo) 1
+		}
+		dtag {
+			set data(undo) 0
+			eval $object dtag $current
+			set data(undo) 1
+		}
+		dchars {
+			set data(undo) 0
+			eval $object dchars $current
+			set data(undo) 1
+		}
+		insert {
+			set data(undo) 0
+			eval $object insert $current
+			set data(undo) 1
+		}
+		itemconfigure {
+			set data(undo) 0
+			eval $object itemconfigure [lindex $current 0] [lindex $current 1]
+			set data(undo) 1
+		}
+		coords {
+			set data(undo) 0
+			eval $object coords [lindex $current 0] [lindex $current 1]
+			set data(undo) 1
+		}
+		coord {
+			set data(undo) 0
+			eval $object coord [lindex $current 0] [lindex $current 1] [lindex $current 2]
+			set data(undo) 1
+		}
+		move {
+			foreach {tagOrId xAmount yAmount} $current {
+				$w move $tagOrId $xAmount $yAmount
+				if {"$tagOrId"=="_sel"} {
+					$w move _selbd $xAmount $yAmount
+				}
+			}
+		}
+		scale {
+			foreach {tagOrId xOrigin yOrigin xScale yScale} $current {
+				set data(undo) 0
+				$object scale $tagOrId $xOrigin $yOrigin $xScale $yScale
+				set data(undo) 1
+			}
+		}
+		zoom {
+			set zoom [lindex $current 0]
+			set data(undo) 0
+			$object zoom $zoom
+			set data(undo) 1
+		}
+		rotate {
+			foreach {tagOrId x y a} $current {
+				$w visitor rotate $tagOrId -xcenter $x -ycenter $y -angle $a
+			}
+		}
+		lower {
+			set data(undo) 0
+			$object lower [lindex $current 0] [lindex $current 1]
+			set data(undo) 1
+		}
+		raise {
+			set data(undo) 0
+			$object raise [lindex $current 0] [lindex $current 1]
+			set data(undo) 1
+		}
+		a {
+			set undo(busy) 1
+			uplevel #0 [lindex $current 1]
+			unset undo(busy)
+		}
+		selection {
+			set data(undo) 0
+			$object selection set [lindex $current 0]
+			set data(undo) 1
+			Classy::todo $object selection redraw
+		}
+		current {
+			set data(undo) 0
+			eval $object current [lindex $current 0]
+			set data(undo) 1
+		}
+		xview {
+			eval $w yview [lindex $current 0]
+		}
+		yview {
+			eval $w yview [lindex $current 0]
 		}
 	}
 }
@@ -471,13 +535,19 @@ Classy::Canvas method redo {} {
 Classy::Canvas method addundo {redodata undodata} {
 	private $object undo
 	if [info exists undo(pos)] {
-		set remove [lrange $undo(redo) [expr {$undo(pos)+1}] end]
-		incr undo(num) [llength [lfind $remove ""]]
 		set undo(redo) [lrange $undo(redo) 0 $undo(pos)]
 		set undo(undo) [lrange $undo(undo) 0 $undo(pos)]
+		unset undo(pos)
 	}
 	lappend undo(redo) $redodata
 	lappend undo(undo) $undodata
+	if [info exists undo(check)] return
+	set len [llength $undo(undo)]
+	if {$len>$undo(steps)} {
+		set pos [expr {$len-$undo(steps)+1}]
+		set undo(undo) [lrange $undo(undo) $pos end]
+		set undo(redo) [lrange $undo(redo) $pos end]
+	}
 }
 
 #doc {Canvas command noundo} cmd {
@@ -486,6 +556,7 @@ Classy::Canvas method addundo {redodata undodata} {
 # execute command without storing in undo buffer
 #}
 Classy::Canvas method noundo {args} {
+	private $object data
 	set keep $data(undo)
 	set data(undo) 0
 	eval $object $args
@@ -507,7 +578,7 @@ proc Classy::tag2items {object w tagOrId} {
 proc Classy::zoomfont {font zoom} {
 	set size [lindex $font 1]
 	if {"$size" == ""} {return $font}
-	set size [expr int($size*$zoom)]
+	set size [expr int(abs($size*$zoom))]
 	if {$size==0} {set size 1}
 	return [lreplace $font 1 1 $size]
 }
@@ -518,8 +589,13 @@ Classy::Canvas method fastconfigure {items option value} {
 	}
 }
 
-Classy::Canvas method zoom {factor} {
+Classy::Canvas method zoom {{factor {}}} {
 	private $object w data fonts widths itemw
+	if {"$factor" == ""} {
+		return $data(zoom)
+	}
+	if {$factor < 0.02} {set factor 0.02}
+	if {$factor > 100} {set factor 20}
 	if $data(undo) {
 		$object addundo [list zoom $factor] [list zoom $data(zoom)]
 	}
@@ -535,6 +611,9 @@ Classy::Canvas method zoom {factor} {
 		$w itemconfigure $item -width $widths($value)
 	}
 	set data(zoom) $factor
+	if {"[$w configure -scrollregion]" != ""} {
+		$w configure -scrollregion "0 0 [lrange [$w coords _page] 2 3]"
+	}
 }
 
 Classy::Canvas method font {font} {
@@ -643,6 +722,7 @@ Classy::Canvas method create {type args} {
 
 Classy::Canvas method delete {args} {
 	private $object w data del
+	Classy::todo $object selection redraw
 	if $data(undo) {
 		private $object itemw
 		foreach tagOrId $args {
@@ -663,9 +743,42 @@ Classy::Canvas method delete {args} {
 }
 
 Classy::Canvas method clear {} {
-	foreach img [image names $object:*] {
-		destroy $img
+	private $object w data options del widths itemw fonts rfont
+	foreach img [image names] {
+		if [regexp "^$object:" $img] {
+			destroy $img
+		}
 	}
+	catch {unset del}
+	catch {unset data}
+	catch {unset widths}
+	catch {unset itemw}
+	foreach name [array names fonts] {
+		font delete $fonts($name)
+	}
+	catch {unset fonts}
+	catch {unset rfont}
+	$w delete all
+	set data(page) [$w create rectangle -10000 -10000 0 0 -fill white -outline white -tags _page]
+	set del($data(page)) _page
+	set data(sel) [$w create rectangle -10000 -10000 -10000 -10000 -outline red -tags {_selection _h _selbd}]
+	set del($data(sel)) _sel
+	set data(cur) [$w create rectangle -10000 -10000 -10000 -10000 -outline blue -tags {_cur _h _selbd}]
+	set del($data(cur)) _sel
+	set data(selector) [$w create rectangle -10000 -10000 -10000 -10000 -outline red -tags _selector]
+	set del($data(selector)) _sel
+	set data(ind) 0
+	set undo(prevact) ""
+	if [info exists undo] {unset undo}
+	set data(undo) 1
+	set undo(undo) ""
+	set undo(redo) ""
+	set undo(steps) 200
+	set currentname 1
+	set data(zoom) 1
+	set data(current) ""
+	set data(group) 0
+	$object configure -papersize $options(-papersize)
 }
 
 Classy::Canvas method itemconfigure {tagOrId args} {
@@ -784,6 +897,40 @@ Classy::Canvas method coords {tagOrId args} {
 	}
 }
 
+Classy::Canvas method coord {tagOrId pos args} {
+	private $object w data del
+	if {"$args"==""} {
+		set pos [expr {2*$pos}]
+		return [lrange [$w coords $tagOrId] $pos [expr {$pos+1}]]
+	} else {
+		set pos1 [expr {2*$pos}]
+		set pos2 [expr {$pos1+1}]
+		if $data(undo) {
+			private $object undo
+			set lastredo [lindex $undo(redo) end]
+			if {[lrange $lastredo 0 2] != [list coord $tagOrId $pos]} {
+				set do 1
+			} else {
+				set do 0
+				set lastredo [lreplace $lastredo 3 3 $args]
+				set undo(redo) [lreplace $undo(redo) end end $lastredo]
+			}
+		} else {
+			set do 0
+		}
+		set items [Classy::tag2items $object $w $tagOrId]
+		set coords ""
+		set x [lindex $args 0]
+		set y [lindex $args 1]
+		foreach item $items {
+			set fcoords [$w coords $item]
+			eval $w coords $item [lreplace $fcoords $pos1 $pos2 $x $y]
+			if $do {lappend coords [lrange $fcoords $pos1 $pos2]}
+		}
+		if $do {$object addundo [list coord $tagOrId $pos $args] [list coord $items $pos $coords]}
+	}
+}
+
 Classy::Canvas method move {tagOrId xAmount yAmount} {
 	private $object w data
 	if $data(undo) {
@@ -800,6 +947,9 @@ Classy::Canvas method move {tagOrId xAmount yAmount} {
 			set undo(undo)
 		}
 	}
+	if {"$tagOrId"=="_sel"} {
+		$w move _selbd $xAmount $yAmount
+	}
 	return [$w move $tagOrId $xAmount $yAmount]
 }
 
@@ -813,18 +963,21 @@ Classy::Canvas method scale {tagOrId xOrigin yOrigin xScale yScale} {
 		set nf [catch {$w itemcget $citem -font} font]
 		if !$nf {
 			set font [lindex $font 2]
-			if ![info exists scalef($font)] {
-				set newfont [Classy::zoomfont $font $yScale]
-				set scalef($font) [$object font $newfont]
-			}
-			$w itemconfigure $citem -font $scalef($font)
+			set newfont [Classy::zoomfont $font $yScale]
+			$w itemconfigure $citem -font [$object font $newfont]
 		}
 		if [info exists itemw($citem)] {
-			set itemw($citem) [expr {$itemw($citem)*$yScale}]
-			$w itemconfigure $citem -width [expr {$itemw($citem)*$data(zoom)}]
+			set itemw($citem) [expr {abs($itemw($citem)*$yScale)}]
+			if ![info exists widths($itemw($citem))] {
+				set widths($itemw($citem)) [expr $itemw($citem)*$data(zoom)]
+				set rwidths($widths($itemw($citem))) $itemw($citem)
+			}
+			$w itemconfigure $citem -width $widths($itemw($citem))
 		}
 	}
-	return [$w scale $tagOrId $xOrigin $yOrigin $xScale $yScale]
+	set result [$w scale $tagOrId $xOrigin $yOrigin $xScale $yScale]
+	if {"$tagOrId" == "_sel"} {Classy::todo $object selection redraw}
+	return $result
 }
 
 if ![catch {package require Visrotate}] {
@@ -1007,7 +1160,7 @@ Classy::Canvas method addtag {tag searchcommand args} {
 # </dl>
 #}
 Classy::Canvas method find {searchcommand args} {
-	private $object w data
+	private $object w data del
 	if $data(undo) {
 		switch $searchcommand {
 			tags {
@@ -1041,7 +1194,7 @@ Classy::Canvas method find {searchcommand args} {
 				}
 			}
 			default {
-				return [leval $w find $searchcommand $args]
+				return [llremove [leval $w find $searchcommand $args] [array names del]]
 			}
 		}
 	} else {
@@ -1061,7 +1214,7 @@ Classy::Canvas method find {searchcommand args} {
 				return $citems
 			}
 			default {
-				leval $w addtag $tag $searchcommand $args
+				return [llremove leval $w find $searchcommand $args] [array names del]]
 			}
 		}
 	}
@@ -1116,6 +1269,44 @@ Classy::Canvas method dchars {tagOrId first {last {}}} {
 	}
 }
 
+Classy::Canvas method xview {args} {
+	private $object w data undo
+	if ![string length $args] {
+		return [$w xview]
+	}
+	if $data(undo) {
+		set lastundo [lindex $undo(undo) end]
+		if {"[lindex $lastundo 0]" != "xview"} {
+			$object addundo [list xview $args] [list xview [$w xview]]
+		} else {
+			lpop undo(redo)			
+			lpop undo(undo)
+			$object addundo [list xview $args] [list xview [lindex $lastundo 1]]
+			set undo(undo)
+		}
+	}
+	eval $w xview $args
+}
+
+Classy::Canvas method yview {args} {
+	private $object w data undo
+	if ![string length $args] {
+		return [$w yview]
+	}
+	if $data(undo) {
+		set lastundo [lindex $undo(undo) end]
+		if {"[lindex $lastundo 0]" != "yview"} {
+			$object addundo [list yview $args] [list yview [$w yview]]
+		} else {
+			lpop undo(redo)			
+			lpop undo(undo)
+			$object addundo [list yview $args] [list yview [lindex $lastundo 1]]
+			set undo(undo)
+		}
+	}
+	eval $w yview $args
+}
+
 Classy::Canvas method insert {tagOrId beforeThis string} {
 	private $object w data
 	if $data(undo) {
@@ -1168,109 +1359,202 @@ proc Classy::mtagrmitems {object w var list} {
 	}
 }
 
-if $::Classy::dashpatch {
+Classy::Canvas method selection {action {list {}}} {
+	private $object w data undo
+	switch $action {
+		set {
+			if $data(undo) {set pre [$w find withtag _sel]}
+			$w dtag _sel
+			foreach tag $list {
+				$w addtag _sel withtag $tag
+			}
+			Classy::todo $object selection redraw
+			if {"$list" == ""} {
+				catch {$w itemconfigure all -stipple {}}
+				catch {$w itemconfigure all -outlinestipple {}}
+			} else {
+				catch {$w itemconfigure all -stipple gray50}
+				catch {$w itemconfigure all -outlinestipple gray50}
+				catch {$w itemconfigure _sel -stipple {}}
+				catch {$w itemconfigure _sel -outlinestipple {}}
+			}
+			$w itemconfigure _page -stipple {}
+			if $data(undo) {
+				set post [$w find withtag _sel]
+				if {"$pre" != "$post"} {
+					$object addundo [list selection $post] [list selection $pre]
+				}
+			}
+		}
+		get {
+			return [$w find withtag _sel]
+		}
+		add {
+			if ![llength $list] return
+			if $data(undo) {set pre [$w find withtag _sel]}
+			foreach tag $list {
+				$w addtag _sel withtag $tag
+			}
+			Classy::todo $object selection redraw
+			catch {$w itemconfigure all -stipple gray50}
+			catch {$w itemconfigure all -outlinestipple gray50}
+			catch {$w itemconfigure _sel -stipple {}}
+			catch {$w itemconfigure _sel -outlinestipple {}}
+			$w itemconfigure _page -stipple {}
+			if $data(undo) {
+				set post [$w find withtag _sel]
+				if {"$pre" != "$post"} {
+					$object addundo [list selection $post] [list selection $pre]
+				}
+			}
+		}
+		clear {
+			if $data(undo) {set pre [$w find withtag _sel]}
+			catch {$w itemconfigure all -stipple {}}
+			catch {$w itemconfigure all -outlinestipple {}}
+			$w dtag _sel
+			if $data(undo) {
+				set post {}
+				if {"$pre" != "$post"} {
+					$object addundo [list selection $post] [list selection $pre]
+				}
+			}
+		}
+		remove {
+			if $data(undo) {set pre [$w find withtag _sel]}
+			foreach tag $list {
+				catch {$w itemconfigure $tag -stipple gray50}
+				catch {$w itemconfigure $tag -outlinestipple gray50}
+				$w dtag $tag _sel
+			}
+			Classy::todo $object selection redraw
+			if $data(undo) {
+				set post [$w find withtag _sel]
+				if {"$pre" != "$post"} {
+					$object addundo [list selection $post] [list selection $pre]
+				}
+			}
+		}
+		redraw {
+			set bbox [$w bbox $data(current)]
+			if {"$bbox" != ""} {
+				$w coords $data(cur) $bbox
+				$w raise $data(cur)
+			} else {
+				$w coords $data(cur) -1000 -1000 -1000 -1000
+			}
+			if ![info exists data(nw)] {
+				foreach name {nw n ne e se s sw w} {
+					set data($name) [$w create bitmap -1000 -1000 \
+						-bitmap [Classy::getbitmap canvas_select] \
+						-foreground red \
+						-tags [list _sb _sb_$name _selbd]]
+				}
+			}
+			set bbox [$w bbox _sel]
+			if {"$bbox" != ""} {
+				set x1 [lindex $bbox 0]
+				set y1 [lindex $bbox 1]
+				set x2 [lindex $bbox 2]
+				set y2 [lindex $bbox 3]
+				if {$x2 < $x1} {set temp $x1;set x1 $x2;set x2 $temp}
+				if {$y2 < $y1} {set temp $y1;set y1 $y2;set y2 $temp}
+				$w coords $data(sel) $x1 $y1 $x2 $y2
+				$w raise $data(sel)
+				$w coords _nw -1000 -1000
+				$w coords $data(nw) $x1 $y1
+				$w coords $data(ne) $x2 $y1
+				$w coords $data(se) $x2 $y2
+				$w coords $data(sw) $x1 $y2
+				$w coords $data(n) [expr {$x1+($x2-$x1)/2}] $y1
+				$w coords $data(e) $x2 [expr {$y1+($y2-$y1)/2}]
+				$w coords $data(s) [expr {$x1+($x2-$x1)/2}] $y2
+				$w coords $data(w) $x1 [expr {$y1+($y2-$y1)/2}]
+				$w raise _sb
+			} else {
+				foreach name {nw n ne e se s sw w} {
+					$w coords $data($name) -1000 -1000
+				}
+				$w coords $data(sel) -1000 -1000 -1000 -1000
+			}
+			if $data(ind) {
+				$w delete _ind
+				set num 0
+				foreach {x y} [$w coords $data(current)] {
+					$w create bitmap $x $y \
+						-bitmap [Classy::getbitmap canvas_current] \
+						-foreground red \
+						-tags [list _ind _ind_$num _selbd]
+					incr num
+				}
+			}
+		}
+		draw {
+			set x1 [lindex $list 0]
+			set y1 [lindex $list 1]
+			set x2 [lindex $list 2]
+			set y2 [lindex $list 3]
+			$w coords $data(sel) $x1 $y1 $x2 $y2
+			$w raise $data(sel)
+			$w coords _nw -1000 -1000
+			$w coords $data(nw) $x1 $y1
+			$w coords $data(ne) $x2 $y1
+			$w coords $data(se) $x2 $y2
+			$w coords $data(sw) $x1 $y2
+			$w coords $data(n) [expr {$x1+($x2-$x1)/2}] $y1
+			$w coords $data(e) $x2 [expr {$y1+($y2-$y1)/2}]
+			$w coords $data(s) [expr {$x1+($x2-$x1)/2}] $y2
+			$w coords $data(w) $x1 [expr {$y1+($y2-$y1)/2}]
+			$w raise _sb
+		}
+		coords {
+			return [$w coords $data(sel)]
+		}
+	}
+}
 
-#doc {Canvas command selection} cmd {
-#pathname selection ?action? ?args?
+#doc {Canvas command current} cmd {
+#pathname current ?item?
 #} descr {
-# Change the current selection of canvas objects; has the following subcommands:
-#<dl>
-#<dt>set<dd>set the current selection: args are the itemnumbers or tags of the items that must be selected
-#<dt>get<dd>get itemnames of all canvas items in the selection
-#<dt>add<dd>add items corresponding to the given itemnumbers or tags
-#<dt>clear<dd>clear the selection
-#<dt>remove<dd>remve items corresponding to the given itemnumbers or tags
-#<dt>redraw<dd>redraw the selection
-#</dl>
+# returns the current item. If current is given, it chabges the
+# the current item to the item given.
 #}
-Classy::Canvas method selection {action args} {
+Classy::Canvas method current {args} {
 	private $object w data
-	switch $action {
-		set {
-			$w itemconfigure _sel -state normal
-			$w dtag _sel
-			foreach tag $args {
-				$w addtag _sel withtag $tag
-			}
-			$w itemconfigure _sel -state disabled
-			Classy::todo $object selection redraw
+	if {"$args" == ""} {
+		return $data(current)
+	} else {
+		$w delete _ind
+		if $data(undo) {
+			$object addundo [list current [lindex $args 0]] [list current $data(current)]
 		}
-		get {
-			return [$w find withtag _sel]
+		set data(current) [lindex $args 0]
+	}
+	if {[llength $args] == 2}  {
+		set num 0
+		foreach {x y} [$w coords $data(current)] {
+			$w create bitmap $x $y \
+				-bitmap [Classy::getbitmap canvas_current] \
+				-foreground red \
+				-tags [list _ind _ind_$num _selbd]
+			incr num
 		}
-		add {
-			foreach tag $args {
-				$w addtag _sel withtag $tag
-			}
-			$w itemconfigure _sel -state disabled
-			Classy::todo $object selection redraw
-		}
-		clear {
-			$w itemconfigure _sel -state normal
-			$w dtag _sel
-		}
-		remove {
-			foreach tag $args {
-				$w itemconfigure $tag -state normal
-				$w dtag $tag _sel
-			}
-			Classy::todo $object selection redraw
-		}
-		redraw {
-			set bbox [$w bbox _sel]
-			if {"$bbox" != ""} {
-				$w coords $data(sel) $bbox
-				$w raise $data(sel)
-			} else {
-				$w coords $data(sel) -1000 -1000 -1000 -1000
-			}
-		}
+		set data(ind) 1
+	} else {
+		set data(ind) 0
+	}
+	set bbox [$w bbox $data(current)]
+	if {"$bbox" != ""} {
+		$w coords $data(cur) $bbox
+		$w raise $data(cur)
+	} else {
+		$w coords $data(cur) -1000 -1000 -1000 -1000
 	}
 }
 
-} else {
-
-Classy::Canvas method selection {action args} {
-	private $object w data
-	switch $action {
-		set {
-			$w itemconfigure _sel -state normal
-			$w dtag _sel
-			foreach tag $args {
-				$w addtag _sel withtag $tag
-			}
-			Classy::todo $object selection redraw
-		}
-		get {
-			return [$w find withtag _sel]
-		}
-		add {
-			foreach tag $args {
-				$w addtag _sel withtag $tag
-			}
-			Classy::todo $object selection redraw
-		}
-		clear {
-			$w dtag _sel
-		}
-		remove {
-			foreach tag $args {
-				$w dtag $tag _sel
-			}
-			Classy::todo $object selection redraw
-		}
-		redraw {
-			set bbox [$w bbox _sel]
-			if {"$bbox" != ""} {
-				$w coords $data(sel) $bbox
-				$w raise $data(sel)
-			} else {
-				$w coords $data(sel) -1000 -1000 -1000 -1000
-			}
-		}
-	}
-}
-
+Classy::Canvas method selector {x1 y1 x2 y2} {
+	private $object w
+	$w coords _selector $x1 $y1 $x2 $y2
 }
 
 Classy::Canvas method images {{pattern *}} {
@@ -1490,10 +1774,10 @@ Classy::Canvas method save {{tag all}} {
 }
 
 #doc {Canvas command undo} cmd {
-#pathname save ?tag?
+#pathname load ?tag?
 #} descr {
 # restores a previously saved drawing. Its argument is a list as returned by
-# te save method.
+# the save method.
 #}
 Classy::Canvas method load {c} {
 	private $object w load data tag
@@ -1510,9 +1794,10 @@ Classy::Canvas method load {c} {
 			set tags [lreplace $tags $pos $pos $tag($g)]
 		}
 		lappend tags _new
-		if {"[info commands ::Classy::Canvas_load_$type]" != ""} {
-			::Classy::Canvas_load_$type $object $w $idata $tags
-		}
+		catch {::Classy::Canvas_load_$type $object $w $idata $tags}
+#		if {"[info commands ::Classy::Canvas_load_$type]" != ""} {
+#			::Classy::Canvas_load_$type $object $w $idata $tags
+#		}
 	}
 	return {}
 }
@@ -1549,4 +1834,63 @@ Classy::Canvas method findgroup {tagOrId} {
 	} else {
 		return {}
 	}
+}
+
+#doc {Canvas command cut} cmd {
+#pathname cut ?tagOrId?
+#} descr {
+# copies a description of the objects given by tagOrId to the clipboard
+#}
+Classy::Canvas method cut {{tagOrId _sel}} {
+	clipboard clear -displayof $object			  
+	catch {									
+		clipboard append -displayof $object [$object save $tagOrId]
+		$object delete $tagOrId
+	}										  
+}
+
+#doc {Canvas command copy} cmd {
+#pathname copy ?tagOrId?
+#} descr {
+# copies a description of the objects given by tagOrId to the clipboard
+#}
+Classy::Canvas method copy {{tagOrId _sel}} {
+	clipboard clear -displayof $object			  
+	catch {									
+		clipboard append -displayof $object [$object save $tagOrId]
+	}										  
+}
+
+#doc {Canvas command paste} cmd {
+#pathname paste
+#} descr {
+# creates new objects from a description put on the clipboard by the copy or cut method
+#}
+Classy::Canvas method paste {} {
+	$object selection set {}
+	$object load [selection get -displayof $object -selection CLIPBOARD]
+}
+
+Classy::Canvas method _getprint {var} {
+putsvars var
+	private $object w data
+	upvar #0 ::$var print
+	if $print(portrait) {set rotate 0} else {set rotate 1}
+	return [$w postscript \
+		-rotate $rotate -colormode $print(colormode) \
+		-width $print(pwidth) -height $print(pheight) \
+		-pagewidth [expr {$print(scale)*$print(pwidth)/100.0}] \
+		-x $print(xoffset) -y $print(yoffset) \
+		-pageanchor nw -pagex 0 -pagey 0]
+}
+
+#doc {Canvas command print} cmd {
+#pathname print
+#} descr {
+# pops up a print dialog
+#}
+Classy::Canvas method print {} {
+	private $object w data
+	set page [$w coords _page]
+	Classy::printdialog -papersize [lrange $page 2 3] -getdata [list $object _getprint]
 }

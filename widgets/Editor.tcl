@@ -739,7 +739,8 @@ Classy::Editor method setmacro {name command {key {}}} {
 	laddnew macros $name
 	Classy::Default set app Classy::Editor_macros $macros
 	Classy::Default set app Classy::Editor_macro_$name [list $command $key]
-	eval [[Classy::DynaMenu menu Classy::Editor].macros cget -postcommand]
+	update idletasks
+	Classy::DynaMenu updateactive Classy::Editor
 }
 
 #doc {Editor command deletemacro} cmd {
@@ -752,7 +753,7 @@ Classy::Editor method deletemacro {name} {
 		return
 	}
 	Classy::Default unset app Classy::Editor_macro_$name
-	eval [[Classy::DynaMenu menu Classy::Editor].macros cget -postcommand]
+	Classy::DynaMenu updateactive Classy::Editor
 }
 
 #doc {Editor command getmacromenu} cmd {
@@ -760,18 +761,18 @@ Classy::Editor method deletemacro {name} {
 #} descr {
 #}
 Classy::Editor method getmacromenu {} {
-	set data {action Macro "Manage Macros" "%W macro"}
+	set data {action "Manage Macros" "%W macro" <<Macro>>}
 	append data "\n"
 	set names ""
 	foreach m [Classy::Default names app Classy::Editor_macro_*] {
 		regexp {^Classy::Editor_macro_(.*)$} $m temp name
 		set temp [Classy::Default get app Classy::Editor_macro_$name]
 		set key [lindex $temp 1]
-		append data "action [list Macro$name] \"$name\" \{[list %W runmacro $name]\}"
+		append data "action \"$name\" \{[list %W runmacro $name]\}"
 		if {"$key" == ""} {
 			append data "\n"
 		} else {
-			append data " $key\n"
+			append data " <$key>\n"
 		}
 		lappend names $name
 	}
@@ -801,7 +802,7 @@ Classy::Editor method getpatternmenu {} {
 	if ![info exists pattern] {
 		set pattern {^proc |^Classy }
 	}
-	set data {action Pattern "Set pattern" "%W pattern"}
+	set data {action "Set pattern" "%W pattern"}
 	append data "\n"
 	set names ""
 	set index 1.0
@@ -810,7 +811,7 @@ Classy::Editor method getpatternmenu {} {
 		set r [$object.edit search -regexp -- $pattern $index end]
 		if {"$r" == ""} break
 		set line [$object.edit get "$r linestart" "$r lineend"]
-		append data [list action [list Pattern$num] $line [list %W see $r]]\n
+		append data [list action $line [list %W see $r] <<Pattern$num>>]\n
 		incr num
 		set index "$r +1c"
 	}

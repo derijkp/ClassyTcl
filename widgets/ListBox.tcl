@@ -73,7 +73,9 @@ Classy::ListBox chainoption -highlightcolor {$object} -highlightcolor {$object.l
 #}
 Classy::ListBox addoption -content {content Content {}} {
 	$object.list delete 0 end
-	eval $object.list insert end $value
+	foreach el $value {
+		$object.list insert end $el
+	}
 	Classy::todo $object redraw
 }
 

@@ -16,11 +16,13 @@ test Classy::Editor {Editor and find} {
 
 test Classy::Editor {edit and insert} {
 	classyclean
-	set w [edit try/try.tcl]
-	wm geometry $w +0+0
-	$w.editor insert end try
-	$w.editor get "end-4c" "end-1c"
+	set ::w [edit try/try.tcl]
+	wm geometry $::w +0+0
+	$::w.editor insert end try
+	$::w.editor get "end-4c" "end-1c"
 } {try}
+
+catch {destroy $::w}
 
 test Classy::Editor {links} {
 	classyclean
@@ -41,5 +43,7 @@ test Classy::Editor {links} {
 	.t.try insert end try
 	.t.try2 get "end-4c" "end-1c"
 } {try}
+
+catch {destroy .t}
 
 testsummarize

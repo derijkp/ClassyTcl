@@ -86,6 +86,7 @@ array set ::Classy::WindowBuilder::options {
 	-content {Code text}
 	command text
 	content text
+	persistent bool
 }
 set ::Classy::WindowBuilder::options(common) {
 	-textvariable -text -command -justify -image -orient -variable 

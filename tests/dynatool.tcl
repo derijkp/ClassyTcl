@@ -48,10 +48,35 @@ test Classy::DynaTool {text} {
 	Classy::DynaTool define Test {
 		action "Test" "Test" {%W insert end test}
 		action "OK" "OK" {%W insert end OK}
-		widget Entry Entry .e
+		label label "Just a label"
 	}
 	entry .e
 	Classy::DynaTool .try -type Test -cmdw .text
+	pack .try -fill x
+	text .text
+	pack .text -side bottom
+	manualtest
+} {}
+
+test Classy::DynaTool {misc} {
+	classyclean
+	proc tproc {w} {
+		Classy::Entry $w
+		return [list $w configure -command [list invoke {v} {puts %W:$v}]]
+	}
+	Classy::DynaTool define Test {
+		action "Test" "Test" {%W insert end test}
+		action "OK" "OK" {%W insert end OK}
+		label label "Just a label"
+		tool tproc "Proc"
+		widget Entry "Entry" {-command {invoke v {puts %W:$v}}}
+		check copy "Copy" {-variable copy -command {puts %W:$copy}}
+		radio opt1 "opt1" {-variable opt -value opt1 -command {puts %W:$opt}}
+		radio opt2 "opt2" {-variable opt -value opt2 -command {puts %W:$opt}}
+	}
+	entry .e
+	Classy::DynaTool .try -cmdw .text
+	.try configure -type Test
 	pack .try -fill x
 	text .text
 	pack .text -side bottom

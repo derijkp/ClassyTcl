@@ -59,7 +59,7 @@ array set ::html::events {
 	Enter	{-borderwidth 2 -relief raised }
 	Leave	{-borderwidth 2 -relief flat }
 	<Action>		{-borderwidth 2 -relief sunken}
-	<ButtonRelease-Action>	{-borderwidth 2 -relief raised}
+	<Action-ButtonRelease>	{-borderwidth 2 -relief raised}
 }
 
 # ------------------------------------------------------------------

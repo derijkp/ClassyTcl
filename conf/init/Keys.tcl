@@ -53,6 +53,7 @@ Classy::configkey Control {
 	SpecialFocusPrev <<SpecialFocusPrev>> <ISO_Left_Tab> {TextFocusPrev key}
 }
 Classy::configkey Misc {
+	New <<New>> <Alt-n> {Help key}
 	Help <<Help>> <F1> {Help key}
 	Format <<Format>> <Control-Alt-j> {Format key}
 	Print <<Print>> <Control-p> {Print key}

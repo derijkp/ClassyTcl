@@ -26,6 +26,7 @@ proc ::Classy::Selector {} {}
 proc Selector {} {}
 }
 
+auto_load Classy::Text
 option add *Classy::Selector.highlightThickness 0 widgetDefault
 
 # ------------------------------------------------------------------

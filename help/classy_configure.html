@@ -6,8 +6,9 @@
 
 <h2>Configuration system</h2>
 The Configuration system is used to change the ClassyTcl configuration 
-settings. Keys, mousebuttons, fonts, colors, menus, toolbars and some 
-general settings can be changed.
+settings. Keys, mousebuttons, fonts, colors, <a href="classy_dynamenu.html">menu</a> and 
+<a href="classy_dynatool.html">toolbar definitions</a> and some 
+general settings can be changed. 
 <p>
 Configuration can be changed at different levels, making it possible to eg. to change the 
 configuration for either all ClassyTcl applications or for one specific application, 
@@ -16,29 +17,38 @@ At startup, a ClassyTcl application will parse different levels in the following
 order:
 <ol>
 <li><b>ClassyTcl default (def)</b>: Global configuration settings
-<dd>
+<br>
 This level contains the most general configuration settings. They apply to any ClassyTcl 
 application, and should never be deleted. However, they can be overruled by any of the other 
 levels. (The configuration files for this level are stored in the conf/init subdirectory of 
-the ClassyTcl installation directory.)
+the ClassyTcl installation directory. Icons are stored in the corresponding 
+conf/icons subdirectory.)
 <li><b>ClassyTcl user (user)</b>: Personal configuration
-<dd>
+<br>
 Settings at this level overrule the global, default settings for a particular user.
 The configuration id stored in the directory .classy/init (or equivalent depending on OS) 
-in the home directory of the user.
+in the home directory of the user. Icons are stored in the corresponding 
+.classy/icons subdirectory.
 <li><b>Application Default (appdef)</b>: Global application specific configuration
-<dd>
+<br>
 Settings at this level overrule the global, default settings for a particular application.
 The configuration is stored in files in the conf/init subdirectory of the 
-application directory.
+application directory. Icons are stored in the corresponding 
+conf/icons subdirectory.
 <li><b>Application user (appuser)</b>: Personal application specific configuration
-<dd>
+<br>
 These configuration  settings are specific to the current user (Unix) and application.
 Settings at this level will overrule any other settings for that appliction and user.
 The settings are stored in the subdirectory .classy-apps/&lt;application name&gt;/init of the users home 
-directory (or equivalent depending on OS). 
+directory (or equivalent depending on OS).  Icons are stored in the corresponding 
+.classy-apps/&lt;application name&gt;/icons subdirectory.
 </ol>
-<p>
+
+<h2>Icons</h2>
+Icons cannot be changed from the Configuration dialog yet,
+but they can be changed by replacing the files in the icon configuration directories in the 
+different levels. Icons are searched by name, starting at the appuser level, followed by the 
+appdef, user and def levels. (Icons are retrieved using the command "Classy::geticon iconname".)
 
 <h2>Named configurations</h2>
 Named configurations can be used to store several possible configurations (eg. blue or 
@@ -56,7 +66,8 @@ configuration item and a button bar with the following buttons:
 <li><b>SaveAs</b>: save the current settings on a different level, or as a named configuration
 <li><b>Use</b>: use the currently being edited settings
 <li><b>Select</b>: select the settings from another level or named configuration
-<li><b>Clear</b>: set all settings to use default
+<li><b>Clear</b>: removes the current configuration entry at the current level. This
+will cause the settings of one of the lower levels to be used.
 <li><b>Reconfigure</b>: go through the normal configuration initialisation.
 <li><b>Restore</b>: reset currently being edited settings to those in the file
 <li><b>Help</b>: show this help text
