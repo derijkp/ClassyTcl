@@ -87,6 +87,13 @@ Classy::DynaTool addoption -type {type Type {}} {
 	set num 0
 	eval destroy [winfo children $object]
 	catch {unset data(slaves)}
+	if ![info exists tooldata($value)] {
+		if [info exists ::Classy::configtoolbar($value)] {
+			set tooldata($value) $::Classy::configtoolbar($value)
+		} else {
+			return -code error "Toolbar type \"$value\" not defined"
+		}
+	}
 	set list [splitcomplete $tooldata($value)]
 	if {[lsearch -regexp $list "^\[\t \]*nodisplay\[\t \]*\$"] != -1} {
 		[Classy::window $object] configure -height 0 -width $options(-width)
@@ -233,7 +240,18 @@ Classy::DynaTool classmethod redraw {tooltype} {
 #}
 Classy::DynaTool classmethod types {{pattern *}} {
 	private $class tooldata
-	return [array names tooldata $pattern]
+	set list ""
+	foreach tool [array names ::Classy::configtoolbar] {
+		if [string match $pattern $tool] {
+			laddnew list $tool
+		}
+	}
+	foreach tool [array names tooldata $pattern] {
+		if [string match $pattern $tool] {
+			laddnew list $tool
+		}
+	}
+	return $list
 }
 
 #doc {DynaTool get} cmd {

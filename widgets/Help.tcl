@@ -15,7 +15,7 @@
 # The help widget is a toplevel with a menu that displays HTML
 # help files. It has all the options and methods of the 
 # <a href="HTML.html">HTML widget</a>.
-# It is usually called via the Extral::help command.
+# It is usually called via the help command.
 #}
 #doc {Help options} h2 {
 #	Help specific options

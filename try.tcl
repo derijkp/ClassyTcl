@@ -1,3 +1,44 @@
+set data [Classy::config_get $level {}]
+
+source tools.tcl
+set object .try
+canvas .try
+pack .try -fill both -expand yes
+set id [.try create text 10 10]
+	.try itemconfigure $id -anchor nw -text "Hallo allemaal" -width 50
+.try delete all
+for {set y 10} {$y < 500} {incr y 50} {
+	for {set x 10} {$x < 500} {incr x 50} {
+		.try create text $x $y -anchor nw -text "Hallo allemaal" -width 50
+	}
+}
+
+classyclean
+catch {CanvasSeq destroy}
+catch {try destroy}
+canvas .try
+pack .try -fill both -expand yes
+update idletasks
+Classy::CanvasSeq new try -boxwidth 0 -canvas .try -area {10 10 210 250}
+try configure -area {10 10 510 250} -end 780 -basesperline 500
+try configure -endtick 1
+bind .try <1> {
+	puts "set x %x"
+	puts "set y %y"
+	puts [try xpos %x %y]
+}
+proc getboxes {start end} {
+	return {
+		{blue 20 160 20 {-fill blue}}
+		{green 400 550 20 {-fill green}}
+		{orange 650 720 -20 {-fill orange}}
+	}
+}
+try configure -getboxes getboxes
+
+
+
+
 source cfiles
 set object .try
 Classy::Builder .try

@@ -115,7 +115,11 @@ proc Classy::fullpath {file} {
 
 # Classy::parseopt arguments variable list ?remain?
 # variable: name of array to set options in
-# list: each element is of the form {options {possible values} default}
+# list: lists posible options in the folowing format <br>
+# option {possible values} {default value} ...<br>
+# if {possible values} is empty, any value is ok.
+# if {possible values} is {0 1}, the option is considered a boolean (and consequently doesn't need 
+# an argument).
 # remain: remaining options
 proc Classy::parseopt {real variable possible {remain {}}} {
 	upvar $variable var
@@ -123,16 +127,26 @@ proc Classy::parseopt {real variable possible {remain {}}} {
 	set rem ""
 	catch {unset var}
 	foreach {option options default} $possible {
-		set pos [lsearch $real $option]
-		if {$pos!=-1} {
-			lpop real $pos
-			set value [lpop real $pos]
-			if {("$options"!="")&&([lsearch $options $value]==-1)} {
-				error "Incorrect value \"$value\" for option $option\nmust be one of: $options"
+		if {"$options" == "0 1"} {
+			set pos [lsearch $real $option]
+			if {$pos!=-1} {
+				lpop real $pos
+				set var($option) 1
+			} else {
+				set var($option) 0
 			}
-			set var($option) $value
 		} else {
-			set var($option) $default
+			set pos [lsearch $real $option]
+			if {$pos!=-1} {
+				lpop real $pos
+				set value [lpop real $pos]
+				if {("$options"!="")&&([lsearch $options $value]==-1)} {
+					error "Incorrect value \"$value\" for option $option: must be one of: $options"
+				}
+				set var($option) $value
+			} else {
+				set var($option) $default
+			}
 		}
 	}
 	if {"$real"!=""} {

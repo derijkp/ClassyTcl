@@ -63,6 +63,8 @@ Classy::Selector addoption -variable {variable Variable {}} {
 #doc {Selector options -type} option {-type type Type} descr {
 #}
 Classy::Selector addoption -type {type Type {}} {
+	set list {int line text color font key mouse anchor justify bool orient relief select sticky}
+	if {[lsearch $list [lindex $value 0]] == -1} {return -code error "Unknown type \"$value\""}
 	Classy::todo $object redraw
 }
 
@@ -108,6 +110,7 @@ Classy::Selector method set {item} {
 	if {"$options(-type)" == "sticky"} {
 		$object _stickyset $item
 	}
+	Classy::todo $object redraw
 }
 
 #doc {Selector command get} cmd {

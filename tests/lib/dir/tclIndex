@@ -12,4 +12,3 @@ set auto_index(ttt) [list source [file join $dir try.tcl]]
 set auto_index(top) [list source [file join $dir try.tcl]]
 set auto_index(t) [list source [file join $dir try.tcl]]
 set auto_index(printdialog) [list source [file join $dir try2.tcl]]
-

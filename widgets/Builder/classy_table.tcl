@@ -4,8 +4,11 @@
 
 proc ::Classy::WindowBuilder::add_Classy::Table {object base args} {
 	private $object data
-	Classy::Table $base -rows 10 -cols 4 -getcommand {get table(%x,%y)} \
-		-setcommand {set table(%x,%y) %v} -xlabelcommand {echo %x}  -ylabelcommand {echo %y}
+	Classy::Table $base -rows 5 -cols 4 \
+		-getcommand {invoke {object w x y} {get ::table($x,$y) ""}} \
+		-setcommand {invoke {object w x y v} {set ::table($x,$y) $v}} \
+		-xlabelcommand {invoke {o w col} {return $col}} \
+		-ylabelcommand {invoke {o w row} {return $row}}
 	eval $base configure $args
 	return $base
 }
@@ -15,7 +18,7 @@ proc ::Classy::WindowBuilder::start_Classy::Table {object base} {
 	set bindtags($base) [bindtags $base]
 	bindtags $base $data(tags)
 	$object _recursestartedit $base [winfo children $base]
-	$base redraw
+	$base _redraw
 }
 
 proc ::Classy::WindowBuilder::edit_Classy::Table {object w} {

@@ -27,4 +27,3 @@ set auto_index(browser_dataunder) [list source [file join $dir bindings.tcl]]
 set auto_index(browser_small) [list source [file join $dir bindings.tcl]]
 set auto_index(browser_data) [list source [file join $dir bindings.tcl]]
 set auto_index(filer_drag) [list source [file join $dir bindings.tcl]]
-

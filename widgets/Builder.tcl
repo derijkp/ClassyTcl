@@ -113,12 +113,6 @@ Classy::Builder method destroy {} {
 Classy::Builder method new {type {name {}}} {
 	global auto_index
 	private $object browse options defdir
-	if {[lsearch {color font misc key mouse menu tool} $browse(type)] != -1} {
-		set type $browse(type)
-		set configfile 1
-	} else {
-		set configfile 0
-	}
 	if {"$name" == ""} {
 		catch {destroy $object.temp}
 		Classy::InputDialog $object.temp -title "New $type" -label "Name" \
@@ -149,8 +143,6 @@ Classy::Builder method new {type {name {}}} {
 		}
 		$object.browse selection set $base
 		return
-	} elseif {"$type" == "config"} {
-		if !$configfile {error "file \"$file\" is not a configuration file"}
 	} else {
 		if [info exists auto_index($name)] {
 			set file [lindex $auto_index($name) 1]
@@ -207,24 +199,10 @@ Classy::Builder method new {type {name {}}} {
 			append code "\n\}"
 			$object infile set $file $name $code
 		}
-		color - font - misc - key - mouse - menu - tool {
-			set f [open $file a]
-			puts $f "\nClassy::config$type [list $name] \{"
-			puts $f "\}"
-			close $f
-		}
 	}
 	set base [list $file $name $type]
-	switch $type {
-		color - font - misc - key - mouse - menu - tool {
-			set pnode [list $file {} [lindex $browse(base) 2]]
-			$object.browse addnode $pnode $base -type end -text $name -image [Classy::geticon config_$type]
-		}
-		default {
-			set pnode [list $file {} file]
-			$object.browse addnode $pnode $base -type end -text $name -image [Classy::geticon new$type]
-		}
-	}
+	set pnode [list $file {} file]
+	$object.browse addnode $pnode $base -type end -text $name -image [Classy::geticon new$type]
 	update idletasks
 	$object.browse selection set $base
 }
@@ -265,12 +243,6 @@ Classy::Builder method open {file function type} {
 		function {
 			$object fedit $object.fedit $file $function $type
 		}
-		default {
-			set name $function
-			set level $file
-			catch {set type [structlget {color Colors font Fonts misc Misc mouse Mouse key Keys menu Menus tool Toolbars} $type]}
-			Classy::Config config $type $name $level
-		}
 	}
 }
 
@@ -283,9 +255,6 @@ Classy::Builder method infile {cmd file args} {
 			while {![eof $f]} {
 				set line [getcomplete $f]
 				if [string match "proc $name *" $line] {
-					close $f
-					return $line
-				} elseif [regexp "^Classy::config\[a-z\]+ [list $name]" $line] {
 					close $f
 					return $line
 				}
@@ -303,9 +272,6 @@ Classy::Builder method infile {cmd file args} {
 			while {![eof $f]} {
 				set line [getcomplete $f]
 				if [string match "proc $name *" $line] {
-					puts $o $code
-					set done 1
-				} elseif [regexp "^Classy::config\[a-z\]+ [list $name]" $line] {
 					puts $o $code
 					set done 1
 				} else {
@@ -330,8 +296,6 @@ Classy::Builder method infile {cmd file args} {
 				set line [getcomplete $f]
 				if [string match "proc *" $line] {
 					lappend result [lindex $line 1]
-				} elseif [regexp "^Classy::config\[a-z\]+ " $line] {
-					lappend result [lindex $line 1]
 				}
 			}
 			close $f
@@ -346,9 +310,7 @@ Classy::Builder method infile {cmd file args} {
 			while {![eof $f]} {
 				set line [getcomplete $f]
 				if ![string match "proc $name *" $line] {
-					if ![regexp "^Classy::config\[a-z\]+ [list $name]" $line] {
-						puts $o $line
-					}
+					puts $o $line
 				}
 			}
 			close $o
@@ -377,9 +339,6 @@ Classy::Builder method infile {cmd file args} {
 					catch {auto_mkindex [file dirname $file] *.tcl}
 					unset ::auto_index($name)
 					set ::auto_index($newname) [list source $file]
-				} elseif [regexp "^Classy::config\[a-z\]+ [list $name]" $line] {
-					regsub "^(Classy::config\[a-z\]+) [list $name]" $line "\\1 [list $newname]" line
-					puts $o $line
 				} else {
 					puts $o $line
 				}
@@ -391,9 +350,8 @@ Classy::Builder method infile {cmd file args} {
 			set code [lindex $args 0]
 			set func [lindex $code 1]
 			set funcs ""
-			foreach line [Extral::splitcomplete [readfile $file]] {
+			foreach line [splitcomplete [readfile $file]] {
 				if [regexp {^proc } $line] {lappend funcs [lindex $line 1]}
-				if [regexp "^Classy::config\[a-z\]+ " $line] {lappend funcs [lindex $line 1]}
 			}
 			if {[lsearch $funcs $func] != -1} {
 				set num 1
@@ -605,23 +563,8 @@ Classy::Builder method opennode {args} {
 			}
 		}
 		foreach file [lsort $list] {
-			switch -- [file tail $file] {
-				Colors.tcl - Keys.tcl - Misc.tcl - Toolbars.tcl - 
-				Fonts.tcl - Menus.tcl - Mouse.tcl {
-					set f [open $file]
-					set line [gets $f]
-					close $f
-					if [regexp {^#[^ ]+ ([^ ]+) configuration file} $line temp type] {
-						set image [Classy::geticon config_$type]
-					} else {
-						set image [Classy::geticon newfile]
-					}
-				}
-				default {
-					set type file
-					set image [Classy::geticon newfile]
-				}
-			}
+			set type file
+			set image [Classy::geticon newfile]
 			$object.browse addnode $root [list $file {} $type] -text [file tail $file] -image $image
 		}
 		foreach file [lsort $olist] {
@@ -649,15 +592,6 @@ Classy::Builder method opennode {args} {
 				} else {
 					$object.browse addnode $root [list $browse(file) $func function] -type end -text $func -image [Classy::geticon newfunction]
 				}
-			} elseif [regexp {^Classy::config([^ ]+) } $line temp type] {
-				if [info complete $line] {
-					set func [lindex "$line" 1]
-				} else {
-					set func [lindex "$line\}" 1]
-				}
-				set browse(type) $type
-				$object.browse addnode $root [list $browse(file) $func $type] \
-					-type end -text $func -image [Classy::geticon config_$type]
 			}
 		}
 		close $f
@@ -704,18 +638,6 @@ Classy::Builder method fedit {w file function type} {
 	}]]
 }
 
-Classy::Builder method confedit {w file function type} {
-	if ![winfo exists $w] {
-		Classy::Toplevel $w -keepgeometry all
-		Classy::Config $w.edit -closecommand "$w hide"
-		pack $w.edit -fill both -expand yes
-	} else {
-		$w place
-	}
-	wm title $w $file
-	$w.edit open $file $function $type
-}
-
 Classy::Builder method rename {args} {
 	if {"$args" == ""} {
 		$object.browse edit [lindex [$object.browse selection] 0] "$object rename [$object.browse selection]"
@@ -739,14 +661,7 @@ Classy::Builder method rename {args} {
 			set parent [$object.browse parentnode $src]
 			$object infile rename [lindex $src 0] [lindex $src 1] $dst
 			$object.browse deletenode $src
-			switch $type {
-				color - font - misc - key - mouse - menu - tool {
-					$object.browse addnode $parent [lreplace $src 1 1 $dst] -type end -text [file tail $dst] -image [Classy::geticon config_$type]
-				}
-				default {
-					$object.browse addnode $parent [lreplace $src 1 1 $dst] -type end -text [file tail $dst] -image [Classy::geticon new$type]
-				}
-			}
+			$object.browse addnode $parent [lreplace $src 1 1 $dst] -type end -text [file tail $dst] -image [Classy::geticon new$type]
 		}
 	}
 }

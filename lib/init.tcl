@@ -53,5 +53,8 @@ if [file exists [file join ${::class::dir} classy[info sharedlibextension]]] {
 # in the parent namespace.
 #
 
-lappend auto_path [file join ${::class::dir} lib]
+lappend auto_path [file join ${::class::dir} lib] [file join ${::class::dir} classes]
+proc tm {args} {puts "[string range $args 0 20]: [uplevel 1 [list time $args]]"}
+
+source [file join $::class::dir lib Class.tcl]
 

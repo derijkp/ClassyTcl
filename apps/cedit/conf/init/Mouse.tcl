@@ -1,3 +1,0 @@
-#Application mouse configuration file
-
-

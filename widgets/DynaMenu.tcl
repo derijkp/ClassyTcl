@@ -43,14 +43,12 @@ option add *Classy::TopMenu.Menubutton.padY 1 widgetDefault
 # ------------------------------------------------------------------
 #  Widget creation
 # ------------------------------------------------------------------
-
 Class subclass Classy::DynaMenu
 Classy::export DynaMenu {}
 
 # ------------------------------------------------------------------
 #  Methods
 # ------------------------------------------------------------------
-
 #doc {DynaMenu attachmainmenu} cmd {
 #DynaMenu attachmainmenu menutype window ?menuroot?
 #} descr {
@@ -60,6 +58,7 @@ Classy::export DynaMenu {}
 #}
 Classy::DynaMenu method attachmainmenu {menutype cmdw {menuroot {}}} {
 	private $object menus
+	$class define $menutype
 	set menu $menus($menutype)
 	if {"$menuroot" == ""} {
 		set root [winfo toplevel $cmdw]
@@ -87,6 +86,7 @@ Classy::DynaMenu method attachmainmenu {menutype cmdw {menuroot {}}} {
 #}
 Classy::DynaMenu method attachmenu {menutype cmdw} {
 	private $object menus
+	$class define $menutype
 	set menu $menus($menutype)
 	if ![winfo exists $menu] {
 		$object makemenu $menutype $menu $cmdw Classy::Menu_$menutype
@@ -135,6 +135,13 @@ Classy::DynaMenu method define {menutype args} {
 	private $object menudata cmdws checks bindtags flag menus
 	switch [llength $args] {
 		0 {
+			if ![info exists menus($menutype)] {
+				if [info exists ::Classy::configmenu($menutype)] {
+					$class define $menutype $::Classy::configmenu($menutype)
+				} else {
+					return -code error "Menu type \"$menutype\" not defined"
+				}
+			}
 			return $menudata($menutype)
 		}
 		1 {
@@ -182,15 +189,27 @@ Classy::DynaMenu method define {menutype args} {
 #} descr {
 # returns a list of menutypes managed by Dynamenu
 #}
-Classy::DynaMenu method types {} {
+Classy::DynaMenu method types {{pattern *}} {
 	private $object menudata
+	set list ""
+	foreach tool [array names ::Classy::configmenu] {
+		if [string match $pattern $tool] {
+			laddnew list $tool
+		}
+	}
+	foreach tool [array names menudata] {
+		if [string match $pattern $tool] {
+			laddnew list $tool
+		}
+	}
+	return $list
 	return [array names menudata]
 }
 
 #doc {DynaMenu delete} cmd {
 #DynaMenu delete menutype
 #} descr {
-# delete the definition and all menus of $menutype
+# delete the current definition and all menus of $menutype
 #}
 Classy::DynaMenu method delete {menutype} {
 	private $object menudata cmdws checks bindtags menus
@@ -209,6 +228,7 @@ Classy::DynaMenu method delete {menutype} {
 #}
 Classy::DynaMenu method menu {menutype {cmdw {}}} {
 	private $object cmdws menus
+	$class define $menutype
 	set menu $menus($menutype)
 	if {"$cmdw" == ""} {
 		if [info exists cmdws($menutype)] {
@@ -232,7 +252,8 @@ Classy::DynaMenu method menu {menutype {cmdw {}}} {
 # add this to the bindtags of the window that must be controlled by the menu.
 #}
 Classy::DynaMenu method bindtag {menutype} {
-	private $object cmdws menus
+	private $object menus
+	$class define $menutype
 	set menu $menus($menutype)
 	if ![winfo exists $menu] {
 		$object makemenu $menutype $menu . Classy::Menu_$menutype
@@ -247,6 +268,7 @@ Classy::DynaMenu method bindtag {menutype} {
 #}
 Classy::DynaMenu method popup {menutype x y {cmdw {}}} {
 	private $object cmdws menus
+	$class define $menutype
 	set menu $menus($menutype)
 	if {"$cmdw" == ""} {
 		if [info exists cmdws($menutype)] {
@@ -286,7 +308,11 @@ Classy::DynaMenu method makemenu {menutype menu cmdw bindtag} {
 	private $object cmdws checks bindtags
 	private $object menudata
 	if ![info exists menudata($menutype)] {
-		return -code error "Menu type \"$menutype\" not defined"
+		if [info exists ::Classy::configmenu($menutype)] {
+			$class define $menutype $::Classy::configmenu($menutype)
+		} else {
+			return -code error "Menu type \"$menutype\" not defined"
+		}
 	}
 	set bindtags($menutype) $bindtag
 	set cmdws($menutype) $cmdw
@@ -417,4 +443,3 @@ Classy::DynaMenu method updateactive {menutype} {
 		uplevel #0 [$active cget -postcommand]
 	}
 }
-

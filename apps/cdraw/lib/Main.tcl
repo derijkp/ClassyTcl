@@ -25,7 +25,7 @@ proc mainw args {# ClassyTcl generated Toplevel
 	Classy::DynaTool $window.maintool  \
 		-width 179 \
 		-type MainTool \
-		-height 21
+		-height 42
 	grid $window.maintool -row 0 -column 0 -columnspan 2 -sticky new
 	Classy::Canvas $window.canvas \
 		-papersize A4 \
@@ -47,7 +47,8 @@ proc mainw args {# ClassyTcl generated Toplevel
 	# End windows
 	# Parse this
 	$window configure \
-		-destroycommand "exit" \
+		-destroycommand [varsubst window {destroy $window
+exit}] \
 		-title [tk appname]
 	$window.maintool configure \
 		-cmdw [varsubst window {$window.canvas}]
@@ -300,6 +301,7 @@ proc zoomdialog args {# ClassyTcl generated Dialog
 	$window persistent set 
 	return $window
 }
+
 
 
 

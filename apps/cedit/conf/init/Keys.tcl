@@ -1,2 +1,0 @@
-#Application key configuration file
-

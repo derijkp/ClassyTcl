@@ -57,8 +57,8 @@ proc ::Classy::WindowBuilder::edit_Classy::DynaTool {object w} {
 			$w.general.w0.value set $::Classy::temp
 		}
 	}]
-	button $w.edit -text "Edit tool" -command "Classy::Config config tool \[$object attribute get -type\] appdef"
-	button $w.new -text "New tool" -command "Classy::Config newconfig tool appdef"
+	button $w.edit -text "Edit tool" -command "Classy::config -node \[list Toolbars \[$object attribute get -type\]\] -level appdef"
+	button $w.new -text "New tool" -command "Classy::newconfig toolbar appdef"
 	grid $w.select $w.edit $w.new -sticky nswe
 	grid $w.general -sticky nswe -columnspan 4
 	grid columnconfigure $w 3 -weight 1

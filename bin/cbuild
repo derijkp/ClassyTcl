@@ -22,7 +22,7 @@ if {"$argv" != ""} {
 	if {"$file" == ""} exit
 }
 
-set name [file tail $file]
+set name [file root [file tail $file]]
 if ![file exists $file] {
 	if {[lsearch {conf help lib} $name] != -1} {
 		error "Cannot create application named \"$name\": reserved"
@@ -33,6 +33,17 @@ if ![file exists $file] {
 	set file [file join $file $name.tcl]
 } elseif [file isdir $file] {
 	set file [file join $file $name.tcl]
+}
+set f [open $file]
+gets $f;gets $f;gets $f
+set line [gets $f]
+set v 0.1
+regexp {[0-9.]+$} $line v
+close $f
+switch $v {
+	0.1 {
+		exec [file join $::class::dir bin convert0.1_to_0.2] $file
+	}
 }
 puts "Starting application \"$name\""
 if {"$tcl_platform(platform)" != "windows"} {

@@ -7,19 +7,20 @@
 # script is sourced, the variable $dir must contain the
 # full path name of this file's directory.
 
-namespace eval __temp [list set dir $dir]
-namespace eval __temp {
+namespace eval ::__temp {}
+proc ::__temp::initpkg dir {
 	# $Format: "\tset version 0.$ProjectMajorVersion$"$
 	set version 0.1
 	# $Format: "\tset minorversion $ProjectMinorVersion$"$
-	set minorversion 6
+	set minorversion 7
 	regsub -all {[ab]} $version {} version
 	set loadcmd {
 		package provide Class @version@
-		namespace eval ::class {set dir @dir@}
+		namespace eval ::class {}
+		set ::class::dir @dir@
 		source [file join @dir@ lib init.tcl]
-		namespace eval ::class {set version @version@}
-		namespace eval ::class {set minorversion @minorversion@}
+		set ::class::version @version@
+		set ::class::minorversion @minorversion@
 	}
 	regsub -all {@version@} $loadcmd [list $version] loadcmd
 	regsub -all {@minorversion@} $loadcmd [list $minorversion] loadcmd
@@ -36,5 +37,5 @@ namespace eval __temp {
 	regsub -all {@dir@} $loadcmd [list $dir] loadcmd
 	package ifneeded ClassyTcl $version $loadcmd
 }
-namespace delete __temp
+::__temp::initpkg $dir
 

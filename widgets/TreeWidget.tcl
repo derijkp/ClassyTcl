@@ -170,7 +170,7 @@ Classy::TreeWidget method _action {x y} {
 			if {"$options(-closecommand)" != ""} {
 				uplevel #0 $options(-closecommand) [list $node]
 			}
-			$object clearnode $node
+			# $object clearnode $node
 		}
 		closed {
 			if {"$options(-opencommand)" == ""} return
