@@ -37,7 +37,7 @@ option add *Somemenu.Menu definition widgetDefault
  changed at any time. DynaMenu also handles key shortcuts.
 
 <dl><b><dt>
-DynaMenu makemenu menutype menu cmdw bindtag
+DynaMenu makemenu menutype menu cmdw bindtag ?menuroot?
 </b><dd>
  This is usually the only method you need to create menus. It
  creates a menu named $menu of type $menutype if $menu does not exist yet.
@@ -47,19 +47,14 @@ DynaMenu makemenu menutype menu cmdw bindtag
  will make all shortcuts available from that widget.
  The menu created will be a popup or top menu depending
  on the <a href="../classy_configure.html">ClassyTcl configuration</a>.
+ <br>menuw can optionally be given to give the window on wich to tag 
+ a menubar. If not given the toplevel of the cmdw is used. In this case,
+ the cmdw has to exist when the menu is made.
 
 <b><dt>
-DynaMenu makepopup menutype menu cmdw bindtag
+DynaMenu makepopup menu curmenu data cmdw bindtag
 </b><dd>
- create a popup menu of type $menutype. $cmdw
- determines the initial cmdw. All key bindings for key shortcuts
- are bound to $bindtag. Adding $bindtag to the bindtags of a widget
- will make all shortcuts available from that widget.
-
-<b><dt>
-DynaMenu maketop menutype menu cmdw bindtag
-</b><dd>
- create a top menu of type $menutype. $cmdw
+ create a popup menu by the definition given in data. $cmdw
  determines the initial cmdw. All key bindings for key shortcuts
  are bound to $bindtag. Adding $bindtag to the bindtags of a widget
  will make all shortcuts available from that widget.
@@ -84,9 +79,9 @@ DynaMenu names
  returns a list of menutypes managed by Dynamenu
 
 <b><dt>
-DynaMenu redraw menutype
+DynaMenu menus menutype
 </b><dd>
- redraw menus of type $menutype
+ returns a list of menus of type $menutype managed by Dynamenu
 
 <b><dt>
 DynaMenu get menutype

@@ -12,11 +12,8 @@ test Classy::Text {create and configure} {
 		global d
 		if {$col == 1} {
 			$w configure -bg gray
-		} else {
-			$w configure -bg [$object cget -bg]
-		}
-		if {$row == 5} {
-			$w configure -bg blue
+		} elseif {$row == 5} {
+			$w configure -bg yellow
 		} else {
 			$w configure -bg [$object cget -bg]
 		}
@@ -38,6 +35,10 @@ test Classy::Text {create and configure} {
 	grid columnconfigure . 1 -weight 0
 	grid rowconfigure . 0 -weight 1
 	grid rowconfigure . 1 -weight 0
+
+	proc xlabelcommand {object w col} {return "x $col"}
+	proc ylabelcommand {object w row} {return "y $row"}
+	.try configure -xlabelcommand xlabelcommand -ylabelcommand ylabelcommand
 } {char}
 
 

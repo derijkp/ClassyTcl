@@ -41,10 +41,27 @@ catch {Classy::Table destroy}
 
 option add *Classy::Table.base.Entry.highlightThickness 0 widgetDefault
 option add *Classy::Table.base.Entry.borderWidth 1 widgetDefault
+option add *Classy::Table.base.Text.highlightThickness 0 widgetDefault
+option add *Classy::Table.base.Text.borderWidth 1 widgetDefault
+
+option add *Classy::Table::xpane.width 1 widgetDefault
+option add *Classy::Table::xpane.relief flat widgetDefault
+option add *Classy::Table::xpane.cursor sb_h_double_arrow widgetDefault
+#option add *Classy::Table::xpane.background green widgetDefault
+
+option add *Classy::Table::ypane.height 1 widgetDefault
+option add *Classy::Table::ypane.relief flat widgetDefault
+option add *Classy::Table::ypane.cursor sb_v_double_arrow widgetDefault
+#option add *Classy::Table::ypane.background green widgetDefault
 
 proc Classy::Tableobject {w args} {
 	eval [winfo parent [winfo parent $w]] $args
 }
+
+bind Classy::Table::xpane <<Action>> {Classy::Tableobject %W _startdrag x %W %X %Y}
+bind Classy::Table::xpane <<Action-Motion>> {Classy::Tableobject %W _drag %W %X %Y}
+bind Classy::Table::ypane <<Action>> {Classy::Tableobject %W _startdrag y %W %X %Y}
+bind Classy::Table::ypane <<Action-Motion>> {Classy::Tableobject %W _drag %W %X %Y}
 
 bind Classy::Table::text <FocusOut> {Classy::Tableobject %W _set %W}
 bind Classy::Table::text <Control-Up> {Classy::Tableobject %W movey %W -1}
@@ -75,7 +92,6 @@ Classy::Table classmethod init {args} {
 	$object configure -width 100 -height 100 -highlightthicknes 0 -bd 0
 	frame $object.base -borderwidth 0
 	grid $object.base -row 0 -column 0 -sticky nw
-	entry $object.base.e0,0 -width 1 -textvariable [privatevar $object data](0,0)
 	grid columnconfigure $object 1 -weight 1
 	grid rowconfigure $object 1 -weight 1
 	grid propagate $object 0
@@ -86,6 +102,8 @@ Classy::Table classmethod init {args} {
 	private $object drow dcol
 	set drow(start) 0
 	set dcol(start) 0
+	set dcol(num) 0
+	set drow(num) 0
 
 	# REM Configure initial arguments
 	# -------------------------------
@@ -102,18 +120,18 @@ Classy::Table component book {$object.book}
 #  Widget options
 # ------------------------------------------------------------------
 
-#doc {Table options -columns} option {-columns columns columns} descr {
-# 
+#doc {Table options -cols} option {-cols cols cols} descr {
+# gives the number of columns in the table
 #}
-Classy::Table addoption -columns {columns Columns 5} {
+Classy::Table addoption -cols {cols cols 5} {
 }
 #doc {Table options -rows} option {-rows rows rows} descr {
-# 
+# gives the number of rows in the table
 #}
 Classy::Table addoption -rows {rows Rows 20} {
 }
 #doc {Table options -colsize} option {-colsize colsize colsize} descr {
-# 
+# gives the default column size
 #}
 Classy::Table addoption -colsize {colSize ColSize {}} {
 	private $object options dcol
@@ -128,7 +146,7 @@ Classy::Table addoption -colsize {colSize ColSize {}} {
 	Classy::todo $object _redraw
 }
 #doc {Table options -rowsize} option {-rowsize rowsize rowsize} descr {
-# 
+# gives the default row size
 #}
 Classy::Table addoption -rowsize {rowSize RowSize {}} {
 	private $object options drow
@@ -143,7 +161,7 @@ Classy::Table addoption -rowsize {rowSize RowSize {}} {
 	Classy::todo $object _redraw
 }
 #doc {Table options -type} option {-type type type} descr {
-# 
+# gives the type of widgets in the table, must be entry or text
 #}
 Classy::Table addoption -type {type Type entry} {
 	private $object options drow dcol
@@ -155,38 +173,144 @@ Classy::Table addoption -type {type Type entry} {
 	if {"$options(-colsize)" == ""} {
 		set dcol(s) [winfo reqwidth $object.temp]
 	}
+	set dcol(ls) $dcol(s)
+	set drow(ls) $drow(s)
 	destroy object.temp
-	set dcol(num) 1
-	set drow(num) 1
 	eval destroy [winfo children $object.base]
-	Classy::Table__create_elem $object $value 0 0
+	set dcol(num) 0
+	set drow(num) 0
 	Classy::todo $object _redraw
 }
-#doc {Table options -xscrollcommand} option {-xscrollcommand xscrollcommand xscrollcommand} descr {
-# 
-#}
+#doc {Table options -xscrollcommand} option {-xscrollcommand xscrollcommand xscrollcommand} descr {}
 Classy::Table addoption -xscrollcommand {xScrollCommand ScrollCommand {}} {}
-#doc {Table options -yscrollcommand} option {-yscrollcommand yscrollcommand yscrollcommand} descr {
-# 
-#}
+#doc {Table options -yscrollcommand} option {-yscrollcommand yscrollcommand yscrollcommand} descr {}
 Classy::Table addoption -yscrollcommand {yScrollCommand ScrollCommand {}} {}
 #doc {Table options -getcommand} option {-getcommand getcommand getcommand} descr {
-# 
+# gives the command that will be called to obtain the value of a given cell. It must have the 
+# following format:<br>
+# getcommand object w row col<br>
+# The parameters given to the command when obtaining a value are the table objects name, the window
+# name of the currently associated cell, the row and the column.<br>
+# The getcommand must return the value to be shown in the given cell. If the getcommand
+# wishes to set the value itself (eg. in a text), it can return with a -code break, so
+# that its return value will not be used.
 #}
 Classy::Table addoption -getcommand {getCommand Command {}} {}
 #doc {Table options -setcommand} option {-setcommand setcommand setcommand} descr {
-# 
+# gives the command that will be called to set a given cell to a new value. It must have the 
+# following format:<br>
+# setcommand object w row col value<br>
+# The parameters given to the command are the table objects name, the window
+# name of the currently associated cell, the row, the column and the new value.
+# If the setcommand fails, the previous value will be restored.
 #}
 Classy::Table addoption -setcommand {setCommand Command {}} {}
-#doc {Table options -xlabels} option {-xlabels xLabels Labels} descr {
-# 
+#doc {Table options -xlabelcommand} option {-xlabelCommand xLabelCommand Command} descr {
+# If this option is empty, no xlabels will be displayed.
+# Othwerwise, it gives the command that will be called to obtain the value of a given xlabel. 
+# It must have the following format:<br>
+# getcommand object w col<br>
+# The parameters given to the command when obtaining a value are the table objects name, the window
+# name of the currently associated cell and the column.<br>
+# The command normally returns the value to be shown in the given label. If the command
+# returns with a -code break, its return value will not be used to set the label.
 #}
-Classy::Table addoption -xlabels {xLabels Labels {}} {}
+Classy::Table addoption -xlabelcommand {xLabelCommand Command {}} {
+	private $object dcol drow
+	eval destroy [winfo children $object.base]
+	set dcol(num) 0
+	set drow(num) 0
+	Classy::todo $object _redraw
+}
+#doc {Table options -ylabelcommand} option {-ylabelCommand yLabelCommand Command} descr {
+# If this option is empty, no ylabels will be displayed.
+# Othwerwise, it gives the command that will be called to obtain the value of a given ylabel. 
+# It must have the following format:<br>
+# getcommand object w row<br>
+# The parameters given to the command when obtaining a value are the table objects name, the window
+# name of the currently associated cell and the row.<br>
+# The command normally returns the value to be shown in the given label. If the command
+# returns with a -code break, its return value will not be used to set the label.
+#}
+Classy::Table addoption -ylabelcommand {yLabelCommand Command {}} {
+	private $object dcol drow
+	eval destroy [winfo children $object.base]
+	set dcol(num) 0
+	set drow(num) 0
+	Classy::todo $object _redraw
+}
 
 # ------------------------------------------------------------------
 #  Methods
 # ------------------------------------------------------------------
 
+#doc {Table command colsize} cmd {
+#pathname colsize col args
+#} descr {
+# query or change the current width of the given column
+#}
+Classy::Table method colsize {col args} {
+	private $object dcol
+	if {"$col" == "label"} {
+		if {"$args" == ""} {
+			return $dcol(ls)
+		} else {
+			set dcol(ls) [lindex $args 0]
+		}
+	}
+	if {"$args" == ""} {
+		if [info exists dcol(s,$col)] {
+			return $dcol(s,$col)
+		} else {
+			return $dcol(s)
+		}
+	} else {
+		set size [lindex $args 0]
+		if {"$size" == ""} {
+			unset dcol(s,$col)
+		} else {
+			set dcol(s,$col) $size
+		}
+	}
+	$object _redraw
+}
+
+#doc {Table command rowsize} cmd {
+#pathname rowsize row ?value?
+#} descr {
+# query or change the current height of the given row
+#}
+Classy::Table method rowsize {row args} {
+	private $object drow
+	if {"$row" == "label"} {
+		if {"$args" == ""} {
+			return $drow(ls)
+		} else {
+			set drow(ls) [lindex $args 0]
+		}
+	}
+	if {"$args" == ""} {
+		if [info exists drow(s,$row)] {
+			return $drow(s,$row)
+		} else {
+			return $drow(s)
+		}
+	} else {
+		set size [lindex $args 0]
+		if {"$size" == ""} {
+			unset drow(s,$row)
+		} else {
+			set drow(s,$row) $size
+		}
+	}
+	$object _redraw
+}
+
+#doc {Table command movey} cmd {
+#pathname movey w step
+#} descr {
+#
+#}
 Classy::Table method movey {w step} {
 	private $object options drow
 	regexp {([0-9]+),([0-9]+)$} $w temp row col
@@ -206,11 +330,16 @@ Classy::Table method movey {w step} {
 	}
 }
 
+#doc {Table command movex} cmd {
+#pathname movex w step
+#} descr {
+# 
+#}
 Classy::Table method movex {w step} {
 	private $object options dcol
 	regexp {([0-9]+),([0-9]+)$} $w temp row col
 	set rcol [expr $col+$dcol(start)+1]
-	if {($step > 0)&&($rcol >= $options(-columns))} return
+	if {($step > 0)&&($rcol >= $options(-cols))} return
 	set newcol [expr {$col + $step	}]
 	set end [expr {$dcol(num)-2}]
 	if {$newcol >= $end} {
@@ -238,7 +367,7 @@ Classy::Table method _set {w} {
 	}
 	set rcol [expr {$col+$dcol(start)}]
 	set rrow [expr {$row+$drow(start)}]
-	if {($rrow >= $options(-rows))||($rcol >= $options(-columns))} {
+	if {($rrow >= $options(-rows))||($rcol >= $options(-cols))} {
 		set res ""
 	} elseif [catch {$options(-setcommand)	$object $object.base.e$row,$col $rrow $rcol $value} res] {
 		$object _reset $row $col
@@ -258,7 +387,7 @@ Classy::Table method _reset {row col} {
 	private $object options drow dcol data
 	set rcol [expr {$col+$dcol(start)}]
 	set rrow [expr {$row+$drow(start)}]
-	if {($rrow >= $options(-rows))||($rcol >= $options(-columns))} {
+	if {($rrow >= $options(-rows))||($rcol >= $options(-cols))} {
 		set new ""
 	} else {
 		set code [catch {$options(-getcommand) $object $object.base.e$row,$col $rrow $rcol} new]
@@ -286,18 +415,18 @@ Classy::Table method _refresh {} {
 	set rcol $dcol(start)
 	for {set col 0} {$col < $dcol(num)} {incr col} {
 		if [info exists dcol(s,$rcol)] {
-			eval grid columnconfigure $object.base $col -minsize $dcol(s,$rcol)
+			grid columnconfigure $object.base [expr {2*$col+2}] -minsize $dcol(s,$rcol)
 		} else {
-			grid columnconfigure $object.base $col -minsize $dcol(s)
+			grid columnconfigure $object.base [expr {2*$col+2}] -minsize $dcol(s)
 		}
 		incr rcol
 	}
 	set rrow $drow(start)
 	for {set row 0} {$row < $drow(num)} {incr row} {
 		if [info exists drow(s,$rrow)] {
-			eval grid rowconfigure $object.base $row -minsize $drow(s,$rrow)
+			grid rowconfigure $object.base [expr {2*$row+2}] -minsize $drow(s,$rrow)
 		} else {
-			grid rowconfigure $object.base $row -minsize $drow(s)
+			grid rowconfigure $object.base [expr {2*$row+2}] -minsize $drow(s)
 		}
 		incr rrow
 	}
@@ -306,7 +435,7 @@ Classy::Table method _refresh {} {
 		set rcol $dcol(start)
 		for {set col 0} {$col < $dcol(num)} {incr col} {
 			set w $object.base.e$row,$col
-			if {($rrow >= $options(-rows))||($rcol >= $options(-columns))} {
+			if {($rrow >= $options(-rows))||($rcol >= $options(-cols))} {
 				set new ""
 			} else {
 				set code [catch {$options(-getcommand) $object $w $rrow $rcol} new]
@@ -331,6 +460,42 @@ Classy::Table method _refresh {} {
 		}
 		incr rrow
 	}
+
+	# labels
+	if {"$options(-ylabelcommand)" != ""} {
+		grid columnconfigure $object.base 0 -minsize $dcol(ls)
+		set rrow $drow(start)
+		for {set row 0} {$row < $drow(num)} {incr row} {
+			set code [catch {$options(-ylabelcommand) $object $w $rrow} new]
+			if {$code == 1} {
+				set new $rrow
+			} elseif {$code != 0} {
+				unset new
+			}
+			if [info exists new] {
+				$object.base.yl$row configure -text $new
+			}
+			incr rrow
+		}
+	}
+	if {"$options(-xlabelcommand)" != ""} {
+		grid rowconfigure $object.base 0 -minsize $drow(ls)
+		set rcol $dcol(start)
+		for {set col 0} {$col < $dcol(num)} {incr col} {
+			set code [catch {$options(-xlabelcommand) $object $w $rcol} new]
+			if {$code == 1} {
+				set new $rcol
+			} elseif {$code != 0} {
+				unset new
+			}
+			if [info exists new] {
+				$object.base.xl$col configure -text $new
+			}
+			incr rcol
+		}
+	}
+
+	# values
 	$object _sethbar
 	$object _setvbar
 }
@@ -346,7 +511,7 @@ proc Classy::Table__create_elem {object type row col} {
 			bindtags $object.base.e$row,$col [list $object Classy::Table::text $object.base.e$row,$col Text . all]
 		}
 	}
-	grid $object.base.e$row,$col -row $row -column $col -sticky nwse
+	grid $object.base.e$row,$col -row [expr {2*$row+2}] -column [expr {2*$col+2}] -sticky nwse
 }
 
 #doc {Table command _redraw} cmd {
@@ -355,11 +520,24 @@ proc Classy::Table__create_elem {object type row col} {
 #}
 Classy::Table method _redraw {} {
 	private $object options drow dcol data
+	if ![winfo exists $object.base.ypanelabel] {
+		frame $object.base.ypanelabel -class Classy::Table::ypane
+	}
+	if ![winfo exists $object.base.xpanelabel] {
+		frame $object.base.xpanelabel -class Classy::Table::xpane
+	}
 	set width [winfo width $object]
 	set prevcol $dcol(num)
-	set cs 0
 	set dcol(num) 0
 	set rcol $dcol(start)	
+	set panew [$object.base.xpanelabel cget -width]
+	if {"$options(-ylabelcommand)" != ""} {
+		set cs $dcol(ls)
+		incr cs $panew
+	} else {		
+		set cs 0
+	}
+
 	while 1 {
 		if [info exists dcol(s,$rcol)] {
 			set size $dcol(s,$rcol)
@@ -367,31 +545,37 @@ Classy::Table method _redraw {} {
 			set size $dcol(s)
 		}
 		incr cs $size
-		grid columnconfigure $object $dcol(num) -minsize $size -weight 0
+		incr cs $panew
 		incr rcol
 		incr dcol(num)
-		if {$rcol == $options(-columns)} break
+		if {$rcol == $options(-cols)} break
 		if {$cs > $width} break
 	}
 	set colnum [expr {$dcol(num)-$prevcol}]
 
 	set height [winfo height $object]
 	set prevrow $drow(num)
-	set drow(cs) 0
 	set drow(num) 0
 	set rrow $drow(start)	
+	set paneh [$object.base.ypanelabel cget -height]
+	if {"$options(-ylabelcommand)" != ""} {
+		set cs $drow(ls)
+		incr cs $paneh
+	} else {		
+		set cs 0
+	}
 	while 1 {
 		if [info exists drow(s,$rrow)] {
 			set size $drow(s,$rrow)
 		} else {
 			set size $drow(s)
 		}
-		incr drow(cs) $size
-		grid rowconfigure $object $drow(num) -minsize $size -weight 0
+		incr cs $size
+		incr cs $paneh
 		incr rrow
 		incr drow(num)
 		if {$rrow == $options(-rows)} break
-		if {$drow(cs) > $height} break
+		if {$cs > $height} break
 	}
 	set rownum [expr {$drow(num)-$prevrow}]
 
@@ -402,12 +586,14 @@ Classy::Table method _redraw {} {
 			for {set row 0} {$row < $to} {incr row} {
 				Classy::Table__create_elem $object $options(-type) $row $col
 			}
+			frame $object.base.xpane$col -class Classy::Table::xpane
 		}
 	} elseif {$colnum < 0} {
 		for {set col $dcol(num)} {$col < $prevcol} {incr col} {
 			for {set row 0} {$row < $prevrow} {incr row} {
 				destroy $object.base.e$row,$col
 			}
+			destroy $object.base.xpane$col
 		}
 	}
 
@@ -416,11 +602,52 @@ Classy::Table method _redraw {} {
 			for {set col 0} {$col < $dcol(num)} {incr col} {
 				Classy::Table__create_elem $object $options(-type) $row $col
 			}
+			frame $object.base.ypane$row -class Classy::Table::ypane
 		}
 	} elseif {$rownum < 0} {
 		for {set row $drow(num)} {$row < $prevrow} {incr row} {
 			for {set col 0} {$col < $prevcol} {incr col} {
 				destroy $object.base.e$row,$col
+			}
+			destroy $object.base.ypane$row
+		}
+	}
+
+	for {set row 0} {$row < $drow(num)} {incr row} {
+		set pos [expr {2*$row+3}]
+		grid $object.base.ypane$row -row 0 -row $pos -columnspan [expr {2*$dcol(num)+2}] -sticky nwse
+		raise $object.base.ypane$row
+	}
+	for {set col 0} {$col < $dcol(num)} {incr col} {
+		set pos [expr {2*$col+3}]
+		grid $object.base.xpane$col -row 0 -column $pos -rowspan [expr {2*$drow(num)+2}] -sticky nwse
+		raise $object.base.xpane$col
+	}
+
+	# labels
+	if {"$options(-ylabelcommand)" != ""} {
+		grid $object.base.ypanelabel -row 1 -column 0 -columnspan $dcol(num) -sticky nwse
+		if {$rownum > 0} {
+			for {set row $prevrow} {$row < $drow(num)} {incr row} {
+				button $object.base.yl$row -width 1 -height 1 -anchor w
+				grid $object.base.yl$row -row [expr {2*$row+2}] -column 0 -sticky nwse
+			}
+		} elseif {$rownum < 0} {
+			for {set row $drow(num)} {$row < $prevrow} {incr row} {
+				destroy $object.base.yl$row
+			}
+		}
+	}
+	if {"$options(-xlabelcommand)" != ""} {
+		grid $object.base.xpanelabel -row 0 -column 1 -rowspan $drow(num) -sticky nwse
+		if {$colnum > 0} {
+			for {set col $prevcol} {$col < $dcol(num)} {incr col} {
+				button $object.base.xl$col -width 1 -height 1
+				grid $object.base.xl$col -row 0 -column [expr {2*$col+2}] -sticky nwse
+			}
+		} elseif {$colnum < 0} {
+			for {set col $dcol(num)} {$col < $prevcol} {incr col} {
+				destroy $object.base.xl$col
 			}
 		}
 	}
@@ -437,7 +664,7 @@ Classy::Table method xview {args} {
 	set pos $dcol(start)
 	set size $dcol(num)
 	set min 0
-	set max [expr {$options(-columns)-1}]
+	set max [expr {$options(-cols)-1}]
 
 	switch [lindex $args 0] {
 		"" {
@@ -510,7 +737,7 @@ Classy::Table method _sethbar {} {
 	set curlow $dcol(start)
 	set curhigh [expr {$dcol(start) + $dcol(num)}]
 	set min 0
-	set max $options(-columns)
+	set max $options(-cols)
 
 	if {$curlow < $min} {set curlow $min}
 	if {$curhigh < $min} {set curhigh $min}
@@ -539,3 +766,24 @@ Classy::Table method _setvbar {} {
 	}
 }
 
+Classy::Table method _startdrag {dir w x y} {
+	private $object drag
+	set drag(dir) $dir
+	set drag(x) $x
+	set drag(y) $y
+	regexp {.base.[xy]pane(.+)$} $w temp drag(pos)
+	if {"$dir"=="x"} {
+		set drag(s) [$object colsize $drag(pos)]
+	} else {
+		set drag(s) [$object rowsize $drag(pos)]
+	}
+}
+
+Classy::Table method _drag {w x y} {
+	private $object drag
+	if {"$drag(dir)"=="x"} {
+		$object colsize $drag(pos) [expr $drag(s)+$x-$drag(x)]
+	} else {
+		$object rowsize $drag(pos) [expr $drag(s)+$y-$drag(y)]
+	}
+}

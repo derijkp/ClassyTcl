@@ -75,7 +75,6 @@ Classy::Paned addoption -maxsize {maxsize MaxSize {}}
 #  Methods
 # ------------------------------------------------------------------
 
-
 Classy::Paned method _start {x y} {
 	private $object data options
 	set window $options(-window)

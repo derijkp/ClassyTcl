@@ -21,6 +21,8 @@ HTML
 <b><dt>Command-Line Name: -unknown</b><b><dt>Database Name: unknown</b><b><dt>Database Class: Unknown</b><dd>
 <b><dt>Command-Line Name: -size</b><b><dt>Database Name: size</b><b><dt>Database Class: Size</b><dd>
 <b><dt>Command-Line Name: -symbols</b><b><dt>Database Name: symbols</b><b><dt>Database Class: Symbols</b><dd>
+<b><dt>Command-Line Name: -tagmap</b><b><dt>Database Name: tagMap</b><b><dt>Database Class: TagMap</b><dd>
+<b><dt>Command-Line Name: -insertmap</b><b><dt>Database Name: insertMap</b><b><dt>Database Class: InsertMap</b><dd>
 
 </dl><h2>
 	HTML specific methods
@@ -37,6 +39,9 @@ pathname back
 pathname forward 
 </b><dd>
 <b><dt>
+pathname history
+</b><dd>
+<b><dt>
 pathname fullurl url
 </b><dd>
 <b><dt>
@@ -45,5 +50,19 @@ pathname load file
 <b><dt>
 pathname set html
 </b><dd>
-
+<b><dt>
+pathname linkat x y
+</b><dd>
+ returns the link (href) at position x,y.
+ This is used in comination with bindlink to change the behaviour
+ of links.
+<br>eg.:<pre>
+ objectName bindlink <3> {puts [%W linkat %x %y]}
+</pre><b><dt>
+pathname bindlink ?event? ?sequence?
+</b><dd>
+ binds action to a certain event happening on a link
+<br>eg.:<pre>
+ objectName bindlink <3> {puts [%W linkat %x %y]}
+</pre>
 </body>

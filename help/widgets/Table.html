@@ -1,0 +1,105 @@
+<HEAD>
+<TITLE>
+Table
+</TITLE>
+</HEAD>
+<BODY>
+<h1>
+Table
+</h1>
+
+ subclass of <a href="../basic/Widget.html">Widget</a><br>
+ creates a table of entries or text fields. This acts much like a spreadsheet. It supports
+ supports scrollbars using the normal methods. The table must have an associated getcommand 
+ and setcommand. These are used to get the data to display in the table and te change data when it
+ is edited in the table. The get and set commands 
+ will be called with the following parameters:<br>
+ <dl>
+ <dt>getcommand object w row col
+ <dd>the parameter object is the name of the table, the parameter w gives the window of the cell
+ associated with the row and column given in row and col.<br>
+ The getcommand must return the value to be shown in the given cell. If the getcommand
+ wishes to set the value itself (eg. in a text), it can return with a -code break, so
+ that its return value will not be used.
+ When the getcommand fails, the error message will be shown in the affected cell.
+ <dt>setcommand object w row col value
+ <dd>The setcommand takes one extra parameter: the new value of the cell.
+ If the setcommand fails, the previous value will be restored.
+ </dl>
+
+<h2>
+	Table specific options
+</h2><dl><b><dt>Command-Line Name: -cols</b><b><dt>Database Name: cols</b><b><dt>Database Class: cols</b><dd>
+ gives the number of columns in the table
+<b><dt>Command-Line Name: -rows</b><b><dt>Database Name: rows</b><b><dt>Database Class: rows</b><dd>
+ gives the number of rows in the table
+<b><dt>Command-Line Name: -colsize</b><b><dt>Database Name: colsize</b><b><dt>Database Class: colsize</b><dd>
+ gives the default column size
+<b><dt>Command-Line Name: -rowsize</b><b><dt>Database Name: rowsize</b><b><dt>Database Class: rowsize</b><dd>
+ gives the default row size
+<b><dt>Command-Line Name: -type</b><b><dt>Database Name: type</b><b><dt>Database Class: type</b><dd>
+ gives the type of widgets in the table, must be entry or text
+<b><dt>Command-Line Name: -xscrollcommand</b><b><dt>Database Name: xscrollcommand</b><b><dt>Database Class: xscrollcommand</b><dd><b><dt>Command-Line Name: -yscrollcommand</b><b><dt>Database Name: yscrollcommand</b><b><dt>Database Class: yscrollcommand</b><dd><b><dt>Command-Line Name: -getcommand</b><b><dt>Database Name: getcommand</b><b><dt>Database Class: getcommand</b><dd>
+ gives the command that will be called to obtain the value of a given cell. It must have the 
+ following format:<br>
+ getcommand object w row col<br>
+ The parameters given to the command when obtaining a value are the table objects name, the window
+ name of the currently associated cell, the row and the column.<br>
+ The getcommand must return the value to be shown in the given cell. If the getcommand
+ wishes to set the value itself (eg. in a text), it can return with a -code break, so
+ that its return value will not be used.
+<b><dt>Command-Line Name: -setcommand</b><b><dt>Database Name: setcommand</b><b><dt>Database Class: setcommand</b><dd>
+ gives the command that will be called to set a given cell to a new value. It must have the 
+ following format:<br>
+ setcommand object w row col value<br>
+ The parameters given to the command are the table objects name, the window
+ name of the currently associated cell, the row, the column and the new value.
+ If the setcommand fails, the previous value will be restored.
+<b><dt>Command-Line Name: -xlabelCommand</b><b><dt>Database Name: xLabelCommand</b><b><dt>Database Class: Command</b><dd>
+ If this option is empty, no xlabels will be displayed.
+ Othwerwise, it gives the command that will be called to obtain the value of a given xlabel. 
+ It must have the following format:<br>
+ getcommand object w col<br>
+ The parameters given to the command when obtaining a value are the table objects name, the window
+ name of the currently associated cell and the column.<br>
+ The command normally returns the value to be shown in the given label. If the command
+ returns with a -code break, its return value will not be used to set the label.
+<b><dt>Command-Line Name: -ylabelCommand</b><b><dt>Database Name: yLabelCommand</b><b><dt>Database Class: Command</b><dd>
+ If this option is empty, no ylabels will be displayed.
+ Othwerwise, it gives the command that will be called to obtain the value of a given ylabel. 
+ It must have the following format:<br>
+ getcommand object w row<br>
+ The parameters given to the command when obtaining a value are the table objects name, the window
+ name of the currently associated cell and the row.<br>
+ The command normally returns the value to be shown in the given label. If the command
+ returns with a -code break, its return value will not be used to set the label.
+
+</dl><h2>
+	Table specific methods
+</h2><dl><b><dt>
+pathname colsize col args
+</b><dd>
+ query or change the current width of the given column
+<b><dt>
+pathname rowsize row ?value?
+</b><dd>
+ query or change the current height of the given row
+<b><dt>
+pathname movey w step
+</b><dd>
+
+<b><dt>
+pathname movex w step
+</b><dd>
+ 
+<b><dt>
+pathname _redraw 
+</b><dd>
+<b><dt>
+pathname yview args
+</b><dd>
+<b><dt>
+pathname yview args
+</b><dd>
+
+</body>

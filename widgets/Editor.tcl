@@ -489,6 +489,7 @@ Classy::Editor method find {what args} {
 		set startindex 1.0
 		set stopindex end
 	}
+	set ::Classy::number 0
 	if $options(-searchreopen) {
 		private $object curfile
 		set startfile $curfile
