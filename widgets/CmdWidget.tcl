@@ -95,6 +95,31 @@ Classy::CmdWidget chainoptions {$object}
 Classy::CmdWidget addoption -prompt {prompt Prompt {[pwd] % }} {}
 
 # ------------------------------------------------------------------
+#  widget destruction
+# ------------------------------------------------------------------
+
+Classy::CmdWidget method destroy {} {
+	private $object connection interactive
+	if [info exists connection] {
+		catch {
+			send $connection {
+				if {"[info commands Classy__keepunknown]"!=""} {
+					rename unknown {}
+					rename Classy__keepunknown unknown
+				}
+			}
+			send $connection {
+				if {"[info commands Classy__keepputs]"!=""} {
+					rename puts {}
+					rename Classy__keepputs puts
+				}
+			}
+			send $connection set tcl_interactive $interactive
+		}
+	}
+}
+
+# ------------------------------------------------------------------
 #  Methods
 # ------------------------------------------------------------------
 

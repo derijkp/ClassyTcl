@@ -44,7 +44,9 @@ setevent <<Save>> <Alt-s>
 ## SaveAs {SaveAs key} key
 setevent <<SaveAs>> <Alt-S>
 ## Quit {Quit key} key
-setevent <<Quit>> <Alt-q>
+setevent <<Quit>> <Alt-Q>
+## Close {Close key} key
+setevent <<Close>> <Alt-q>
 ## Reopen {Reopen key} key
 setevent <<Reopen>> <Alt-r>
 ## Macro {Macro key} key

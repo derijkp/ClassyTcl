@@ -22,9 +22,11 @@
 if 0 {
 proc ::Classy::Help {} {}
 proc Help {} {}
+proc help {} {}
 }
 
 laddnew ::Classy::help_path [file join $class::dir help]
+laddnew ::Classy::help_path [file join $Extral::dir docs]
 
 # ------------------------------------------------------------------
 #  Widget creation
@@ -60,7 +62,8 @@ Classy::Help classmethod init {args} {
 	wm protocol $w WM_DELETE_WINDOW "destroy $w"
 	Classy::HTML $w.html -yscrollcommand "$w.vbar set" \
 		-state disabled -wrap word -cursor hand2 \
-		-width 70 -height 28 -relief sunken
+		-width 70 -height 28 -relief sunken \
+		-errorcommand [list $object retry]
 	$w.html bindlink <<Adjust>> {newhelp [%W linkat %x %y]}
 	scrollbar $w.vbar -orient vertical -command "$w.html yview"
 	Classy::DynaMenu makemenu Classy::Help $w.menu $object Classy::Help
@@ -88,8 +91,11 @@ Classy::Help classmethod init {args} {
 
 Classy::Help private generalmenu {
 	action HelpHelp "Help on Help" {%W gethelp classy_help}
+	action HelpHelp "Tcl/Tk" {%W gethelp tcltk}
 	action HelpHelp "ClassyTcl" {%W gethelp ClassyTcl}
+	action HelpHelp "Extral" {%W gethelp Extral}
 }
+
 # ------------------------------------------------------------------
 #  Widget options
 # ------------------------------------------------------------------
@@ -213,6 +219,10 @@ Classy::Help method edit {} {
 Classy::Help method getcontentsmenu {} {
 	set data "action TopHelp Top {%W see 1.0}\n"
 	return $data
+}
+
+Classy::Help method retry {url query result} {
+	$object gethelp [file tail $url]
 }
 
 Classy::Help method getgeneralmenu {} {

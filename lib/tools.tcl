@@ -153,6 +153,14 @@ proc ::Classy::widget {object} {
 	}
 }
 
+proc ::Classy::object {object} {
+	if {"[info commands ::class::Tk_$object]"!=""} {
+		return ::class::Tk_$object
+	} else {
+		return $object
+	}
+}
+
 # For debugging purposes only
 
 proc ::Classy::msg {text} {

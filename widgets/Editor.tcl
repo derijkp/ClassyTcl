@@ -350,16 +350,16 @@ Classy::Editor method load {{file {}} args} {
 	private $object curfile curmarkers curmarker prevmarker reopenlist cur
 	private $class editing
 	if {"[$object closefile]" != "true"} {return}
-	set curfile $file
+	set curfile [::Classy::fullpath $file]
 	::Classy::busy add $object
-	if [info exists editing([::Classy::fullpath $curfile])] {
-		set w [lindex $editing([::Classy::fullpath $curfile]) 0]
+	if [info exists editing($curfile)] {
+		set w [lindex $editing($curfile) 0]
 		$object.edit link $w.edit
-	} elseif [file exists $file] {
-		if [file isdir $file] {
-			error "Cannot open directory \"$file\""
+	} elseif [file exists $curfile] {
+		if [file isdir $curfile] {
+			error "Cannot open directory \"$curfile\""
 		}
-		set f [open $file r]
+		set f [open $curfile r]
 		[::Classy::widget $object.edit] insert end [read $f]
 		close $f
 		$object clearundo
@@ -382,19 +382,21 @@ Classy::Editor method load {{file {}} args} {
 	if [info exists cur(prevmarker,$curfile)] {
 		set prevmarker $cur(prevmarker,$curfile)
 	}
-	laddnew reopenlist $file
+	laddnew reopenlist $curfile
 	if {"$args" != ""} {
-		eval lappend reopenlist $args 
+		foreach otherfile $args {
+			lappend reopenlist [::Classy::fullpath $otherfile]
+		}
 	}
 	set reopenlist [lmanip remdup $reopenlist]
 	set loadcommand [getprivate $object options(-loadcommand)]
 	if {"$loadcommand" != ""} {
-		 eval $loadcommand [list $file]
+		 eval $loadcommand [list $curfile]
 	}
-	lappend editing([::Classy::fullpath $curfile]) $object
+	lappend editing($curfile) $object
 #	if [$object textchanged] {$object _changed}
 	::Classy::busy remove $object
-	return $file
+	return $curfile
 }
 
 #doc {Editor command set} cmd {
@@ -788,7 +790,7 @@ Classy::Editor method pattern {args} {
 	if {"$args" != ""} {
 		set pattern [lindex $args 0]
 	} else {
-		Classy::InputBox $object.pattern -label Pattern -textvariable [privatevar $object pattern]
+		Classy::InputBox $object.pattern -label Pattern -textvariable [privatevar $object pattern] -default Classy::Editor_patterns
 	}
 }
 

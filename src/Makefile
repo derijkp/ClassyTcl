@@ -29,8 +29,8 @@ TK_LIB_SPEC = -L/usr/local/lib -ltk8.0
 
 CC_SWITCHES = $(CFLAGS) $(SHLIB_CFLAGS) $(DEFS) -I$(TCL_SRC)/unix -I$(TCL_SRC)/generic \
 			 -I${TK_SRC}/generic -I${TK_SRC}/xlib/X11 ${X11_INCLUDES}
-CLASSYOBJS= class.o private.o classyInit.o
-SRCS= class.c var.c classyInit.c
+CLASSYOBJS= class.o private.o object.o method.o classyInit.o
+SRCS= class.c private.c object.c method.c classyInit.c
 
 # --------------------------- Rules -----------------------------
 

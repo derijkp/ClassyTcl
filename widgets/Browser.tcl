@@ -32,9 +32,9 @@ Classy::Browser classmethod init {args} {
 	# REM Create object
 	# -----------------
 	super
-	canvas $object.c -xscrollcommand [list $object.hbar set] -yscrollcommand [list $object.vbar set]
-	scrollbar $object.vbar -command [list $object.c yview] -orient vertical
-	scrollbar $object.hbar -command [list $object.c xview] -orient horizontal
+	canvas $object.c -xscrollcommand [list $object.hbar set]
+	scrollbar $object.vbar -command [list $object _view] -orient vertical
+	scrollbar $object.hbar -command [list $object _view] -orient horizontal
 	grid $object.c $object.vbar -row 0 -sticky nwse
 	grid columnconfigure $object 0 -weight 1
 	grid columnconfigure $object 1 -weight 0
@@ -46,14 +46,15 @@ Classy::Browser classmethod init {args} {
 
 	# REM Initialise variables
 	# ------------------------
-	private $object data
-	set data() {}
+	private $object curpos
+	set curpos 0
 
 	# REM Configure initial arguments
 	# -------------------------------
 	if {"$args" != ""} {eval $object configure $args}
 }
 
+Classy::Browser component canvas {$object.c}
 # ------------------------------------------------------------------
 #  Widget options
 # ------------------------------------------------------------------
@@ -95,11 +96,17 @@ Classy::Browser addoption -datafont {dataFont Font {}} {
 }
 
 Classy::Browser addoption -data {data Data {}} {
+	private $object sizes
+	catch {unset sizes}
 	Classy::todo $object redraw
 }
 
 Classy::Browser addoption -dataunder {dataUnder DataUnder 0} {
 	set value [true $value]
+	Classy::todo $object redraw
+}
+
+Classy::Browser addoption -dataalign {dataAlign DataAlign l} {
 	Classy::todo $object redraw
 }
 
@@ -124,30 +131,44 @@ Classy::Browser addoption -order {order Order row} {
 	Classy::todo $object redraw
 }
 
+Classy::Browser addoption -gettext {getText GetText {}} {
+	Classy::todo $object redraw
+}
+
+Classy::Browser addoption -getimage {getImage GetImage {}} {
+	Classy::todo $object redraw
+}
+
+Classy::Browser addoption -getdata {getData GetData {}} {
+	Classy::todo $object redraw
+}
+
+Classy::Browser addoption -list {list List {}} {
+	private $object curpos active
+	set curpos 0
+	set active [lindex $value 0]
+	Classy::todo $object redraw
+}
+
 # ------------------------------------------------------------------
 #  Methods
 # ------------------------------------------------------------------
 
 Classy::Browser chainallmethods {$object.c} canvas
 
-Classy::Browser method add {name args} {
-	private $object data options
-	Classy::parseopt $args opt [list \
-		-text {} $name \
-		-data {} {} \
-		-image {} [Classy::geticon file] \
-		-window {} {} \
-	] args
-	lappend data() $name
-	set data(n,$name) $opt(-text)
-	set data(d,$name) $opt(-data)
-	set data(i,$name) $opt(-image)
-	set data(w,$name) $opt(-window)
-	Classy::todo $object redraw
+Classy::Browser method redraw {} {
+	private $object options curpos endpos step
+	update idletasks
+	switch $options(-order) {
+		list {$object _redrawlist}
+		column {$object _redrawcolumn}
+		row {$object _redrawrow}
+	}
+	Classy::canceltodo $object redraw
 }
 
-Classy::Browser method redraw {} {
-	private $object data options
+Classy::Browser method _redrawrow {} {
+	private $object options curpos endpos step dline
 	set minx $options(-minx)
 	set miny $options(-miny)
 	set padx $options(-padx)
@@ -155,160 +176,375 @@ Classy::Browser method redraw {} {
 	set padtext $options(-padtext)
 	set w $object.c
 	$w delete all
-	Classy::canceltodo $object redraw
-	update idletasks
+	if {"$options(-list)" == ""} return
 	set startx $padx
 	set starty $pady
-
-	if {"$options(-order)" == "row"} {
-		set sw [winfo width $object.c]
-		set x $startx
-		set y $starty
-		set ny $y
-		set notfirst 0
-		foreach name $data() {
-			set bx $x
-			set by $y
-			set id [$w create image $x $y -anchor nw -image $data(i,$name) -tags [list $name image]]
-			set bbox [$w bbox $id]
-			set height [expr {[lindex $bbox 3]-[lindex $bbox 1]}]
-			set width [expr {[lindex $bbox 2]-[lindex $bbox 0]}]
-			if {$width < $minx} {
-				$w move $id [expr {($minx - $width)/2}] 0
-				set width $minx
-			}
-			if {$height < $miny} {
-				$w move $id 0 [expr {($miny - $height)/2}]
-				set height $miny
-			}
-			set id [$w create text [expr {$x+$width/2}] [expr {$y+$height+$padtext}] \
-				-anchor n -justify center -text $data(n,$name) \
-				-tags [list $name text] -font $options(-font)]
-			set bbox [$w bbox $id]
-			set temp [expr {$y + $height + [expr {[lindex $bbox 3]-[lindex $bbox 1]}] + $padtext + $pady}]
-			if {$temp > $ny} {set ny $temp}
-			set temp [expr {[lindex $bbox 2]-[lindex $bbox 0]}]
-			if {$temp > $width} {
-				$w move $name [expr {($temp-$width)/2}] 0
-				set x [expr {$x + $temp + $padx}]
-			} else {
-				set x [expr {$x + $width + $padx}]
-			}
-			if $options(-dataunder) {
-				set ny [$object _drawdataunder $x $ny $name $id]
-				set x [lshift ny]
-			}
-
-			if {($x > $sw)&&$notfirst} {
-				set notfirst 0
-				$w move $name [expr {$startx - $bx}] [expr {$ny - $by}]
-				set bbox [$w bbox $name]
-				set x [expr {[lindex $bbox 2]+$padx}]
-				set y $ny
-			}
-			set notfirst 1
+	set list [lrange $options(-list) $curpos end]
+	set endpos $curpos
+	set step 1
+	set sh [winfo height $object.c]
+	set sw [winfo width $object.c]
+	set x $startx
+	set y $starty
+	set ny $y
+	set notfirst 0
+	set step 0
+	set endpos $curpos
+	catch {unset dline}
+	set dline(num) 0
+	foreach name $list {
+		if {"$options(-gettext)" == ""} {
+			set text $name
+		} else {
+			set text [eval $options(-gettext) {$name}]
 		}
-		$object.c configure -scrollregion [list 0 0 $sw $ny]
-	} elseif {"$options(-order)" == "column"} {
-		set sh [winfo height $object.c]
-		set x $startx
-		set y $starty
-		set nx $x
-		set notfirst 0
-		foreach name $data() {
-			set bx $x
-			set by $y
-			set id [$w create image $x $y -anchor nw -image $data(i,$name) -tags [list $name image]]
-			set bbox [$w bbox $id]
-			set height [expr {[lindex $bbox 3]-[lindex $bbox 1]}]
-			set width [expr {[lindex $bbox 2]-[lindex $bbox 0]}]
-			if {$width < $minx} {
-				$w move $id [expr {($minx - $width)/2}] 0
-				set width $minx
-			}
-			if {$height < $miny} {
-				$w move $id 0 [expr {($miny - $height)/2}]
-				set height $miny
-			}
-			set id [$w create text [expr {$x+$width+$padtext}] [expr {$y+$height/2}] \
-				-anchor w -text $data(n,$name) \
-				-tags [list $name text] -font $options(-font)]
-			set bbox [$w bbox $id]
-			set temp [expr {$x + $width + [expr {[lindex $bbox 2]-[lindex $bbox 0]}] + $padtext + $padx}]
-			if {$temp > $nx} {set nx $temp}
-			set y [expr {$y + $height + $pady}]
-			if $options(-dataunder) {
-				$w move $id 0 [expr {-$height/2}]
-				$w itemconfigure $id -anchor nw
-				set y [$object _drawdataunder $nx $y $name $id]
-				set nx [lshift y]
-			}
-			if {($y > $sh)&&$notfirst} {
-				if !$options(-dataunder) {
-					set nx [$object _drawdata $nx $names $items]
-				}
-				$w move $name [expr {$nx - $bx}] [expr {$starty - $by}]
-				set names {}
-				set items {}
-				set notfirst 0
-				set bbox [$w bbox $name]
-				set x $nx
-				set y [expr {[lindex $bbox 3]+$pady}]
-			}
-			lappend names $name
-			lappend items $id
-			set notfirst 1
+		if {"$options(-getimage)" == ""} {
+			set image [Classy::geticon file]
+		} else {
+			set image [eval $options(-getimage) {$name}]
 		}
-		if !$options(-dataunder) {
-			set nx [$object _drawdata $nx $names $items]
+		set bx $x
+		set by $y
+		set id [$w create image $x $y -anchor nw -image $image -tags [list _$name image img_$name]]
+		set bbox [$w bbox $id]
+		set height [expr {[lindex $bbox 3]-[lindex $bbox 1]}]
+		set width [expr {[lindex $bbox 2]-[lindex $bbox 0]}]
+		if {$width < $minx} {
+			set width $minx
 		}
-		$object.c configure -scrollregion [list 0 0 $nx $sh]
-	} elseif {"$options(-order)" == "list"} {
-		set sh [winfo height $object.c]
-		set x $startx
-		set y $starty
-		set nx $x
-		set notfirst 0
-		set items {}
-		foreach name $data() {
-			set id [$w create image $x $y -anchor nw -image $data(i,$name) -tags [list $name image]]
-			set bbox [$w bbox $id]
-			set height [expr {[lindex $bbox 3]-[lindex $bbox 1]}]
-			set width [expr {[lindex $bbox 2]-[lindex $bbox 0]}]
-			if {$width < $minx} {
-				$w move $id [expr {($minx - $width)/2}] 0
-				set width $minx
-			}
-			if {$height < $miny} {
-				$w move $id 0 [expr {($miny - $height)/2}]
-				set height $miny
-			}
-			set temp [expr {$y + $height + 2*$pady}]
-			set id [$w create text [expr {$x+$width+$padtext}] [expr {$y+$height/2}] \
-				-anchor w -text $data(n,$name) \
-				-tags [list $name text] -font $options(-font)]
-			lappend items $id
-			set bbox [$w bbox $id]
-			set temp [expr {$x + $width + [expr {[lindex $bbox 2]-[lindex $bbox 0]}] + $padtext + $padx}]
-			if {$temp > $nx} {set nx $temp}
-			set y [expr {$y + $height + $pady}]
-			if $options(-dataunder) {
-				$w move $id 0 [expr {-$height/2}]
-				$w itemconfigure $id -anchor nw
-				set y [$object _drawdataunder $nx $y $name $id]
-				set nx [lshift y]
-			}
+		if {$height < $miny} {
+			set height $miny
 		}
-		set cy $y
-		if !$options(-dataunder) {
-			set nx [$object _drawdata $nx $data() $items]
+		set id [$w create text [expr {$x+$padtext}] [expr {$y+$height+$padtext}] \
+			-anchor nw -justify center -text $text \
+			-tags [list _$name text text_$name t] -font $options(-font)]
+		set bbox [$w bbox $id]
+		set temp [expr {$y + $height + [expr {[lindex $bbox 3]-[lindex $bbox 1]}] + $padtext + $pady}]
+		if {$temp > $ny} {set ny $temp}
+		set temp [expr {[lindex $bbox 2]-[lindex $bbox 0]}]
+		if {$temp > $width} {
+			set x [expr {$x + $temp + $padx}]
+		} else {
+			set x [expr {$x + $width + $padx}]
 		}
-		$object.c configure -scrollregion [list 0 0 $nx $cy]
+		if $options(-dataunder) {
+			set ny [$object _drawdataunder $x $ny $name $id]
+			set x [lshift ny]
+		}
+		incr endpos
+		if {$notfirst&&($x > $sw)} {
+			set notfirst 0
+			set movex [expr {$startx - $bx}]
+			$w move _$name $movex [expr {$ny - $by}]
+			set bbox [$w bbox _$name]
+			set x [expr {$x+$movex}]
+			set y $ny
+			if {$ny > $sh} break
+			incr dline(num)
+		}
+		if {$dline(num) == 0} {incr step}
+		set notfirst 1
+		lappend dline($dline(num)) $name
 	}
+	$object _drawselection
+	$object active set
+	$object _setbar
+}
+
+Classy::Browser method _redrawcolumn {} {
+	private $object options curpos endpos step sel dline
+	set minx $options(-minx)
+	set miny $options(-miny)
+	set padx $options(-padx)
+	set pady $options(-pady)
+	set padtext $options(-padtext)
+	set w $object.c
+	$w delete all
+	if {"$options(-list)" == ""} return
+	set startx $padx
+	set starty $pady
+	set list [lrange $options(-list) $curpos end]
+	set sh [winfo height $object.c]
+	set sw [winfo width $object.c]
+	set x $startx
+	set y $starty
+	set nx $x
+	set notfirst 0
+	set endpos $curpos
+	set step 0
+	set selfg [option get $object selectForeground Background]
+	set selbg [option get $object selectBackground Foreground]
+	catch {unset dline}
+	set dline(num) 0
+	foreach name $list {
+		if {"$options(-gettext)" == ""} {
+			set text $name
+		} else {
+			set text [eval $options(-gettext) {$name}]
+		}
+		if {"$options(-getimage)" == ""} {
+			set image [Classy::geticon file]
+		} else {
+			set image [eval $options(-getimage) {$name}]
+		}
+		set bx $x
+		set by $y
+		set id [$w create image $x $y -anchor nw -image $image -tags [list _$name image img_$name]]
+		set bbox [$w bbox $id]
+		set height [expr {[lindex $bbox 3]-[lindex $bbox 1]}]
+		set width [expr {[lindex $bbox 2]-[lindex $bbox 0]}]
+		if {$width < $minx} {
+			$w move $id [expr {($minx - $width)/2}] 0
+			set width $minx
+		}
+		if {$height < $miny} {
+			$w move $id 0 [expr {($miny - $height)/2}]
+			set height $miny
+		}
+		set id [$w create text [expr {$x+$width+$padtext}] [expr {$y+$height/2}] \
+			-anchor w -text $text \
+			-tags [list _$name text text_$name t] -font $options(-font)]
+		set bbox [$w bbox $id]
+		set temp [expr {$x + $width + [expr {[lindex $bbox 2]-[lindex $bbox 0]}] + $padtext + $padx}]
+		if {$temp > $nx} {set nx $temp}
+		set y [expr {$y + $height + $pady}]
+		if $options(-dataunder) {
+			$w move $id 0 [expr {-$height/2}]
+			$w itemconfigure $id -anchor nw
+			set y [$object _drawdataunder $nx $y $name $id]
+			set nx [lshift y]
+		}
+		if {($y > $sh)&&$notfirst} {
+			if !$options(-dataunder) {
+				set nx [$object _drawdata $nx $names $items]
+			}
+			$w move _$name [expr {$nx - $bx}] [expr {$starty - $by}]
+			set names {}
+			set items {}
+			set notfirst 0
+			set bbox [$w bbox _$name]
+			set x $nx
+			set y [expr {[lindex $bbox 3]+$pady}]
+			if {$x > $sw} break
+			incr dline(num)
+		}
+		if {$dline(num) == 0} {incr step}
+		lappend names $name
+		incr endpos
+		lappend items $id
+		set notfirst 1
+		lappend dline($dline(num)) $name
+	}
+	if !$options(-dataunder) {
+		set nx [$object _drawdata $nx $names $items]
+	}
+	$object _drawselection
+	$object active set
+	$object _setbar
+}
+
+Classy::Browser method _panestart {w x y} {
+	private $object pane
+	set current [$object.c find withtag current]
+	set pane(item) $current
+	set pane(px) $x
+	set coords [$object.c coords $current]
+	set pane(ph) [lindex $coords end]
+	eval $object.c coords $current [lreplace $coords end end 10000]
+}
+
+Classy::Browser method _panemove {w x y} {
+	private $object pane
+	$object.c move $pane(item) [expr $x-$pane(px)] 0
+	set pane(px) $x
+}
+
+Classy::Browser method _panestop {w x y} {
+	private $object options pane psize
+	$object.c move $pane(item) [expr $x-$pane(px)] 0
+	set pane(px) $x
+	set id [lindex [$object.c itemcget $pane(item) -tags] 1]
+	regsub {^pane_} $id {} id
+	if {"$id" == "name"} {
+		set psize($id) $x
+	} else {
+		set bbox [$object.c coords bg_$id]
+		set psize($id) [expr {$x-[lindex $bbox 0]-2*$options(-padtext)}]
+	}
+	if {$psize($id)<5} {
+		set psize($id) 5
+	}
+	$object.c configure -cursor {}
+	$object redraw
+}
+
+Classy::Browser method _paneremove {w x y} {
+	private $object pane psize
+	set current [$object.c find withtag current]
+	set id [lindex [$object.c itemcget $current -tags] 1]
+	regsub {^pane_} $id {} id
+	catch {unset psize($id)}
+	$object.c configure -cursor {}
+	.try redraw
+}
+
+Classy::Browser method _redrawlist {} {
+	private $object options curpos endpos step psize sel
+	set minx $options(-minx)
+	set miny $options(-miny)
+	set padx $options(-padx)
+	set pady $options(-pady)
+	set padtext $options(-padtext)
+	set w $object.c
+	$w delete all
+	set startx $padx
+	set starty $pady
+	set list [lrange $options(-list) $curpos end]
+	set endpos $curpos
+	set step 1
+	set sh [winfo height $object.c]
+	set sw [winfo width $object.c]
+	set x $startx
+	set y $starty
+	set nx $x
+	set notfirst 0
+	set items {}
+	if !$options(-dataunder) {
+		set id [$w create text $x $y \
+			-anchor w -text name \
+			-tags [list {} label_text] -font $options(-font)]
+		set bbox [$w bbox $id]
+		set height [expr {[lindex $bbox 3]-[lindex $bbox 1]}]
+		set width [expr {[lindex $bbox 2]-[lindex $bbox 0]}]
+		set hh [expr {$height/2}]
+		set id [$w create line 0 [expr $y-$hh] $padtext [expr $y-$hh] $padtext [expr $y+$hh] \
+			-tags [list {} pane_name pane] -width 2]
+		if [info exists psize(name)] {$object.c itemconfigure $id -fill red}
+		foreach dt $options(-data) {
+			$w create text 0 $y -anchor e -text $dt -tags [list {} label_$dt d$dt] -font $options(-font)
+			set id [$w create line 0 [expr $y-$hh] $padtext [expr $y-$hh] $padtext [expr $y+$hh] \
+				-tags [list {} pane_$dt pane] -width 2]
+			if [info exists psize($dt)] {$object.c itemconfigure $id -fill red}
+		}
+		set y [expr {$y + $height + $pady}]
+		$object.c move all 0 [expr {$height/2}]
+		$object.c bind pane <Enter> [list $object.c configure -cursor sb_h_double_arrow]
+		$object.c bind pane <Leave> [list $object.c configure -cursor {}]
+		$object.c bind pane <<Action>> [list $object _panestart %W %x %y]
+		$object.c bind pane <<Action-Motion>> [list $object _panemove %W %x %y]
+		$object.c bind pane <<Action-ButtonRelease>> [list $object _panestop %W %x %y]
+		$object.c bind pane <<Adjust>> [list $object _paneremove %W %x %y]
+	}
+	foreach name $list {
+		if {"$options(-gettext)" == ""} {
+			set text $name
+		} else {
+			set text [eval $options(-gettext) {$name}]
+		}
+		if {"$options(-getimage)" == ""} {
+			set image [Classy::geticon file]
+		} else {
+			set image [eval $options(-getimage) {$name}]
+		}
+		if {"$options(-getdata)" == ""} {
+			set data {}
+		} else {
+			set data [eval $options(-getdata) {$name}]
+		}
+		set imid [$w create image $x $y -anchor nw -image $image -tags [list _$name image name img_$name]]
+		set imbbox [$w bbox $imid]
+		set height [expr {[lindex $imbbox 3]-[lindex $imbbox 1]}]
+		set width [expr {[lindex $imbbox 2]-[lindex $imbbox 0]}]
+		if {$width < $minx} {
+			$w move $imid [expr {($minx - $width)/2}] 0
+			set width $minx
+		}
+		if {$height < $miny} {
+			$w move $imid 0 [expr {($miny - $height)/2}]
+			set height $miny
+		}
+		set temp [expr {$y + $height + 2*$pady}]
+		set ty [expr {$y+$height/2}]
+		set id [$w create text [expr {$x+$width+$padtext}] $ty \
+			-anchor w -text $text \
+			-tags [list _$name text name text_$name t] -font $options(-font)]
+		lappend items $id
+		set bbox [$w bbox $id]
+		set temp [expr {$x + $width + [expr {[lindex $bbox 2]-[lindex $bbox 0]}] + $padtext + $padtext}]
+		if {$temp > $nx} {set nx $temp}
+		if !$options(-dataunder) {
+			foreach dt $options(-data) d $data {
+				$w create text 0 $ty \
+					-anchor e -text $d -tags [list _$name d$dt ${dt}_$name t] -font $options(-datafont)
+			}
+		}
+		set y [expr {$y + $height + $pady}]
+		if $options(-dataunder) {
+			$w move $id 0 [expr {-$height/2+$padtext}]
+			$w itemconfigure $id -anchor w
+			set y [$object _drawdataunder $nx $y $name $id]
+			set nx [lshift y]
+		}
+		incr endpos
+		if {$y > $sh} break
+	}
+	set cy $y
+	set bgcol [$object.c cget -bg]
+	if !$options(-dataunder) {
+		if [info exists psize(name)] {
+			set pos [expr {$psize(name)+$padtext}]
+		} else {
+			set bbox [$object.c bbox text]
+			set pos [expr {[lindex $bbox 2]+$padtext}]
+		}
+		set id [$object.c create rectangle 0 0 $pos $sh -fill $bgcol -outline $bgcol -tags {{} bg_name}]
+		$object.c move pane_name [expr {$pos-2*$padtext}] 0
+		$object.c lower $id
+		foreach dt $options(-data) d $data {
+			if [info exists psize($dt)] {
+				set size $psize($dt)
+			} else {
+				set bbox [$object.c bbox d$dt]
+				set size [expr {[lindex $bbox 2]-[lindex $bbox 0]}]
+			}
+			if {"$options(-dataalign)"=="l"} {
+				$object.c create rectangle \
+					[expr {$pos-$padtext}] 0 [expr {$pos+$size+$padtext}] $sh \
+					-tags [list {} bg_$dt] -fill $bgcol -outline $bgcol
+				$object.c itemconfigure d$dt -anchor w
+				$object.c move d$dt $pos 0
+				$object.c move pane_$dt [expr {$pos+$size-$padtext}] 0
+				set pos [expr {$pos+$size+$padtext}]
+				$object.c raise bg_$dt
+				$object.c raise d$dt
+			} else {
+				set pos [expr {$pos+$size}]
+				$object.c create rectangle \
+					[expr {$pos-$size-$padtext}] 0 [expr {$pos+$padtext}] $sh \
+					-tags [list {} bg_$dt] -fill $bgcol -outline $bgcol
+				$object.c move d$dt $pos 0
+				$object.c move pane_$dt $pos 0
+				set pos [expr {$pos+$padtext}]
+				$object.c lower d$dt
+				$object.c lower bg_$dt
+			}
+		}
+		set id [$object.c create rectangle $pos 0 \
+			$sw $sh -tags [list {} bg_end] -fill $bgcol -outline $bgcol]
+		$object.c raise $id
+		$object.c raise pane
+		if {"$options(-dataalign)"=="r"} {
+			$object.c lower name
+			$object.c lower bg_name
+		}
+	}
+	$object _drawselection
+	$object active set
+	$object _setbar
 }
 
 Classy::Browser method _drawdataunder {nx ny name id} {
-	private $object data options
+	private $object options
 	set padx $options(-padx)
 	set pady $options(-pady)
 	set padtext $options(-padtext)
@@ -316,9 +552,14 @@ Classy::Browser method _drawdataunder {nx ny name id} {
 	set bbox [$w bbox $id]
 	set tempy [lindex $bbox 3]
 	set tempx [lindex $bbox 0]
-	foreach dt $options(-data) d $data(d,$name) {
+	if {"$options(-getdata)" == ""} {
+		set data {}
+	} else {
+		set data [eval $options(-getdata) {$name}]
+	}
+	foreach dt $options(-data) d $data {
 		set tempid [$w create text $tempx $tempy \
-			-anchor nw -text $d -tags [list $name $dt] -font $options(-datafont)]
+			-anchor nw -text $d -tags [list _$name d$dt ${dt}_$name t] -font $options(-datafont)]
 		set bbox [$w bbox $tempid]
 		set tempy [lindex $bbox 3]
 		set temp [expr {$tempx + [expr {[lindex $bbox 2]-[lindex $bbox 0]}] + $padx}]
@@ -329,21 +570,60 @@ Classy::Browser method _drawdataunder {nx ny name id} {
 	return [list $nx $ny]
 }
 
+Classy::Browser method _drawselection {} {
+	private $object options curpos endpos sel
+	$object.c delete selection
+	set sw [winfo width $object.c]
+	set selfg [option get $object selectForeground Background]
+	set selbg [option get $object selectBackground Foreground]
+	$object.c itemconfigure t -fill black
+	foreach name [lrange $options(-list) $curpos $endpos] {
+		if [info exists sel($name)] {
+			if {("$options(-order)" == "list")&&!$options(-dataunder)} {
+				$object.c itemconfigure text_$name -fill $selfg
+				set bbox [$object.c bbox img_$name]
+				if {"$bbox" != ""} {
+					set id [$object.c create rectangle \
+						[lindex $bbox 0] [lindex $bbox 1] $sw [lindex $bbox 3]\
+						-tags [list _$name name selection] -fill $selbg -outline $selbg]
+					$object.c lower $id img_$name
+				}
+			} else {
+				foreach item [$object.c find withtag _$name] {
+					catch {$object.c itemconfigure $item -fill $selfg}
+				}
+				set bbox [$object.c bbox _$name]
+				if {"$bbox" != ""} {
+					set id [eval $object.c create rectangle $bbox \
+						{-tags [list _$name selection] -fill $selbg -outline $selbg}]
+					$object.c lower $id _$name
+				}
+			}
+		}
+	}
+}
+
 Classy::Browser method _drawdata {nx names items} {
-	private $object data options
+	private $object options
 	set padx $options(-padx)
 	set pady $options(-pady)
 	set padtext $options(-padtext)
 	set w $object.c
 	set i 0
+	set names [lrange $names 0 [expr [llength $items]-1]]
 	foreach dt $options(-data) {
 		set cx [expr {$nx-$padx+$padtext}]
 		set nitems ""
-		foreach name $names item $items {
-			set d [lindex $data(d,$name) $i]
+		foreach item $items name $names {
+			if {"$options(-getdata)" == ""} {
+				set data {}
+			} else {
+				set data [eval $options(-getdata) {$name}]
+			}
+			set d [lindex $data $i]
 			set y [lindex [$object.c coords $item] 1]
 			set id [$w create text $cx $y \
-				-anchor w -text $d -tags [list $name $dt] -font $options(-datafont)]
+				-anchor w -text $d -tags [list _$name d$dt ${dt}_$name t] -font $options(-datafont)]
 			set bbox [$w bbox $id]
 			lappend nitems $id
 			set temp [expr {$cx + [expr {[lindex $bbox 2]-[lindex $bbox 0]}]}]
@@ -359,25 +639,316 @@ Classy::Browser method _drawdata {nx names items} {
 	return $nx
 }
 
-Classy::Browser method clear {} {
-	private $object data options
-	$object.c delete all
-	unset data
-	set data() {}
-}
-
 Classy::Browser method name {index {y {}}} {
 	if {"$y" != ""} {
-		set index [$object.c find overlapping $index $y $index $y]
+		set index [lindex [$object.c find overlapping $index $y $index $y] end]
 	}
-	set tags [$object itemcget $index -tags]
-	return [lindex $tags 0]
+	set name [lindex [$object itemcget $index -tags] 0]
+	return [string range $name 1 end]
 }
 
 Classy::Browser method type {index {y {}}} {
 	if {"$y" != ""} {
-		set index [$object.c find overlapping $index $y $index $y]
+		set index [lindex [$object.c find overlapping $index $y $index $y] end]
 	}
 	set tags [$object itemcget $index -tags]
 	return [lindex $tags 1]
 }
+
+Classy::Browser method _view {args} {
+	private $object options curpos endpos step
+	set pagesize [expr {$endpos - $curpos}]
+	set pos $curpos
+	set size $pagesize
+	set min 0
+	set max [expr {[llength $options(-list)]-1}]
+	switch [lindex $args 0] {
+		"" {
+			set end [expr {double($pos + $size)/$max}]
+			if {$end > 1} {set end 1}
+			return [list [expr {double($pos)/$max}] $end]
+		}
+		moveto {
+			set fraction [lindex $args 1]
+			set pos [expr $fraction*$max]
+		}
+		scroll {
+			set number [lindex $args 1]
+			set what [lindex $args 2]
+			if {"$what"=="pages"} {
+				set pos [expr {$pos + $number*$pagesize}]
+			} else {
+				set pos [expr {$pos + $number*$step}]
+			}
+		}
+	}
+	if {$pos > $max} {set pos $max}
+	if {$pos < 0} {set pos 0}
+	set curpos [expr {int($pos)}]
+	$object redraw
+}
+
+Classy::Browser method _setbar {} {
+	private $object options curpos endpos step
+	set curlow $curpos
+	set curhigh $endpos
+	set min 0
+	set max [expr {[llength $options(-list)]}]
+	if {$curlow < $min} {set curlow $min}
+	if {$curhigh < $min} {set curhigh $min}
+	if {$curlow > $max} {set curlow $max}
+	if {$curhigh > $max} {set curhigh $max}
+	set realw [expr {$max - $min}]
+	if {"$options(-order)" == "column"} {
+		$object.hbar set [expr {double($curlow)/$realw}] [expr {double($curhigh)/$realw}]
+	} else {
+		$object.vbar set [expr {double($curlow)/$realw}] [expr {double($curhigh)/$realw}]
+	}
+}
+
+Classy::Browser method selection {option args} {
+	private $object options sel
+	set list $options(-list)
+	switch $option {
+		clear {
+			switch [llength $args] {
+				0 {
+					catch {unset sel}
+				}
+				1 {
+					set name [lindex $args 0]
+					set pos [lsearch $list $name]
+					if {$pos == -1} {
+						return -code error "cannot select \"$name\": not in list"
+					}
+					catch {unset sel($name)}
+				}
+				2 {
+					set pos [lsearch $list [lindex $args 0]]
+					if {$pos == -1} {
+						return -code error "cannot select \"[lindex $args 0]\": not in list"
+					}
+					set end [lsearch $list [lindex $args 1]]
+					if {$end == -1} {
+						return -code error "cannot select \"[lindex $args 1]\": not in list"
+					}
+					foreach name [lrange $list $pos $end] {
+						catch {unset sel($name)}
+					}
+				}
+				default {
+						return -code error "wrong # args: should be \"$object selection clear ?first? ?last?\""
+				}
+			}
+		}
+		set {
+			switch [llength $args] {
+				0 {
+					foreach name $list {
+						set sel($name) 1
+					}
+				}
+				1 {
+					set name [lindex $args 0]
+					set pos [lsearch $list $name]
+					if {$pos == -1} {
+						return -code error "cannot select \"$name\": not in list"
+					}
+					set sel($name) 1
+				}
+				2 {
+					set pos [lsearch $list [lindex $args 0]]
+					if {$pos == -1} {
+						return -code error "cannot select \"[lindex $args 0]\": not in list"
+					}
+					set end [lsearch $list [lindex $args 1]]
+					if {$end == -1} {
+						return -code error "cannot select \"[lindex $args 1]\": not in list"
+					}
+					foreach name [lrange $list $pos $end] {
+						set sel($name) 1
+					}
+				}
+				default {
+						return -code error "wrong # args: should be \"$object selection set ?first? ?last?\""
+				}
+			}
+		}
+		includes {
+			return [info exists sel([lindex $args 0])]
+		}
+		add {
+			foreach name $args {
+				if {[lsearch $list $name] == -1} {
+					return -code error "cannot select \"$name\": not in list"
+				}
+				set sel($name) 1
+			}
+		}
+		delete {
+			foreach name $args {
+				catch {unset sel($name)}
+			}
+		}
+		get {
+			return [array names sel]
+		}
+		default {
+			return -code error "unknown option \"$option\": should be one of clear, set includes, add, delete or get"
+		}
+	}
+	Classy::todo $object _drawselection
+}
+
+Classy::Browser method edit {name type command} {
+	private $object edit options id
+	if ![winfo exists $object.e] {
+		entry $object.e -textvariable [privatevar $object edit] -relief sunken -bd 1
+	}
+	foreach el [$object.c find withtag _$name] {
+		set t [lindex [$object.c itemcget $el -tags] 1]
+		if {"$t" == "$type"} {
+			set item $el
+			break
+		}
+	}
+	if ![info exists item] {
+		return -code error "item not found"
+	}
+	set bbox [$object.c bbox $item]
+	set x [lindex $bbox 0]
+	set y [lindex $bbox 1]
+	set h [expr {[lindex $bbox 3]-[lindex $bbox 1]+2}]
+	if {"$type" == "text"} {
+		$object.e configure -font $options(-font)
+	} else {
+		$object.e configure -font $options(-datafont)
+	}
+	switch $options(-order) {
+		list {
+			if !$options(-dataunder) {
+				if {"$type" == "text"} {
+					set coords [$object.c coords pane_name]
+					set w [expr {[lindex $coords 0]-[lindex $bbox 0]+2}]
+				} else {
+					set coords [$object.c coords bg_$type]
+					set w [expr {[lindex $coords 2]-[lindex $coords 0]}]
+					$object.e configure -font $options(-datafont)
+				}
+			} else {
+				set w [expr {[winfo width $object.c]-$x-5}]
+			}
+		}
+		column {
+			set w [expr {[lindex $bbox 2]-[lindex $bbox 0]+2}]
+		}
+		row {
+			set w [expr {[lindex $bbox 2]-[lindex $bbox 0]+2}]
+		}
+	}
+	set edit [$object.c itemcget $item -text]
+	catch {$object.c delete $id}
+	set id [$object.c create window $x $y -anchor nw -window $object.e -width $w -height $h]
+	bind $object.e <Return> [list $object _stopedit $command]	
+}
+
+Classy::Browser method _stopedit {command} {
+	private $object edit id command
+	$object.c delete $id
+	uplevel #0 $command {$edit}
+}
+
+Classy::Browser method active {{option get} args} {
+	private $object active
+	switch $option {
+		set {
+			$object.c delete active
+			if {"$args" != ""} {
+				set active [lindex $args 0]
+			}
+			$object.c delete active
+			set bbox [$object.c bbox _$active]
+			if {"$bbox" != ""} {
+				eval $object.c create rectangle $bbox {-tags {{} active} -outline darkgray}
+			}
+			return $active
+		}
+		get {
+			return $active
+		}
+	}
+}
+
+Classy::Browser method move {dir} {
+	private $object options active dline curpos endpos
+	if {"$options(-order)" == "row"} {
+		switch $dir {
+			down {set dir right}
+			up {set dir left}
+			left {set dir up}
+			right {set dir down}
+		}
+	}
+	switch $dir {
+		down {
+			set pos [lsearch $options(-list) $active]
+			incr pos
+			set result [lindex $options(-list) $pos]
+			if {$pos >= [expr {$endpos-1}]} {
+				if {$endpos != [llength $options(-list)]} {
+					$object _view scroll 1 units
+				}
+			}
+		}
+		up {
+			set pos [lsearch $options(-list) $active]
+			incr pos -1
+			set result [lindex $options(-list) $pos]
+			if {$pos < $curpos} {
+				if {$curpos != 0} {
+					$object _view scroll -1 units
+				}
+			}
+		}
+		left {
+			for {set i 0} {$i <= $dline(num)} {incr i} {
+				set pos [lsearch $dline($i) $active]
+				if {$pos != -1} break
+			}
+			if {$pos == -1} return
+			if {$i==0} {
+				if {$curpos == 0} return
+				$object _view scroll -1 units
+				update idletasks
+			} else {
+				incr i -1
+			}
+			set result [lindex $dline($i) $pos]
+			if {"$result" == ""} {
+				set result [lindex $dline($i) end]
+			}
+		}
+		right {
+			for {set i 0} {$i <= $dline(num)} {incr i} {
+				set pos [lsearch $dline($i) $active]
+				if {$pos != -1} break
+			}
+			if {$pos == -1} return
+			if {$i >= [expr {$dline(num)-1}]} {
+				if {$endpos == [llength $options(-list)]} return
+				$object _view scroll 1 units
+				update idletasks
+			} else {
+				incr i
+			}
+			set result [lindex $dline($i) $pos]
+			if {"$result" == ""} {
+				set result [lindex $dline($i) end]
+			}
+		}
+	}
+	if {"$result" != ""} {
+		$object active set $result
+	}
+}
+

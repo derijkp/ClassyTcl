@@ -25,3 +25,7 @@ Classy::setfont *Text.font NonPropFont
 Classy::setfont *Classy::Browser.font BoldFont
 ## {Browser data font} {font used for data in the browser widget} font
 Classy::setfont *Classy::Browser.dataFont Font
+## {LargeBrowser font} {font used for names in the browser widget} font
+Classy::setfont *Classy::LargeBrowser.font BoldFont
+## {LargeBrowser data font} {font used for data in the browser widget} font
+Classy::setfont *Classy::LargeBrowser.dataFont Font

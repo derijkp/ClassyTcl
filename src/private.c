@@ -1,5 +1,5 @@
 /*
- *       File:    variable.c
+ *       File:    private.c
  *       Purpose: object extension to Tcl
  *       Author:  Copyright (c) 1998 Peter De Rijk
  *
@@ -10,6 +10,164 @@
 #include <string.h>
 #include "tcl.h"
 #include "class.h"
+
+int Classy_PropagateVar(
+	Tcl_Interp *interp,
+	Class *class,
+	Tcl_Obj *name,
+	Tcl_Obj *value)
+{
+	Tcl_HashEntry *entry;
+	Tcl_HashSearch search;
+	Class *subclass;
+	Tcl_Obj *val,*temp;
+	int error;
+
+	entry = Tcl_FirstHashEntry(&(class->subclasses), &search);
+	while(1) {
+		if (entry == NULL) break;
+		subclass = (Class *)Tcl_GetHashValue(entry);
+		temp = Tcl_NewObj();
+		Tcl_AppendStringsToObj(temp, "::class::", Tcl_GetStringFromObj(subclass->class,NULL), ",,vd", (char *)NULL);
+		val = Tcl_ObjGetVar2(interp, temp, name, TCL_GLOBAL_ONLY);
+		if (val == NULL) {
+			temp = Tcl_NewObj();
+			Tcl_AppendStringsToObj(temp, "::class::", Tcl_GetStringFromObj(subclass->class,NULL), ",,v,", 
+				Tcl_GetStringFromObj(name,NULL), (char *)NULL);
+			Tcl_ObjSetVar2(interp,temp,NULL,value,TCL_PARSE_PART1|TCL_GLOBAL_ONLY);
+			error = Classy_PropagateVar(interp,subclass,name,value);
+			if (error != TCL_OK) {return error;}
+		}
+		entry = Tcl_NextHashEntry(&search);
+	}
+	return TCL_OK;
+}
+
+int Classy_PrivateMethod(
+	Tcl_Interp *interp,
+	Class *class,
+	Object *object,
+	int argc,
+	Tcl_Obj *CONST argv[])
+{
+	Tcl_Obj *temp,*res;
+	int error;
+
+	if (argc==0) {
+		Tcl_Obj **objv,*result,*src;
+		char *name;
+		int len,start,objc,i;
+		name = Tcl_GetStringFromObj(object->name, &len);
+		error = Tcl_VarEval(interp, "lsort [info vars ::class::",name, ",,v,*]",(char *)NULL);
+		if (error != TCL_OK) {return error;}
+		src = Tcl_GetObjResult(interp);
+		error = Tcl_ListObjGetElements(interp, src, &objc, &objv);
+		if (error != TCL_OK) {return error;}
+		start = len + 13;
+		result = Tcl_NewObj();
+		i = 0;
+		while(i<objc) {
+			name = Tcl_GetStringFromObj(objv[i],&len);
+			error = Tcl_ListObjAppendElement(interp, result, Tcl_NewStringObj(name+start,len-start));
+			if (error != TCL_OK) {return error;}
+			i++;
+		}
+		Tcl_SetObjResult(interp,result);
+		return TCL_OK;
+	} else if (argc==1) {
+		temp = Tcl_NewObj();
+		Tcl_AppendStringsToObj(temp, "::class::", Tcl_GetStringFromObj(object->name,NULL), ",,v,", 
+			Tcl_GetStringFromObj(argv[0],NULL), (char *)NULL);
+		res = Tcl_ObjGetVar2(interp,temp,NULL,TCL_PARSE_PART1|TCL_GLOBAL_ONLY);
+		if (res != NULL) {
+			Tcl_SetObjResult(interp,res);
+			return TCL_OK;
+		} else {
+			Tcl_ResetResult(interp);
+			Tcl_AppendResult(interp,"\"", Tcl_GetStringFromObj(object->name,NULL), 
+				"\" does not have a private variable \"", Tcl_GetStringFromObj(argv[0],NULL), "\"",NULL);
+			return TCL_ERROR;
+		}
+	} else if (argc==2) {
+		temp = Tcl_NewObj();
+		Tcl_AppendStringsToObj(temp, "::class::", Tcl_GetStringFromObj(object->name,NULL), ",,v,", 
+			Tcl_GetStringFromObj(argv[0],NULL), (char *)NULL);
+		Tcl_SetObjResult(interp,Tcl_ObjSetVar2(interp,temp,NULL,argv[1],TCL_PARSE_PART1|TCL_GLOBAL_ONLY));
+		return TCL_OK;
+	} else {
+		Tcl_ResetResult(interp);
+		Tcl_AppendResult(interp,"wrong # args: should be \"",Tcl_GetStringFromObj(object->name,NULL),
+			" private ?varName? ?newValue?\"", (char *)NULL);
+		return TCL_ERROR;
+	}
+	return TCL_OK;
+}
+
+int Classy_PrivateClassMethod(
+	Tcl_Interp *interp,
+	Class *class,
+	Object *object,
+	int argc,
+	Tcl_Obj *CONST argv[])
+{
+	Tcl_Obj *temp,*res;
+	int error;
+
+	if (argc==0) {
+		Tcl_Obj **objv,*result,*src;
+		char *name;
+		int len,start,objc,i;
+		name = Tcl_GetStringFromObj(class->class, &len);
+		error = Tcl_VarEval(interp, "lsort [info vars ::class::",name, ",,v,*]",(char *)NULL);
+		if (error != TCL_OK) {return error;}
+		src = Tcl_GetObjResult(interp);
+		error = Tcl_ListObjGetElements(interp, src, &objc, &objv);
+		if (error != TCL_OK) {return error;}
+		start = len + 13;
+		result = Tcl_NewObj();
+		i = 0;
+		while(i<objc) {
+			name = Tcl_GetStringFromObj(objv[i],&len);
+			error = Tcl_ListObjAppendElement(interp, result, Tcl_NewStringObj(name+start,len-start));
+			if (error != TCL_OK) {return error;}
+			i++;
+		}
+		Tcl_SetObjResult(interp,result);
+		return TCL_OK;
+	} else if (argc==1) {
+		temp = Tcl_NewObj();
+		Tcl_AppendStringsToObj(temp, "::class::", Tcl_GetStringFromObj(class->class,NULL), ",,v,", 
+			Tcl_GetStringFromObj(argv[0],NULL), (char *)NULL);
+		res = Tcl_ObjGetVar2(interp,temp,NULL,TCL_PARSE_PART1|TCL_GLOBAL_ONLY);
+		if (res != NULL) {
+			Tcl_SetObjResult(interp,res);
+			return TCL_OK;
+		} else {
+			Tcl_ResetResult(interp);
+			Tcl_AppendResult(interp,"\"", Tcl_GetStringFromObj(class->class,NULL), 
+				"\" does not have a private variable \"", Tcl_GetStringFromObj(argv[0],NULL), "\"",NULL);
+			return TCL_ERROR;
+		}
+	} else if (argc==2) {
+		error = Classy_PropagateVar(interp,class,argv[0],argv[1]);
+		if (error != TCL_OK) {return error;}
+		temp = Tcl_NewObj();
+		Tcl_AppendStringsToObj(temp, "::class::", Tcl_GetStringFromObj(class->class,NULL), ",,vd", (char *)NULL);
+		temp = Tcl_ObjSetVar2(interp, temp, argv[0], Tcl_NewObj(), TCL_GLOBAL_ONLY|TCL_LEAVE_ERR_MSG);
+		if (temp == NULL) {return TCL_ERROR;}
+		temp = Tcl_NewObj();
+		Tcl_AppendStringsToObj(temp, "::class::", Tcl_GetStringFromObj(class->class,NULL), ",,v,", 
+			Tcl_GetStringFromObj(argv[0],NULL), (char *)NULL);
+		Tcl_SetObjResult(interp,Tcl_ObjSetVar2(interp,temp,NULL,argv[1],TCL_PARSE_PART1|TCL_GLOBAL_ONLY));
+		return TCL_OK;
+	} else {
+		Tcl_ResetResult(interp);
+		Tcl_AppendResult(interp,"wrong # args: should be \"",Tcl_GetStringFromObj(class->class,NULL),
+			" private ?varName? ?newValue?\"", (char *)NULL);
+		return TCL_ERROR;
+	}
+	return TCL_OK;
+}
 
 Tcl_Obj *Classy_ObjectPrivateVar(
 	Tcl_Obj *name,

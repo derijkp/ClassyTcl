@@ -25,9 +25,17 @@ proc HTML {} {}
 
 source [file join $::class::dir html_library-0.3 html_library.tcl]
 
-proc ::html::link_callback {win href} {
-	$win geturl $href
-}
+#proc ::html::link_callback {win href} {
+#	private $win options
+#	if {"$options(-errorcommand)" == ""} {
+#		$win geturl $href
+#	} else {
+#		if [catch {$win geturl $href} result] {
+#			eval $options(-errorcommand) {$href $result}
+#		}
+#	}
+#}
+
 proc ::html::submit_form {win param query} {
 	regexp {method="([^"]+)"} $param temp method
 	regexp {action="([^"]+)"} $param temp action
@@ -37,9 +45,11 @@ proc ::html::submit_form {win param query} {
 		error "unsupported method \"$method\""
 	}
 }
+
 proc ::html::set_image {win handle src} {
 	$win _setimage $handle $src
 }
+
 catch {unset ::html::events}
 array set ::html::events {
 	Enter	{-borderwidth 2 -relief raised }
@@ -143,6 +153,10 @@ Classy::HTML addoption -tagmap {tagMap TagMap {}}
 #}
 Classy::HTML addoption -insertmap {insertMap InsertMap {}}
 
+#doc {HTML options -errorcommand} option {-errorcommand errorCommand Command} descr {
+#}
+Classy::HTML addoption -errorcommand {errorCommand Command {}}
+
 # ------------------------------------------------------------------
 #  Methods
 # ------------------------------------------------------------------
@@ -197,43 +211,54 @@ Classy::HTML method geturl {url {query {}}} {
 	if ![regexp {^([^:]*)://([^/]+)(/.*)$} $url dummy protocol host file] {
 		error "error in url format of \"$url\""
 	}
-	switch $protocol {
-		http {
-			package require http
-			if {"$query" == ""} {
-				set id [http::geturl $base]
-			} else {
-				set id [http::geturl $base -query $query]
+	set code [catch {
+		switch $protocol {
+			http {
+				package require http
+				if {"$query" == ""} {
+					set id [http::geturl $base]
+				} else {
+					set id [http::geturl $base -query $query]
+				}
+				set html [http::data $id]
+				array set state [set [set id](meta)]
+				if [info exists state(Content-Type)] {
+					set type [string trimright [string trimleft $state(Content-Type)]]
+	#				if {"$type" != "text/html"} {
+	#					set html "<pre>$html</pre>"
+	#				}
+				} else {
+					set type text/html
+				}
+				unset $id
 			}
-			set html [http::data $id]
-			array set state [set [set id](meta)]
-			if [info exists state(Content-Type)] {
-				set type [string trimright [string trimleft $state(Content-Type)]]
-#				if {"$type" != "text/html"} {
-#					set html "<pre>$html</pre>"
-#				}
-			} else {
+			file {
+				set html [readfile $file]
+				if [regexp {html?$} $file] {
+					set type text/html
+				} else {
+	#				set html "<pre>$html</pre>"
+				}
+			}
+			data {
+				set html [string range $file 1 end]
 				set type text/html
 			}
-			unset $id
-		}
-		file {
-			set html [readfile $file]
-			if [regexp {html?$} $file] {
-				set type text/html
-			} else {
-#				set html "<pre>$html</pre>"
+			ftp {
+				error "not yet"
+			}
+			default {
+				error "unsupported protocol"
 			}
 		}
-		data {
-			set html [string range $file 1 end]
-			set type text/html
-		}
-		ftp {
-			error "not yet"
-		}
-		default {
-			error "unsupported protocol"
+	} result]
+	if $code {
+		if {"$options(-errorcommand)" == ""} {
+			return -code $code $result
+		} else {
+			if [catch {$win geturl $href} result] {
+				return [eval $options(-errorcommand) {$url $query $result}]
+			}
 		}
 	}
 

@@ -9,8 +9,10 @@ menu file "File" {
 	action Editor "New editor" "edit newfile"
 	action Cmd "Command window" {Classy::cmd}
 	separator
+	action SaveState "Save state" {savestate}
 	action Configure "Customise application" {Classy::Configurator dialog}
 	action Close "Close" "%W close"
+	action Exit "Exit" "exit"
 }
 menu edit "Edit" {
 	action Cut "Cut" "%W cut"
@@ -54,47 +56,6 @@ menu tools "Tools" {
 }
 activemenu macros "Macros" {%W getmacromenu}
 activemenu pattern "Pattern" {%W getpatternmenu}
-}
-## Help {menu used in the ClassyTcl help system} menu
-Classy::setoption *Classy::Help.Menu {
-menu file "File" {
-	action Reload "Reload" {%W reload}
-	action Edit "Edit" {%W edit}
-	action Save "Save source" {%W save [Classy::selectfile]}
-	action SaveText "Save as text" {%W save [Classy::selectfile] text}
-	action Configure "Configure" {Configurator dialog}
-	separator
-	action Close "Close" {destroy %W}
-}
-activemenu contents "Contents" {%W getcontentsmenu}
-menu go "Go" {
-	action Back "Back" {%W back}
-	action Forward "Forward" {%W forward} C-r
-	action History "History" {%W historymenu}
-}
-activemenu general "General" {%W getgeneralmenu}
-}
-
-## Filer {menu used in the ClassyTcl Filer} menu
-Classy::setoption *Classy::Filer.Menu {
-menu sel "Selection" {
-	action Delete "Delete" {%W deletefiles sel}
-	action Rename "Rename" {%W renamebox} C-r
-	action Copy "Copy" {%W copybox}
-}
-menu option "Options" {
-	check HiddenFiles "Hidden files" {-variable [privatevar %W hidden] -onvalue yes -offvalue no -command {%W refresh}}
-	action Filter "Filter" "%W filterbox" C-f
-	separator
-	radio SortExt "Sort by extension" {-variable [privatevar %W order] -value extension -command {%W refresh}}
-	radio SortTime "Sort by time" {-variable [privatevar %W order] -value time -command {%W refresh}}
-	radio SortAccess "Sort by access" {-variable [privatevar %W order] -value accesstime -command {%W refresh}}
-	radio SortSize "Sort by size" {-variable [privatevar %W order] -value size -command {%W refresh}}
-	radio Unsorted "Unsorted (as on disk)" {-variable [privatevar %W order] -value disk -command {%W refresh}}
-	separator
-	radio NormalIcons "Normal icons" {-variable [privatevar %W view] -value normal -command {%W redraw}}
-	radio SmallIcons "Small icons" {-variable [privatevar %W view] -value small -command {%W redraw}}
-	radio FullInfo "Full info" {-variable [privatevar %W view] -value full -command {%W redraw}}
+menu help "Help" {
 }
 }
-

@@ -29,6 +29,7 @@ typedef struct Class {
 	Method *classdestroy;
 	Method *destroy;
 	Tcl_Obj *trace;
+	ClientData clientdata;
 } Class;
 
 typedef struct Object {
@@ -36,6 +37,7 @@ typedef struct Object {
 	Class *parent;
 	Tcl_Obj *name;
 	Tcl_Obj *trace;
+	ClientData clientdata;
 } Object;
 
 typedef int Classy_Method _ANSI_ARGS_((Tcl_Interp *interp,
