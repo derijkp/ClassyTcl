@@ -4,7 +4,7 @@
 #
 # Class-tcl
 #
-# Create the base class Class, the work namespace ::class
+# Create the base class Class, the work namespace ::Class
 # and all supplementary commands: tcl version
 #
 # ----------------------------------------------------------------------
@@ -20,7 +20,7 @@
 # The methods defined by Class can be invoked from all objects
 #}
 
-proc ::class::correctcmd {fcmd cmd} {
+proc ::Class::correctcmd {fcmd cmd} {
 	set result "$cmd"
 	if [regexp {,,cm,} $fcmd] {
 		set list [lrange [info args $fcmd] 1 end]
@@ -39,19 +39,19 @@ proc ::class::correctcmd {fcmd cmd} {
 	return $result
 }
 
-proc ::class::classerror {class object result cmd arg} {
+proc ::Class::classerror {class object result cmd arg} {
 	global errorInfo
-	set ::class::error $result 
-	set ::class::errorInfo $errorInfo 
+	set ::Class::error $result 
+	set ::Class::errorInfo $errorInfo 
 	if [regexp "called \"(.*)\" with too many arguments" $result temp fcmd] {
-		set error "wrong # args: should be \"$object [class::correctcmd $fcmd $cmd]\""
+		set error "wrong # args: should be \"$object [Class::correctcmd $fcmd $cmd]\""
 	} elseif [regexp "no value given for parameter \".*\" to \"(.*)\"" $result temp fcmd] {
-		set error "wrong # args: should be \"$object [class::correctcmd $fcmd $cmd]\""
-	} elseif [regexp "^invalid command name \"(::class::${class},,c?m,.*)\"$" $result temp fcmd] {
+		set error "wrong # args: should be \"$object [Class::correctcmd $fcmd $cmd]\""
+	} elseif [regexp "^invalid command name \"(::Class::${class},,c?m,.*)\"$" $result temp fcmd] {
 		if {"$class"=="$object"} {
-			set methods [join [lsort [concat [::class::info_ $class $object methods] [::class::info_ $class $object classmethods]]] ", "]
+			set methods [join [lsort [concat [::Class::info_ $class $object methods] [::Class::info_ $class $object classmethods]]] ", "]
 		} else {
-			set methods [join [lsort [::class::info_ $class $object methods]] ", "]
+			set methods [join [lsort [::Class::info_ $class $object methods]] ", "]
 		}
 		set error "bad option \"$cmd\": must be $methods"
 	} else {
@@ -72,7 +72,7 @@ proc ::class::classerror {class object result cmd arg} {
 # This can be done using the command 
 #<pre>super init ?...?</pre>.
 #}
-proc ::class::new {class arg} {
+proc ::Class::new {class arg} {
 #puts [list new $class $arg]
 	set object [lindex $arg 0]
 	regsub {^::} $object {} object
@@ -83,22 +83,22 @@ proc ::class::new {class arg} {
 	if {"[info commands ::$object]" != ""} {
 		return -code error "command \"$object\" exists"
 	}
-	set ::class::parent($object) $class
-	set ::class::${class},,child($object) 1
+	set ::Class::parent($object) $class
+	set ::Class::${class},,child($object) 1
 	set body {
-		if [catch {uplevel ::class::@class@,,m,${cmd} @class@ @object@ $args} result] {
-			return -code error -errorinfo [set ::errorInfo] [class::classerror @class@ @object@ $result $cmd $args]
+		if [catch {uplevel ::Class::@class@,,m,${cmd} @class@ @object@ $args} result] {
+			return -code error -errorinfo [set ::errorInfo] [Class::classerror @class@ @object@ $result $cmd $args]
 		}
 		return $result
 	}
 	regsub -all {@class@} $body [list $class] body
 	regsub -all {@object@} $body [list $object] body
 	proc ::$object {cmd args} $body
-#	set ::class::current $class
-	if [info exists ::class::${class},,init] {
-		if [catch {uplevel ::class::${class},,init [list $class] $arg} result] {
+#	set ::Class::current $class
+	if [info exists ::Class::${class},,init] {
+		if [catch {uplevel ::Class::${class},,init [list $class] $arg} result] {
 			set errorInfo [set ::errorInfo]
-			::class::objectdestroy $class $object
+			::Class::objectdestroy $class $object
 			return -code error -errorinfo $errorInfo $result
 		} else {
 			return $result
@@ -106,7 +106,7 @@ proc ::class::new {class arg} {
 	} elseif {"$class" != "Class"} {
 		if [catch {eval super init [lrange $arg 1 end]} result] {
 			set errorInfo [set ::errorInfo]
-			::class::objectdestroy $class $object
+			::Class::objectdestroy $class $object
 			return -code error -errorinfo $errorInfo $result
 		} else {
 			return $result
@@ -123,7 +123,7 @@ proc ::class::new {class arg} {
 # and methods from class ClassName. ClassName is the parent or
 # superclass of SubClass.
 #}
-proc ::class::subclass {class arg} {
+proc ::Class::subclass {class arg} {
 	set len [llength $arg]
 	if {$len != 1} {
 		return -code error "wrong # args: should be \"$class subclass class\""
@@ -137,15 +137,24 @@ proc ::class::subclass {class arg} {
 	if {"$namespace" != ""} {
 		namespace eval $namespace {}
 	}
-	set ::class::parent($child) $class
-	set ::class::${class},,subclass($child) 1
-	set body [info body ::$class]
-	regsub -all $class $body [list $child] body
+	set ::Class::parent($child) $class
+	set ::Class::${class},,subclass($child) 1
+#	set body [info body ::$class]
+#	regsub -all " $class " $body " [list $child] " body
+	set body {
+		if [regexp {^\.} $cmd] {set args [concat $cmd $args];set cmd new}
+		if [catch {uplevel ::Class::@class@,,cm,${cmd} @class@ $args} result] {
+			set error [::Class::classerror @class@ @class@ $result $cmd $args]
+			return -code error -errorinfo [set ::errorInfo] $error
+		}
+		return $result
+	}
+	regsub -all @class@ $body [list $child] body
 	proc ::$child {cmd args} $body
 
 	# copy methods
-	foreach cmd [info commands ::class::${class},,m,*] {
-		regexp "^::class::${class},,m,(.*)\$" $cmd temp name
+	foreach cmd [info commands ::Class::${class},,m,*] {
+		regexp "^::Class::${class},,m,(.*)\$" $cmd temp name
 		set args ""
 		foreach arg [info args $cmd] {
 			if [info default $cmd $arg def] {
@@ -154,12 +163,12 @@ proc ::class::subclass {class arg} {
 				lappend args $arg
 			}
 		}
-		proc ::class::${child},,m,${name} $args [info body $cmd]
+		proc ::Class::${child},,m,${name} $args [info body $cmd]
 	}
 
 	# copy classmethods
-	foreach cmd [info commands ::class::${class},,cm,*] {
-		regexp "^::class::${class},,cm,(.*)\$" $cmd temp name
+	foreach cmd [info commands ::Class::${class},,cm,*] {
+		regexp "^::Class::${class},,cm,(.*)\$" $cmd temp name
 		set args ""
 		foreach arg [info args $cmd] {
 			if [info default $cmd $arg def] {
@@ -168,16 +177,16 @@ proc ::class::subclass {class arg} {
 				lappend args $arg
 			}
 		}
-		proc ::class::${child},,cm,${name} $args [info body $cmd]
+		proc ::Class::${child},,cm,${name} $args [info body $cmd]
 	}
 
 	# copy class variables
-	foreach var [info vars ::class::${class},,v,*] {
-		regexp "^::class::${class},,v,(.*)\$" $var temp name
+	foreach var [info vars ::Class::${class},,v,*] {
+		regexp "^::Class::${class},,v,(.*)\$" $var temp name
 		if [array exists $var] {
-			array set ::class::${child},,v,${name} [array get $var]
+			array set ::Class::${child},,v,${name} [array get $var]
 		} else {
-			set ::class::${child},,v,${name} [set $var]
+			set ::Class::${child},,v,${name} [set $var]
 		}
 	}
 
@@ -193,28 +202,28 @@ proc ::class::subclass {class arg} {
 # desctruction of its children, but before destroying the class
 # itself and and its instances.
 #}
-proc ::class::classdestroy {class} {
+proc ::Class::classdestroy {class} {
 #puts "destroying class $class"
-	foreach child [array names ::class::${class},,subclass] {
+	foreach child [array names ::Class::${class},,subclass] {
 		catch {::$child destroy}
 	}
-	foreach child [array names ::class::${class},,child] {
+	foreach child [array names ::Class::${class},,child] {
 		catch {::$child destroy}
 	}
-	catch {::class::${class},,classdestroy $class}
-	if [info exists ::class::parent($class)] {
+	catch {::Class::${class},,classdestroy $class}
+	if [info exists ::Class::parent($class)] {
 		if {"$class" != "Class"} {
-			set parent [set ::class::parent($class)]
-			if [info exists ::class::${parent},,subclass($class)] {
-				unset ::class::${parent},,subclass($class)
+			set parent [set ::Class::parent($class)]
+			if [info exists ::Class::${parent},,subclass($class)] {
+				unset ::Class::${parent},,subclass($class)
 			}
 		}
-		unset ::class::parent($class)
+		unset ::Class::parent($class)
 	}
-	foreach var [info vars ::class::${class},,*] {
+	foreach var [info vars ::Class::${class},,*] {
 		unset $var
 	}
-	foreach cmd [info commands ::class::${class},,*] {
+	foreach cmd [info commands ::Class::${class},,*] {
 		rename $cmd {}
 	}
 	catch {rename ::$class {}}
@@ -228,20 +237,20 @@ proc ::class::classdestroy {class} {
 # of its superclasses (if defined) will be invoked before the 
 # destruction of the actual object.
 #}
-proc ::class::objectdestroy {class object} {
+proc ::Class::objectdestroy {class object} {
 #puts "destroying object $object"
 	set current $class
 	while {"$current" != ""} {
-		catch {::class::$current,,destroy $class $object}
-		set current [set ::class::parent($current)]
+		catch {::Class::$current,,destroy $class $object}
+		set current [set ::Class::parent($current)]
 	}
-	if [info exists ::class::parent($object)] {
-		unset ::class::parent($object)
+	if [info exists ::Class::parent($object)] {
+		unset ::Class::parent($object)
 	}
-	if [info exists ::class::${class},,child($object)] {
-		unset ::class::${class},,child($object)
+	if [info exists ::Class::${class},,child($object)] {
+		unset ::Class::${class},,child($object)
 	}
-	foreach var [info vars ::class::${object},,*] {
+	foreach var [info vars ::Class::${object},,*] {
 		unset $var
 	}
 	catch {rename ::$object {}}
@@ -252,60 +261,60 @@ proc super {method args} {
 	upvar class class object object
 	set level [info level]
 	set plevel [expr {$level-2}]
-	if [info exists ::class::current($plevel)] {
-		set current $::class::current($plevel)
+	if [info exists ::Class::current($plevel)] {
+		set current $::Class::current($plevel)
 	} else {
 		set current $class
 	}
 	if {"$method" == "init"} {
 		while 1 {
-			set current [set ::class::parent($current)]
+			set current [set ::Class::parent($current)]
 			if {"$current" == "Class"} {
 				return $object
 			}
-			if [info exists ::class::${current},,init] {
+			if [info exists ::Class::${current},,init] {
 				break
 			}
 		}
-		set ::class::current($level) $current
-		set error [catch {eval ::class::${current},,init {$class $object} $args} result]
-		unset ::class::current($level)
+		set ::Class::current($level) $current
+		set error [catch {eval ::Class::${current},,init {$class $object} $args} result]
+		unset ::Class::current($level)
 	} elseif [info exists object] {
-		set proc ::class::${current},,m,${method}
+		set proc ::Class::${current},,m,${method}
 		if [catch {info body $proc} body] {
 			error "No method \"$method\" defined for super of $object (at class \"$current\")"
 		}
 		regexp "^#(\[^\n\]+)" $body temp cclass
 		while 1 {
-			set current [set ::class::parent($current)]
-			set proc ::class::${current},,m,${method}
+			set current [set ::Class::parent($current)]
+			set proc ::Class::${current},,m,${method}
 			if [catch {info body $proc} body] {
 				error "No method \"$method\" defined for super of $object (at class \"$current\")"
 			}
 			regexp "^#(\[^\n\]+)" $body temp bclass
 			if {"$bclass" != "$cclass"} break
 		}
-		set ::class::current($level) $current
+		set ::Class::current($level) $current
 		set error [catch {eval $proc {$class $object} $args} result]
-		unset ::class::current($level)
+		unset ::Class::current($level)
 	} else {
-		set proc ::class::${current},,cm,${method}
+		set proc ::Class::${current},,cm,${method}
 		if [catch {info body $proc} body] {
 			error "No classmethod \"$method\" defined for super of $class (at class \"$current\")"
 		}
 		regexp "^#(\[^\n\]+)" $body temp cclass
 		while 1 {
-			set current [set ::class::parent($current)]
-			set proc ::class::${current},,cm,${method}
+			set current [set ::Class::parent($current)]
+			set proc ::Class::${current},,cm,${method}
 			if [catch {info body $proc} body] {
 				error "No classmethod \"$method\" defined for super of $class (at class \"$current\")"
 			}
 			regexp "^#(\[^\n\]+)" $body temp bclass
 			if {"$bclass" != "$cclass"} break
 		}
-		set ::class::current($level) $current
+		set ::Class::current($level) $current
 		set error [catch {eval $proc {$class} $args} result]
-		unset ::class::current($level)
+		unset ::Class::current($level)
 	}
 	if $error {
 		error $result
@@ -314,29 +323,29 @@ proc super {method args} {
 	}
 }
 
-proc ::class::propagatemethod {class type name args body} {
-	if ![info exists ::class::${class},,subclass] {
+proc ::Class::propagatemethod {class type name args body} {
+	if ![info exists ::Class::${class},,subclass] {
 		return ""
 	}
-	foreach subclass [array names ::class::${class},,subclass] {
-		set temp ::class::${subclass},,$type,${name}
+	foreach subclass [array names ::Class::${class},,subclass] {
+		set temp ::Class::${subclass},,$type,${name}
 		if {("[info commands $temp]" == "")||
 			([regexp "^#$class\n" [info body $temp]])} {
 			proc $temp $args $body
-			::class::propagatemethod $subclass $type $name $args $body
+			::Class::propagatemethod $subclass $type $name $args $body
 		}
 	}
 }
 
-proc ::class::propagatedeletemethod {class type name} {
-	if ![info exists ::class::${class},,subclass] {
+proc ::Class::propagatedeletemethod {class type name} {
+	if ![info exists ::Class::${class},,subclass] {
 		return ""
 	}
-	foreach subclass [array names ::class::${class},,subclass] {
-		set temp ::class::${subclass},,$type,${name}
+	foreach subclass [array names ::Class::${class},,subclass] {
+		set temp ::Class::${subclass},,$type,${name}
 		if [regexp "^#$class\n" [info body $temp]] {
 			rename $temp {}
-			::class::propagatedeletemethod $subclass $type $name
+			::Class::propagatedeletemethod $subclass $type $name
 		}
 	}
 }
@@ -372,7 +381,7 @@ proc ::class::propagatedeletemethod {class type name} {
 # returns information about the method $name of pathName. It takes the same options 
 # as "info classmethod"
 #}
-proc ::class::info_ {class object arg} {
+proc ::Class::info_ {class object arg} {
 	set len [llength $arg]
 	if {$len < 1} {
 		return -code error "wrong # args: should be \"$object info option ?...?\""
@@ -380,20 +389,20 @@ proc ::class::info_ {class object arg} {
 	set option [lindex $arg 0]
 	switch $option {
 		parent {
-			return [set ::class::parent($object)]
+			return [set ::Class::parent($object)]
 		}
 		class {
 			return $class
 		}
 		children {
 			if {"$class" == "$object"} {
-				return [lsort [array names ::class::${class},,child]]
+				return [lsort [array names ::Class::${class},,child]]
 			}
 		}
 		subclasses {
 			if {"$class" == "$object"} {
-				if [info exists ::class::${class},,subclass] {
-					return [array names ::class::${class},,subclass]
+				if [info exists ::Class::${class},,subclass] {
+					return [array names ::Class::${class},,subclass]
 				} else {
 					return ""
 				}
@@ -402,16 +411,16 @@ proc ::class::info_ {class object arg} {
 		methods {
 			if {$len == 1} {
 				set result ""
-				foreach cmd [lsort [info commands ::class::${class},,m,*]] {
-					if [regexp "^::class::${class},,m,(\[^_\].*)\$" $cmd temp name] {
+				foreach cmd [lsort [info commands ::Class::${class},,m,*]] {
+					if [regexp "^::Class::${class},,m,(\[^_\].*)\$" $cmd temp name] {
 						lappend result $name
 					}
 				}
 				return $result
 			} elseif {$len == 2} {
 				set result ""
-				foreach cmd [lsort [info commands ::class::${class},,m,[lindex $arg 1]]] {
-					regexp "^::class::${class},,m,(.*)\$" $cmd temp name
+				foreach cmd [lsort [info commands ::Class::${class},,m,[lindex $arg 1]]] {
+					regexp "^::Class::${class},,m,(.*)\$" $cmd temp name
 					lappend result $name
 				}
 				return $result
@@ -423,16 +432,16 @@ proc ::class::info_ {class object arg} {
 			if {("$class" == "$object")||("$object"=="")} {
 				if {$len == 1} {
 						set result ""
-						foreach cmd [lsort [info commands ::class::${class},,cm,*]] {
-							if [regexp "^::class::${class},,cm,(\[^_\].*)\$" $cmd temp name] {
+						foreach cmd [lsort [info commands ::Class::${class},,cm,*]] {
+							if [regexp "^::Class::${class},,cm,(\[^_\].*)\$" $cmd temp name] {
 								lappend result $name
 							}
 						}
 						return $result
 					} elseif {$len == 2} {
 						set result ""
-						foreach cmd [lsort [info commands ::class::${class},,cm,[lindex $arg 1]]] {
-							regexp "^::class::${class},,cm,(.*)\$" $cmd temp name
+						foreach cmd [lsort [info commands ::Class::${class},,cm,[lindex $arg 1]]] {
+							regexp "^::Class::${class},,cm,(.*)\$" $cmd temp name
 							lappend result $name
 						}
 						return $result
@@ -444,15 +453,15 @@ proc ::class::info_ {class object arg} {
 			if {"$name" == "init"} {
 				set tmpclass $class
 				while 1 {
-					set proc ::class::${tmpclass},,$name
+					set proc ::Class::${tmpclass},,$name
 					if [string length [info commands $proc]] break
 					if {"$tmpclass" == "Class"} {return {}}
-					set tmpclass [set ::class::parent($tmpclass)]
+					set tmpclass [set ::Class::parent($tmpclass)]
 				}
 			} elseif {"$name" == "destroy"} {
-				set proc ::class::${class},,destroy
+				set proc ::Class::${class},,destroy
 			} else {
-				set proc ::class::${class},,m,$name
+				set proc ::Class::${class},,m,$name
 			}
 			switch [lindex $arg 1] {
 				body {
@@ -477,7 +486,7 @@ proc ::class::info_ {class object arg} {
 		classmethod {
 			if {"$class" == "$object"} {
 				set name [lindex $arg 2]
-				set proc ::class::${class},,cm,$name
+				set proc ::Class::${class},,cm,$name
 				switch [lindex $arg 1] {
 					body {
 						set body [info body $proc]
@@ -522,7 +531,7 @@ proc ::class::info_ {class object arg} {
 # invoked the method. If the method was invoked from a class, the values
 # of variables class and object will be identical (name of the class).
 #}
-proc ::class::method {class arg} {
+proc ::Class::method {class arg} {
 	set len [llength $arg]
 	if {$len != 3} {
 		return -code error "wrong # args: should be \"$class method name args body\""
@@ -536,14 +545,14 @@ proc ::class::method {class arg} {
 			return -code error "init classmethod of base Class cannot be redefined"
 		}
 		if {"$body" == ""} {
-			if [info exists ::class::${class},,init] {
-				unset ::class::${class},,init
-				rename ::class::${class},,init {}
+			if [info exists ::Class::${class},,init] {
+				unset ::Class::${class},,init
+				rename ::Class::${class},,init {}
 			}
 		} else {
-			set ::class::${class},,init 1
+			set ::Class::${class},,init 1
 			set args [concat class object $args]
-			proc [list ::class::${class},,init] $args $body
+			proc [list ::Class::${class},,init] $args $body
 		}
 		return $name
 	} elseif {"$name" == "destroy"} {
@@ -554,19 +563,19 @@ proc ::class::method {class arg} {
 			return -code error "destroy method cannot have arguments"
 		}
 		if {"$body" != ""} {
-			proc ::class::${class},,destroy {class object} $body
-		} elseif {"[info commands ::class::${class},,destroy]" != ""} {
-			rename ::class::$class,,destroy {}
+			proc ::Class::${class},,destroy {class object} $body
+		} elseif {"[info commands ::Class::${class},,destroy]" != ""} {
+			rename ::Class::$class,,destroy {}
 		}
 		return $name
 	} else {
 		set args [concat class object $args]
-		proc [list ::class::${class},,m,${name}] $args $body
-#		if [catch {proc [list ::class::${class},,m,${name}] $args $body} result] {
+		proc [list ::Class::${class},,m,${name}] $args $body
+#		if [catch {proc [list ::Class::${class},,m,${name}] $args $body} result] {
 #			regsub "procedure \".+\"" $result "method \"$name\" of class \"$class\"" result
 #			return -code error $result
 #		}
-		::class::propagatemethod $class m $name $args $body
+		::Class::propagatemethod $class m $name $args $body
 		return $name
 	}
 }
@@ -583,7 +592,7 @@ proc ::class::method {class arg} {
 # Because a classmethod can only be invoked from a class, they are both
 # contain the name of the class that invoked the method.
 #}
-proc ::class::classmethod {class arg} {
+proc ::Class::classmethod {class arg} {
 	set len [llength $arg]
 	if {$len != 3} {
 		return -code error "wrong # args: should be \"$class method name args body\""
@@ -603,20 +612,20 @@ proc ::class::classmethod {class arg} {
 				return -code error "destroy classmethod cannot have arguments"
 			}
 			if {"$body" != ""} {
-				proc ::class::${class},,classdestroy {class} $body
-			} elseif {"[info commands ::class::${class},,classdestroy]" != ""} {
-				rename ::class::$class,,classdestroy {}
+				proc ::Class::${class},,classdestroy {class} $body
+			} elseif {"[info commands ::Class::${class},,classdestroy]" != ""} {
+				rename ::Class::$class,,classdestroy {}
 			}
 			return $name
 		}
 	}
 	set args [concat class $args]
-	proc [list ::class::${class},,cm,${name}] $args $body
-#	if [catch {proc [list ::class::${class},,cm,${name}] $args $body} result] {
+	proc [list ::Class::${class},,cm,${name}] $args $body
+#	if [catch {proc [list ::Class::${class},,cm,${name}] $args $body} result] {
 #		regsub "procedure \".+\"" $result "classmethod \"$name\" of class \"$class\"" result
 #		return -code error $result
 #	}
-	::class::propagatemethod $class cm $name $args $body
+	::Class::propagatemethod $class cm $name $args $body
 	return $name
 }
 
@@ -626,7 +635,7 @@ proc ::class::classmethod {class arg} {
 # delete the method named $<u>name</u> from class ClassName.
 # Some special methods cannot be deleted.
 #}
-proc ::class::deletemethod {class arg} {
+proc ::Class::deletemethod {class arg} {
 	set len [llength $arg]
 	if {$len != 1} {
 		return -code error "wrong # args: should be \"$class deletemethod name\""
@@ -637,9 +646,9 @@ proc ::class::deletemethod {class arg} {
 			if {"$class" == "Class"} {
 				return -code error "init classmethod of base Class cannot be deleted"
 			}
-			if [info exists ::class::${class},,init] {
-				unset ::class::${class},,init
-				rename ::class::${class},,init {}
+			if [info exists ::Class::${class},,init] {
+				unset ::Class::${class},,init
+				rename ::Class::${class},,init {}
 				return $name
 			}
 		}
@@ -647,14 +656,14 @@ proc ::class::deletemethod {class arg} {
 			if {"$class" == "Class"} {
 				return -code error "destroy method of base Class cannot be deleted"
 			}
-			if {"[info commands ::class::${class},,destroy]" != ""} {
-				rename ::class::${class},,destroy {}
+			if {"[info commands ::Class::${class},,destroy]" != ""} {
+				rename ::Class::${class},,destroy {}
 			}
 		}
 		default {
-			if {"[info commands ::class::${class},,m,${name}]" != ""} {
-				rename ::class::${class},,m,${name} {}
-				::class::propagatedeletemethod $class m $name
+			if {"[info commands ::Class::${class},,m,${name}]" != ""} {
+				rename ::Class::${class},,m,${name} {}
+				::Class::propagatedeletemethod $class m $name
 			}
 		}
 	}
@@ -667,7 +676,7 @@ proc ::class::deletemethod {class arg} {
 # delete the classmethod named $<u>name</u> from class ClassName.
 # Some special classmethods cannot be deleted.
 #}
-proc ::class::deleteclassmethod {class arg} {
+proc ::Class::deleteclassmethod {class arg} {
 	set len [llength $arg]
 	if {$len != 1} {
 		return -code error "wrong # args: should be \"$class deleteclassmethod name\""
@@ -680,15 +689,15 @@ proc ::class::deleteclassmethod {class arg} {
 			if {"$class" == "Class"} {
 				return -code error "destroy classmethod of base Class cannot be deleted"
 			}
-			if {"[info commands ::class::${class},,classdestroy]" != ""} {
-				rename ::class::$class,,classdestroy {}
+			if {"[info commands ::Class::${class},,classdestroy]" != ""} {
+				rename ::Class::$class,,classdestroy {}
 			}
 			return $name
 		}
 	}
-	if {"[info commands ::class::${class},,cm,${name}]" != ""} {
-		rename ::class::${class},,cm,${name} {}
-		::class::propagatedeletemethod $class cm $name
+	if {"[info commands ::Class::${class},,cm,${name}]" != ""} {
+		rename ::Class::${class},,cm,${name} {}
+		::Class::propagatedeletemethod $class cm $name
 	}
 	return {}
 }
@@ -698,14 +707,14 @@ proc ::class::deleteclassmethod {class arg} {
 # Create the base Class
 # ------------------------------------------------------
 #
-namespace eval ::class {
+namespace eval ::Class {
 	set parent(Class) ""
 }
 
 proc ::Class {cmd args} {
 	if [regexp {^\.} $cmd] {set args [concat $cmd $args];set cmd new}
-	if [catch {uplevel ::class::Class,,cm,${cmd} Class $args} result] {
-		set error [::class::classerror Class Class $result $cmd $args]
+	if [catch {uplevel ::Class::Class,,cm,${cmd} Class $args} result] {
+		set error [::Class::classerror Class Class $result $cmd $args]
 		return -code error -errorinfo [set ::errorInfo] $error
 	}
 	return $result
@@ -713,68 +722,68 @@ proc ::Class {cmd args} {
 
 # Class classmethods
 # ------------------
-proc ::class::Class,,cm,classmethod {class args} {
+proc ::Class::Class,,cm,classmethod {class args} {
 #Class
-	::class::classmethod $class $args
+	::Class::classmethod $class $args
 }
 
-proc ::class::Class,,cm,new {class args} {
+proc ::Class::Class,,cm,new {class args} {
 #Class
-	::class::new $class $args
+	::Class::new $class $args
 }
 
-proc ::class::Class,,cm,destroy {class} {
+proc ::Class::Class,,cm,destroy {class} {
 #Class
-	::class::classdestroy $class
+	::Class::classdestroy $class
 	return {}
 }
 
-proc ::class::Class,,cm,method {class args} {
+proc ::Class::Class,,cm,method {class args} {
 #Class
-	::class::method $class $args
+	::Class::method $class $args
 }
 
-proc ::class::Class,,cm,deletemethod {class args} {
+proc ::Class::Class,,cm,deletemethod {class args} {
 #Class
-	::class::deletemethod $class $args
+	::Class::deletemethod $class $args
 }
 
-proc ::class::Class,,cm,deleteclassmethod {class args} {
+proc ::Class::Class,,cm,deleteclassmethod {class args} {
 #Class
-	::class::deleteclassmethod $class $args
+	::Class::deleteclassmethod $class $args
 }
 
-proc ::class::Class,,cm,subclass {class args} {
+proc ::Class::Class,,cm,subclass {class args} {
 #Class
-	::class::subclass $class $args
+	::Class::subclass $class $args
 }
 
-proc ::class::Class,,cm,private {class args} {
+proc ::Class::Class,,cm,private {class args} {
 #Class
-	::class::classprivatecmd $class $args
+	::Class::classprivatecmd $class $args
 }
 
-proc ::class::Class,,cm,info {class args} {
+proc ::Class::Class,,cm,info {class args} {
 #Class
-	::class::info_ $class $class $args
+	::Class::info_ $class $class $args
 }
 
 # Class methods
 # -------------
-proc ::class::Class,,m,destroy {class object} {
+proc ::Class::Class,,m,destroy {class object} {
 #Class
-	::class::objectdestroy $class $object
+	::Class::objectdestroy $class $object
 	return $object
 }
 
-proc ::class::Class,,m,private {class object args} {
+proc ::Class::Class,,m,private {class object args} {
 #Class
-	::class::privatecmd $class $object $args
+	::Class::privatecmd $class $object $args
 }
 
-proc ::class::Class,,m,info {class object args} {
+proc ::Class::Class,,m,info {class object args} {
 #Class
-	::class::info_ $class $object $args
+	::Class::info_ $class $object $args
 }
 
 #
@@ -791,24 +800,24 @@ proc ::class::Class,,m,info {class object args} {
 # current value of private variable $<u>name</u> is returned. If both arguments
 # are present, the private variable $<u>name</u> is set to $<u>value</u>.
 #}
-proc ::class::privatecmd {class object arg} {
+proc ::Class::privatecmd {class object arg} {
 	set len [llength $arg]
 	if {$len == 0} {
 		set list ""
-		foreach var [lsort [info vars ::class::${object},,v,*]] {
-			regexp "^::class::${object},,v,(.*)\$" $var temp name
+		foreach var [lsort [info vars ::Class::${object},,v,*]] {
+			regexp "^::Class::${object},,v,(.*)\$" $var temp name
 			lappend list $name
 		}
 		return $list
 	} elseif {$len == 1} {
-		set name ::class::${object},,v,[lindex $arg 0]
+		set name ::Class::${object},,v,[lindex $arg 0]
 		if [info exists $name] {
 			return [set $name]
 		} else {
 			return -code error "\"$object\" does not have a private variable \"[lindex $arg 0]\""
 		}
 	} elseif {$len == 2} {
-		return [set ::class::${object},,v,[lindex $arg 0] [lindex $arg 1]]
+		return [set ::Class::${object},,v,[lindex $arg 0] [lindex $arg 1]]
 	} else {
 		return -code error "wrong # args: should be \"$object private ?varName? ?newValue?\""
 	}
@@ -824,17 +833,17 @@ proc ::class::privatecmd {class object arg} {
 # current value of private class variable $<u>name</u> is returned. If both arguments
 # are present, the private class variable $<u>name</u> is set to $<u>value</u>.
 #}
-proc ::class::classprivatecmd {class arg} {
+proc ::Class::classprivatecmd {class arg} {
 	set len [llength $arg]
 	if {$len == 0} {
 		set list ""
-		foreach var [lsort [info vars ::class::${class},,v,*]] {
-			regexp "^::class::${class},,v,(.*)\$" $var temp name
+		foreach var [lsort [info vars ::Class::${class},,v,*]] {
+			regexp "^::Class::${class},,v,(.*)\$" $var temp name
 			lappend list $name
 		}
 		return $list
 	} elseif {$len == 1} {
-		set name ::class::${class},,v,[lindex $arg 0]
+		set name ::Class::${class},,v,[lindex $arg 0]
 		if [info exists $name] {
 			return [set $name]
 		} else {
@@ -842,42 +851,42 @@ proc ::class::classprivatecmd {class arg} {
 		}
 	} elseif {$len == 2} {
 		set name [lindex $arg 0]
-		set ::class::${class},,vd($name) 1
-		class::propagatevar $class $name [lindex $arg 1]
-		return [set ::class::${class},,v,$name [lindex $arg 1]]
+		set ::Class::${class},,vd($name) 1
+		Class::propagatevar $class $name [lindex $arg 1]
+		return [set ::Class::${class},,v,$name [lindex $arg 1]]
 	} else {
 		return -code error "wrong # args: should be \"$class private ?varName? ?newValue?\""
 	}
 }
 
-proc ::class::propagatevar {class name value} {
-	if ![info exists ::class::${class},,subclass] {
+proc ::Class::propagatevar {class name value} {
+	if ![info exists ::Class::${class},,subclass] {
 		return ""
 	}
-	foreach subclass [array names ::class::${class},,subclass] {
-		if ![info exists ::class::${subclass},,vd($name)] {
+	foreach subclass [array names ::Class::${class},,subclass] {
+		if ![info exists ::Class::${subclass},,vd($name)] {
 			setprivate $subclass $name $value
-			::class::propagatevar $subclass $name $value
+			::Class::propagatevar $subclass $name $value
 		}
 	}
 }
 
 proc private {object args} {
 	foreach var $args {
-		uplevel upvar #0 [list ::class::${object},,v,$var] [list $var]
+		uplevel upvar #0 [list ::Class::${object},,v,$var] [list $var]
 	}
 }
 
 proc privatevar {object var} {
-	return ::class::${object},,v,$var
+	return ::Class::${object},,v,$var
 }
 
 proc setprivate {object var value} {
-	set ::class::${object},,v,$var $value
+	set ::Class::${object},,v,$var $value
 }
 
 proc getprivate {object var} {
-	set ::class::${object},,v,$var
+	set ::Class::${object},,v,$var
 }
 
 Class classmethod trace {command} {
@@ -918,7 +927,7 @@ Class method trace {command} {
 #		set oldName [uplevel 1 namespace current]::$oldName
 #	}
 #	regsub ^(::)+ $oldName {} temp
-#	if {![string length $newName] && [info exists ::class::parent($temp)]} {
+#	if {![string length $newName] && [info exists ::Class::parent($temp)]} {
 #		$oldName destroy
 #	} else {
 #		uplevel 1 [list ::Tk::rename $oldName $newName]

@@ -137,7 +137,7 @@ test class {init method info} {
 #	try private try 1
 #	rename try {}
 #	getprivate try try
-#} {can't read "::class::try,,v,try": no such variable} 1
+#} {can't read "::Class::try,,v,try": no such variable} 1
 
 test class {nop} {
 	clean
@@ -334,6 +334,7 @@ test class {inherit method: works with defaults} {
 	subclass try ok
 } {ok 1}
 
+source tools.tcl
 test class {inherit classmethod: works?} {
 	clean
 	Base classmethod try {} {return ok}
@@ -1153,7 +1154,7 @@ test class {namespace of init} {
 	}
 	Try .try
 	set ::temp
-} {::class}
+} {::Class}
 
 test class {info method args} {
 	clean

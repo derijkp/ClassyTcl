@@ -5,8 +5,8 @@ exec tclsh8.0 "$0" "$@"
 source tools.tcl
 lappend auto_path autoload_test
 
-test autoload {Classy::auto_mkindex} {
-	Classy::auto_mkindex autoload_test
+test autoload {Class::auto_mkindex} {
+	Class::auto_mkindex autoload_test
 } {}
 
 test autoload {autoload method from object} {

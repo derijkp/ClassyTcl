@@ -106,7 +106,7 @@ int Classy_ClassObjCmd(
 	Tcl_IncrRefCount(cmdObj);
 	entry = Classy_FindHashEntry(&(class->classmethods), cmdObj);
 	if (entry == NULL) {
-		error = Tcl_VarEval(interp,"auto_load ::class::",Tcl_GetStringFromObj(class->class,NULL),",,cm,",cmd,(char *)NULL);
+		error = Tcl_VarEval(interp,"auto_load ::Class::",Tcl_GetStringFromObj(class->class,NULL),",,cm,",cmd,(char *)NULL);
 		if (error) {return error;}
 		entry = Classy_FindHashEntry(&(class->classmethods), cmdObj);
 	}
@@ -182,8 +182,8 @@ void Classy_ClassDestroy(ClientData clientdata) {
 		entry = Classy_FindHashEntry(&(parent->subclasses),class->class);
 		if (entry != NULL) {Classy_DeleteHashEntry(entry);}
 	}
-	Tcl_VarEval(interp,"foreach ::class::var [info vars ::class::", string,",,*] {unset $::class::var}", (char *)NULL);
-	Tcl_VarEval(interp,"foreach ::class::cmd [info commands ::class::", string,",,*] {rename $::class::cmd {}}", (char *)NULL);
+	Tcl_VarEval(interp,"foreach ::Class::var [info vars ::Class::", string,",,*] {unset $::Class::var}", (char *)NULL);
+	Tcl_VarEval(interp,"foreach ::Class::cmd [info commands ::Class::", string,",,*] {rename $::Class::cmd {}}", (char *)NULL);
 	Tcl_EventuallyFree(clientdata,Classy_FreeClass);
 	Tcl_Release(clientdata);
 }
@@ -221,7 +221,7 @@ int Classy_SubclassClassMethod(
 		}
 		if (pos != 1) {
 			subclassname[pos-1] = '\0';
-			error = Tcl_VarEval(interp,"namespace eval ::class::", subclassname, " {}", (char *)NULL);
+			error = Tcl_VarEval(interp,"namespace eval ::Class::", subclassname, " {}", (char *)NULL);
 			subclassname[pos-1] = ':';
 		}
 	}
@@ -258,12 +258,12 @@ int Classy_SubclassClassMethod(
 	Classy_CopyMethods(&(class->methods),&(subclass->methods));
 	Classy_CopyMethods(&(class->classmethods),&(subclass->classmethods));
 	classname = Tcl_GetStringFromObj(class->class,NULL);
-	error = Tcl_VarEval(interp,"namespace eval class {foreach var [info vars ::class::", classname, ",,v,*] {",
-		"regexp {^::class::", classname, ",,v,(.*)$} $var ::class::temp ::class::name \n",
+	error = Tcl_VarEval(interp,"namespace eval class {foreach var [info vars ::Class::", classname, ",,v,*] {",
+		"regexp {^::Class::", classname, ",,v,(.*)$} $var ::Class::temp ::Class::name \n",
 		"if [array exists $var] {",
-			"array set ::class::", subclassname , ",,v,${::class::name} [array get $var]",
+			"array set ::Class::", subclassname , ",,v,${::Class::name} [array get $var]",
 		"} else {",
-			"set ::class::", subclassname , ",,v,${::class::name} [set $var]",
+			"set ::Class::", subclassname , ",,v,${::Class::name} [set $var]",
 		"}}}",(char *)NULL);
 	if (error != TCL_OK) {return error;}
 	Tcl_SetObjResult(interp,name);

@@ -28,12 +28,12 @@ int Classy_PropagateVar(
 		if (entry == NULL) break;
 		subclass = (Class *)Classy_GetHashValue(entry);
 		temp = Tcl_NewObj();
-		Tcl_AppendStringsToObj(temp, "::class::", Tcl_GetStringFromObj(subclass->class,NULL), ",,vd", (char *)NULL);
+		Tcl_AppendStringsToObj(temp, "::Class::", Tcl_GetStringFromObj(subclass->class,NULL), ",,vd", (char *)NULL);
 		val = Tcl_ObjGetVar2(interp, temp, name, TCL_GLOBAL_ONLY);
 		Tcl_DecrRefCount(temp);
 		if (val == NULL) {
 			temp = Tcl_NewObj();
-			Tcl_AppendStringsToObj(temp, "::class::", Tcl_GetStringFromObj(subclass->class,NULL), ",,v,", 
+			Tcl_AppendStringsToObj(temp, "::Class::", Tcl_GetStringFromObj(subclass->class,NULL), ",,v,", 
 				Tcl_GetStringFromObj(name,NULL), (char *)NULL);
 			Tcl_ObjSetVar2(interp,temp,NULL,value,TCL_PARSE_PART1|TCL_GLOBAL_ONLY);
 			Tcl_DecrRefCount(temp);
@@ -60,7 +60,7 @@ int Classy_PrivateMethod(
 		char *name;
 		int len,start,objc,i;
 		name = Tcl_GetStringFromObj(object->name, &len);
-		error = Tcl_VarEval(interp, "lsort [info vars ::class::",name, ",,v,*]",(char *)NULL);
+		error = Tcl_VarEval(interp, "lsort [info vars ::Class::",name, ",,v,*]",(char *)NULL);
 		if (error != TCL_OK) {return error;}
 		src = Tcl_GetObjResult(interp);
 		error = Tcl_ListObjGetElements(interp, src, &objc, &objv);
@@ -78,7 +78,7 @@ int Classy_PrivateMethod(
 		return TCL_OK;
 	} else if (argc==1) {
 		temp = Tcl_NewObj();
-		Tcl_AppendStringsToObj(temp, "::class::", Tcl_GetStringFromObj(object->name,NULL), ",,v,", 
+		Tcl_AppendStringsToObj(temp, "::Class::", Tcl_GetStringFromObj(object->name,NULL), ",,v,", 
 			Tcl_GetStringFromObj(argv[0],NULL), (char *)NULL);
 		res = Tcl_ObjGetVar2(interp,temp,NULL,TCL_PARSE_PART1|TCL_GLOBAL_ONLY);
 		Tcl_DecrRefCount(temp);
@@ -93,7 +93,7 @@ int Classy_PrivateMethod(
 		}
 	} else if (argc==2) {
 		temp = Tcl_NewObj();
-		Tcl_AppendStringsToObj(temp, "::class::", Tcl_GetStringFromObj(object->name,NULL), ",,v,", 
+		Tcl_AppendStringsToObj(temp, "::Class::", Tcl_GetStringFromObj(object->name,NULL), ",,v,", 
 			Tcl_GetStringFromObj(argv[0],NULL), (char *)NULL);
 		Tcl_SetObjResult(interp,Tcl_ObjSetVar2(interp,temp,NULL,argv[1],TCL_PARSE_PART1|TCL_GLOBAL_ONLY));
 		Tcl_DecrRefCount(temp);
@@ -122,7 +122,7 @@ int Classy_PrivateClassMethod(
 		char *name;
 		int len,start,objc,i;
 		name = Tcl_GetStringFromObj(class->class, &len);
-		error = Tcl_VarEval(interp, "lsort [info vars ::class::",name, ",,v,*]",(char *)NULL);
+		error = Tcl_VarEval(interp, "lsort [info vars ::Class::",name, ",,v,*]",(char *)NULL);
 		if (error != TCL_OK) {return error;}
 		src = Tcl_GetObjResult(interp);
 		error = Tcl_ListObjGetElements(interp, src, &objc, &objv);
@@ -140,7 +140,7 @@ int Classy_PrivateClassMethod(
 		return TCL_OK;
 	} else if (argc==1) {
 		temp = Tcl_NewObj();
-		Tcl_AppendStringsToObj(temp, "::class::", Tcl_GetStringFromObj(class->class,NULL), ",,v,", 
+		Tcl_AppendStringsToObj(temp, "::Class::", Tcl_GetStringFromObj(class->class,NULL), ",,v,", 
 			Tcl_GetStringFromObj(argv[0],NULL), (char *)NULL);
 		res = Tcl_ObjGetVar2(interp,temp,NULL,TCL_PARSE_PART1|TCL_GLOBAL_ONLY);
 		Tcl_DecrRefCount(temp);
@@ -157,11 +157,11 @@ int Classy_PrivateClassMethod(
 		error = Classy_PropagateVar(interp,class,argv[0],argv[1]);
 		if (error != TCL_OK) {return error;}
 		temp = Tcl_NewObj();
-		Tcl_AppendStringsToObj(temp, "::class::", Tcl_GetStringFromObj(class->class,NULL), ",,vd", (char *)NULL);
+		Tcl_AppendStringsToObj(temp, "::Class::", Tcl_GetStringFromObj(class->class,NULL), ",,vd", (char *)NULL);
 		res = Tcl_ObjSetVar2(interp, temp, argv[0], Tcl_NewObj(), TCL_GLOBAL_ONLY|TCL_LEAVE_ERR_MSG);
 		if (res == NULL) {Tcl_DecrRefCount(temp);return TCL_ERROR;}
 		Tcl_SetStringObj(temp,"",0);
-		Tcl_AppendStringsToObj(temp, "::class::", Tcl_GetStringFromObj(class->class,NULL), ",,v,", 
+		Tcl_AppendStringsToObj(temp, "::Class::", Tcl_GetStringFromObj(class->class,NULL), ",,v,", 
 			Tcl_GetStringFromObj(argv[0],NULL), (char *)NULL);
 		Tcl_SetObjResult(interp,Tcl_ObjSetVar2(interp,temp,NULL,argv[1],TCL_PARSE_PART1|TCL_GLOBAL_ONLY));
 		Tcl_DecrRefCount(temp);
@@ -193,7 +193,7 @@ Tcl_Obj *Classy_ObjectPrivateVar(
 			bsize = end-1;
 		}
 	}
-	memcpy(dbuffer,"::class::",9);
+	memcpy(dbuffer,"::Class::",9);
 	memcpy(dbuffer+9,name,objlen);
 	memcpy(dbuffer+9+objlen,",,v,",4);
 	memcpy(dbuffer+objlen+13,var,varlen);
@@ -220,7 +220,7 @@ int Classy_PrivateObjCmd(
 	}
 	obj = Tcl_GetStringFromObj(argv[1],&objlen);
 	dbuffer = buffer;
-	memcpy(dbuffer,"::class::",9);
+	memcpy(dbuffer,"::Class::",9);
 	memcpy(dbuffer+9,obj,objlen);
 	memcpy(dbuffer+9+objlen,",,v,",4);
 	for (i=2;i<argc;i++) {
@@ -229,7 +229,7 @@ int Classy_PrivateObjCmd(
 		if (end > 98) {
 			if (bsize == 0) {
 				dbuffer = (char *)Tcl_Alloc(end*sizeof(char *));
-				memcpy(dbuffer,"::class::",9);
+				memcpy(dbuffer,"::Class::",9);
 				memcpy(dbuffer+9,obj,objlen);
 				memcpy(dbuffer+9+objlen,",,v,",4);
 				bsize = end-1;

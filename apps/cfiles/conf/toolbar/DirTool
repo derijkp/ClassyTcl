@@ -1,2 +1,0 @@
-	action newdir "Create new dir" {error "new dir not implemented yet"}
-	action findfiles "Find files" {error "find not implemented yet"}

@@ -1,2 +1,0 @@
-puts stdout "run ok!"
-

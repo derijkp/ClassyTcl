@@ -9,6 +9,16 @@
 
 #include "hash.h"
 
+/*
+ * Windows needs to know which symbols to export.  Unix does not.
+ * BUILD_Class should be undefined for Unix.
+ */
+
+#ifdef BUILD_Class
+#undef TCL_STORAGE_CLASS
+#define TCL_STORAGE_CLASS DLLEXPORT
+#endif /* BUILD_Class */
+
 typedef struct Method {
 	int copy;
 	void *func;
@@ -62,3 +72,5 @@ EXTERN Tcl_Obj *Classy_ObjectPrivateVar(
 	char *name,
 	char *var);
 
+EXTERN int Class_Init(
+	Tcl_Interp *interp);

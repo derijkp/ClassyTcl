@@ -490,7 +490,7 @@ int Classy_ClassMethodClassMethod(
 		}
 		method = (Method *)Tcl_Alloc(sizeof(Method));
 		procname = Tcl_NewObj();
-		Tcl_AppendStringsToObj(procname,"::class::",classname,",,classdestroy",(char *)NULL);
+		Tcl_AppendStringsToObj(procname,"::Class::",classname,",,classdestroy",(char *)NULL);
 		error = Classy_CreateTclClassMethod(interp,method,procname,argv[1],argv[2],Tcl_NewStringObj("classdestroy",12));
 		if (error != TCL_OK) {Tcl_Free((char *)method);return error;}
 		class->classdestroy=method;
@@ -501,7 +501,7 @@ int Classy_ClassMethodClassMethod(
 		method = (Method *)Tcl_Alloc(sizeof(Method));
 		procname = Tcl_NewObj();
 		Tcl_IncrRefCount(procname);
-		Tcl_AppendStringsToObj(procname,"::class::",classname,",,cm,",name,(char *)NULL);
+		Tcl_AppendStringsToObj(procname,"::Class::",classname,",,cm,",name,(char *)NULL);
 		error = Classy_CreateTclClassMethod(interp,method,procname,argv[1],argv[2],nameObj);
 		Tcl_DecrRefCount(procname);
 		if (error != TCL_OK) {Tcl_DecrRefCount(nameObj);	return error;}
@@ -567,7 +567,7 @@ int Classy_DeleteClassMethodClassMethod(
 			class->init = NULL;
 			string = Tcl_NewObj();
 			Tcl_IncrRefCount(string);
-			Tcl_AppendStringsToObj(string,"rename ::class::",classname,",,init {}",(char *)NULL);
+			Tcl_AppendStringsToObj(string,"rename ::Class::",classname,",,init {}",(char *)NULL);
 			Tcl_EvalObj(interp,string);
 			Tcl_DecrRefCount(string);
 		}
@@ -585,7 +585,7 @@ int Classy_DeleteClassMethodClassMethod(
 			class->classdestroy = NULL;
 			string = Tcl_NewObj();
 			Tcl_IncrRefCount(string);
-			Tcl_AppendStringsToObj(string,"rename ::class::",classname,",,classdestroy {}",(char *)NULL);
+			Tcl_AppendStringsToObj(string,"rename ::Class::",classname,",,classdestroy {}",(char *)NULL);
 			Tcl_EvalObj(interp,string);
 			Tcl_DecrRefCount(string);
 		}
@@ -598,7 +598,7 @@ int Classy_DeleteClassMethodClassMethod(
 		Classy_DeleteHashEntry(entry);
 		string = Tcl_NewObj();
 		Tcl_IncrRefCount(string);
-		Tcl_AppendStringsToObj(string,"rename ::class::",classname,",,cm,",name," {}",(char *)NULL);
+		Tcl_AppendStringsToObj(string,"rename ::Class::",classname,",,cm,",name," {}",(char *)NULL);
 		Tcl_EvalObj(interp,string);
 		Tcl_DecrRefCount(string);
 		Tcl_SetResult(interp,name,TCL_VOLATILE);
@@ -703,7 +703,7 @@ int Classy_MethodClassMethod(
 		}
 		method = (Method *)Tcl_Alloc(sizeof(Method));
 		procname = Tcl_NewObj();
-		Tcl_AppendStringsToObj(procname,"::class::",classname,",,init",(char *)NULL);
+		Tcl_AppendStringsToObj(procname,"::Class::",classname,",,init",(char *)NULL);
 		error = Classy_CreateTclMethod(interp,method,procname,argv[1],argv[2],Tcl_NewStringObj("init",4));
 		if (error != TCL_OK) {Tcl_Free((char *)method);return error;}
 		class->init=method;
@@ -727,7 +727,7 @@ int Classy_MethodClassMethod(
 		}
 		method = (Method *)Tcl_Alloc(sizeof(Method));
 		procname = Tcl_NewObj();
-		Tcl_AppendStringsToObj(procname,"::class::",classname,",,destroy",(char *)NULL);
+		Tcl_AppendStringsToObj(procname,"::Class::",classname,",,destroy",(char *)NULL);
 		error = Classy_CreateTclMethod(interp,method,procname,argv[1],argv[2],Tcl_NewStringObj("destroy",7));
 		if (error != TCL_OK) {Tcl_Free((char *)method);return error;}
 		class->destroy = method;
@@ -738,7 +738,7 @@ int Classy_MethodClassMethod(
 		method = (Method *)Tcl_Alloc(sizeof(Method));
 		procname = Tcl_NewObj();
 		Tcl_IncrRefCount(procname);
-		Tcl_AppendStringsToObj(procname,"::class::",classname,",,m,",name,(char *)NULL);
+		Tcl_AppendStringsToObj(procname,"::Class::",classname,",,m,",name,(char *)NULL);
 		error = Classy_CreateTclMethod(interp,method,procname,argv[1],argv[2],nameObj);
 		Tcl_DecrRefCount(procname);
 		if (error != TCL_OK) {Tcl_DecrRefCount(nameObj);return error;}
@@ -793,7 +793,7 @@ int Classy_DeleteMethodClassMethod(
 			class->destroy = NULL;
 			string = Tcl_NewObj();
 			Tcl_IncrRefCount(string);
-			Tcl_AppendStringsToObj(string,"rename ::class::",classname,",,destroy {}",(char *)NULL);
+			Tcl_AppendStringsToObj(string,"rename ::Class::",classname,",,destroy {}",(char *)NULL);
 			Tcl_EvalObj(interp,string);
 			Tcl_DecrRefCount(string);
 		}
@@ -806,7 +806,7 @@ int Classy_DeleteMethodClassMethod(
 		Classy_DeleteHashEntry(entry);
 		string = Tcl_NewObj();
 		Tcl_IncrRefCount(string);
-		Tcl_AppendStringsToObj(string,"rename ::class::",classname,",,m,",name," {}",(char *)NULL);
+		Tcl_AppendStringsToObj(string,"rename ::Class::",classname,",,m,",name," {}",(char *)NULL);
 		Tcl_EvalObj(interp,string);
 		Tcl_DecrRefCount(string);
 		Tcl_SetResult(interp,name,TCL_VOLATILE);

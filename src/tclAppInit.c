@@ -118,7 +118,7 @@ Tcl_AppInit(interp)
      *
      * where "Mod" is the name of the module.
      */
-    if (Classy_Init(interp) == TCL_ERROR) {
+    if (Class_Init(interp) == TCL_ERROR) {
 		return TCL_ERROR;
     }
 

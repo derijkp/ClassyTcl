@@ -10,7 +10,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: tkAppInit.c 1.3 Thu, 23 Mar 2000 19:16:45 +0100 peter $
+ * RCS: @(#) $Id: tkAppInit.c 1.1 Fri, 26 May 2000 16:32:40 +0200 peter $
  */
 
 #include "tk.h"
@@ -132,7 +132,7 @@ Tcl_AppInit(interp)
      *
      * where "Mod" is the name of the module.
      */
-	if (Classy_Init(interp) == TCL_ERROR) {
+	if (Class_Init(interp) == TCL_ERROR) {
 		return TCL_ERROR;
 	}
 

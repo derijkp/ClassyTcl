@@ -8,9 +8,8 @@
 # full path name of this file's directory.
 
 # $Format: "package ifneeded Class 0.$ProjectMajorVersion$ \\"$
-package ifneeded Class 0.3 \
-	"[list namespace eval ::class {}] ; [list set ::class::dir $dir] ; [list source [file join $dir lib init.tcl]]"
-
-# $Format: "package ifneeded ClassyTcl 0.$ProjectMajorVersion$ \\"$
-package ifneeded ClassyTcl 0.3 \
-	"namespace eval ::Classy {} ; set ::Classy::script \[info script\] ; [list source [file join $dir lib classyinit.tcl]]"
+package ifneeded Class 0.4 \
+	"[list namespace eval ::Class {}] ; [list set ::Class::execdir $dir] ; \
+	if \[file exists [file join $dir lib init.tcl]\] \
+		\{[list source [file join $dir lib init.tcl]]\} \
+		else \{[list source [file join @TCLLIBDIR@ lib init.tcl]]\}"

@@ -63,7 +63,7 @@ int Classy_ObjectObjCmd(
 	argc-=2;
 	entry = Classy_FindHashEntry(&(class->methods), cmdObj);
 	if (entry == NULL) {
-		error = Tcl_VarEval(interp,"auto_load ::class::",Tcl_GetStringFromObj(class->class,NULL),",,m,",cmd,(char *)NULL);
+		error = Tcl_VarEval(interp,"auto_load ::Class::",Tcl_GetStringFromObj(class->class,NULL),",,m,",cmd,(char *)NULL);
 		if (error) {return error;}
 		entry = Classy_FindHashEntry(&(class->methods), cmdObj);
 	}
@@ -120,7 +120,7 @@ void Classy_ObjectDestroy(ClientData clientdata) {
 	string = Tcl_GetStringFromObj(object->name,NULL);
 	entry = Classy_FindHashEntry(&(class->children),object->name);
 	if (entry != NULL) {Classy_DeleteHashEntry(entry);}
-	Tcl_VarEval(class->interp,"foreach ::class::var [info vars ::class::", string,",,*] {unset $::class::var}", (char *)NULL);
+	Tcl_VarEval(class->interp,"foreach ::Class::var [info vars ::Class::", string,",,*] {unset $::Class::var}", (char *)NULL);
 	Tcl_EventuallyFree(clientdata,Classy_FreeObject);
 	Tcl_Release(clientdata);
 }
@@ -178,7 +178,7 @@ int Classy_NewClassMethod(
 			string[pos-1] = '\0';
 			error = Tcl_VarEval(interp,"namespace eval ",string, " {}", (char *)NULL);
 			if (error != TCL_OK) {return error;}
-			error = Tcl_VarEval(interp,"namespace eval ::class::",string, " {}", (char *)NULL);
+			error = Tcl_VarEval(interp,"namespace eval ::Class::",string, " {}", (char *)NULL);
 			if (error != TCL_OK) {return error;}
 			string[pos-1] = ':';
 		}
