@@ -43,7 +43,6 @@ Classy::ColorRGB classmethod init {args} {
 			-fg $color -relief flat
 		pack $object.$color.val -fill y -expand yes -side bottom
 	}
-
 	# REM Create bindings
 	# -------------------
 	foreach color {red green blue} {
@@ -69,8 +68,24 @@ Classy::ColorRGB addoption -command {command Command {}}
 
 # ------------------------------------------------------------------
 #  Methods
-# ------------------------------------------------------------------
+# -------------------------------------------------------------------
 
+
+#doc {ColorRGB command nocmdset} cmd {
+#pathname nocmdset value
+#} descr {
+# set current color to $value, without executing command
+#}
+Classy::ColorRGB method nocmdset {value} {
+	private $object nocmd
+	set rgb [winfo rgb $object $value]
+	set nocmd 1
+	$object.red.val set [expr 0.00389105*[lindex $rgb 0]]
+	$object.green.val set [expr 0.00389105*[lindex $rgb 1]]
+	$object.blue.val set [expr 0.00389105*[lindex $rgb 2]]
+	update idletasks
+	unset nocmd
+}
 
 #doc {ColorRGB command set} cmd {
 #pathname set value
@@ -78,15 +93,11 @@ Classy::ColorRGB addoption -command {command Command {}}
 # set current color to $value
 #}
 Classy::ColorRGB method set {value} {
-	private $object nocmd
-	set rgb [winfo rgb $object $value]
-	set nocmd 1
-	$object.red.val set [expr 0.00389105*[lindex $rgb 0]]
-	$object.green.val set [expr 0.00389105*[lindex $rgb 1]]
-	$object.blue.val set [expr 0.00389105*[lindex $rgb 2]]
-	unset nocmd
-	$object _update
-	update idletasks
+	$object nocmdset $value
+	set command [getprivate $object options(-command)]
+	if {"$command" != ""} {
+		uplevel #0 $command [list [$object get]]
+	}
 }
 
 #doc {ColorRGB command get} cmd {
@@ -109,12 +120,15 @@ Classy::ColorRGB method getRGB {} {
 }
 
 Classy::ColorRGB method _update {args} {
+	private $object nocmd
 	set color [$object get]
 	$object.red.val configure -troughcolor $color
 	$object.green.val configure -troughcolor $color
 	$object.blue.val configure -troughcolor $color
-	private $object nocmd
 	if ![info exists nocmd] {
-		eval [getprivate $object options(-command)]
+		set command [getprivate $object options(-command)]
+		if {"$command" != ""} {
+			uplevel #0 $command [list [$object get]]
+		}
 	}
 }

@@ -77,7 +77,7 @@ test Classy::OptionMenu {basic} {
 
 test Classy::MultiListBox {basic} {
 	classyclean
-	Classy::MultiListbox .try -number 2 -command {puts stdout [.try get]}
+	Classy::MultiListbox .try -number 2 -command {puts stdout}
 	pack .try -fill both -expand yes
 	.try add a b c d e f g h
 	.try select 1
@@ -116,5 +116,22 @@ test Classy::Message {basic} {
 	Classy::Message .try -text "Trying it out"
 	pack .try -fill x
 } {}
+
+test Classy::ListBox {basic} {
+	classyclean
+	Classy::ListBox .try -content {{Trying it out with something long} now a b c d e f g h i j}
+	pack .try -fill both -expand yes
+	.try configure -command {puts}
+} {}
+
+test Classy::MultiFrame {basic} {
+	classyclean
+	Classy::MultiFrame .try
+	pack .try -fill both -expand yes
+	frame .try.f1 -bg gray
+	frame .try.f2 -bg blue
+	.try select f2
+	winfo viewable .try.f2
+} {1}
 
 testsummarize

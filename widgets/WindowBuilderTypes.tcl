@@ -6,6 +6,8 @@ namespace eval ::Classy::WindowBuilder::generate_Classy {}
 namespace eval ::Classy::WindowBuilder::attr_Classy {}
 namespace eval ::Classy::WindowBuilder::add_Classy {}
 namespace eval ::Classy::WindowBuilder::delete_Classy {}
+namespace eval ::Classy::WindowBuilder::configure_Classy {}
+namespace eval ::Classy::WindowBuilder::parse_Classy {}
 
 lappend auto_path [file join $class::dir widgets Builder]
 array set ::Classy::WindowBuilder::parents {
@@ -49,12 +51,14 @@ array set ::Classy::WindowBuilder::options {
 	-title {Display line}
 	-value {Code line}
 	-list {Code text}
+	-changedcommand {Code text}
 	-xscrollcommand {Code text}
 	-yscrollcommand {Code text}
 	-xlabelcommand {Code text}
 	-ylabelcommand {Code text}
 	-getcommand {Code text}
 	-setcommand {Code text}
+	-browsecommand {Code text}
 	-command {Code text}
 	-destroycommand {Code text}
 	-closecommand {Code text}
@@ -79,198 +83,106 @@ array set ::Classy::WindowBuilder::options {
 	-selectcolor {Colors color}
 	-troughcolor {Colors color}
 	-menu {Display menu}
+	-content {Code text}
 	command text
 	content text
 }
 set ::Classy::WindowBuilder::options(common) {
 	-textvariable -text -command -justify -image -orient -variable 
-	-label -title -destroycommand -closecommand -value -menu
+	-label -title -destroycommand -closecommand -value -menu -content
 }
 
 proc ::Classy::WindowBuilder::attredit_line {object v option title {wide 0}} {
-	set value [$object attribute get $option]
-	Classy::Entry $v.value -width 2 -label "$title"	-orient stacked \
+	set var [privatevar $object attredit($v)]
+	set $var [$object attribute get $option]
+	Classy::Selector $v -type line -label $title \
 		-command [varsubst {object v option} {
-			$object attribute setf? $option [$v.value get]
-		}] -textvariable [privatevar $object attredit($v)]
-	if $wide {$v.value configure -orient horizontal -labelwidth $wide}
-	grid $v.value -row 2 -column 0 -sticky we
-	grid columnconfigure $v 0 -weight 1
-	$v.value nocmdset $value
-	grid rowconfigure $v 3 -weight 1
+			$object attribute setf? $option [$v get]
+		}] -variable $var
 }
 
 proc ::Classy::WindowBuilder::attredit_int {object v option title {wide 0}} {
-	set value [$object attribute get $option]
-	Classy::NumEntry $v.value -width 2 -label "$title"	-orient stacked \
+	set var [privatevar $object attredit($v)]
+	set $var [$object attribute get $option]
+	Classy::Selector $v -type int -label $title \
 		-command [varsubst {object v option} {
-			$object attribute setf? $option [$v.value get]
-		}]
-	if $wide {$v.value configure -orient horizontal -labelwidth $wide}
-	grid $v.value -row 2 -column 0 -sticky we
-	grid columnconfigure $v 0 -weight 1
-	$v.value nocmdset $value
-	grid rowconfigure $v 3 -weight 1
+			$object attribute setf? $option [$v get]
+		}] -variable $var
 }
 
 proc ::Classy::WindowBuilder::attredit_text {object v option title {wide 0}} {
-	set value [$object attribute get $option]
-	button $v.change -text "$title" -command [varsubst {object v option title} {
-		$object attribute setf? $option [string trimright [$v.value get 1.0 end]]
-		$v.change configure -text "$title"
-		$v.value textchanged 0
-	}]
-	Classy::Text $v.value -width 5 -height 2
-	grid $v.change -row 2 -column 0 -sticky we
-	grid $v.value -row 3 -column 0 -sticky nswe
-	grid columnconfigure $v 0 -weight 1
-	grid rowconfigure $v 3 -weight 1
-	$v.value insert end $value
-	$v.value textchanged 0
-	$v.value configure -changedcommand [varsubst {v title} {
-		$v.change configure -text "Change $title *"
-	}]
+	set var [privatevar $object attredit($v)]
+	set $var [$object attribute get $option]
+	Classy::Selector $v -type text -label $title \
+		-command [varsubst {object v option} {
+			$object attribute setf? $option [$v get]
+		}] -variable $var
 }
 
 proc ::Classy::WindowBuilder::attredit_color {object v option title {wide 0}} {
-	attredit_line $object $v $option $title $wide
-	$v.value configure -label "$title color"
-	button $v.select -text "Select color" -command "$v.value set \[Classy::getcolor -initialcolor \[$v.value get\]\]"
-	if $wide {
-		grid $v.select -row 2 -column 1 -sticky nwe
-	} else {
-		grid $v.select -row 3 -column 0 -sticky nwe
-		grid rowconfigure $v 3 -weight 0
-		grid rowconfigure $v 4 -weight 1
-	}
+	set var [privatevar $object attredit($v)]
+	set $var [$object attribute get $option]
+	Classy::Selector $v -type color -label $title \
+		-command [varsubst {object v option} {
+			$object attribute setf? $option [$v get]
+		}] -variable $var
 }
 
 proc ::Classy::WindowBuilder::attredit_font {object v option title {wide 0}} {
-	attredit_line $object $v $option $title $wide
-	$v.value configure -label "$title font"
-	button $v.select -text "Select font" -command "$v.value set \[Classy::getfont -font \[$v.value get\]\]"
-	if $wide {
-		grid $v.select -row 2 -column 1 -sticky nwe
-	} else {
-		grid $v.select -row 3 -column 0 -sticky nwe
-		grid rowconfigure $v 3 -weight 0
-		grid rowconfigure $v 4 -weight 1
-	}
+	set var [privatevar $object attredit($v)]
+	set $var [$object attribute get $option]
+	Classy::Selector $v -type font -label $title \
+		-command [varsubst {object v option} {
+			$object attribute setf? $option [$v get]
+		}] -variable $var
 }
 
 proc ::Classy::WindowBuilder::attredit_justify {object v option title {wide 0}} {
-	attredit_line $object $v $option $title $wide
-	frame $v.select
-	set column 0
-	foreach {type icon} {left justify_left.gif center justify_center.gif right justify_right.gif} {
-		radiobutton $v.select.$type -indicatoron 0 -text $type \
-			-image [Classy::geticon Builder/$icon] \
-			-command  "$v.value set $type" -value $type \
-			-variable [privatevar $object attredit($v)]
-		grid $v.select.$type -row 0 -column $column
-		incr column
-	}
-	if $wide {
-		grid $v.select -row 2 -column 1 -sticky nwe
-	} else {
-		grid $v.select -row 3 -column 0 -sticky nwe
-		grid rowconfigure $v 3 -weight 0
-		grid rowconfigure $v 4 -weight 1
-	}
+	set var [privatevar $object attredit($v)]
+	set $var [$object attribute get $option]
+	Classy::Selector $v -type justify -label $title \
+		-command [varsubst {object v option} {
+			$object attribute setf? $option [$v get]
+		}] -variable $var
 }
 
 proc ::Classy::WindowBuilder::attredit_bool {object v option title {wide 0}} {
-	attredit_line $object $v $option $title $wide
-	frame $v.select
-	set column 0
-	foreach {type icon} {1 true.gif 0 false.gif} {
-		radiobutton $v.select.$type -indicatoron 0 -text $type \
-			-image [Classy::geticon Builder/$icon] \
-			-command  "$v.value set $type" -value $type \
-			-variable [privatevar $object attredit($v)]
-		grid $v.select.$type -row 0 -column $column
-		incr column
-	}
-	if $wide {
-		grid $v.select -row 2 -column 1 -sticky nwe
-	} else {
-		grid $v.select -row 3 -column 0 -sticky nwe
-		grid rowconfigure $v 3 -weight 0
-		grid rowconfigure $v 4 -weight 1
-	}
+	set var [privatevar $object attredit($v)]
+	set $var [$object attribute get $option]
+	Classy::Selector $v -type bool -label $title \
+		-command [varsubst {object v option} {
+			$object attribute setf? $option [$v get]
+		}] -variable $var
 }
 
 proc ::Classy::WindowBuilder::attredit_orient {object v option title {wide 0}} {
-	attredit_line $object $v $option $title $wide
-	frame $v.select
-	set column 0
-	foreach {type icon} {horizontal orient_horizontal.gif vertical orient_vertical.gif} {
-		radiobutton $v.select.$type -indicatoron 0 -text $type \
-			-image [Classy::geticon Builder/$icon] \
-			-command  "$v.value set $type" -value $type \
-			-variable [privatevar $object attredit($v)]
-		grid $v.select.$type -row 0 -column $column
-		incr column
-	}
-	if $wide {
-		grid $v.select -row 2 -column 1 -sticky nwe
-	} else {
-		grid $v.select -row 3 -column 0 -sticky nwe
-		grid rowconfigure $v 3 -weight 0
-		grid rowconfigure $v 4 -weight 1
-	}
+	set var [privatevar $object attredit($v)]
+	set $var [$object attribute get $option]
+	Classy::Selector $v -type orient -label $title \
+		-command [varsubst {object v option} {
+			$object attribute setf? $option [$v get]
+		}] -variable $var
 }
 
 proc ::Classy::WindowBuilder::attredit_relief {object v option title {wide 0}} {
-	attredit_line $object $v $option $title $wide
-	frame $v.select
-	set row 0
-	set column 0
-	foreach {type icon} {raised relief_raised sunken relief_sunken flat relief_flat ridge relief_ridge solid relief_solid groove relief_groove} {
-		radiobutton $v.select.$type -indicatoron 0 -text $type \
-			-image [Classy::geticon Builder/$icon] \
-			-command  "$v.value set $type" -value $type \
-			-variable [privatevar $object attredit($v)]
-		grid $v.select.$type -row $row -column $column -sticky we
-		incr column
-		if {$column == 3} {set column 0;incr row}
-	}
-	if $wide {
-		grid $v.select -row 2 -column 1 -sticky nwe
-		grid $v.value -row 2 -column 0 -sticky nwe
-	} else {
-		grid $v.select -row 3 -column 0 -sticky nwe
-		grid rowconfigure $v 3 -weight 0
-		grid rowconfigure $v 4 -weight 1
-	}
+	set var [privatevar $object attredit($v)]
+	set $var [$object attribute get $option]
+	Classy::Selector $v -type relief -label $title \
+		-command [varsubst {object v option} {
+			$object attribute setf? $option [$v get]
+		}] -variable $var
 }
 
 proc ::Classy::WindowBuilder::attredit_anchor {object v option title {wide 0}} {
-	attredit_line $object $v $option $title $wide
-	frame $v.select
-	set row 0
-	set column 0
-	foreach {type icon} {nw anchor_nw n anchor_n ne anchor_ne w anchor_w center anchor_center e anchor_e sw anchor_sw s anchor_s se anchor_se} {
-		radiobutton $v.select.$type -indicatoron 0 -text $type \
-			-image [Classy::geticon Builder/$icon] \
-			-command  "$v.value set $type" -value $type \
-			-variable [privatevar $object attredit($v)]
-		grid $v.select.$type -row $row -column $column -sticky we
-		incr column
-		if {$column == 3} {set column 0;incr row}
-	}
-	$v.select.center configure -text c
-	if $wide {
-		grid $v.select -row 2 -column 1 -sticky nwe
-		grid $v.value -row 2 -column 0 -sticky nwe
-	} else {
-		grid $v.select -row 3 -column 0 -sticky nwe
-		grid rowconfigure $v 3 -weight 0
-		grid rowconfigure $v 4 -weight 1
-	}
+	set var [privatevar $object attredit($v)]
+	set $var [$object attribute get $option]
+	Classy::Selector $v -type anchor -label $title \
+		-command [varsubst {object v option} {
+			$object attribute setf? $option [$v get]
+		}] -variable $var
 }
 
-proc ::Classy::WindowBuilder::menuset {object} {
+proc ::Classy::WindowBuilder::menuset {object args} {
 	private $object data bindtags current
 	set window $data(base)
 	eval set base $window
@@ -287,7 +199,8 @@ proc ::Classy::WindowBuilder::menuset {object} {
 		}
 		set data(menu,$base) $menu
 		set data(class,$menu) Classy::DynaMenu
-		bindtags $menu Classy::WindowBuilder_$object
+		bindtags $menu $data(tags)
+		set data(redir,$menu) $base
 		return $menu
 	} else {
 		$base configure -menu {}
@@ -296,8 +209,22 @@ proc ::Classy::WindowBuilder::menuset {object} {
 	}
 }
 
+proc ::Classy::WindowBuilder::select_menu {object v option title} {
+	set w .classy__.temp
+	catch {destroy $w}
+	Classy::SelectDialog $w
+	$w fill [Classy::DynaMenu types]
+	$w configure -addcommand "Classy::Config newconfig menu appdef"
+	$w configure -deletecommand "puts"
+	set ::Classy::temp [Classy::select Menu [Classy::DynaMenu types]]
+	if {"$::Classy::temp" != ""} {
+		$v.menutype set $::Classy::temp
+	}
+}
+
 proc ::Classy::WindowBuilder::attredit_menu {object v option title {wide 0}} {
 	private $object current
+	frame $v
 	set class [$object itemclass $current(w)]
 	if {("$class" != "Classy::Toplevel")&&("$class" != "Classy::Dialog")} {
 		::Classy::WindowBuilder::attredit_line $object $v $option $title $wide
@@ -307,14 +234,25 @@ proc ::Classy::WindowBuilder::attredit_menu {object v option title {wide 0}} {
 		-command "::Classy::WindowBuilder::menuset $object" \
 		-textvariable [privatevar $object data(opt-mainmenu,$current(w))]
 	if $wide {$v.menutype configure -orient horizontal -labelwidth $wide}
-	grid $v.menutype -row 2 -column 0 -sticky we
+	button $v.select -text "Select menu" -command [varsubst v {
+		set ::Classy::temp [Classy::select Menu [Classy::DynaMenu types]]
+		if {"$::Classy::temp" != ""} {
+			$v.menutype set $::Classy::temp
+		}
+	}]
+	button $v.edit -text "Edit menu" -command "Classy::Config config menu \[$v.menutype get\]"
+	button $v.new -text "New menu" -command "Classy::Config newconfig menu appdef"
 	Classy::Entry $v.cmdw -width 2 -label "Menu window(s)"	-orient stacked \
 		-command "::Classy::WindowBuilder::menuset $object" \
 		-textvariable [privatevar $object data(opt-menuwin,$current(w))]
 	if $wide {$v.cmdw configure -orient horizontal -labelwidth $wide}
-	grid $v.cmdw -row 3 -column 0 -sticky we
-	grid rowconfigure $v 4 -weight 1
-	grid columnconfigure $v 0 -weight 1
+	grid $v.select -row 2 -column 0 -sticky we
+	grid $v.edit -row 2 -column 1 -sticky we
+	grid $v.new -row 2 -column 2 -sticky we
+	grid $v.menutype -row 3 -column 0 -sticky we -columnspan 4
+	grid $v.cmdw -row 4 -column 0 -sticky we -columnspan 4
+	grid rowconfigure $v 5 -weight 1
+	grid columnconfigure $v 3 -weight 1
 }
 
 #
@@ -330,7 +268,6 @@ proc ::Classy::WindowBuilder::defattredit {object w list wide {fill 1}} {
 	set row 0
 	foreach {option title resize } $list {
 		set win $w.w$row
-		frame $win
 		$object _createattributeedit $win $option $title $wide
 		grid $win -sticky nwse -row [incr row] -column 0
 		grid rowconfigure $w $row -weight $resize

@@ -1,46 +1,31 @@
-## ---- Misc settings ----
-## {patch Tk} {patch Tk to to use virtual events. This will be only be really activated after a restart of the program (0/1)} {select 0 1}
-option add *PatchTk 1 widgetDefault
-## Menutype {Menutype: can be popup or top} {select popup top}
-option add *MenuType top widgetDefault
-## {Scrollbar position} {Scrollbar position (left/right)} {select left right}
-option add *ScrollSide right widgetDefault
+#ClassyTcl misc configuration file
 
-## ---- Dialogs ----
-## {Color select} {type of color selection dialog (Tk/Peos)} {select Peos Tk}
-option add *GetColor Peos widgetDefault
-## {Select File} {type of Select File dialog used when running Windows (Win/Peos)} {select Win Peos}
-#option add *SelectFile Win widgetDefault
-## {Save File} {type of Save File dialog used when running Windows (Win/Peos)} {select Win Peos}
-#option add *SaveFile Win widgetDefault
-## {Font select} {type of font selection dialog when running Windows (Win/Peos)} {select Win Peos}
-#option add *GetFont Win widgetDefault
+Classy::configmisc {Misc settings} {
+	{patch Tk} *PatchTk 1 {select 0 1} {patch Tk to use virtual events. This will be only be really activated after a restart of the program (0/1)}
+	{bgerror} *Bgerror Classy {select Classy Tk} {patch Tk to use a different bgerror routine. This will be only be really activated after a restart of the program}
+	Menutype *MenuType top {select popup top} {Menutype: can be popup or top}
+	{Scrollbar position} *ScrollSide right {select left right} {Scrollbar position (left/right)}
+}
 
-## ---- Relief and borders ----
-## {Border width} {Default Border width color}
-option add *borderWidth 1 widgetDefault
-## {Menu border width} {Default Menu border width color}
-#option add *Menu.BorderWidth 1 widgetDefault
-## {Scrollbar width} {Default Scrollbar width color}
-option add *Scrollbar.width 10 widgetDefault
-## {Highlight thickness} {Default Highlight thickness color}
-option add *HighlightThickness 1 widgetDefault
-## {Frame highlight thickness} {Default Frame highlight thickness color}
-option add *Frame.HighlightThickness 0 widgetDefault
-## {Toplevel highlight thickness} {Default Toplevel highlight thickness color}
-option add *Toplevel.HighlightThickness 0 widgetDefault
-## {Button padx} {Default Button padx color}
-option add *Button.padX 1 widgetDefault
-## {Button pady} {Default Button pady color}
-option add *Button.padY 1 widgetDefault
-## {Menu button padx} {Default Menu button padx color}
-option add *MenuButton.padX 1 widgetDefault
-## {Menu button pady} {Default Menu button pady color}
-option add *MenuButton.padY 1 widgetDefault
-## {Checkbutton anchor} {Default Checkbutton anchor color}
-option add *Checkbutton.anchor w widgetDefault
-## {Option box border width} {Default Option box border width color}
-option add *Peos__OptionBox.BorderWidth 2 widgetDefault
-## {Option box relief} {Default Option box relief color}
-option add *Peos__OptionBox.Relief groove widgetDefault
+Classy::configmisc Dialogs {
+	{Color select} *GetColor Peos {select Peos Tk} {type of color selection dialog (Tk/Peos)}
+	{Select File} *SelectFile Win {select Win Peos} {type of Select File dialog used when running Windows (Win/Peos)}
+	{#Save File} *SaveFile Win {select Win Peos} {type of Save File dialog used when running Windows (Win/Peos)}
+	{#Font select} *GetFont Win {select Win Peos} {type of font selection dialog when running Windows (Win/Peos)}
+}
 
+Classy::configmisc {Relief and borders} {
+	{Border width} *borderWidth 1 int {Default Border width color}
+	{#Menu border width} *Menu.BorderWidth 1 int {Default Menu border width color}
+	{Scrollbar width} *Scrollbar.width 10 int {Default Scrollbar width color}
+	{Highlight thickness} *HighlightThickness 1 int {Default Highlight thickness color}
+	{Frame highlight thickness} *Frame.HighlightThickness 0 int {Default Frame highlight thickness color}
+	{Toplevel highlight thickness} *Toplevel.HighlightThickness 0 int {Default Toplevel highlight thickness color}
+	{Button padx} *Button.padX 1 int {Default Button padx color}
+	{Button pady} *Button.padY 1 int {Default Button pady color}
+	{Menu button padx} *MenuButton.padX 1 int {Default Menu button padx color}
+	{Menu button pady} *MenuButton.padY 1 int {Default Menu button pady color}
+	{Checkbutton anchor} *Checkbutton.anchor w {select n ne e se s sw w nw center} {Default Checkbutton anchor color}
+	{Option box border width} *Peos__OptionBox.BorderWidth 2 int {Default Option box border width color}
+	{Option box relief} *Peos__OptionBox.Relief groove {select raised sunken flat ridge solid groove} {Default Option box relief color}
+}

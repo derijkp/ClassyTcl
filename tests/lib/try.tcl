@@ -23,7 +23,9 @@ proc t2 args {# ClassyTcl generated Toplevel
 	} else {
 		set window .t2
 	}
-	Classy::parseopt $args opt {}
+	Classy::parseopt $args opt {-try {try it noe} try -test {} test -t2 {} tttttt}
+# ClassyTcl Initialise
+puts start
 	# Create windows
 	Classy::Toplevel $window  \
 		-keepgeometry 0
@@ -31,22 +33,17 @@ proc t2 args {# ClassyTcl generated Toplevel
 		-height 5 \
 		-width 10
 	grid $window.text1 -row 0 -column 0 -sticky nesw
-	$window.text1 insert end "
-
-"
 	Classy::Text $window.text2  \
 		-height 5 \
 		-width 10
 	grid $window.text2 -row 0 -column 1 -sticky nesw
-	$window.text2 insert end "
-
-"
-	Classy::DynaMenu attachmainmenu Classy::Test $window.text1
-	Classy::DynaMenu attachmainmenu Classy::Test $window.text2
+	Classy::DynaMenu attachmainmenu Classy::Test $window
 	grid columnconfigure $window 0 -weight 1
 	grid columnconfigure $window 1 -weight 1
 	grid rowconfigure $window 0 -weight 1
 
+# ClassyTcl Finalise
+puts ok
 }
 
 proc testframe args {# ClassyTcl generated Frame
@@ -77,10 +74,6 @@ proc testframe args {# ClassyTcl generated Frame
 
 }
 
-
-
-
-
 proc trfr args {# ClassyTcl generated Frame
 	if [regexp {^\.} $args] {
 		set window [lpop args]
@@ -96,8 +89,3 @@ proc trfr args {# ClassyTcl generated Frame
 	grid $window.button1 -row 0 -column 0 -sticky nesw
 
 }
-
-
-
-
-

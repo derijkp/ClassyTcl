@@ -25,16 +25,16 @@ set trydata {
 proc testit w {return ok}
 proc getmenu {} {
 	if {"[Classy::DynaMenu cmdw Test]" == ".t"} {
-		return {Test_active {
+		return {{
 			action Test1 "Test1 t" {puts "Test1 t ok"} Alt-a
 			action Test2 "Test2 t" {%W insert end "Test2 t %W"} Alt-b
-		}}
+		} Test_active}
 	} else {
-		return {Test_active {
+		return {{
 			action Test1 "Test1 b" {puts "Test1 b ok"} Alt-a
 			action Test2 "Test2 b" {%W insert end "Test2 b %W"} Alt-b
 			action Test3 "Test3 b" {%W insert end "Test3 b"} Alt-c
-		}}
+		} Test_active}
 	}
 }
 

@@ -13,6 +13,7 @@ Entry
  with a few extras
 <ul>
 <li>optional label
+<li>invoke command upon entry
 <li>constraints
 <li>a <a href="DefaultMenu.html">DefaultMenu</a> can be added to
  store and reselecte values easily. These default values are stored
@@ -32,8 +33,11 @@ Entry
 <b><dt>Command-Line Name: -label</b><b><dt>Database Name: label</b><b><dt>Database Class: Label</b><dd>
  text to be displayed in the entry label. If this is empty, no label will bne displayed.
 <b><dt>Command-Line Name: -command</b><b><dt>Database Name: command</b><b><dt>Database Class: Command</b><dd>
- associate a command with the entry. This
- command will be executed when the Action key is pressed in the entry.
+ associate a command with the entry. When the Action key (usually Enter) is pressed 
+ in the entry, the widget will invoke a Tcl command by concatenating the given 
+ command and the value in the entry widget. The command will be executed in global
+ scope. If you want to use temporary variables without poluting the global namesspace,
+ the <a href="convenience.html">Extral invoke</a> command might interest you.
 <b><dt>Command-Line Name: -constraint</b><b><dt>Database Name: constraint</b><b><dt>Database Class: Constraint</b><dd>
  the value in the entry must match the regular expression given here.
  No constraint is applied when it is set to the empty string.

@@ -85,6 +85,7 @@ Classy::Balloon method add {widget text} {
 #}
 Classy::Balloon method display {widget} {
 	private $object help
+	if ![winfo exists $widget] return
 	if ![info exists help($widget)] return
 	if ![winfo exists .classy__.balloon] {
 		toplevel .classy__.balloon -class Balloon

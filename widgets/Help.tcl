@@ -44,7 +44,8 @@ Classy::Help classmethod init {args} {
 	$object.html bindlink <<Adjust>> {newhelp [%W linkat %x %y]}
 	scrollbar $object.vbar -orient vertical -command "$object.html yview"
 	Classy::DynaMenu attachmainmenu Classy::Help $object
-	Classy::DynaTool maketool Classy::Help $object.tool $object
+	Classy::DynaTool $object.tool -type Classy::Help
+	$object.tool cmdw $object
 	pack $object.tool -side top -fill x
 	if {"[option get $object scrollSide ScrollSide]" == "right"} {
 		pack $object.vbar -side right -fill y
@@ -72,6 +73,9 @@ Classy::Help private generalmenu {
 #  Widget options
 # ------------------------------------------------------------------
 Classy::Help chainoptions {$object.html}
+Classy::Help chainoption -background {$object} -background {$object.html} -background
+Classy::Help chainoption -highlightbackground {$object} -highlightbackground {$object.html} -highlightbackground
+Classy::Help chainoption -highlightcolor {$object} -highlightcolor {$object.html} -highlightcolor
 
 # ------------------------------------------------------------------
 #  Methods
@@ -89,7 +93,11 @@ Classy::Help method gethelp {name} {
 	} elseif {[regexp {^http:/|^file:/|^ftp:/} $name]} {
 		set url $name
 	} else {
-		foreach dir $::Classy::help_path {
+		set i [llength $::Classy::help_path]
+		incr i -1
+		while {$i > -1} {
+			set dir [lindex $::Classy::help_path $i]
+			incr i -1
 			if {"[file extension $name]" == ""} {
 				set name $name.html
 			}
@@ -120,7 +128,7 @@ Classy::Help method save {filename {how {}}} {
 Classy::Help method historymenu {} {
 	set w $object.history
 	Classy::SelectDialog $w -title "Reopen list" \
-		-command "$object gethelp \[$w get\]"
+		-command "$object gethelp"
 	$w fill [$object.html history]
 }
 
@@ -184,7 +192,6 @@ Classy::Help method getcontentsmenu {} {
 			append contentsmenu "\t[list action None "$line" "$w yview [expr {$pos+1}].0"]\n"
 		}
 	}
-	$object contents
 	set data "action TopHelp Top {%W see 1.0}\n$contentsmenu"
 	return [list $data Classy::Help_contents]
 }
@@ -212,7 +219,7 @@ proc Classy::findhelp {w} {
 	Classy::Entry $w
 	set p [winfo parent $w]
 	$w configure -command [varsubst {w p} {
-		[DynaTool cmdw $p] search $::Classy::helpfind [$w get]
+		[$p cmdw] search $::Classy::helpfind
 	}]
 }
 

@@ -5,7 +5,7 @@
 proc ::Classy::WindowBuilder::add_Classy::Browser {object base args} {
 	private $object data
 	Classy::Browser $base -width 50 -height 50 -list [glob [pwd]/*] \
-		-gettext {invoke {file tail [lindex $args 0]]}}
+		-gettext {invoke dir {file tail $dir}}
 	set data(opt-list,$base) {[glob [pwd]/*]}
 	eval $base configure $args
 	return $base
@@ -14,7 +14,7 @@ proc ::Classy::WindowBuilder::add_Classy::Browser {object base args} {
 proc ::Classy::WindowBuilder::start_Classy::Browser {object base} {
 	private $object data bindtags
 	set bindtags($base) [bindtags $base]
-	bindtags $base Classy::WindowBuilder_$object
+	bindtags $base $data(tags)
 	$object _recursestartedit $base [winfo children $base]
 }
 

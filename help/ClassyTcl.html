@@ -8,13 +8,16 @@
 
 <H1>
 ClassyTcl</H1>
-<I>Object system for Tcl</I>
+<I>Object system, widget set and GUI builder for Tcl</I>
 <BR><I>by Peter De Rijk (Universiteit Antwerpen)</I>
 <H2>
 What is ClassyTcl</H2>
-ClassyTcl is an object system for <A HREF="tcltk.html">Tcl</A>, written
-enirely in Tcl. This means it doesn't require patches to the Tcl core,
+The first component of ClassyTcl is an object system 
+for <A HREF="tcltk.html">Tcl</A>, which has both a Tcl and a C version
+available. It doesn't require patches to the Tcl core,
 making keeping up with new releases easier. Performance is very adequate.
+The C version is gives extra speed, and makes it possible to implement some
+methods in C (usually also for performance reasons).
 Included in the distribution is a large set of <a href="widgets/index.html">
 new widgets</a>, written using
 the object system. While the object system itself only requires Tcl (>8.0),
@@ -26,13 +29,15 @@ Use</H2>
 You should be able to obtain the latest versions of ClassyTcl and ExtraL
 on our server <a href="http://rrna.uia.ac.be/">rrna.uia.ac.be</a> via WWW or 
 anonymous ftp (directory /pub/tcl).
-Both Extral and ClassyTcl are implemented as loadable packages. ClassyTcl
-can be used by&nbsp; putting the directories (after unpacking) somewhere
-appropriate and using the command
+Both Extral and ClassyTcl are implemented as loadable packages. The ClassyTcl
+object systen can be used by putting the directories (after unpacking) 
+somewhere appropriate and using the command
 <BR>package require Class
 
-<P>To use the widgets that come with the distribution, first use the command
-<BR>classyinit &lt;program name>
+<P>To use the widgets that come with the distribution, use the command
+<BR>package require ClassyTcl<br>
+after naming the application (tk appname ?name?). The application name
+will be used for managing defaults and configuration options.
 <H2>
 Implementation</H2>
 Loading the package will create on class named <a href="basic/Class.html">

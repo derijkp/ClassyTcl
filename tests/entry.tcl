@@ -41,16 +41,16 @@ test Classy::Entry {create with configuration configure} {
 	Classy::Entry .try -label int -constraint {^[0-9]*$}
 	pack .try
 	.try cget -constraint
-} {[0-9]}
+} {^[0-9]*$}
 
 test Classy::Entry {command} {
 	classyclean
-	Classy::Entry .try -label try -command {set ::c 1}
+	Classy::Entry .try -label try -command {set ::c}
 	pack .try
 	set ::c 0
 	.try set try
 	set ::c
-} {1}
+} {try}
 
 test Classy::Entry {constraint} {
 	classyclean
@@ -63,12 +63,12 @@ test Classy::Entry {constraint} {
 
 test Classy::Entry {gridlabel} {
 	classyclean
-	Classy::Entry .try -label short -labelwidth 15
-	Classy::Entry .try2 -label "a lot longer" -labelwidth 15
-	grid .try -row 0 -column 1 -sticky se
-	grid .try2 -row 1 -column 1 -sticky se
+	Classy::Entry .try -label short -labelwidth 12
+	Classy::Entry .try2 -label "a lot longer" -labelwidth 12
+	pack .try -fill x
+	pack .try2 -fill x
 	.try cget -label
-} {test}
+} {short}
 
 test Classy::FileEntry {create and configure} {
 	classyclean

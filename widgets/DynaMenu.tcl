@@ -127,11 +127,11 @@ Classy::DynaMenu method makepopup {menutype menu curmenu data cmdw bindtag} {
 			set command [lindex $current 3]
 			regsub -all {%W} $command "\[$object cmdw $menutype\]" command
 			regsub -all {%%} $command % command
-			set data [uplevel #0 $command]
+			set data {}
+			catch {set data [uplevel #0 $command]}
 			menu $curmenu.$key -title $key -postcommand [list $object _activemenu $menutype $menu $curmenu.$key $key $command]
 			$object _activemenu $menutype $menu $curmenu.$key $key $command
 			append checks($menutype) "[list $object _activemenu $menutype $menu $curmenu.$key $key $command]\n"
-			#$object makepopup $menutype $menu $curmenu.$key $data $cmdw $bindtag
 			set shortcut [lindex $current 4]
 			if {"$shortcut"!=""} {
 				lappend bindings($curmenu) <$shortcut>
@@ -427,9 +427,10 @@ Classy::DynaMenu method attachmenu {menutype cmdw} {
 
 Classy::DynaMenu method _activemenu {menutype menu curmenu key command} {
 	private $object cmdws bindtags bindings
-	set data [uplevel #0 $command]
-	set data [lindex $data 0]
+	set data {}
+	catch {set data [uplevel #0 $command]}
 	set bindtag [lindex $data 1]
+	set data [lindex $data 0]
 	set cmdw $cmdws($menutype)
 	foreach event [bind $bindtag] {bind $bindtag $event {}}
 	$object makepopup $menutype $menu $curmenu $data $cmdw $bindtag

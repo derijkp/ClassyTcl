@@ -7,14 +7,23 @@ source tools.tcl
 test ColorEntry {create and configure} {
 	classyclean
 	Classy::ColorEntry .try
-	pack .try
+	pack .try -fill x
 	.try set green
 	.try get
 } {green}
 
+test ColorEntry {command} {
+	classyclean
+	Classy::ColorEntry .try -command {set try}
+	pack .try -fill x
+	set ::try ""
+	.try set green
+	set ::try
+} {green}
+
 test ColorHSV {create and configure} {
 	classyclean
-	Classy::ColorHSV .try
+	Classy::ColorHSV .try -command puts
 	pack .try
 	.try set green
 	.try get
@@ -23,16 +32,16 @@ test ColorHSV {create and configure} {
 test ColorHSV {command} {
 	classyclean
 	set ::try 0
-	Classy::ColorHSV .try -command {set ::try 1}
+	Classy::ColorHSV .try -command {set ::try}
 	pack .try
 	.try set green
 	update
 	set ::try
-} {1}
+} {#00ff00}
 
 test ColorRGB {create and configure} {
 	classyclean
-	Classy::ColorRGB .try
+	Classy::ColorRGB .try -command {puts}
 	pack .try
 	.try set green
 	.try get
@@ -41,12 +50,12 @@ test ColorRGB {create and configure} {
 test ColorRGB {command} {
 	classyclean
 	set ::try 0
-	Classy::ColorRGB .try -command {set ::try 1}
+	Classy::ColorRGB .try -command {set ::try}
 	pack .try
 	.try set green
 	update
 	set ::try
-} {1}
+} {#00ff00}
 
 test ColorSample {create and configure} {
 	classyclean
@@ -62,12 +71,12 @@ test ColorSelect {create and configure} {
 	pack .try -fill both -expand yes
 	.try set green
 	.try get
-} {#00ff00}
+} {green}
 
 test getcolor {getcolor} {
 	classyclean
-	option add *GetColor Peos startupFile
+	option add *GetColor Classy startupFile
 	Classy::getcolor -initialcolor yellow
-} {#ffff00}
+} {yellow}
 
 testsummarize

@@ -6,7 +6,7 @@ source tools.tcl
 source dynamenuinit.tcl
 set object Classy::DynaMenu
 
-test Classy::DynaMenu {popopmenu} {
+test Classy::DynaMenu {topmenu} {
 	classyclean
 	text .b -width 10 -height 5
 	text .t -width 10 -height 5
@@ -21,28 +21,15 @@ test Classy::DynaMenu {popopmenu} {
 	set try 1
 } {1}
 
-test Classy::DynaMenu {topmenu} {
-	classyclean
-	text .b -width 10 -height 5
-	text .t -width 10 -height 5
-	pack .b .t -side left -fill both -expand yes
-	Classy::DynaMenu define Test $::trydata
-	. configure -menu [Classy::DynaMenu menu Test .t]
-	bindtags .t "[Classy::DynaMenu bindtag Test] [bindtags .t]"
-	bindtags .b "[Classy::DynaMenu bindtag Test] [bindtags .b]"
-	manualtest
-	set try 1
-} {1}
-
 test Classy::DynaMenu {popopmenu} {
 	classyclean
 	text .b -width 10 -height 5
 	text .t -width 10 -height 5
 	pack .b .t -side left -fill both -expand yes
 	Classy::DynaMenu define Test $::trydata
-	Classy::DynaMenu makemenu Test .top .t TestBind
-	bindtags .t "TestBind [bindtags .t]"
-	bindtags .b "TestBind [bindtags .b]"
+	set bindtag [Classy::DynaMenu bindtag Test]
+	bindtags .t "$bindtag Test_active [bindtags .t]"
+	bindtags .b "$bindtag Test_active [bindtags .b]"
 	bind .t <<Menu>> {Classy::DynaMenu popup Test %X %Y}
 	bind .b <<Menu>> {Classy::DynaMenu popup Test %X %Y}
 	manualtest

@@ -311,7 +311,7 @@ Classy::BarChart method barconfigure {name args} {
 Classy::BarChart method _drawlegend {} {
 	private $object tag options order hidden
 	set canvas $options(-canvas)
-	if {"$canvas" == ""} return
+	if ![winfo exists $canvas] return
 	$canvas delete $options(-tag)::legend
 	if ![true $options(-legend)] return
 	if {"$order"==""} return
@@ -348,7 +348,7 @@ Classy::BarChart method _drawlabels {} {
 	private $object options hidden
     ::Classy::canceltodo $object _drawlabels
 	set canvas $options(-canvas)
-	if {"$canvas" == ""} return
+	if ![winfo exists $canvas] return
 	if {"$options(-area)" == ""} return
 	set width [expr [lindex $options(-area) 2] - [lindex $options(-area) 0]]
 	if {$width<=0} return
@@ -398,7 +398,7 @@ Classy::BarChart method _drawdata {} {
     private $object data tag options order hidden
     ::Classy::canceltodo $object _drawdata
 	set canvas $options(-canvas)
-	if {"$canvas" == ""} return
+	if ![winfo exists $canvas] return
 	if {"$order"==""} {return}
 
 	set xstart [lindex $options(-area) 0]

@@ -18,7 +18,7 @@ test Classy::Toplevel {destroycommand} {
 
 test Classy::Toplevel {keepgeometry 0} {
 	classyclean
-	Classy::Default unset geometry .try
+	catch {Classy::Default unset geometry .try}
 	button .b -command {
 		Classy::Toplevel .try -title "Try it" -keepgeometry 0
 		button .try.b1 -text "button 1"
@@ -29,11 +29,11 @@ test Classy::Toplevel {keepgeometry 0} {
 	} -text "Click for toplevel"
 	pack .b
 	manualtest
-} {1}
+} {}
 
 test Classy::Toplevel {keepgeometry 1} {
 	classyclean
-	Classy::Default unset geometry .try
+	catch {Classy::Default unset geometry .try}
 	button .b -command {
 		Classy::Toplevel .try -title "Try it" -keepgeometry 1
 		button .try.b1 -text "button 1"
@@ -44,11 +44,11 @@ test Classy::Toplevel {keepgeometry 1} {
 	} -text "Click for toplevel"
 	pack .b
 	manualtest
-} {1}
+} {}
 
 test Classy::Toplevel {keepgeometry all} {
 	classyclean
-	Classy::Default unset geometry .try
+	catch {Classy::Default unset geometry .try}
 	button .b -command {
 		Classy::Toplevel .try -title "Try it" -keepgeometry all
 		button .try.b1 -text "button 1"
@@ -59,7 +59,7 @@ test Classy::Toplevel {keepgeometry all} {
 	} -text "Click for toplevel"
 	pack .b
 	manualtest
-} {1}
+} {}
 
 
 testsummarize

@@ -141,7 +141,7 @@ Classy::Dialog addoption -help {help Help {}} {
 # add a button with name $button to the dialog. The button will display
 # the $text. When it is invoked, $command will be executed.
 # If the word default is added, the button will be displayed differently
-# and invoked by default (eg. when presseng Enter).
+# and invoked by default (eg. when pressing Enter).
 #}
 Classy::Dialog method add {button text command args} {
 	if {"$args" == "default"} {
@@ -168,12 +168,35 @@ Classy::Dialog method add {button text command args} {
 		bind $object <Alt-[string index $text $pos]> "$object invoke $button Adjust"
 		$object.actions.$button configure -underline $pos
 		lappend shortcuts [string index $text $pos]
-#		if {"$args" != ""} {
-#			bind $object <KeyPress-$args> "$object invoke $button"
-#		}
 		lappend persistent $button
 	}
 	return $object.actions.$button
+}
+
+#doc {Dialog command remove} cmd {
+#pathname delete button
+#} descr {
+# remove the button with name $button to the dialog.
+#}
+Classy::Dialog method delete {button} {
+	private $object shortcuts persistent
+	destroy $object.actions.$button
+	catch {set persistent [lremove $persistent $button]}
+}
+
+#doc {Dialog command rename} cmd {
+#pathname rename button newname
+#} descr {
+# rename the button with name $button to the dialog to $newname.
+#}
+Classy::Dialog method rename {button newname} {
+	private $object shortcuts persistent
+	set w $object.actions.$button
+	set conf [$object button $button]
+	eval {$object add $newname} $conf
+	pack $object.actions.$newname -before $w
+	$object delete $button
+	catch {set persistent [lremove $persistent $button]}
 }
 
 #doc {Dialog command button} cmd {
@@ -243,7 +266,7 @@ Classy::Dialog method persistent {{option {}} args} {
 #}
 Classy::Dialog method invoke {item {button Action}} {
 	private $object persistent
-	set autoraise [getprivate $object options(-autoraise)]
+	$object.actions.$item invoke
 	if {("$item"!="help")&&("$button"!="Adjust")} {
 		if [info exists persistent] {
 			if {[lsearch -exact $persistent $item]==-1} {
@@ -251,13 +274,6 @@ Classy::Dialog method invoke {item {button Action}} {
 			}
 		} else {
 			Classy::todo $object close
-		}
-	}
-
-	$object.actions.$item invoke
-	if {"$item"!="help"} {
-		if [info exists autoraise] {
-			if $autoraise [list after 100 "raise $object"]
 		}
 	}
 }

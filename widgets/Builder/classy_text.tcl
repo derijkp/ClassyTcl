@@ -2,18 +2,17 @@
 # Classy::Text
 #
 
-proc ::Classy::WindowBuilder::add_Classy::Text {object w args} {
-	Classy::Text $w -width 10 -height 5
-	eval $w configure $args
+proc ::Classy::WindowBuilder::add_Classy::Text {object base args} {
+	Classy::Text $base -width 10 -height 5
+	eval $base configure $args
 	return $base
 }
 
 proc ::Classy::WindowBuilder::attr_Classy::Text_content {object w args} {
 	if {"$args" == ""} {
-		return [$w get 1.0 end]
+		return [$w get]
 	} else {
-		$w delete 1.0 end
-		$w insert end [lindex $args 0]
+		$w set [lindex $args 0]
 	}
 }
 
@@ -66,11 +65,15 @@ proc ::Classy::WindowBuilder::edit_Classy::Text {object w} {
 }
 
 proc ::Classy::WindowBuilder::generate_Classy::Text {object base} {
+	private $object data
 	set body ""
 	set outw [$object outw $base]
 	append body "\tClassy::Text $outw [$object getoptions $base]\n"
 	append body "\t[$object gridwconf $base]\n"
-	append body "\t$outw insert end \"[$base get 1.0 end]\"\n"
+	set value [string trimright [$base get] "\n "]
+	if {"$value" != ""} {
+		append data(parse) "\t$outw set [list $value]\n"
+	}
 	append body [$object generatebindings $base $outw]
 	return $body
 }

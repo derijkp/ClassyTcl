@@ -30,6 +30,7 @@ proc ::Classy::handletodo {object} {
 	if [info exists ::Classy::__todolist__$object] {
 		upvar ::Classy::__todolist__$object todolist
 		if {"$todolist"!=""} {
+			if {"[info commands $object]" == ""} {unset todolist;return}
 			foreach todoitem $todolist {
 				if [catch {eval $object $todoitem} result] {
 					global errorInfo
@@ -284,12 +285,12 @@ proc ::Classy::msg {text} {
 	update
 }
 
-proc ::Classy::Message {window args} {
-	eval message $window $args
-	::Tk::bind $window <Configure> [varsubst {window} {
-		$window configure -width [expr [winfo width $window] - 2*[$window cget -bd]]
-	}]
-}
+#proc ::Classy::Message {window args} {
+#	eval message $window $args
+#	::Tk::bind $window <Configure> [varsubst {window} {
+#		$window configure -width [expr [winfo width $window] - 2*[$window cget -bd]]
+#	}]
+#}
 
 proc ::Classy::overwriteyn {file {append 1}} {
 	if [file exists $file] {
@@ -334,3 +335,11 @@ proc Classy::bgstop {id} {
 	catch {unset ::Classy::bg($id)}
 }
 
+proc Classy::orient {value} {
+	switch -glob $value {
+		v* {return vertical}
+		h* {return horizontal}
+		s* {return stacked}
+		default {return -code error "Unknown orientation \"$value\""}
+	}
+}

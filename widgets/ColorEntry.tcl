@@ -18,6 +18,13 @@ proc ::Classy::ColorEntry {} {}
 proc ColorEntry {} {}
 }
 
+option add *Classy::ColorEntry.highlightThickness 0 widgetDefault
+option add *Classy::ColorEntry*Frame.highlightThickness 0 widgetDefault
+option add *Classy::ColorEntry*Frame.borderWidth 0 widgetDefault
+option add *Classy::ColorEntry.entry.relief sunken widgetDefault
+option add *Classy::ColorEntry.label.anchor w widgetDefault
+option add *Classy::ColorEntry.entry.width 5 widgetDefault
+
 # ------------------------------------------------------------------
 #  Widget creation
 # ------------------------------------------------------------------
@@ -27,11 +34,10 @@ Classy::export ColorEntry {}
 
 Classy::ColorEntry classmethod init {args} {
 	super
+	bindtags $object [lreplace [bindtags $object] 2 0 Classy::Entry]
+	bindtags $object.entry [lreplace [bindtags $object.entry] 3 0 Classy::Entry]
 	frame $object.sample -relief raised -width 25 -borderwidth 2
 	pack $object.sample -side left -expand yes -fill both
-
-#	bind $object <KeyRelease-Return> [varsubst object {}]
-
 	# REM Configure initial arguments
 	# -------------------------------
 	if {"$args" != ""} {eval $object configure $args}
@@ -45,19 +51,27 @@ Classy::ColorEntry classmethod init {args} {
 #  Methods
 # ------------------------------------------------------------------
 
-Classy::ColorEntry method set {val} {
+Classy::ColorEntry method nocmdset {val} {
 	$object.entry delete 0 end
 	$object.entry insert 0 $val
 	$object.sample configure -background $val
 }
 
+Classy::ColorEntry method set {val} {
+	$object.entry delete 0 end
+	$object.entry insert 0 $val
+	$object.sample configure -background $val
+	$object command
+}
+
 Classy::ColorEntry method command {} {
-	set command [getprivate $object options(-command)]
 	$object.sample configure -background [$object get]
-	if {"$command"==""} {
+	set command [getprivate $object options(-command)]
+	if {"$command" != ""} {
+		uplevel #0 $command [list [$object.entry get]]
+		return 1
+	} else {
 		return 0
 	}
-	uplevel #0 $command
-	return 1
 }	
 

@@ -3,7 +3,7 @@
 #
 proc ::Classy::WindowBuilder::edit_Classy::Entry {object base} {
 	::Classy::WindowBuilder::defattredit $object $base {
-		-label Label 0 -labelwidth Labelwidth 0 -textvariable Textvariable 0 -command Command 1
+		-label Label 0 -textvariable Textvariable 0 -orient Orientation 0 -labelwidth Labelwidth 0 -command Command 1
 	} 10 0
 }
 
@@ -15,7 +15,7 @@ proc ::Classy::WindowBuilder::add_Classy::Entry {object base args} {
 
 proc ::Classy::WindowBuilder::edit_Classy::NumEntry {object base} {
 	::Classy::WindowBuilder::defattredit $object $base {
-		-label Label 0 -labelwidth Labelwidth 0 -textvariable Textvariable 0 -command Command 1
+		-label Label 0 -textvariable Textvariable 0 -orient Orientation 0 -labelwidth Labelwidth 0 -command Command 1
 	} 10 0
 }
 
@@ -31,6 +31,25 @@ proc ::Classy::WindowBuilder::add_Classy::NumEntry {object base args} {
 
 proc ::Classy::WindowBuilder::add_Classy::Progress {object base args} {
 	Classy::Progress $base -width 50
+	eval $base configure $args
+	return $base
+}
+
+#
+# Message
+#
+proc ::Classy::WindowBuilder::configure_Classy::Message {object w} {
+	Classy::todo $w redraw
+}
+
+proc ::Classy::WindowBuilder::edit_Classy::Message {object w} {
+	::Classy::WindowBuilder::defattredit $object $w {
+		-anchor Anchor 0 -justify Justify 0 -text Text 1
+	} 8 0
+}
+
+proc ::Classy::WindowBuilder::add_Classy::Message {object base args} {
+	Classy::Message $base -text message
 	eval $base configure $args
 	return $base
 }

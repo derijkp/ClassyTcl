@@ -51,6 +51,7 @@ Classy::NoteBook classmethod init {args} {
 	# -----------------
 	setprivate $object num 0
 	setprivate $object current {}
+	setprivate $object labels {}
 
 	# REM Configure initial arguments
 	# -------------------------------
@@ -95,7 +96,7 @@ Classy::NoteBook addoption -side {side Side top} {
 #} descr {
 #}
 Classy::NoteBook method manage {label w args} {
-	private $object managed_options widget button num cmd
+	private $object managed_options widget button num cmd labels
 	if [info exists widget($label)] {error "label \"$label\" exists"}
 	set pos [lsearch $args -command] 
 	if {$pos != -1} {
@@ -111,6 +112,7 @@ Classy::NoteBook method manage {label w args} {
 	set widget($label) $w
 	set button($label) $num
 	set managed_options($label) $args
+	lappend labels $label
 	incr num
 	Classy::todo $object redraw
 	return $w
@@ -122,8 +124,9 @@ Classy::NoteBook method manage {label w args} {
 # This method selects the managed window that is managed by the notebook
 # under the name label.
 #}
-Classy::NoteBook method select {label} {
+Classy::NoteBook method select {{label {}}} {
 	private $object widget button managed_options cmd current
+	if {"$label" == ""} {return $current}
 	if [info exists cmd($label)] {
 		if {[uplevel #0 $cmd($label)] == 0} return
 	}
@@ -185,13 +188,16 @@ Classy::NoteBook method propagate {{state {}}} {
 #} descr {
 #}
 Classy::NoteBook method redraw {} {
-	private $object current button widget
+	private $object current button widget labels
 	set side [getprivate $object options(-side)]
 	set list ""
-	foreach item [lsort -dict [winfo children $object]] {
-		if [regexp "^$object.tab\[0-9\]+\$" $item] {
-			lappend list $item
-		}
+#	foreach item [lsort -dict [winfo children $object]] {
+#		if [regexp "^$object.tab\[0-9\]+\$" $item] {
+#			lappend list $item
+#		}
+#	}
+	foreach label $labels {
+		lappend list $object.tab$button($label)
 	}
 	place $object.label -x 0 -y 1
 	if {"$side" == "top"} {
@@ -298,8 +304,7 @@ Classy::NoteBook method get {} {
 #} descr {
 #}
 Classy::NoteBook method labels {} {
-	private $object widget
-	return [array names widget]
+	return [getprivate $object labels]
 }
 
 #doc {NoteBook command window} cmd {
@@ -325,7 +330,8 @@ Classy::NoteBook method button {label} {
 #} descr {
 #}
 Classy::NoteBook method delete {label} {
-	private $object widget button managed_options cmd current
+	private $object widget button managed_options cmd current labels
+	set labels [lremove $labels $label]
 	if [info exists cmd($label)] {
 		unset cmd($label)
 	}
@@ -338,6 +344,57 @@ Classy::NoteBook method delete {label} {
 	} else {
 		Classy::todo $object redraw
 	}
+}
+
+#doc {NoteBook command rename} cmd {
+#pathname delete label 
+#} descr {
+#}
+Classy::NoteBook method rename {old new} {
+	private $object widget button managed_options cmd current labels
+	if {[lsearch  $labels $old] == -1} {
+		return -code error "label \"$old\" does not exists"
+	}
+	if {[lsearch  $labels $new] != -1} {
+		return -code error "label \"$new\" exists"
+	}
+	catch {set cmd($new) $cmd($old)}
+	catch {set widget($new) $widget($old)}
+	catch {set managed_options($new) $managed_options($old)}
+	catch {set button($new) $button($old)}
+	$object.tab$button($old) configure -text $new -command [list $object select $new]
+	set pos [lfind $labels $old]
+	set labels [lreplace $labels $pos $pos $new]
+	catch {unset cmd($old)}
+	catch {unset widget($old)}
+	catch {unset managed_options($old)}
+	catch {unset button($old)}
+	if {"$current" == "$old"} {
+		$object select $new
+	} else {
+		Classy::todo $object redraw
+	}
+}
+
+#doc {NoteBook command reorder} cmd {
+#pathname delete label 
+#} descr {
+#}
+Classy::NoteBook method reorder {args} {
+	private $object labels
+	set remain $labels
+	set new ""
+	foreach el $args {
+		set pos [lsearch $remain $el]
+		if {$pos == -1} {
+			return -code error "label \"$el\" does not exists"
+		}
+		lappend new $el
+		set remain [lreplace $remain $pos $pos]
+	}
+	set labels [concat $new $remain]
+	Classy::todo $object redraw
+	return $labels
 }
 
 Classy::NoteBook method _children {} {

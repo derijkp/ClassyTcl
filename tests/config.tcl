@@ -6,7 +6,7 @@ source tools.tcl
 
 test Classy::config {basic} {
 	classyclean
-	Classy::Configurator dialog
+	Classy::Config dialog
 	update idletasks
 	manualtest
 } {}

@@ -158,7 +158,7 @@ Classy::OptionBox method get {} {
 	} else {
 		set varname $options(-variable)
 	}
-	return [uplevel #0 set $varname]
+	return [set ::$varname]
 }
 
 #doc {OptionBox command items} cmd {

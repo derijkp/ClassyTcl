@@ -73,11 +73,11 @@ test NumEntry {int} {
 
 test NumEntry {int} {
 	classyclean
-	NumEntry .try -label try -min 0 -max 10 -constraint int -command {set ::try 10}
+	NumEntry .try -label try -min 0 -max 10 -constraint int -command {set ::try}
 	pack .try
 	update
 	set ::try 1
-	.try set 1
+	.try set 10
 	update
 	set ::try
 } {10}

@@ -97,7 +97,8 @@ namespace eval ::class {
 	if [info exists _chain($option)] {
 		return [lreplace [[subst [lindex $_chain($option) 0]] configure [lindex $_chain($option) 1]] 0 0 $option]
 	} elseif [info exists _chain()] {
-		return [lreplace [[subst $_chain()] configure $option] 0 0 $option]
+		set w [subst $_chain()]
+		return [lreplace [$w configure $option] 0 0 $option]
 	} else {
 		return -code error "unknown option \"$option\""
 	}
@@ -418,8 +419,13 @@ Widget classmethod chainallmethods {widget widgettype} {
 	while {[winfo exists .class,,temp$num]} {
 		incr num
 	}
-	$widgettype .class,,temp$num
-	foreach method [::class::getwidgetmethods .class,,temp$num] {
+	if [regexp ^:*Classy:: $widgettype] {
+		set methods [$widgettype info methods *]
+	} else {
+		$widgettype .class,,temp$num
+		set methods [::class::getwidgetmethods .class,,temp$num]
+	}
+	foreach method $methods {
 		if [regexp {^cget$|^class$|^component$|^config$|^configure$|^destroy$|^private$|^trace$} $method] continue
 		if {"[::$class info methods $method]" == ""} {
 			if {"$method" != "destroy"} {

@@ -8,9 +8,9 @@ DynaTool
 DynaTool
 </h1>
 
- subclass of <a href="../basic/Class.html">Class</a><br>
- DynaTool is not a widget and is not intended to produce instances. 
- It is a class that manages toolbars in an easy and dynamic way.
+ subclass of <a href="../basic/Widget.html">Widget</a><br>
+ The DynaTool widgets are toolbars, for which the contents are managed by
+ the DynaTool class in an easy and dynamic way.
  DynaTool can handle several tooltypes.
 <p>
  Each tooltype is defined by a definition in a simple format. 
@@ -28,12 +28,6 @@ DynaTool
  changed at any time.
 
 <dl><b><dt>
-pathname maketool tooltype tool cmdw
-</b><dd>
- create a toolbar of type $tooltype. $cmdw
- determines the initial commmand widget.
-
-<b><dt>
 pathname define tooltype ?data?
 </b><dd>
  set the definition describing the tools that will be generated 
@@ -45,13 +39,13 @@ pathname define tooltype ?data?
  method will automatically define a tooltype that isn't managed yet.
 
 <b><dt>
-pathname names 
-</b><dd>
-
-<b><dt>
 pathname redraw tooltype
 </b><dd>
  redraw toolbars of type $tooltype
+
+<b><dt>
+pathname types ?pattern? 
+</b><dd>
 
 <b><dt>
 pathname get tooltype
@@ -73,17 +67,11 @@ pathname cmdw tool {cmdw {}}
 </b><dd>
  change the current cmdw for $tool to $cmdw. If the cmdw argument is
  not given, the method returns the current cmdw for $tool.
- This method is automatically called when a widget which has bindtags
- defined by DynaTool recieves the focus.
 
 <b><dt>
 pathname invoke curtool index
 </b><dd>
  invoke the item given by $index in $curtool
-
-<b><dt>
-pathname conftool tooltype
-</b><dd>
 
 <b><dt>
 pathname reqwidth tool

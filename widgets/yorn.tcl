@@ -27,7 +27,7 @@ proc Classy::yorn {message args} {
 		-close {1 0 yes no true false} no
 	} remain
 	if {"$remain" != ""} {error "bad options \"$remain\""}
-	Classy::YornBox .classy__.yorn -yescommand {set ::Classy::yorn 1} \
+	Classy::yornDialog .classy__.yorn -yescommand {set ::Classy::yorn 1} \
 		  -nocommand {set ::Classy::yorn 0} \
 		  -closecommand {set ::Classy::yorn close} \
 		  -title "YorN" -message $message -keepgeometry no

@@ -117,6 +117,7 @@ if {"[info commands ::Tk::focus]" == ""} {
 		set ::class::refocus($w) $focusw
 	}
 }
+
 #----------------------------------------------------------------------
 # Initialise
 #----------------------------------------------------------------------
@@ -130,13 +131,30 @@ if {[option get . patchTk PatchTk]==1} {
 	source [file join [set ::class::dir] patches miscpatches.tcl]
 }
 
-#----------------------------------------------------------------------
-# add lib in the appdir to the auto_path
-#----------------------------------------------------------------------
-lappend auto_path [file join ${::Classy::appdir} lib]
-
 # ----------------------------------------------------------------------
 # Change the bgerror command
 # ----------------------------------------------------------------------
 source [file join $::class::dir lib error.tcl]
+
+# ----------------------------------------------------------------------
+# class to coommand table (used in Builder and Config)
+# ----------------------------------------------------------------------
+array set ::Classy::cmds {
+	Frame frame
+	Entry entry
+	Label label
+	Button button
+	Checkbutton checkbutton
+	Radiobutton radiobutton
+	Menubutton menubutton
+	Message message
+	Scrollbar scrollbar
+	Listbox listbox
+	Text text
+	Canvas canvas
+	Scale scale
+	Menu menu
+	Menubutton menubutton
+	Classy::Topframe frame
+}
 

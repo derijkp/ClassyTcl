@@ -34,28 +34,40 @@ foreach type {user appuser} {
 proc Classy::configkey {name map} {
 	foreach {name event keys descr} $map {
 		if {"[string index $name 0]" == "#"} continue
+		set ::Classy::configkey($event) $keys
+	}
+}
+
+proc Classy::doconfigkey {} {
+	foreach {event keys} [array get ::Classy::configkey] {
 		event delete $event
 		eval event add $event $keys
 	}
 }
 
+# Mouse button bindings
+# Which mousebutton does what?
+# Action = select, invoke button, ...
+# Menu = popup associated popup menu
+# Adjust = Alternative action, depends on the widget
+#          e.g. when you click on a dialog button with Action,
+#          it will execute the action, and close the dialog.
+#          Often you can use the adjust button to execute
+#          the action without closing the dialog.
+#          In entries or texts under X, it works as the copy button 
+# -----------------------------------------------------------------
 proc Classy::configmouse {name map} {
 	foreach {name event keys descr} $map {
 		if {"[string index $name 0]" == "#"} continue
+		set ::Classy::configmouse($event) $keys
+	}
+}
+
+proc Classy::doconfigmouse {} {
+	foreach {event keys} [array get ::Classy::configmouse] {
 		event delete $event
 		eval event add $event $keys
 	}
-	# Mouse button bindings
-	# Which mousebutton does what?
-	# Action = select, invoke button, ...
-	# Menu = popup associated popup menu
-	# Adjust = Alternative action, depends on the widget
-	#          e.g. when you click on a dialog button with Action,
-	#          it will execute the action, and close the dialog.
-	#          Often you can use the adjust button to execute
-	#          the action without closing the dialog.
-	#          In entries or texts under X, it works as the copy button 
-	# -----------------------------------------------------------------
 	set list ""
 	foreach {name num} {Action 1 Adjust 2 Menu 3} {
 		regexp {[0-9]+} [event info <<$name>>] num
@@ -78,33 +90,75 @@ proc Classy::configmouse {name map} {
 	}
 }
 
+proc Classy::realcolor {color} {
+	if {[lsearch {Background DarkBackground LightBackground Foreground activeBackground activeForeground disabledForeground selectBackground selectForeground selectColor HighlightBackground HighlightColor} $color] != -1} {
+		set color [option get . $color $color]
+	}
+	return $color
+}
+
+proc Classy::realfont {font} {
+	if [regexp {^Font$|^BoldFont$|^ItalicFont$|^BoldItalicFont$|^NonPropFont$} $font] {
+		set font [option get . $font $font]
+	}
+	return $font
+}
+
 proc Classy::configcolor {name map} {
 	foreach {name option value descr} $map {
 		if {"[string index $name 0]" == "#"} continue
-		if {"$value" != ""} {
-			option add $option $value widgetDefault
-		}
+		set ::Classy::configcolor($option) $value
+		laddnew ::Classy::configcolor() $option
+	}
+}
+
+proc Classy::doconfigcolor {} {
+	set list [set ::Classy::configcolor()]
+	set common [lcommon {Background DarkBackground LightBackground Foreground activeBackground activeForeground disabledForeground selectBackground selectForeground selectColor HighlightBackground HighlightColor} $list]
+	foreach option $common {
+		set value [set ::Classy::configcolor($option)]
+		option add $option [Classy::realcolor $value] widgetDefault
+	}
+	foreach option [lremove $list $common] {
+		set value [set ::Classy::configcolor($option)]
+		option add $option [Classy::realcolor $value] widgetDefault
 	}
 }
 
 proc Classy::configfont {name map} {
 	foreach {name option value descr} $map {
 		if {"[string index $name 0]" == "#"} continue
-		if {"$value" == ""} {
-		} elseif [regexp {^Font$|^BoldFont$|^ItalicFont$|^BoldItalicFont$|^NonPropFont$} $value] {
-			option add $option [option get . $value $value] widgetDefault
-		} else {
-			option add $option $value widgetDefault
-		}
+		if {"$value" == ""} continue
+		set ::Classy::configfont($option) $value
+		laddnew ::Classy::configfont() $option
+	}
+}
+
+proc Classy::doconfigfont {} {
+	set list [set ::Classy::configfont()]
+	set common [lcommon {Font BoldFont ItalicFont BoldItalicFont NonPropFont} $list]
+	foreach option $common {
+		set value [set ::Classy::configfont($option)]
+		option add $option [Classy::realfont $value] widgetDefault
+	}
+	foreach option [lremove $list $common] {
+		set value [set ::Classy::configfont($option)]
+		option add $option [Classy::realfont $value] widgetDefault
 	}
 }
 
 proc Classy::configmisc {name map} {
 	foreach {name option value type descr} $map {
 		if {"[string index $name 0]" == "#"} continue
-		if {"$value" != ""} {
-			option add $option $value widgetDefault
-		}
+		if {"$value" == ""} continue
+		set ::Classy::configmisc($option) $value
+		laddnew ::Classy::configmisc() $option
+	}
+}
+
+proc Classy::doconfigmisc {} {
+	foreach option [set ::Classy::configmisc()] {
+		option add $option [set ::Classy::configmisc($option)] widgetDefault
 	}
 }
 
@@ -142,7 +196,7 @@ proc Classy::geticon {name {reload {}}} {
 		}
 	}
 	if {"$file" == ""} {
-		return ""
+		error "Could not find icon \"$name\""
 	} else {
 		if {"[file extension $file]"==".xbm"} {
 			image create bitmap Classy::icon_$name -file $file
@@ -180,30 +234,29 @@ proc Classy::setoption {key value} {
 	}
 }
 
-proc Classy::setfont {key value} {
-	if {"$value" == ""} {
-	} elseif [regexp {^Font$|^BoldFont$|^ItalicFont$|^BoldItalicFont$|^NonPropFont$} $value] {
-		option add $key [option get . $value $value] widgetDefault
-	} else {
-		option add $key $value widgetDefault
-	}
-}
+#proc Classy::setfont {key value} {
+#	if {"$value" == ""} {
+#	} elseif [regexp {^Font$|^BoldFont$|^ItalicFont$|^BoldItalicFont$|^NonPropFont$} $value] {
+#		option add $key [option get . $value $value] widgetDefault
+#	} else {
+#		option add $key $value widgetDefault
+#	}
+#}
 
-proc Classy::loadKeys {} {
-	foreach dir [set ::Classy::dirs] {
-		set file [file join $dir init Keys.tcl]
-		if [file readable $file] {
-			source $file
+proc Classy::initconf {{types {Fonts Colors Misc Keys Mouse Menus Toolbars}}} {
+	if {([lsearch $types Keys] != -1) || ([lsearch $types Mouse] != -1)} {
+		set event 1
+		foreach event [event info] {
+			event delete $event
 		}
-	} 
-}
-
-proc Classy::initconf {} {
-	foreach event [event info] {
-		event delete $event
+	} else {
+		set event 0
 	}
-	foreach dir [set ::Classy::dirs] {
-		foreach file [glob -nocomplain [file join $dir init *.tcl]] {
+	foreach type $types {
+		catch {set stype [structlget {Colors color Fonts font Misc misc Mouse mouse Keys key Menus menu Toolbars tool} $type]}
+		catch {unset ::Classy::config$stype}
+		foreach dir [set ::Classy::dirs] {
+			set file [file join $dir init $type.tcl]
 			if [file readable $file] {
 				if [catch {uplevel #0 source $file} error] {
 					puts $error
@@ -211,5 +264,6 @@ proc Classy::initconf {} {
 				}
 			}
 		}
+		catch {Classy::doconfig$stype}
 	}
 }

@@ -15,7 +15,8 @@
 static Class *classcurrent = NULL;
 Classy_Method Classy_MethodClassMethod;
 
-int Classy_FreeObject(Object *object) {
+void Classy_FreeObject(char *clientdata) {
+	Object *object = (Object *)clientdata;
 	if (object->name != NULL) {
 		Tcl_DecrRefCount(object->name);
 		object->name = NULL;
@@ -24,7 +25,7 @@ int Classy_FreeObject(Object *object) {
 		Tcl_DecrRefCount(object->trace);
 		object->trace = NULL;
 	}
-	return TCL_OK;
+	Tcl_Free(clientdata);
 }
 
 int Classy_ObjectObjCmd(
@@ -62,15 +63,16 @@ int Classy_ObjectObjCmd(
 	if (entry != NULL) {
 		Method *method;
 		method = (Method *)Tcl_GetHashValue(entry);
+		Tcl_Preserve((ClientData)object);
 		error = Classy_ExecMethod(interp,method,class,object,argc,argv);
 		if (error != TCL_OK) {
 			Tcl_Obj *errorObj = Tcl_NewStringObj("\nwhile invoking method \"",24);
 			Tcl_AppendStringsToObj(errorObj, cmd, "\" of object \"", Tcl_GetStringFromObj(object->name,NULL), "\"\n", (char *) NULL);
 			Tcl_AddObjErrorInfo(interp, Tcl_GetStringFromObj(errorObj,NULL), -1);
 			Tcl_DecrRefCount(errorObj);
-			return error;
 		}
-		return TCL_OK;
+		Tcl_Release((ClientData)object);
+		return error;
 	} else {
 		Tcl_Obj *result, **objv;
 		int objc,i;
@@ -99,6 +101,7 @@ void Classy_ObjectDestroy(ClientData clientdata) {
 	char *string;
 
 	object = (Object *)clientdata;
+	Tcl_Preserve(clientdata);
 	class = object->parent;
 	tempclass = class;
 	while(1) {
@@ -112,8 +115,8 @@ void Classy_ObjectDestroy(ClientData clientdata) {
 	entry = Tcl_FindHashEntry(&(class->children),string);
 	if (entry != NULL) {Tcl_DeleteHashEntry(entry);}
 	Tcl_VarEval(class->interp,"foreach var [info vars ::class::", string,",,*] {unset $var}", (char *)NULL);
-	Classy_FreeObject(object);
-	Tcl_Free((char *)object);
+	Tcl_EventuallyFree(clientdata,Classy_FreeObject);
+	Tcl_Release(clientdata);
 }
 
 int Classy_ObjectDestroyObjCmd(
@@ -123,7 +126,9 @@ int Classy_ObjectDestroyObjCmd(
 	int argc,
 	Tcl_Obj *CONST argv[])
 {
+	Tcl_Preserve((ClientData)object);
 	Tcl_DeleteCommandFromToken(interp,object->token);
+	Tcl_Release((ClientData)object);
 	return TCL_OK;
 }
 
@@ -179,8 +184,9 @@ int Classy_NewClassMethod(
 		object = (Object *)Tcl_Alloc(sizeof(Object));
 		Tcl_SetHashValue(entry,(ClientData)object);
 	} else {
-		object = (Object *)Tcl_GetHashValue(entry);
-		Classy_FreeObject(object);
+		Tcl_ResetResult(interp);
+		Tcl_AppendResult(interp,"command \"",string,"\" exists", (char *)NULL);
+		return TCL_ERROR;
 	}
 	object->parent = class;
 	object->name = name;
@@ -207,8 +213,9 @@ int Classy_NewClassMethod(
 				Tcl_SetObjResult(interp,errorObj);
 				Tcl_DecrRefCount(errorObj);
 				Tcl_DecrRefCount(errorinfo);
+				return error;
 			}
-			return error;
+			break;
 		}
 		tempclass = tempclass->parent;
 		if (tempclass == NULL) break;
@@ -232,10 +239,8 @@ int Classy_TraceMethod(
 		Tcl_WrongNumArgs(interp,argc,argv," procedure");
 		return TCL_ERROR;
 	}
-	
 	command = Tcl_GetStringFromObj(argv[0],&len);
 	if (len != 0) {
-		
 		if (object != NULL) {
 			object->trace = Tcl_DuplicateObj(argv[0]);
 			Tcl_IncrRefCount(object->trace);

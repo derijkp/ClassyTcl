@@ -276,7 +276,6 @@ Classy::Tree method addnode {parent node args} {
 	}
 	set pa(t) f
 	lappend pa(l) $node
-
 	Classy::parseopt $args opt {
 		-text {} {}
 		-image {} {}
@@ -284,7 +283,6 @@ Classy::Tree method addnode {parent node args} {
 		-length {} 0
 		-type {folder end} folder
 	} args
-
 	if {"$opt(-type)" == "folder"} {
 		set im [Classy::geticon sm_folder]
 		set type c
@@ -465,4 +463,42 @@ Classy::Tree method selection {{cmd {}} args} {
 		clear {set selection ""}
 	}
 	Classy::todo $object _redraw
+}
+
+#doc {Tree command addnode} cmd {
+# pathname nodes parent
+#} descr {
+# resturns the child nodes from $parent
+#}
+Classy::Tree method nodes {parent} {
+	private $object data options
+	if ![info exists data($parent)] {
+		error "parent node \"$parent\" doesn't exist"
+	}
+	array set pa $data($parent)
+	return $pa(l)
+}
+
+Classy::Tree method edit {node command} {
+	private $object data options
+	set canvas $options(-canvas)
+	array set d $data($node)
+	set bbox [$canvas bbox $d(ti)]
+	$canvas delete $options(-tag)_edit
+	catch {destroy $canvas.classy_edit}
+	entry $canvas.classy_edit
+	$canvas create window [expr {[lindex $bbox 0]-1}] [expr {[lindex $bbox 1]-1}] \
+		-tags [list $options(-tag) $options(-tag)_edit] \
+		-window $canvas.classy_edit \
+		-anchor nw -height [expr {[lindex $bbox 3]-[lindex $bbox 1]+2}] \
+		-width [expr {[lindex $bbox 2]-[lindex $bbox 0]+2}]
+	$canvas.classy_edit insert end [$canvas itemcget $d(ti) -text]
+	bind $canvas.classy_edit <<Return>> "$command \[$canvas.classy_edit get\] ; $object stopedit"
+}
+
+Classy::Tree method stopedit {} {
+	private $object data options
+	set canvas $options(-canvas)
+	destroy $canvas.classy_edit
+	$canvas delete $options(-tag)_edit
 }

@@ -39,7 +39,8 @@ Classy::configtool Classy::WindowBuilder {toolbar used in the ClassyTcl WindowBu
 	action cut "Delete" {%W delete}
 	separator
 	action save "Save" {%W save}
-	action test "Test" {%W test}
+	action test "Test" {%W testparam}
+	action ftest "test without parameters" {%W test}
 	action recreate "Recreate Dialog" {%W recreate}
 	separator
 	action close "Close" {destroy %W}
@@ -61,9 +62,13 @@ Classy::configtool Classy::WindowBuilder_icons {Tk widget toolbar used in the Cl
 	action Builder/canvas Canvas {%W add canvas}
 	action Builder/scale Scale {%W add scale}
 	label Classy "ClassyTcl widgets"
-	action Builder/classy__dynamenu {menu} {%W add Classy::DynaMenu}
+	action Builder/classy__dynamenu {Main Menu} {%W add Classy::DynaMenu}
+	action Builder/classy__dynatool {Toolbar} {%W add Classy::DynaTool}
 	action Builder/classy__entry {ClassyTcl Entry} {%W add Classy::Entry}
 	action Builder/classy__numentry {ClassyTcl Numerical Entry} {%W add Classy::NumEntry}
+	action Builder/classy__listbox {ClassyTcl ListBox} {%W add Classy::ListBox}
+	action Builder/classy__scrolledtext {ClassyTcl scrolled Text} {%W add Classy::ScrolledText}
+	action Builder/classy__message "ClassyTcl Message" {%W add Classy::Message}
 	action Builder/classy__text {ClassyTcl Text} {%W add Classy::Text}
 	action Builder/classy__canvas {ClassyTcl Canvas} {%W add Classy::Canvas}
 	action Builder/classy__notebook {Notebook with tabs} {%W add Classy::NoteBook}
@@ -78,5 +83,20 @@ Classy::configtool Classy::WindowBuilder_icons {Tk widget toolbar used in the Cl
 	action Builder/classy__colorselect {Color select} {%W add button -text "Select color" -command {set color [Classy::getcolor]}}
 	action Builder/classy__treewidget {Tree widget} {%W add Classy::TreeWidget}
 	action Builder/classy__browser {Browser} {%W add Classy::Browser}
+	action Builder/classy__selector {Selector} {%W add Classy::Selector}
 }
 
+Classy::configtool Classy::Dummy {toolbar used as a dummy in the ClassyTcl WindowBuilder} {
+	action Builder/question {Dummy tool} {Classy::msg "Just a d ummy toolbar"}
+}
+
+Classy::configtool Classy::Config {} {
+	action save {Save} {::Classy::Config save %W}
+	action SaveAs {Save as} {::Classy::Config saveas %W}
+	action Use {Use} {::Classy::Config use %W}
+	action Select {Select} {::Classy::Config select %W %W}
+	action Clear {Clear} {::Classy::Config clear %W}
+	action Reconfigure {Reconfigure} {::Classy::Config reconfigure %W}
+	action Restore {Restore} {::Classy::Config restore %W %W}
+	action Close {Close} {if [info exists %W(close)] {eval [set %W(close)]}}
+}

@@ -60,31 +60,10 @@ Classy::ColorSelect classmethod init {args} {
 
 	# REM Create bindings
 	# -------------------
-	$object.entry configure -command [varsubst {object} {
-		set value [$object.entry get];
-		$object.rgb set $value;
-		$object.hsv set $value;
-		$object _update entry
-	}]
-	$object.sample configure -command [varsubst {object} {
-		set value [$object.sample get];
-		$object.entry set $value;
-		$object.hsv set $value;
-		$object.rgb set $value;
-		$object _update sample
-	}]
-	$object.rgb configure -command [varsubst {object} {
-		set value [$object.rgb get];
-		$object.entry set $value;
-		$object.hsv set $value;
-		$object _update rgb
-	}]
-	$object.hsv configure -command [varsubst {object} {
-		set value [$object.hsv get];
-		$object.entry set $value;
-		$object.rgb set $value;
-		$object _update hsv
-	}]
+	$object.entry configure -command [list $object set]
+	$object.sample configure -command [list $object set]
+	$object.rgb configure -command [list $object set]
+	$object.hsv configure -command [list $object set]
 
 	# REM Configure initial arguments
 	# -------------------------------
@@ -111,15 +90,26 @@ Classy::ColorSelect addoption -command {command Command {}}
 #  Methods
 # ------------------------------------------------------------------
 
+#doc {ColorSelect command nocmdset} cmd {
+#pathname nocmdset value
+#} descr {
+# set current color to $value, without executing -command
+#}
+Classy::ColorSelect method nocmdset {value} {
+	$object.entry nocmdset $value
+	$object.rgb nocmdset $value;
+	$object.hsv nocmdset $value;
+}
+
 #doc {ColorSelect command set} cmd {
 #pathname set value
 #} descr {
 # set current color to $value
 #}
 Classy::ColorSelect method set {value} {
-	$object.entry set $value
-	$object.rgb set $value;
-	$object.hsv set $value;
+	$object.entry nocmdset $value
+	$object.rgb nocmdset $value;
+	$object.hsv nocmdset $value;
 }
 
 #doc {ColorSelect command get} cmd {

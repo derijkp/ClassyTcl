@@ -30,7 +30,7 @@ test Classy::Default {remove} {
 test Classy::DefaultMenu {create and configure} {
 	classyclean
 	entry .e
-	Classy::DefaultMenu .try -key try -command {.e delete 0 end;.e insert 0 [.try get]} -getcommand {.e get}
+	Classy::DefaultMenu .try -key try -command {.e delete 0 end;.e insert 0} -getcommand {.e get}
 	pack .e .try -side left
 	.e delete 0 end;.e insert 0 try
 	Classy::Default set app try {ertu fghfh dfhjdf dffj}

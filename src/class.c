@@ -60,6 +60,7 @@ void Classy_FreeClass(Class *class) {
 		entry = Tcl_NextHashEntry(&search);
 	}
 	Tcl_DeleteHashTable(&(class->methods));
+	Tcl_Free((char *)class);
 }
 
 int Classy_ClassObjCmd(
@@ -101,6 +102,7 @@ int Classy_ClassObjCmd(
 	if (entry != NULL) {
 		Method *method;
 		method = (Method *)Tcl_GetHashValue(entry);
+		Tcl_Preserve((ClientData)class);
 		error = Classy_ExecClassMethod(interp,method,class,NULL,argc,argv);
 		if (error == TCL_ERROR) {
 			Tcl_Obj *errorObj=Tcl_NewStringObj("\nwhile invoking classmethod \"",29);
@@ -108,6 +110,7 @@ int Classy_ClassObjCmd(
 			Tcl_AddObjErrorInfo(interp, Tcl_GetStringFromObj(errorObj,NULL), -1);
 			Tcl_DecrRefCount(errorObj);
 		}
+		Tcl_Release((ClientData)class);
 		return error;
 	}
 	entry = Tcl_FindHashEntry(&(class->methods), cmd);
@@ -128,6 +131,8 @@ int Classy_ClassObjCmd(
 		Tcl_ResetResult(interp);
 		error = Classy_InfoClassMethods(interp,class,NULL);
 		if (error != TCL_OK) {return error;}
+		error = Classy_InfoMethods(interp,class,NULL);
+		if (error != TCL_OK) {return error;}
 		result = Tcl_GetObjResult(interp);
 		Tcl_IncrRefCount(result);
 		Tcl_ResetResult(interp);
@@ -138,6 +143,7 @@ int Classy_ClassObjCmd(
 		for (i=1;i<objc;i++) {
 			Tcl_AppendResult(interp, ", ", Tcl_GetStringFromObj(objv[i],NULL), NULL);
 		}
+
 		Tcl_DecrRefCount(result);
 		return TCL_ERROR;
 	}
@@ -152,6 +158,7 @@ void Classy_ClassDestroy(ClientData clientdata) {
 	char *string;
 
 	class = (Class *)clientdata;
+	Tcl_Preserve(clientdata);
 	interp = class->interp;
 	if (class->classdestroy != NULL) {
 		Classy_ExecClassMethod(interp,class->classdestroy,class,NULL,0,NULL);
@@ -178,8 +185,8 @@ void Classy_ClassDestroy(ClientData clientdata) {
 	}
 	Tcl_VarEval(interp,"foreach var [info vars ::class::", string,",,*] {unset $var}", (char *)NULL);
 	Tcl_VarEval(interp,"foreach cmd [info commands ::class::", string,",,*] {rename $cmd {}}", (char *)NULL);
-	Classy_FreeClass(class);
-	Tcl_Free((char *)class);
+	Tcl_EventuallyFree(clientdata,Classy_FreeClass);
+	Tcl_Release(clientdata);
 }
 
 int Classy_SubclassClassMethod(
@@ -237,8 +244,9 @@ int Classy_SubclassClassMethod(
 		subclass = (Class *)Tcl_Alloc(sizeof(Class));
 		Tcl_SetHashValue(entry,(ClientData)subclass);
 	} else {
-		subclass = (Class *)Tcl_GetHashValue(entry);
-		Classy_FreeClass(subclass);
+		Tcl_ResetResult(interp);
+		Tcl_AppendResult(interp,"command \"",subclassname,"\" exists", (char *)NULL);
+		return TCL_ERROR;
 	}
 	subclass->parent = class;
 	subclass->class = name;
@@ -276,7 +284,9 @@ int Classy_ClassDestroyObjCmd(
 	int argc,
 	Tcl_Obj *CONST argv[])
 {
+	Tcl_Preserve((ClientData)class);
 	Tcl_DeleteCommandFromToken(interp,class->token);
+	Tcl_Release((ClientData)class);
 	return TCL_OK;
 }
 

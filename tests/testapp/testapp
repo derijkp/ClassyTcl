@@ -27,5 +27,6 @@ if {"$script"==""} {
 tk appname $appname
 package require ClassyTcl
 set pwd [pwd]
+lappend Classy::help_path [file join $Classy::appdir help]
 
 eval main $argv

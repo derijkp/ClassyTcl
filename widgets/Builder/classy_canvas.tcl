@@ -7,6 +7,7 @@ proc ::Classy::WindowBuilder::add_Classy::Canvas {object base args} {
 	Classy::Canvas $base -width 50 -height 50
 	eval $base configure $args
 	$base create image  5 5 -anchor nw -image [Classy::geticon Builder/classy__canvas]
+	return $base
 }
 
 proc ::Classy::WindowBuilder::attr_Classy::Canvas_xscroll {object w args} {

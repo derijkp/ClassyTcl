@@ -17,24 +17,40 @@ proc ::Classy::WindowBuilder::start_Classy::NoteBook {object base} {
 	private $object data bindtags
 	set bindtags($base) [bindtags $base]
 	foreach w [list $base $base.label $base.book $base.cover_] {
-		bindtags $w Classy::WindowBuilder_$object
+		bindtags $w $data(tags)
 	}
-	bindtags $base [list Classy::WindowBuilder_$object ::Classy::NoteBook]
+	bindtags $base [list $data(tags) ::Classy::NoteBook]
 	foreach label [$base labels] {
 		set b [$base window $label]
+		$object startedit $b
 		$object protected $b set delete
-		bindtags $b Classy::WindowBuilder_$object
+		bindtags $b $data(tags)
 		set b "$base.tab[getprivate $base button($label)]"
 		set data(class,$b) Classy::NoteBookButton
-		bindtags $b Classy::WindowBuilder_$object
+		bindtags $b $data(tags)
 	}
+	set data(optinitialselection,$base) [$base select]
 }
 
 proc ::Classy::WindowBuilder::attr_Classy::NoteBook_initialselection {object w args} {
+	private $object data
 	if {"$args" == ""} {
-		return [$w get]
+		if ![info exists data(optinitialselection,$w)] {
+			return [lindex [$w labels] 0]
+		} else {
+			return $data(optinitialselection,$w)
+		}
 	} else {
-		$w set [lindex $args 0]
+		set data(optinitialselection,$w) [lindex $args 0]
+		$w select [lindex $args 0]
+	}
+}
+
+proc ::Classy::WindowBuilder::attr_Classy::NoteBook_order {object w args} {
+	if {"$args" == ""} {
+		return [$w labels]
+	} else {
+		eval $w reorder [lindex $args 0]
 	}
 }
 
@@ -43,12 +59,12 @@ proc ::Classy::WindowBuilder::edit_Classy::NoteBook {object w} {
 	frame $w.general
 	set base $current(w)
 	::Classy::WindowBuilder::defattredit $object $w.general {
-		-label Label 0 initialselection "Initial selection" 0
-	} 10
+		-label Label 0 order Order 0 initialselection "Initial selection" 0
+	} 12
 	catch {destroy .classy__.temp}
 	button $w.add -text "Add Tab" -command [varsubst {object w base} {
-			::Classy::InputBox .classy__.temp -title "Tab name" -label "Tab name" \
-			-command "::Classy::WindowBuilder::edit_Classy::NoteBook_add $object $w $base \[.classy__.temp get\]"
+			::Classy::InputDialog .classy__.temp -title "Tab name" -label "Tab name" \
+			-command "::Classy::WindowBuilder::edit_Classy::NoteBook_add $object $w $base"
 		}]
 	grid $w.general -sticky we -columnspan 2
 	grid $w.add -sticky we
@@ -75,12 +91,21 @@ proc ::Classy::WindowBuilder::generate_Classy::NoteBook {object base} {
 	append body [$object generatebindings $base $outw]
 	append body "\t[$object gridwconf $base]"
 	append body "\n"
+	set labels ""
 	foreach b [$base labels] {
 		set w [$base window $b]
 		append body [$object generate $w]
-		catch {append body "\t$outw add [[$base button $b] cget -text] $w\n"}
+		set label [[$base button $b] cget -text]
+		catch {append body "\t$outw manage $label [$object outw $w]\n"}
+		lappend labels $label
 	}
-	append body "\t$outw select [$base get]\n"
+	if [info exists data(optinitialselection,$base)] {
+		if {[lsearch $labels $data(optinitialselection,$base)] != -1} {
+			append body "\t$outw select $data(optinitialselection,$base)\n"
+		}
+	} else {
+			append body "\t$outw select [lindex [$base labels] 0]\n"
+	}
 	return $body
 }
 
@@ -88,13 +113,22 @@ proc ::Classy::WindowBuilder::generate_Classy::NoteBook {object base} {
 # Classy::NoteBookButton
 #
 
+proc ::Classy::WindowBuilder::attr_Classy::NoteBookButton_label {object w args} {
+	if {"$args" == ""} {
+		return [$w cget -text]
+	} else {
+		[winfo parent $w] rename [$w cget -text] [lindex $args 0]
+	}
+	$object startedit [winfo parent $w]
+}
+
 proc ::Classy::WindowBuilder::edit_Classy::NoteBookButton {object w} {
 	private $object current
 	$current(w) invoke
 	frame $w.general
 	button $w.delete
 	::Classy::WindowBuilder::defattredit $object $w {
-		-text Text 0 -command Command 1
+		label Label 0
 	} 8 1
 }
 
@@ -115,11 +149,11 @@ proc ::Classy::WindowBuilder::edit_Classy::NoteBook_add {object w base name} {
 		set b [$base window $label]
 		catch {unset data(redir,$b)}
 		$object protected $b set delete
-		bindtags $b Classy::WindowBuilder_$object
+		bindtags $b $data(tags)
 		set b $base.tab[getprivate $base button($label)]	
 		catch {unset data(redir,$b)}
 		set data(class,$b) Classy::NoteBookButton
-		bindtags $b Classy::WindowBuilder_$object
+		bindtags $b $data(tags)
 	}
 }
 

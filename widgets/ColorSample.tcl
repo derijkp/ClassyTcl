@@ -87,7 +87,10 @@ Classy::ColorSample addoption -command {command Command {}}
 Classy::ColorSample method set {value} {
 	private $object color
 	set color $value
-	uplevel #0 [getprivate $object options(-command)]
+	set command [getprivate $object options(-command)]
+	if {"$command" != ""} {
+		uplevel #0 $command [list [$object get]]
+	}
 }
 
 #doc {ColorSample command get} cmd {

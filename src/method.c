@@ -695,7 +695,7 @@ int Classy_MethodClassMethod(
 		Tcl_AppendStringsToObj(procname,"::class::",classname,",,destroy",(char *)NULL);
 		error = Classy_CreateTclMethod(interp,method,procname,argv[1],argv[2],"destroy");
 		if (error != TCL_OK) {Tcl_Free((char *)method);return error;}
-		class->destroy=method;
+		class->destroy = method;
 		Tcl_SetResult(interp,name,TCL_VOLATILE);
 		return TCL_OK;
 	} else {

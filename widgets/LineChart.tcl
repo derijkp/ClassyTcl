@@ -290,7 +290,7 @@ Classy::LineChart method lineconfigure {name args} {
 Classy::LineChart method _drawlegend {} {
 	private $object tag options order hidden
 	set canvas $options(-canvas)
-	if {"$canvas" == ""} return
+	if ![winfo exists $canvas] return
 	$canvas delete $options(-tag)::legend
 	if ![true $options(-legend)] return
 	if {"$order"==""} return
@@ -329,7 +329,7 @@ Classy::LineChart method _drawlabels {} {
 	private $object options hidden
     ::Classy::canceltodo $object _drawlabels
 	set canvas $options(-canvas)
-	if {"$canvas" == ""} return
+	if ![winfo exists $canvas] return
 	set width [expr [lindex $options(-area) 2] - [lindex $options(-area) 0]]
 	if {$width<=0} return
 
@@ -380,7 +380,7 @@ Classy::LineChart method _drawdata {} {
 	private $object data tag options order hidden
 	::Classy::canceltodo $object _drawdata
 	set canvas $options(-canvas)
-	if {"$canvas" == ""} return
+	if ![winfo exists $canvas] return
 	if {"$order"==""} {return}
 
 	set xstart [lindex $options(-area) 0]
@@ -403,9 +403,14 @@ Classy::LineChart method _drawdata {} {
 	foreach name $order {
 		if [info exists hidden($name)] continue
 		set pos 0
-		while 1 {
+		set len [llength $data($name)]
+		while {$pos < $len} {
 			if {[lindex $data($name) $pos]>$minx} break
 			incr pos 2
+		}
+		if {$pos >= $len} {
+			$canvas coords $tag($name) -1 -1
+			continue
 		}
 		set d ""
 		if {$pos != 0} {
@@ -485,11 +490,9 @@ Classy::LineChart method _drawdata {} {
 #}
 Classy::LineChart method redraw {args} {
 	private $object options
-	if {"$options(-canvas)" == ""} return
-	::Classy::busy
+	if ![winfo exists $options(-canvas)] return
+#	::Classy::busy
 	::Classy::canceltodo $object _drawdata _drawlegend _drawlabels
-	$object _drawdata
-#	$object _drawlegend
-#	$object _drawlabels
-	::Classy::busy remove
+	catch {$object _drawdata}
+#	::Classy::busy remove
 }

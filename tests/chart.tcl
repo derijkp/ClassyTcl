@@ -17,6 +17,7 @@ test Classy::ChartGrid {create and configure} {
 
 test Classy::BarChart {create and configure} {
 	classyclean
+	Classy::ChartGrid destroy
 	canvas .try
 	pack .try -fill both -expand yes
 	update idletasks
@@ -45,9 +46,10 @@ test Classy::BarChart {create and configure} {
 	try dataget Try
 } {5 6 5 5 4 5 6 7}
 
-test Classy::BarChartBox {create and configure} {
+test Classy::BarChartDialog {create and configure} {
 	classyclean
-	Classy::BarChartBox .try
+	Classy::ChartGrid destroy
+	Classy::BarChartDialog .try
 	.try dataset Try {5 6 5 5 4 5 6 7}
 	.try dataset "Try 2" {4 5 4 4 5 6 5 9}
 	.try dataset "Try3" {10 6 3 9 3 8 4 10}
@@ -59,6 +61,8 @@ test Classy::BarChartBox {create and configure} {
 
 test Classy::LineChart {create and configure} {
 	classyclean
+	Classy::ChartGrid destroy
+	catch {rename try {}}
 	canvas .try
 	pack .try -fill both -expand yes
 	update idletasks
@@ -83,9 +87,11 @@ test Classy::LineChart {create and configure} {
 	try dataget Try
 } {1 5 2 6 3 5 4 5 5 4 6 5 7 6 8 7}
 
-test Classy::LineChartBox {create and configure} {
+test Classy::LineChartDialog {create and configure} {
 	classyclean
-	Classy::LineChartBox .try
+	Classy::ChartGrid destroy
+	catch {rename try {}}
+	Classy::LineChartDialog .try
 	.try dataset Try {1 5 2 6 3 5 4 5 5 4 6 5 7 6 8 7}
 	.try dataset "Try 2" {1 4 2 5 3 4 4 4 5 5 6 6 7 5 8 9}
 	.try dataset "Try 3" {1 8 2 9 3 8 4 8 5 20 6 7 7 9 8 9}

@@ -87,6 +87,11 @@ proc t args {# ClassyTcl generated Dialog
 
 }
 
+
+                    
+
+
+
 proc geom args {# ClassyTcl generated Toplevel
 	if [regexp {^\.} $args] {
 		set window [lpop args]
@@ -101,8 +106,7 @@ proc geom args {# ClassyTcl generated Toplevel
 	button $window.o1 \
 		-text {button 1}
 	grid $window.o1 -row 0 -column 0 -sticky esw
-	entry $window.o2 \
-		-validate none
+	entry $window.o2
 	grid $window.o2 -row 1 -column 0 -sticky esw
 	frame $window.frame 
 	grid $window.frame -row 0 -column 1 -rowspan 5 -sticky nesw
@@ -111,12 +115,15 @@ proc geom args {# ClassyTcl generated Toplevel
 	grid $window.frame.o6 -row 3 -column 0 -sticky nesw
 	scrollbar $window.frame.o5
 	grid $window.frame.o5 -row 0 -column 1 -sticky nesw
-	listbox $window.frame.listbox \
-		-offset 0,0
+	listbox $window.frame.listbox 
 	grid $window.frame.listbox -row 0 -column 0 -sticky nesw
+	$window.frame.listbox insert end 
 	label $window.label1 \
 		-text label
 	grid $window.label1 -row 2 -column 0 -sticky new
+	Classy::DynaMenu attachmainmenu Classy::Test $window
+	Classy::DynaMenu attachmainmenu Classy::Test $window
+	Classy::DynaMenu attachmainmenu Classy::Test $window
 	grid columnconfigure $window 0 -weight 1
 	grid rowconfigure $window 2 -weight 1
 
@@ -153,13 +160,8 @@ set try 1
 
 
 
-
-
-
-
-
-
-
+                    
+proc ttt tt {} {puts okok}
 
 
 

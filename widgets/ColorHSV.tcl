@@ -92,12 +92,12 @@ Classy::ColorHSV addoption -command {command Command {}}
 # ------------------------------------------------------------------
 
 
-#doc {ColorHSV command set} cmd {
+#doc {ColorHSV command nocmdset} cmd {
 #pathname set value
 #} descr {
-# set the current color to $value
+# set the current color to $value, without executing command
 #}
-Classy::ColorHSV method set {value} {
+Classy::ColorHSV method nocmdset {value} {
 	private $object valV nocmd
 	eval $object _set_rgb [winfo rgb $object $value]
 
@@ -105,6 +105,19 @@ Classy::ColorHSV method set {value} {
 	$object.valV set [lindex [split [expr $valV*100] .] 0]
 	$object.valV configure -command "$object _updateV"
 	if [winfo exists $object.valHS] {$object _drawHSpos}
+}
+
+#doc {ColorHSV command set} cmd {
+#pathname set value
+#} descr {
+# set the current color to $value
+#}
+Classy::ColorHSV method set {value} {
+	$object nocmdset $value
+	set command [getprivate $object options(-command)]
+	if {"$command" != ""} {
+		uplevel #0 $command [list [$object get]]
+	}
 }
 
 # ------------------------------------------------------------------
@@ -217,7 +230,9 @@ Classy::ColorHSV method _updateHS {mode x y} {
 
 	update idletasks
 	set command [getprivate $object options(-command)]
-	if {"$command" != ""} {eval $command}
+	if {"$command" != ""} {
+		uplevel #0 $command [list [$object get]]
+	}
 }
 
 # ------------------------------------------------------------------
@@ -228,7 +243,9 @@ Classy::ColorHSV method _updateV {val} {
 	set valV [expr $val/100.0]
 	$object _drawHSpos
 	set command [getprivate $object options(-command)]
-	if {"$command" != ""} {eval $command}
+	if {"$command" != ""} {
+		uplevel #0 $command [list [$object get]]
+	}
 }
 
 # ------------------------------------------------------------------

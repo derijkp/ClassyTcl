@@ -12,6 +12,7 @@
 # with a few extras
 #<ul>
 #<li>optional label
+#<li>invoke command upon entry
 #<li>constraints
 #<li>a <a href="DefaultMenu.html">DefaultMenu</a> can be added to
 # store and reselecte values easily. These default values are stored
@@ -35,6 +36,7 @@ option add *Classy::Entry*Frame.highlightThickness 0 widgetDefault
 option add *Classy::Entry*Frame.borderWidth 0 widgetDefault
 option add *Classy::Entry.entry.relief sunken widgetDefault
 option add *Classy::Entry.label.anchor w widgetDefault
+option add *Classy::Entry.entry.width 5 widgetDefault
 
 bind Classy::Entry <Key-Return> {
 	%W constrain warn
@@ -75,14 +77,11 @@ Classy::Entry classmethod init {args} {
 	::class::rebind $object.entry $object
 	::class::refocus $object $object.entry
 	pack $object.entry -in $object.frame.entry -side left -expand yes -fill x
-
 	# REM Create bindings
 	# -------------------
-
 	# REM Initialise variables
 	# ------------------------
 	setprivate $object previous {}
-
 	# REM Configure initial arguments
 	# -------------------------------
 	if {"$args" != ""} {eval $object configure $args}
@@ -94,14 +93,17 @@ Classy::Entry classmethod init {args} {
 # ------------------------------------------------------------------
 
 Classy::Entry chainoptions {$object.entry}
+Classy::Entry chainoption -background {$object} -background {$object.entry} -background
+Classy::Entry chainoption -highlightbackground {$object} -highlightbackground {$object.entry} -highlightbackground
+Classy::Entry chainoption -highlightcolor {$object} -highlightcolor {$object.entry} -highlightcolor
 
 #doc {Entry options -orient} option {-orient orient Orient} descr {
 # determines the position of the label relative to the entry: horizontal or vertical
 #}
 Classy::Entry addoption -orient {orient Orient horizontal} {
+	set value [Classy::orient $value]
 	Classy::todo $object _redrawentry
 }
-
 
 #doc {Entry options -default} option {-default default Default} descr {
 # If not empty, a <a href="DefaultMenu.html">DefaultMenu</a> will be 
@@ -116,7 +118,7 @@ Classy::Entry addoption -default {default Default {}} {
 		destroy $w
 	} elseif ![winfo exists $w] {
 		Classy::DefaultMenu $w -key $value \
-			-command "$object set \[$w get\]" \
+			-command "$object set" \
 			-getcommand "$object get"
 		pack $object.defaults -in $object.frame.entry -side right
 	} else {
@@ -131,7 +133,6 @@ Classy::Entry addoption -default {default Default {}} {
 #}
 Classy::Entry addoption -label {label Label {}} {
 	private $object options
-#puts "set to $value"
 	catch {destroy $object.label}
 	if {"$value" != ""} {
 		label $object.label
@@ -148,8 +149,11 @@ Classy::Entry addoption -label {label Label {}} {
 }
 
 #doc {Entry options -command} option {-command command Command} descr {
-# associate a command with the entry. This
-# command will be executed when the Action key is pressed in the entry.
+# associate a command with the entry. When the Action key (usually Enter) is pressed 
+# in the entry, the widget will invoke a Tcl command by concatenating the given 
+# command and the value in the entry widget. The command will be executed in global
+# scope. If you want to use temporary variables without poluting the global namesspace,
+# the <a href="convenience.html">Extral invoke</a> command might interest you.
 #}
 Classy::Entry addoption -command {command Command {}}
 
@@ -165,7 +169,6 @@ Classy::Entry addoption -constraint {constraint Constraint {}}
 Classy::Entry addoption -labelwidth {labelWidth LabelWidth {}} {
 	Classy::todo $object _redrawentry
 }
-
 
 # ------------------------------------------------------------------
 #  Methods
@@ -193,7 +196,7 @@ Classy::Entry method nocmdset {val} {
 #}
 Classy::Entry method set {val} {
 	$object nocmdset $val
-	uplevel #0 [getprivate $object options(-command)]
+	$object command
 }
 
 #doc {Entry command get} cmd {
@@ -212,11 +215,12 @@ Classy::Entry method get {} {
 #}
 Classy::Entry method command {} {
 	set command [getprivate $object options(-command)]
-	if {"$command"==""} {
+	if {"$command" != ""} {
+		uplevel #0 $command [list [$object.entry get]]
+		return 1
+	} else {
 		return 0
 	}
-	uplevel #0 $command
-	return 1
 }	
 
 #doc {Entry command constrain} cmd {

@@ -85,24 +85,26 @@ Classy::Text method link {{lw {}}} {
 	if {"$lw"==""} {return $linked}
 	if {[lsearch -exact $linked $lw]!=-1} {return $linked}
 	if ![winfo exists $lw] {error "Couldn't link: $lw does not exists"}
-	upvar #0 [privatevar $lw linked] flinked
-	upvar #0 [privatevar $lw undobuffer] fundobuffer
-	upvar #0 [privatevar $lw redobuffer] fredobuffer
-	upvar #0 [privatevar $lw textchanged] ftextchanged
+	foreach var {flinked fundobuffer fredobuffer ftextchanged} val [$lw _getlink] {
+		set $var $val
+	}
 	set undobuffer $fundobuffer
 	set redobuffer $redobuffer
-#	set textchanged $ftextchanged
 	if $ftextchanged {$object _changed}
 	$w delete 1.0 end
 	$w insert end [$lw get 1.0 end]
 	$w delete "end-1c"
-
 	set linked $flinked
 	lappend linked $lw
 	foreach link $linked {
 		uplevel #0 lappend [privatevar $link linked] $object
 	}
 	return $linked
+}
+
+Classy::Text method _getlink {} {
+	return [list [getprivate $object linked] [getprivate $object undobuffer] \
+	[getprivate $object redobuffer] [getprivate $object textchanged]]
 }
 
 #doc {Text command unlink} cmd {
@@ -195,7 +197,7 @@ Classy::Text method textchanged {{bool {}}} {
 Classy::Text method _changed {} {
 	private $object textchanged
 	set textchanged 1
-	eval [getprivate $object options(-changedcommand)]
+	uplevel #0 [getprivate $object options(-changedcommand)]
 }
 
 #doc {Text command delete} cmd {
@@ -247,8 +249,10 @@ Classy::Text method undo {{link {}}} {
 	}
 	set undo [lpop undobuffer]
 	set index1 [lindex $undo 2]
-	$w mark set insert $index1
-	$w see $index1
+	if {"$link" == ""} {
+		$w mark set insert $index1
+		$w see $index1
+	}
 	switch [lindex $undo 0] {
 		Insert {
 			$w delete $index1 [lindex $undo 3]
@@ -278,8 +282,10 @@ Classy::Text method redo {{link {}}} {
 	}
 	set redo [lpop redobuffer]
 	set index1 [lindex $redo 2]
-	$w mark set insert $index1
-	$w see $index1
+	if {"$link" == ""} {
+		$w mark set insert $index1
+		$w see $index1
+	}
 	switch [lindex $redo 0] {
 		Delete {
 			$w delete $index1 [lindex $redo 3]
@@ -361,6 +367,34 @@ Classy::Text method findsel {dir} {
 		set findwhat [$object get sel.first sel.last]
 	}
 	$object find $findwhat $dir -exact
+}
+
+#doc {Text command get} cmd {
+#pathname get ?index1? ?index2?
+#} descr {
+#}
+Classy::Text method get {args} {
+	set len [llength $args]
+	set w [Classy::window $object]
+	if {$len == 0} {
+		$w get 1.0 end
+	} elseif {$len == 1} {
+		$w get [lindex $args 0]
+	} elseif {$len == 2} {
+		$w get [lindex $args 0] [lindex $args 1]
+	} else {
+		return -code error "wrong # args: should be \"$object get ?index1? ?index2?\""
+	}
+}
+
+#doc {Text command set} cmd {
+#pathname set value
+#} descr {
+#}
+Classy::Text method set {value} {
+	set w [Classy::window $object]
+	$object delete 1.0 end
+	$object insert end $value
 }
 
 # REM Moving methods

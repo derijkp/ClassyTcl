@@ -589,3 +589,5 @@ proc ClassyFilerWindow_drawdir {} {
 	pack $object.dir.l$num -side right
 }
 
+
+

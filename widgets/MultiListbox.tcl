@@ -113,8 +113,10 @@ Classy::MultiListbox method select {item} {
 #} descr {
 #}
 Classy::MultiListbox method command {} {
-	public $object command
-	return [uplevel #0 $command]
+	private $object options
+	if {"$options(-command)" != ""} {
+		uplevel #0 $options(-command) [list [$object get]]
+	}
 }
 
 #doc {MultiListbox command get} cmd {

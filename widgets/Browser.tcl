@@ -70,6 +70,9 @@ Classy::Browser method destroy {} {
 # ------------------------------------------------------------------
 
 Classy::Browser chainoptions {$object.c}
+Classy::Browser chainoption -background {$object} -background {$object.c} -background
+Classy::Browser chainoption -highlightbackground {$object} -highlightbackground {$object.c} -highlightbackground
+Classy::Browser chainoption -highlightcolor {$object} -highlightcolor {$object.c} -highlightcolor
 
 Classy::Browser addoption -minx {minX MinX 0} {
 	Classy::todo $object redraw

@@ -44,7 +44,7 @@ Classy::Toplevel classmethod init {args} {
 	wm positionfrom $object program
 	wm withdraw $object
 	wm group $object .
-	wm protocol $object WM_DELETE_WINDOW [list catch [list destroy $object]]
+	wm protocol $object WM_DELETE_WINDOW [list catch [list $object destroy]]
 	# REM Create bindings
 	# -------------------
 	# REM Initialise variables
@@ -142,6 +142,9 @@ Classy::Toplevel method place {} {
 	set keeppos 0
 	set minw [winfo reqwidth $object]
 	set minh [winfo reqheight $object]
+	set minsize [wm minsize $object]
+	if {$minw < [lindex $minsize 0]} {set minw [lindex $minsize 0]}
+	if {$minh < [lindex $minsize 1]} {set minh [lindex $minsize 1]}
 	set w $minw
 	set h $minh
 	set rx [lindex $resize 0]

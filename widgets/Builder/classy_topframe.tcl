@@ -6,7 +6,7 @@ proc ::Classy::WindowBuilder::start_Classy::Topframe {object base} {
 	private $object data bindtags
 	set bindtags($base) [bindtags $base]
 	$object startedit [winfo children $base]
-	bindtags $base Classy::WindowBuilder_$object
+	bindtags $base $data(tags)
 	$object select $base
 }
 

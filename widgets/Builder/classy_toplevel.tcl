@@ -6,8 +6,35 @@ proc ::Classy::WindowBuilder::start_Classy::Toplevel {object base} {
 	private $object data bindtags
 	set bindtags($base) [bindtags $base]
 	$object startedit [winfo children $base]
-	bindtags $base Classy::WindowBuilder_$object
+	foreach child [winfo children $base] {
+		if [regexp "^$base.#classy__#menu_" $child] {
+			set data(redir,$child) $base
+		}
+	}
+	bindtags $base $data(tags)
+	if ![info exists data(opt-destroycommand,$base)] {
+		set data(opt-destroycommand,$base) ""
+	}
+	$base configure -destroycommand "destroy $base"
 	$object select $base
+	wm protocol $base WM_DELETE_WINDOW [varsubst base {
+		catch {$base configure -destroycommand {}}
+		catch {destroy $base}
+	}]
+}
+
+proc ::Classy::WindowBuilder::attr_Classy::Toplevel_-destroycommand {object w args} {
+	private $object data
+	if {"$args" == ""} {
+		return $data(opt-destroycommand,$w)
+	} else {
+		set value [lindex $args 0]
+		if ![info exists data(opt-destroycommand,$w)] {
+			if {"$value" != ""} {
+				set data(opt-destroycommand,$w) "\"$value\""
+			}
+		}
+	}
 }
 
 proc ::Classy::WindowBuilder::edit_Classy::Toplevel {object w} {
@@ -40,10 +67,10 @@ proc ::Classy::WindowBuilder::generate_Classy::Toplevel {object base} {
 		if {"$data(opt-mainmenu,$base)" != ""} {
 			if {"$data(opt-menuwin,$base)" != ""} {
 				foreach win $data(opt-menuwin,$base) {
-					append body "\tClassy::DynaMenu attachmainmenu $data(opt-mainmenu,$base) $win\n"
+					append data(parse) "\tClassy::DynaMenu attachmainmenu $data(opt-mainmenu,$base) $win\n"
 				}
 			} else {
-				append body "\tClassy::DynaMenu attachmainmenu $data(opt-mainmenu,$base)\n"
+				append data(parse) "\tClassy::DynaMenu attachmainmenu $data(opt-mainmenu,$base) $outw\n"
 			}
 		}
 	}
@@ -51,6 +78,3 @@ proc ::Classy::WindowBuilder::generate_Classy::Toplevel {object base} {
 	append body "\n"
 	return $body
 }
-
-
-

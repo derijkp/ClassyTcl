@@ -7,9 +7,9 @@
 #doc DynaTool title {
 #DynaTool
 #} descr {
-# subclass of <a href="../basic/Class.html">Class</a><br>
-# DynaTool is not a widget and is not intended to produce instances. 
-# It is a class that manages toolbars in an easy and dynamic way.
+# subclass of <a href="../basic/Widget.html">Widget</a><br>
+# The DynaTool widgets are toolbars, for which the contents are managed by
+# the DynaTool class in an easy and dynamic way.
 # DynaTool can handle several tooltypes.
 #<p>
 # Each tooltype is defined by a definition in a simple format. 
@@ -32,48 +32,60 @@ proc ::Classy::DynaTool {} {}
 proc DynaTool {} {}
 }
 
-option add *Classy::Tool.Button.padY 0 widgetDefault
-option add *Classy::Tool.Checkbutton.padY 1 widgetDefault
-option add *Classy::Tool.Menubutton.padY 1 widgetDefault
+option add *Classy::DynaTool.Button.padY 0 widgetDefault
+option add *Classy::DynaTool.Checkbutton.padY 1 widgetDefault
+option add *Classy::DynaTool.Menubutton.padY 1 widgetDefault
+
+bind Classy::DynaTool <Configure> "%W redraw"
 
 # ------------------------------------------------------------------
 #  Widget creation
 # ------------------------------------------------------------------
 
-Class subclass Classy::DynaTool
+Widget subclass Classy::DynaTool
 Classy::export DynaTool {}
 
+Classy::DynaTool classmethod init {args} {
+	# REM Create object
+	# -----------------
+	super
+	$object configure -bd 0
+	# REM Create bindings
+	# -------------------
+	# REM Initialise variables
+	# ------------------------
+	private $object data
+	catch {unset data(slaves)}
+	set data(type) ""
+	set data(cmdw) ""
+	set data(checks) ""
+	# REM Configure initial arguments
+	# -------------------------------
+	if {"$args" != ""} {eval $object configure $args}
+	Classy::todo $object redraw
+}
+
 # ------------------------------------------------------------------
-#  Methods
+#  Widget options
 # ------------------------------------------------------------------
 
-#doc {DynaTool maketool} cmd {
-#pathname maketool tooltype tool cmdw
-#} descr {
-# create a toolbar of type $tooltype. $cmdw
-# determines the initial commmand widget.
-#}
-Classy::DynaTool method maketool {tooltype tool cmdw} {
-	private $object cmdws tooldata tooltypes checks slaves
-	if ![info exists tooldata($tooltype)] {
-		$object define $tooltype
+Classy::DynaTool chainoptions {$object}
+
+Classy::DynaTool addoption -type {type Type {}} {
+	private $object data options
+	private $class tooldata tools
+	set prev $options(-type)
+	if [info exists tools($prev)] {
+		set tools($prev) [lremove $tools($prev) $object]
 	}
-	catch {unset slaves($tool)}
-	set tooltypes($tool) $tooltype
-	set cmdws($tool) $cmdw
-	set checks($tool) ""
-	set sepnum 0
-	if [winfo exists $tool] {
-		if {"[$tool cget -class]"!="Classy::Tool"} {
-			error "$tool already exists"
-		}
-	} else {
-		frame $tool -class Classy::Tool -bd 0
-	}
+	lappend tools($value) $object
+	set cmdw $data(cmdw)
 	set num 0
-	set list [splitcomplete $tooldata($tooltype)]
+	eval destroy [winfo children $object]
+	catch {unset data(slaves)}
+	set list [splitcomplete $tooldata($value)]
 	if {[lsearch -regexp $list "^\[\t \]*nodisplay\[\t \]*\$"] != -1} {
-		$tool configure -height 0 -width 0
+		$object configure -height 0 -width 0
 		return
 	}
 	foreach current $list {
@@ -85,53 +97,49 @@ Classy::DynaTool method maketool {tooltype tool cmdw} {
 		set help [lshift current]
 		if {"$type"=="action"} {
 			set command [lshift current]
-			regsub -all {%W} $command "\[$object cmdw $tool\]" command
+			regsub -all {%W} $command "\[$object cmdw\]" command
 			regsub -all {%%} $command % command
-			set image [Classy::geticon $id reload]
-			if {"$image"!=""} {
-				button $tool.$key -image $image -highlightthickness 0 -command [list Classy::check $command]
+			if ![catch {set image [Classy::geticon $id reload]}] {
+				button $object.$key -image $image -highlightthickness 0 -command [list Classy::check $command]
 			} else {
-				button $tool.$key -text $id -highlightthickness 0 -command [list Classy::check $command]
+				button $object.$key -text $id -highlightthickness 0 -command [list Classy::check $command]
 			}
-			lappend slaves($tool) $tool.$key
+			lappend data(slaves) $object.$key
 		} elseif {"$type"=="check"} {
 			set command [lshift current]
 			regsub -all {%W} $command $cmdw tempcmd
 			regsub -all {%%} $tempcmd % tempcmd
-			set image [Classy::geticon $id reload]
-			if {"$image"!=""} {
-				eval {checkbutton $tool.$key -image $image -indicatoron 0 -highlightthickness 0} $tempcmd
+			if ![catch {set image [Classy::geticon $id reload]}] {
+				eval {checkbutton $object.$key -image $image -indicatoron 0 -highlightthickness 0} $tempcmd
 			} else {
-				eval {checkbutton $tool.$key -text $id -highlightthickness 0} $tempcmd
+				eval {checkbutton $object.$key -text $id -highlightthickness 0} $tempcmd
 			}
-			append checks($tool) "$tool.$key configure $command\n"
-			lappend slaves($tool) $tool.$key
+			append data(checks) "$object.$key configure $command\n"
+			lappend data(slaves) $object.$key
 		} elseif {"$type"=="radio"} {
 			set command [lshift current]
 			regsub -all {%W} $command $cmdw tempcmd
 			regsub -all {%%} $tempcmd % tempcmd
-			set image [Classy::geticon $id reload]
-			if {"$image"!=""} {
-				eval {radiobutton $tool.$key -image $image -indicatoron 0 -highlightthickness 0} $tempcmd
+			if ![catch {set image [Classy::geticon $id reload]}] {
+				eval {radiobutton $object.$key -image $image -indicatoron 0 -highlightthickness 0} $tempcmd
 			} else {
-				eval {radiobutton $tool.$key -text $id -highlightthickness 0} $tempcmd
+				eval {radiobutton $object.$key -text $id -highlightthickness 0} $tempcmd
 			}
-			append checks($tool) "$tool.$key configure $command\n"
-			lappend slaves($tool) $tool.$key
+			append data(checks) "$object.$key configure $command\n"
+			lappend data(slaves) $object.$key
 		} elseif {"$type"=="widget"} {
-			eval $id $tool.$key
+			eval $id $object.$key
 			update idletasks
-			lappend slaves($tool) $tool.$key
+			lappend data(slaves) $object.$key
 		} elseif {"$type"=="label"} {
-			set image [Classy::geticon $id reload]
-			if {"$image"!=""} {
-				label $tool.$key -image $image
+			if ![catch {set image [Classy::geticon $id reload]}] {
+				label $object.$key -image $image
 			} else {
-				label $tool.$key -text $id
+				label $object.$key -text $id
 			}
-			lappend slaves($tool) $tool.$key
+			lappend data(slaves) $object.$key
 		} elseif {"$type"=="separator"} {
-			lappend slaves($tool) separator
+			lappend data(slaves) separator
 		} elseif [regexp ^# $type] {
 			continue
 		} elseif {"$type" == ""} {
@@ -139,10 +147,18 @@ Classy::DynaTool method maketool {tooltype tool cmdw} {
 		} else {
 			error "Unknown entrytype $type" 
 		}
-		Classy::Balloon add $tool.$key $help
+		Classy::Balloon add $object.$key $help
 	}
-	$object _placetopfirst $tool
+	$object _placetopfirst
 }
+
+Classy::DynaTool addoption -cmdw {cmdw Cmdw {}} {
+	$object cmdw $value
+}
+
+# ------------------------------------------------------------------
+#  Methods
+# ------------------------------------------------------------------
 
 #doc {DynaTool define} cmd {
 #pathname define tooltype ?data?
@@ -155,88 +171,48 @@ Classy::DynaTool method maketool {tooltype tool cmdw} {
 # You will usually not invoke this method, as the maketool
 # method will automatically define a tooltype that isn't managed yet.
 #}
-Classy::DynaTool method define {tooltype {data {}}} {
-	private $object tooldata keep
-	if [info exists tooldata($tooltype)] {set keep $tooldata($tooltype)}
+Classy::DynaTool classmethod define {tooltype {data {}}} {
+#putsvars tooltype data
+	private $class tooldata keep
+	if [info exists tooldata($tooltype)] {
+		set keep $tooldata($tooltype)
+	} else {
+		catch {unset keep}
+	}
 	if {"$data" != ""} {
 		set tooldata($tooltype) $data
-		$object redraw $tooltype
+		$class redraw $tooltype
 	} else {
 		return $tooldata($tooltype)
 	}
 }
-
-#doc {DynaTool names} cmd {
-#pathname names 
-#} descr {
-#}
-Classy::DynaTool method names {{pattern *}} {
-	private $object tooldata
-	return [array names tooldata $pattern]
-}
-
-Classy::DynaTool method add {tooltype data} {
-#	private $object tooldata keep
-#	set data [split $data "\n"]
-#	set data [lremove $data {}]
-#	
-#	if ![info exists tooldata($tooltype)] {
-#		$object define $tooltype $data
-#		return
-#	}
-#	set mdata $tooldata($tooltype)
-#
-#	set pos end
-#	foreach line $data {
-#		if [regexp {^tool} $line] {
-#			set tools [lsub $mdata [lfind -regexp $mdata {^tool}]]
-#			set search [lsearch -exact $tools $line]
-#			if {$search==-1} {
-#				lappend mdata $line
-#				set pos end
-#			} else {
-#				set len [llength [lfind -regexp $mdata {^tool}]]
-#				incr search
-#				if {$search==$len} {
-#					set pos end
-#				} else {
-#					set pos [lindex [lfind -regexp $mdata {^tool}] $search]
-#				}
-#			}
-#		} else {
-#			set item [lindex $line 1]
-#			set temp [lsearch -regexp $mdata "\[ \t\]*\[a-z\]* $item "]
-#			if {$temp==-1} {
-#				set mdata [linsert $mdata $pos $line]
-#			} else {
-#				set mdata [lreplace $mdata $temp $temp $line]
-#			}
-#		}
-#	}
-#
-#	set keep $tooldata($tooltype)
-#	set tooldata($tooltype) $mdata
-#	after cancel "$object redraw $tooltype"
-#	after idle "$object redraw $tooltype"
-#}
 
 #doc {DynaTool redraw} cmd {
 #pathname redraw tooltype
 #} descr {
 # redraw toolbars of type $tooltype
 #}
-Classy::DynaTool method redraw {tooltype} {
-	private $object keep
-	if [catch {$object _refresh $tooltype} result] {
+Classy::DynaTool classmethod redraw {tooltype} {
+	private $class tooldata keep
+	if [catch {$class _refresh $tooltype} result] {
 		global errorInfo
 		set error $errorInfo
 		if [info exists keep] {
 			set tooldata($tooltype) $keep
-			$object _refresh $tooltype
+			$class _refresh $tooltype
 			append result "\nRestored old tool"
 		}
 		error $result $error
 	}
+}
+
+#doc {DynaTool types} cmd {
+#pathname types ?pattern? 
+#} descr {
+#}
+Classy::DynaTool classmethod types {{pattern *}} {
+	private $class tooldata
+	return [array names tooldata $pattern]
 }
 
 #doc {DynaTool get} cmd {
@@ -244,8 +220,8 @@ Classy::DynaTool method redraw {tooltype} {
 #} descr {
 # returns the definition of $tooltype
 #}
-Classy::DynaTool method get {tooltype} {
-	private $object tooldata
+Classy::DynaTool classmethod get {tooltype} {
+	private $class tooldata
 	return [join $tooldata($tooltype) "\n"]
 }
 
@@ -254,16 +230,13 @@ Classy::DynaTool method get {tooltype} {
 #} descr {
 # delete $tool managed by DynaTool
 #}
-Classy::DynaTool method deletetool {tool} {
-	private $object tooldata tooltypes cmdws checks slaves
-	if ![info exists tooltypes($tool)] {
-		error "Couldn't delete $tool; it is not a tool managed by $object."
-	}
-	if [winfo exists $tool] {destroy $tool}
-	catch {unset slaves($tool)}
-	catch {unset tooltypes($tool)}
-	catch {unset cmdws($tool)}
-	catch {unset checks($tool)}
+Classy::DynaTool method destroy {} {
+	private $object data
+	catch {unset tools($object)}
+	catch {unset data(slaves)}
+	catch {unset data(type)}
+	catch {unset data(cmdw)}
+	catch {unset data(checks)}
 }
 
 #doc {DynaTool delete} cmd {
@@ -271,40 +244,33 @@ Classy::DynaTool method deletetool {tool} {
 #} descr {
 # delete the definition and all toolbars of $tooltype
 #}
-Classy::DynaTool method delete {tooltype} {
-	private $object tooldata tooltypes cmdws checks
+Classy::DynaTool classmethod delete {tooltype} {
+	private $class tooldata tools
 	if ![info exists tooldata($tooltype)] {
 		error "Couldn't delete $tooltype; it is not a tooltype managed by $object."
 	}
-	unset tooldata($tooltype)
-	if [info exists tooltypes] {
-		set toollist [array get tooltypes]
-		set poss [lfind -exact $toollist $tooltype]
-		foreach pos $poss {
-			set tool [lindex $toollist [expr $pos-1]]
-			if [winfo exists $tool] {destroy $tool}
-			unset tooltypes($tool)
-			unset cmdws($tool)
-			unset checks($tool)
+	if [info exists tools($tooltype)] {
+		foreach tool $tools($tooltype) {
+			destroy $tool
 		}
 	}
 }
 
-Classy::DynaTool method _refresh {tooltype} {
-	private $object tooltypes cmdws checks
-	if [info exists tooltypes] {
-		set toollist [array get tooltypes]
-		set poss [lfind -exact $toollist $tooltype]
-		foreach pos $poss {
-			set tool [lindex $toollist [expr $pos-1]]
-			if ![winfo exists $tool] {
-				$object deletetool $tool
+Classy::DynaTool classmethod _refresh {tooltype} {
+	private $class tools
+	set code 0
+	set result ""
+	if [info exists tools($tooltype)] {
+		foreach tool $tools($tooltype) {
+			if [winfo exists $tool] {
+				set code [catch {$tool configure -type $tooltype} result]
 			} else {
-				eval destroy [winfo children $tool]
-				$object maketool $tooltype $tool $cmdws($tool)
+				set tools($tooltype) [lremove tools($tooltype) $tool]
 			}
 		}
 	}
+	if $code {error $result}
+	return $result
 }
 
 #doc {DynaTool cmdw} cmd {
@@ -312,24 +278,22 @@ Classy::DynaTool method _refresh {tooltype} {
 #} descr {
 # change the current cmdw for $tool to $cmdw. If the cmdw argument is
 # not given, the method returns the current cmdw for $tool.
-# This method is automatically called when a widget which has bindtags
-# defined by DynaTool recieves the focus.
 #}
-Classy::DynaTool method cmdw {tool {cmdw {}}} {
-	private $object cmdws
+Classy::DynaTool method cmdw {{cmdw {}}} {
+	private $object data options
 	if {"$cmdw"==""} {
-		return $cmdws($tool)
+		return $data(cmdw)
 	} else {
-		if [info exists cmdws($tool)] {
-			if {"$cmdws($tool)"=="$cmdw"} {return $cmdw}
+		if [info exists data(cmdw)] {
+			if {"$data(cmdw)"=="$cmdw"} {return $cmdw}
 		}
-		set cmdws($tool) $cmdw
-		private $object checks
-		if [info exists checks($tool)] {
-			regsub -all {%W} $checks($tool) $cmdw command
+		set data(cmdw) $cmdw
+		if [info exists data(checks)] {
+			regsub -all {%W} $data(checks) $cmdw command
 			regsub -all {%%} $command % command
 			eval $command
 		}
+		set options(-cmdw) $cmdw
 		return $cmdw
 	}
 }
@@ -343,38 +307,15 @@ Classy::DynaTool method invoke {curtool index} {
 	$curtool invoke $index
 }
 
-#doc {DynaTool conftool} cmd {
-#pathname conftool tooltype
-#} descr {
-#}
-Classy::DynaTool method conftool {tooltype} {
-	Classy::Configurator conftool $tooltype
-}
-
-#Classy::DynaTool method loadtool {tooltype {file {}}} {
-#	if {"$file"==""} {
-#		set file [Classygetconffile $tooltype.tool]
-#	}
-#	if [file exists $file] {
-#		set f [open $file]
-#		set c [read $f]
-#		close $f
-#		$object define $tooltype $c
-#		return $file
-#	} else {
-#		error "tool file $tooltype.tool not found in search path"
-#	}
-#}
-
 #doc {DynaTool reqwidth} cmd {
 #pathname reqwidth tool
 #} descr {
 #}
 Classy::DynaTool method reqwidth {tool} {
-	private $object slaves
+	private $object data
 	set x 0
-	if ![info exists slaves($tool)] {return 0}
-	foreach slave $slaves($tool) {
+	if ![info exists data(slaves)] {return 0}
+	foreach slave $data(slaves) {
 		if {"$slave"=="separator"} {
 			incr x 5
 		} else {
@@ -398,12 +339,12 @@ Classy::DynaTool method reqheight {tool} {
 	return [expr $mh+2*[$tool cget -bd]+1]
 }
 
-Classy::DynaTool method _placetopfirst {tool} {
-	private $object slaves
+Classy::DynaTool method _placetopfirst {} {
+	private $object data
 	set mh 0
 	set x 0
-	if [info exists slaves($tool)] {
-		foreach slave $slaves($tool) {
+	if [info exists data(slaves)] {
+		foreach slave $data(slaves) {
 			if {"$slave"=="separator"} {
 				set w 5
 				set h 0
@@ -416,30 +357,29 @@ Classy::DynaTool method _placetopfirst {tool} {
 			}
 			if {"$slave"!="separator"} {
 				place forget $slave
-				place $slave -x $x -y 1 -in $tool
+				place $slave -x $x -y 1 -in $object
 				raise $slave
 			}
 			incr x $w
 		}
 	}
-	incr mh [$tool cget -bd]
-	$tool configure -height $mh -width [expr $x+2*[$tool cget -bd]+1]
-	bind $tool <Configure> "$object _placetop $tool"
+	incr mh [$object cget -bd]
+	$object configure -height $mh -width [expr $x+2*[$object cget -bd]+1]
 }
 
 
-Classy::DynaTool method _placetop {tool} {
-	private $object slaves
-	if ![info exists slaves($tool)] {return 0}
-	set keep [bind $tool <Configure>]
-	bind $tool <Configure> {}
-	set width [expr [winfo width $tool]-2*[$tool cget -bd]-1]
+Classy::DynaTool method redraw {} {
+	private $object data
+	if ![info exists data(slaves)] {return 0}
+	set keep [bind $object <Configure>]
+	bind $object <Configure> {}
+	set width [expr [winfo width $object]-2*[$object cget -bd]-1]
 	set y 0
 	set mh 0
 	set x 0
 	set xs ""
 	set curslaves ""
-	foreach slave $slaves($tool) {
+	foreach slave $data(slaves) {
 		if {"$slave"=="separator"} {
 			set w 5
 			set h 0
@@ -463,7 +403,7 @@ Classy::DynaTool method _placetop {tool} {
 		if {"$slave"!="separator"} {
 			lappend curslaves $slave
 			place forget $slave
-			place $slave -x $x -y $y -in $tool
+			place $slave -x $x -y $y -in $object
 			raise $slave
 		}
 		incr x $w
@@ -471,7 +411,7 @@ Classy::DynaTool method _placetop {tool} {
 	foreach temp $curslaves {
 		place $temp -height $mh
 	}
-	set y [expr $y+$mh+2*[$tool cget -bd]+1]
-	$tool configure -height $y
-	after idle "bind $tool <Configure> [list $keep]"
+	set y [expr $y+$mh+2*[$object cget -bd]+1]
+	$object configure -height $y
+	after idle "bind $object <Configure> [list $keep]"
 }

@@ -1,24 +1,22 @@
-## ---- Basic Fonts ----
-## Font {basic font} font
-option add *Font {helvetica 10} widgetDefault
-## BoldFont {basic bold font class} font
-option add *BoldFont {helvetica 10 bold} widgetDefault
-## ItalicFont {basic italic font class} font
-option add *ItalicFont {helvetica 10 italic} widgetDefault
-## BoldItalicFont {basic bold-italic font class} font
-option add *BoldItalicFont {helvetica 10 bold italic} widgetDefault
-## NonPropFont {basic non-proportional font class} font
-option add *NonPropFont {courier 10} widgetDefault
+#ClassyTcl font configuration file
 
-## ---- Widget Fonts ----
-## {Button Font} {font used on buttons} font
-option add *Button.font [option get . Font Font] widgetDefault
-## {Menu Font} {font used in menus} font
-option add *Menu.font [option get . BoldItalicFont BoldItalicFont] widgetDefault
-## {Menubutton font} {font used in menu buttons} font
-option add *Menubutton.font [option get . BoldItalicFont BoldItalicFont] widgetDefault
-## {Scale Font} {font used in scales} font
-option add *Scale.font [option get . BoldItalicFont BoldItalicFont] widgetDefault
-## {Text font} {font used in text widgets} font
-option add *Text.font [option get . NonPropFont NonPropFont] widgetDefault
+Classy::configfont {Basic Fonts} {
+	Font *Font {helvetica 10} {basic font}
+	BoldFont *BoldFont {helvetica 10 bold} {basic bold font class}
+	ItalicFont *ItalicFont {helvetica 10 italic} {basic italic font class}
+	BoldItalicFont *BoldItalicFont {helvetica 10 bold italic} {basic bold-italic font class}
+	NonPropFont *NonPropFont {courier 10} {basic non-proportional font class}
+}
 
+Classy::configfont {Widget Fonts} {
+	{Button Font} *Button.font Font {font used on buttons}
+	{Menu Font} *Menu.font BoldItalicFont {font used in menus}
+	{Menubutton font} *Menubutton.font BoldItalicFont {font used in menu buttons}
+	{Scale Font} *Scale.font BoldItalicFont {font used in scales}
+	{Text font} *Text.font NonPropFont {font used in text widgets}
+	{Tree font} *treeFont Font {default font used for text in a tree}
+	{Browser font} *Classy::Browser.font BoldFont {font used for names in the browser widget}
+	{Browser data font} *Classy::Browser.dataFont Font {font used for data in the browser widget}
+	{LargeBrowser font} *Classy::LargeBrowser.font BoldFont {font used for names in the browser widget}
+	{LargeBrowser data font} *Classy::LargeBrowser.dataFont Font {font used for data in the browser widget}
+}

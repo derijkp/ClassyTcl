@@ -51,7 +51,7 @@ Classy::Editor classmethod init {args} {
 	::class::refocus $object $object.edit
 	scrollbar $object.vbar -orient vertical -command "$object.edit yview"
 	scrollbar $object.hbar -orient horizontal -command "$object.edit xview"
-	Classy::DynaTool maketool Classy::Editor $object.tool $object
+	Classy::DynaTool $object.tool -type Classy::Editor -cmdw $object
 	grid $object.tool - -sticky we
 	grid rowconfigure $object 1 -weight 1
 	if {"[option get $object scrollSide ScrollSide]"=="left"} {
@@ -84,6 +84,9 @@ Classy::Editor classmethod init {args} {
 #  Widget options
 # ------------------------------------------------------------------
 Classy::Editor chainoptions {$object.edit}
+Classy::Editor chainoption -background {$object} -background {$object.edit} -background
+Classy::Editor chainoption -highlightbackground {$object} -highlightbackground {$object.edit} -highlightbackground
+Classy::Editor chainoption -highlightcolor {$object} -highlightcolor {$object.edit} -highlightcolor
 
 #doc {Editor options -loadcommand} option {-loadcommand loadCommand LoadCommand} descr {
 #}
@@ -175,7 +178,7 @@ Classy::Editor method copy {} {
 Classy::Editor method connectto {} {
 	set w $object.connectto
 	Classy::SelectDialog $w -title "Connect execution to" \
-		-command "$object configure -connection \[$w get\]"
+		-command "$object configure -connection"
 	$w fill [winfo interps]
 	$w set [getprivate $object options(-connection)]
 }
@@ -204,7 +207,7 @@ Classy::Editor method findfunction {args} {
 	} elseif {"[$object tag ranges sel]"!=""} {
 		set function [$object get sel.first sel.last]
 	} else {
-		ClassyInputBox $object.findfunction -command "$object findfunction \[$object.findfunction get\]"
+		Classy::InputDialog $object.findfunction -command "$object findfunction"
 		return
 	}
 	set index [send -- [getprivate $object options(-connection)] setglobal auto_index($function)]
@@ -220,7 +223,7 @@ Classy::Editor method save {} {
 	private $object curfile options
 	set temp [$object get 1.0 "end-1c"]
 	if {"$options(-savecommand)" != ""} {
-		uplevel #0 {$options(-savecommand) $temp}
+		uplevel #0 $options(-savecommand) [list $temp]
 	} else {
 		set f [open $curfile w]
 		puts -nonewline $f $temp
@@ -254,11 +257,11 @@ Classy::Editor method saveas {file} {
 	catch {wm title [winfo toplevel $object] "$curfile"}
 }
 
-#doc {Editor command savebox} cmd {
-#pathname savebox 
+#doc {Editor command savedialog} cmd {
+#pathname savedialog 
 #} descr {
 #}
-Classy::Editor method savebox {} {
+Classy::Editor method savedialog {} {
 	private $object curfile
 	$object saveas [Classy::savefile -title "Save as" \
 		-transfercommand "$object transfercommand" -initialfile $curfile]
@@ -269,7 +272,7 @@ Classy::Editor method savebox {} {
 #} descr {
 #}
 Classy::Editor method transfercommand {} {
-	set type [string trimleft [file extension [$object.savebox get]] "."]
+	set type [string trimleft [file extension [$object.savedialog get]] "."]
 	return [varsubst {type object} {$type {$object get 1.0 end}}]
 }
 
@@ -344,8 +347,9 @@ Classy::Editor method closefile {} {
 #}
 Classy::Editor method load {{file {}} args} {
 	if {"$file"==""} return
-	private $object curfile curmarkers curmarker prevmarker reopenlist cur
+	private $object curfile curmarkers curmarker prevmarker reopenlist cur options
 	private $class editing
+	set options(-savecommand) ""
 	if {"[$object closefile]" != "true"} {return}
 	set curfile [::Classy::fullpath $file]
 	::Classy::busy add $object
@@ -362,7 +366,6 @@ Classy::Editor method load {{file {}} args} {
 		$object clearundo
 		$object textchanged 0
 	}
-
 	if [info exists cur(pos,$curfile)] {
 		$object mark set insert $cur(pos,$curfile)
 		$object see insert
@@ -392,7 +395,6 @@ Classy::Editor method load {{file {}} args} {
 		 eval $loadcommand [list $curfile]
 	}
 	lappend editing($curfile) $object
-#	if [$object textchanged] {$object _changed}
 	::Classy::busy remove $object
 	return $curfile
 }
@@ -426,12 +428,11 @@ Classy::Editor method forget {args} {
 #}
 Classy::Editor method reopenlist {} {
 	private $object curfile reopenlist
-
 	set w $object.reopenlist
 	destroy $w
 	Classy::SelectDialog $w -title "Reopen list" \
-		-command "$object load \[$w get\]" \
-		-deletecommand "$object forget \[$w get\]"
+		-command "$object load" \
+		-deletecommand "$object forget"
 	set reopenlist [lsort $reopenlist]
 	$w fill $reopenlist
 	$w set $curfile
@@ -704,11 +705,12 @@ Classy::Editor method macro {} {
 	# Options
 	#--------
 	private $object macrokey macroname
-	Classy::Entry $object.macro.options.name -label "Name" -default Classy::Editor_macros \
-		-textvariable [privatevar $object macroname] -command [varsubst object {
-			$object.macro invoke get
-		}]
-	Classy::Entry $object.macro.options.key -textvariable [privatevar $object macrokey] -label "Key-code"
+	Classy::Entry $object.macro.options.name -label "Name" \
+		-default Classy::Editor_macros \
+		-textvariable [privatevar $object macroname] \
+		-command [list $object.macro invoke get]
+	Classy::Entry $object.macro.options.key -label "Key-code" \
+		-textvariable [privatevar $object macrokey]
 	scrollbar $object.macro.options.scroll -command "$object.macro.options.text yview"
 	Classy::Text $object.macro.options.text -yscrollcommand "$object.macro.options.scroll set" -width 20 -height 10
 	if {"$macroname"==""} {set macroname temp}
@@ -782,7 +784,7 @@ Classy::Editor method pattern {args} {
 	if {"$args" != ""} {
 		set pattern [lindex $args 0]
 	} else {
-		Classy::InputBox $object.pattern -label Pattern -textvariable [privatevar $object pattern] -default Classy::Editor_patterns
+		Classy::InputDialog $object.pattern -label Pattern -textvariable [privatevar $object pattern] -default Classy::Editor_patterns
 	}
 }
 
@@ -987,24 +989,33 @@ Classy::Editor method marker {command args} {
 	set arg [lindex $args 0]
 	switch $command {
 		set {
-			if {"$arg"==""} {
-				set arg $marker
-			}
 			private $object curmarker prevmarker
+			if {"$arg" != ""} {
+				set newmarker $arg
+			} else {
+				set newmarker mark
+			}
+			set names [$we mark names]
+			set names [lremove $names anchor current insert]
+			if {[lsearch $names $newmarker] != -1} {
+				set num 1
+				regsub { [0-9]+$} $newmarker {} base
+				while {[lsearch $names "$newmarker $num"] != -1} {
+					incr num
+				}
+				set newmarker "$newmarker $num"
+			}
 			if {"[$we tag ranges sel]"==""} {
-				$we mark set $arg insert
+				$we mark set $newmarker insert
 			} else {
 				set select [$we get sel.first sel.last]
-				$we mark set $arg sel.first
-				$we mark set $arg' sel.last
+				$we mark set $newmarker sel.first
+				$we mark set $newmarker' sel.last
 			}
 			set prevmarker $curmarker
-			set curmarker $arg
-			regexp {^(.*[^0-9])([0-9]*)$} $arg temp mark num
-			if {"$num"==""} {set num 1}
-			set marker $mark$num
+			set curmarker $newmarker
 			$object marker refresh
-			return $temp
+			return {}
 		}
 		delete {
 			private $object curmarker prevmarker
@@ -1040,10 +1051,9 @@ Classy::Editor method marker {command args} {
 			} else {
 				if ![winfo exists $w] {
 					Classy::SelectDialog $w -title "Select mark" -cache 1 \
-						-command "$object marker goto \[$w get\]" \
+						-command "$object marker goto" \
 						-addcommand "$object marker set" \
-						-addvariable [privatevar $object marker] \
-						-deletecommand "$object marker delete \[$w get\]"
+						-deletecommand "$object marker delete"
 				} else {
 					$w place
 				}
@@ -1154,7 +1164,7 @@ proc Classy::title {w title} {
 }
 
 proc edit {args} {
-	if {"$args"==""} {set args "Newfile"}
+#	if {"$args"==""} {set args "Newfile"}
 	set w .classy__.edit
 	set num 1
 	while {[winfo exists $w$num] == 1} {incr num}
@@ -1164,6 +1174,8 @@ proc edit {args} {
 	wm protocol $w WM_DELETE_WINDOW "destroy $w"
 	Classy::Editor $w.editor -loadcommand "Classy::title $w" -closecommand "after idle \{destroy $w\}" -setgrid yes
 	pack $w.editor -fill both -expand yes
-	eval $w.editor load $args
+	if {"$args"!=""} {
+		eval $w.editor load $args
+	}
 	return $w
 }

@@ -39,26 +39,17 @@ Classy::export SelectDialog {}
 Classy::SelectDialog classmethod init {args} {
 	super
 	$object configure -resize {1 1}
-	$object add go "Go" {} default
+	$object add go "Go" [list $object _command] default
 	frame $object.options.frame
-	listbox $object.options.list -selectmode browse -exportselection no -yscrollcommand "$object.options.yscroll set"
-	scrollbar $object.options.yscroll -orient vertical -command "$object.options.list yview" -takefocus 0
+	Classy::ListBox $object.options.list -selectmode browse -exportselection no -width 5 -height 5
 	pack $object.options.frame -fill both -expand yes
 	pack $object.options.list -in $object.options.frame -side left -fill both -expand yes
-	pack $object.options.yscroll -in $object.options.frame -side right -fill y
-#	grid $object.options.list -row 0 -column 0 -sticky nwse
-#	grid $object.options.yscroll -row 0 -column 1 -sticky ns
-#	grid columnconfigure $object.options 0 -weight 1
-#	grid columnconfigure $object.options 1 -weight 0
-#	grid rowconfigure $object.options 0 -weight 1
-
 	# REM Create bindings
 	# -------------------
 	bind $object.options.list <Enter> "focus $object.options.list"
 	bind $object.options.list <<Invoke>> "$object invoke go"
 	bind $object.options.list <<MExecute>> "$object invoke go Action"
 	bind $object.options.list <<MExecuteAjust>> "$object.options.list activate @%x,%y;$object invoke go Adjust"
-
 	# REM Configure initial arguments
 	# -------------------------------
 	if {"$args" != ""} {eval $object configure $args}
@@ -74,7 +65,14 @@ Classy::SelectDialog component renameentry {$object.options.rename}
 
 #doc {SelectDialog options -command} option {-command ? ?} descr {
 #}
-Classy::SelectDialog chainoption -command {$object.actions.go} -command
+Classy::SelectDialog addoption -command {command Command {}} {}
+#Classy::SelectDialog chainoption -command {$object.actions.go} -command
+
+#doc {SelectDialog options -command} option {-command ? ?} descr {
+#}
+Classy::SelectDialog addoption -addvariable {addvariable AddVariable {}} {
+	$object configure -addcommand [getprivate $object options(-addcommand)]
+}
 
 #doc {SelectDialog options -default} option {-default default Default} descr {
 #}
@@ -85,23 +83,16 @@ Classy::SelectDialog addoption -default {default Default {}} {
 	return $value
 }
 
-#doc {SelectDialog options -addvariable} option {-addvariable addVariable AddVariable} descr {
-#}
-Classy::SelectDialog addoption -addvariable {addVariable AddVariable {}} {
-	if [winfo exists $object.options.add] {destroy $object.options.add}
-	if {"$value" != ""} {
-		Classy::Entry $object.options.add -label "Add" -textvariable $value \
-			-command "$object invoke add" -default [getprivate $object options(-default)]
-		pack $object.options.add -side bottom -fill x
-	}
-	return $value
-}
-
 #doc {SelectDialog options -addcommand} option {-addcommand addCommand AddCommand} descr {
 #}
 Classy::SelectDialog addoption -addcommand {addCommand AddCommand {}} {
+	private $object options
 	catch {destroy $object.actions.add}
+	catch {destroy $object.options.add}
 	if {"$value" != ""} {
+		Classy::Entry $object.options.add -label "Add" -textvariable $options(-addvariable) \
+			-command "$object invoke add" -default [getprivate $object options(-default)]
+		pack $object.options.add -side bottom -fill x
 		$object add add "Add" [list $object _add] Insert
 	}
 	return $value
@@ -123,7 +114,8 @@ Classy::SelectDialog addoption -renamecommand {renameCommand RenameCommand {}} {
 	catch {destroy $object.actions.rename}
 	catch {destroy $object.options.rename}
 	if {"$value" != ""} {
-		Classy::Entry $object.options.rename -label "Rename to"
+		Classy::Entry $object.options.rename -label "Rename to" \
+			-command "$object invoke rename"
 		pack $object.options.rename -side bottom -fill x
 		$object add rename "Rename" [list $object _rename]
 	}
@@ -165,22 +157,23 @@ Classy::SelectDialog method set {name} {
 	}
 }
 
-proc Classy::select {title list} {
-	global Classytemp
-	Classy::SelectDialog .classy__.select -title $title -command {
-		set Classytemp [.classy__.select get]
-	} -closecommand {set Classytemp ""}
-	.classy__.select fill $list
-	tkwait window .classy__.select
-	return $Classytemp
+Classy::SelectDialog method _command {} {
+	set command [getprivate $object options(-command)]
+	if {"$command" != ""} {
+		set value [$object.options.list get active]
+		uplevel #0 $command [list $value]
+	}
 }
 
 Classy::SelectDialog method _add {} {
 	set addcommand [getprivate $object options(-addcommand)]
 	if {"$addcommand" != ""} {
-		set res [uplevel #0 $addcommand]
+		set value [$object.options.add get]
+		set res [uplevel #0 $addcommand [list $value]]
 		if {[llength $res]==2} {
 			$object.options.list insert [$object.options.list index [lindex $res 1]] [lindex $res 0]
+		} else {
+			$object.options.list insert active $value
 		}
 	}
 }
@@ -188,7 +181,7 @@ Classy::SelectDialog method _add {} {
 Classy::SelectDialog method _delete {} {
 	set deletecommand [getprivate $object options(-deletecommand)]
 	if {"$deletecommand" != ""} {
-		uplevel #0 $deletecommand
+		uplevel #0 $deletecommand [list [$object get]]
 		$object.options.list delete active
 	}
 }
@@ -196,9 +189,18 @@ Classy::SelectDialog method _delete {} {
 Classy::SelectDialog method _rename {} {
 	set renamecommand [getprivate $object options(-renamecommand)]
 	if {"$renamecommand" != ""} {
-		uplevel #0 $renamecommand [$object get] [$object.options.rename get]
+		uplevel #0 $renamecommand [list [$object get]] [list [$object.options.rename get]]
 		$object.options.list insert [expr [$object.options.list index active]+1] [$object.options.rename get]
 		$object.options.list delete active
 	}
+}
+
+proc Classy::select {title list} {
+	Classy::SelectDialog .classy__.select -title $title \
+		-command {set Classy::temp} \
+		-closecommand {set Classy::temp ""}
+	.classy__.select fill $list
+	tkwait window .classy__.select
+	return $::Classy::temp
 }
 

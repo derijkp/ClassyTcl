@@ -70,7 +70,7 @@ proc Classy::savefile {args} {
 	} else {
 		catch {destroy .classy__.selectfile}
 		Classy::FileSelect .classy__.selectfile -dir $dir \
-			-title $opt(-title) -command {set ::Classy::selectfile [.classy__.selectfile get]} \
+			-title $opt(-title) -command {set ::Classy::selectfile} \
 			-filter $filter -default $opt(-default) -help $opt(-help) \
 			-closecommand {set ::Classy::selectfile ""}
 		if {"$remain"!=""} {eval .classy__.selectfile configure $remain}

@@ -13,7 +13,7 @@ proc ::Classy::WindowBuilder::start_Frame {object base} {
 	set bindtags($base) [bindtags $base]
 	$object startedit [winfo children $base]
 	if ![info exists data(bind,$base)] {
-		bindtags $base Classy::WindowBuilder_$object
+		bindtags $base $data(tags)
 	}
 	$object select $base
 }

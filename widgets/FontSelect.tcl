@@ -44,9 +44,12 @@ Classy::FontSelect classmethod init {args} {
 	bind $object.family <Enter> [list focus $object.family]
 	scrollbar $object.vbar -orient vertical -command [list $object.family yview]
 	Classy::Entry $object.font -textvariable [privatevar $object font] -width 5\
-		-label "Font" -command "$object set;Classy::todo $object display" -default classy__font
-	Classy::NumEntry $object.size -textvariable [privatevar $object size] -width 5\
-		-command "Classy::todo $object display" -min 0 -increment 1 \
+		-label "Font" \
+		-command "$object set ; Classy::todo $object display" \
+		-default classy__font
+	Classy::NumEntry $object.size -textvariable [privatevar $object size] -width 5 \
+		-command "Classy::todo $object display" \
+		-min 0 -increment 1 \
 		-label "Size" -orient stacked
 	Classy::OptionBox $object.weight -label "Weight" -orient stacked -variable [privatevar $object weight]
 	$object.weight add normal "Normal" -command "Classy::todo $object display"
@@ -165,7 +168,7 @@ Classy::FontSelect method set {{newfont {}}} {
 #pathname display 
 #} descr {
 #}
-Classy::FontSelect method display {} {
+Classy::FontSelect method display {args} {
 	if ![winfo exists $object.example] {
 		return
 		Classy::todo $object display

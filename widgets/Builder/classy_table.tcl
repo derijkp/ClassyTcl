@@ -13,7 +13,7 @@ proc ::Classy::WindowBuilder::add_Classy::Table {object base args} {
 proc ::Classy::WindowBuilder::start_Classy::Table {object base} {
 	private $object data bindtags
 	set bindtags($base) [bindtags $base]
-	bindtags $base Classy::WindowBuilder_$object
+	bindtags $base $data(tags)
 	$object _recursestartedit $base [winfo children $base]
 	$base redraw
 }

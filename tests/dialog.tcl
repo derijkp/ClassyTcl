@@ -106,7 +106,7 @@ test Classy::SelectDialog {create and configure} {
 	classyclean
 	Classy::SelectDialog .try
 	.try configure -command {
-		set ::try [.try get]
+		set ::try 
 	}
 	.try fill {hallo daar {Hoe gaat het?} ermee jo}
 	update
@@ -135,11 +135,10 @@ test Classy::SelectDialog {destroy if no cache} {
 
 test Classy::SelectDialog {add item} {
 	classyclean
-	Classy::SelectDialog .try -command {puts [.try get]}
-	.try configure -addcommand {puts add:$::try;set temp {ok end}}
-	.try configure -addvariable try
-	.try configure -deletecommand {puts del:$try}
-	.try configure -renamecommand {set ::try ren}
+	Classy::SelectDialog .try -command {puts}
+	.try configure -addcommand {invoke {} {puts add:$args;set temp {ok end}}}
+	.try configure -deletecommand {invoke {} {puts del:$args}}
+	.try configure -renamecommand {invoke {} {puts ren:$args}}
 	.try fill {hallo daar {Hoe gaat het?} ermee jo}
 	set ::try try
 	update
@@ -157,7 +156,7 @@ test Classy::FileSelect {basic} {
 	classyclean
 	Classy::FileSelect .try
 	.try configure -textvariable try2 -selectmode persistent \
-	    -default try -command {set ::try [.try get]}
+	    -default try -command {invoke {} {set ::try $args}}
 	set w [.try component extra]
 	button $w.test -text "Please select dialog.tcl"
 	pack $w.test -fill x -expand yes
@@ -168,21 +167,35 @@ test Classy::FileSelect {basic} {
 	file tail [set ::try]
 } {dialog.tcl}
 
+test Classy::savefile {basic} {
+	classyclean
+	file tail [Classy::savefile -initialdir [pwd] -initialfile dialog.tcl]
+} {dialog.tcl}
+
 test Classy::selectfile {basic} {
 	classyclean
 	file tail [Classy::selectfile -initialdir [pwd] -initialfile dialog.tcl]
 } {dialog.tcl}
 
-test Classy::InputBox {basic} {
+test Classy::InputDialog {basic} {
 	classyclean
-	Classy::InputBox .try -title Open -buttontext Open
+	Classy::InputDialog .try -title Open -buttontext Open
 	.try set try
 	.try get
 } {try}
 
-test Classy::SaveBox {basic} {
+test Classy::InputDialog {basic} {
 	classyclean
-	Classy::SaveBox .try -textvariable colfile
+	Classy::InputDialog .try -title Open -buttontext Open -command {set try}
+	.try set try
+	set ::try ""
+	.try invoke go
+	set ::try
+} {try}
+
+test Classy::SaveDialog {basic} {
+	classyclean
+	Classy::SaveDialog .try -textvariable colfile
 	.try set try
 	file tail [.try get]
 } {try}

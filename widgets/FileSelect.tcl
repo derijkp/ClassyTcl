@@ -35,10 +35,8 @@ Classy::export FileSelect {}
 
 Classy::FileSelect classmethod init {args} {
 	super
-	$object add go "Select" {} default
-
+	$object add go "Select" [list $object _command] default
 	set w $object.options
-
 	checkbutton $w.hidden -text "Show (Unix) hidden files" -variable [privatevar $object hidden] \
 		-command "$object configure -hidden \[getprivate $object hidden\];$object refresh"
 	Classy::Entry $w.filter -label "Filter" -orient horizontal -default Classy__FileSelect__filter
@@ -46,15 +44,15 @@ Classy::FileSelect classmethod init {args} {
 	scrollbar $w.dirsbar -orient vertical -command "$w.dirs yview" -takefocus 0
 	listbox $w.files -yscrollcommand "$w.filesbar set" -exportselection no
 	scrollbar $w.filesbar -orient vertical -command "$w.files yview" -takefocus 0
-	Classy::Entry $w.file -label "File" -orient horizontal -command [varsubst object {
-		set ::Classy::temp [$object get]
-		if [file isdir $::Classy::temp] {
-			$object configure -dir $::Classy::temp
+	Classy::Entry $w.file -label "File" -orient horizontal \
+		-command [list invoke {value} [varsubst object {
+		if [file isdir $value] {
+			$object configure -dir $value
 		} else {
 			$object invoke go
 			$object destroy
 		}
-	}]
+	}]]
 	frame $w.extra
 	Classy::Paned $w.pane -window $w.dirs
 	grid $w.filter - - - - -sticky we
@@ -65,7 +63,6 @@ Classy::FileSelect classmethod init {args} {
 	grid columnconfigure $w 0 -minsize 40
 	grid columnconfigure $w 3 -weight 50
 	grid rowconfigure $w 2 -weight 100
-
 	# REM Initialise variables and options
 	# ------------------------------------
 	set textvarpos [lsearch -exact $args "-textvariable"]
@@ -94,17 +91,15 @@ Classy::FileSelect classmethod init {args} {
 		$w.file nocmdset $dir
 	}
 	$w.filter nocmdset [file join $dir $filter]
-
 	# REM Create bindings
 	# -------------------
-	$w.filter configure -command [varsubst {object w} {
-		set temp [$w.filter get];
-		if {([file isdir $temp])&&("[file tail $temp]"!="*")} {
-			$object configure -dir $temp -filter *
+	$w.filter configure -command [list invoke value [varsubst {object w} {
+		if {([file isdir $value])&&("[file tail $value]"!="*")} {
+			$object configure -dir $value -filter *
 		} else {
-			$object configure -dir [file dir $temp] -filter [file tail $temp]
+			$object configure -dir [file dir $value] -filter [file tail $value]
 		}
-	}]
+	}]]
 	bind $w.files <<Action>> "$object dirset;focus $w.files"
 	bind $w.files <<Action-Motion>> "$object dirset;focus $w.files"
 	bind $w.files <<MExecute>> "$object dirset \[$w.files get @%x,%y\]; $object invoke go;break;"
@@ -116,7 +111,6 @@ Classy::FileSelect classmethod init {args} {
 	bind $w.dirs <<MExecute>> "$object movedir \[$w.dirs get @%x,%y\]"
 	bind $w.dirs <<Return>> "$object movedir \[$w.dirs get active\];break"
 	bind $w.file.entry <<Complete>> "$w.file nocmdset \[Classyfilecomplete \[$w.file get\]\];break"
-
 	# REM Configure initial arguments
 	# -------------------------------
 	if {"$args" != ""} {eval {$object configure -resize {1 1}} $args}
@@ -131,12 +125,18 @@ Classy::FileSelect component extra {$object.options.extra}
 #  Widget options
 # ------------------------------------------------------------------
 
+#doc {FileSelect options -dir} option {-dir dir Dir} descr {
+#}
 Classy::FileSelect addoption	-dir [list dir Dir ""] {
 	Classy::todo $object refresh
 }
+#doc {FileSelect options -filter} option {-filter filter Filter} descr {
+#}
 Classy::FileSelect addoption	-filter [list filter Filter *] {
 	Classy::todo $object refresh
 }
+#doc {FileSelect options -hidden} option {-hidden hidden Hidden} descr {
+#}
 Classy::FileSelect addoption	-hidden {hidden Hidden 0} {
 	Classy::todo $object refresh
 }
@@ -144,7 +144,7 @@ Classy::FileSelect addoption	-transfercommand {transferCommand TransferCommand {
 
 #doc {FileSelect options -command} option {-command command Command} descr {
 #}
-Classy::FileSelect chainoption -command {$object.actions.go} -command
+Classy::FileSelect addoption	-command [list command Command {}] {}
 
 #doc {FileSelect options -default} option {-default default Default} descr {
 #}
@@ -280,4 +280,11 @@ Classy::FileSelect method movedir {movedir} {
 	}
 	set options(-dir) $new
 	Classy::todo $object refresh
+}
+
+Classy::FileSelect method _command {} {
+	set command [getprivate $object options(-command)]
+	if {"$command" != ""} {
+		uplevel #0 $command [list [$object get]]
+	}
 }

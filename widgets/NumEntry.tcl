@@ -32,6 +32,7 @@ option add *Classy::NumEntry*Frame.highlightThickness 0 widgetDefault
 option add *Classy::NumEntry*Frame.borderWidth 0 widgetDefault
 option add *Classy::NumEntry.entry.relief sunken widgetDefault
 option add *Classy::NumEntry.label.anchor w widgetDefault
+option add *Classy::NumEntry.entry.width 5 widgetDefault
 
 # ------------------------------------------------------------------
 #  Creation

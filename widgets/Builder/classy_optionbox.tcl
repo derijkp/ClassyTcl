@@ -5,7 +5,7 @@
 proc ::Classy::WindowBuilder::start_Classy::OptionBox {object base} {
 	private $object data bindtags
 	set bindtags($base) [bindtags $base]
-	bindtags $base Classy::WindowBuilder_$object
+	bindtags $base $data(tags)
 	$object _recursestartedit $base [winfo children $base]
 	foreach b [winfo children $base.box] {
 		catch {unset data(redir,$b)}
@@ -24,8 +24,9 @@ proc ::Classy::WindowBuilder::attr_Classy::OptionBox_initialvalue {object w args
 proc ::Classy::WindowBuilder::edit_Classy::OptionBox_add {object w base} {
 	private $object data
 	set value [$w.addvalue get]
+	set text [$w.addtext get]
 	if {"$value" == ""} {error "No value given"}
-	set new [$object current add $value [$w.addtext get]]
+	set new [$object current add $value $text]
 	$object startedit $new
 	catch {unset data(redir,$new)}
 	set data(class,$new) Classy::OptionBoxButton

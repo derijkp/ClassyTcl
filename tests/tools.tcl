@@ -27,6 +27,7 @@ proc classyclean {} {
 	catch {Widget destroy}
 	catch {eval destroy [winfo children .]}
 	catch {. configure -menu {}}
+	Classy::initconf
 }
 
 #proc test {name description script expected {causeerror 0}} {

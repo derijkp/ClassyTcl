@@ -12,7 +12,7 @@ proc ::Classy::WindowBuilder::add_Classy::ScrolledFrame {object base args} {
 proc ::Classy::WindowBuilder::start_Classy::ScrolledFrame {object base} {
 	private $object data bindtags
 	set bindtags($base) [bindtags $base]
-	bindtags $base Classy::WindowBuilder_$object
+	bindtags $base $data(tags)
 	$object _recursestartedit $base [winfo children $base]
 	catch {unset data(redir,$base.view.frame)}
 	$object startedit $base.view.frame

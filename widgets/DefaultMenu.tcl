@@ -33,10 +33,13 @@ proc DefaultMenu {} {}
 Widget subclass Classy::DefaultMenu
 Classy::export DefaultMenu {}
 
+bind Classy::DefaultMenu <<ButtonPress-Action>> "%W menu"
+bind Classy::DefaultMenu <Any-ButtonRelease> "%W _action"
+bind Classy::DefaultMenu <Motion> "%W _motion %X %Y"
+
 Classy::DefaultMenu classmethod init {args} {
 	super button $object -relief raised -image [::Classy::geticon cbxarrow.xbm] -takefocus 0
-	bind $object <<ButtonPress-Action>> "$object menu"
-	bind $object <Any-ButtonRelease> "$object _action"
+	bindtags $object [lreplace [bindtags $object] 1 0 Classy::DefaultMenu]
 
 	# REM Evaluate arguments
 	if {"$args" != ""} {eval $object configure $args}
@@ -86,26 +89,12 @@ Classy::DefaultMenu method _init {} {
 	catch {destroy $w}
 	if ![winfo exists $w] {
 		Classy::SelectDialog $w -cache 1 -title "Select Value" \
-			-command "#" -addcommand "#" -deletecommand "#"
+			-command "#" -addcommand "#" -deletecommand "#" -addvariable [privatevar $object add]
 	}
 	after cancel "$w place"
 #	$w place
 	wm withdraw $w
 }
-
-Classy::DefaultMenu method _action {} {
-	private $object posted
-	set w .classy__.defaultmenu
-	if {"$posted"=="$w.options.list"} {
-		$w invoke go
-		$object removemenu
-	} elseif {"$posted"=="$w.actions.close"} {
-		$w invoke close
-	} elseif {"$posted"=="$w.actions.add"} {
-		$w invoke add
-	}
-}
-
 
 #doc {DefaultMenu command menu} cmd {
 #pathname menu 
@@ -116,24 +105,19 @@ Classy::DefaultMenu method menu {} {
 	private $object posted focus add options
 	set w .classy__.defaultmenu
 	if ![winfo exists $w] {$object _init}
-
 	set focus [focus -displayof $object]
 	set w .classy__.defaultmenu
-	$w configure -command "$options(-command)\n$object removemenu" \
-		-addvariable [privatevar $object add] \
-		-addcommand "$object add \[setglobal [privatevar $object add]\]" \
-		-deletecommand "$object remove \[$w get\]" \
+	$w configure -command "$object removemenu" \
+		-addcommand "$object add" \
+		-deletecommand "$object remove" \
 		-closecommand "$object removemenu"
 	$w fill [Classy::Default get app $options(-key)]
 	set add [eval $options(-getcommand)]
-
 	set posted 0
 	.classy__.defaultmenu.options.list activate 0
-	bind $object <Motion> "$object _motion %X %Y"
 	focus .classy__.defaultmenu.options.list
 	after idle "$object place"
 }
-
 
 #doc {DefaultMenu command add} cmd {
 #pathname add value
@@ -155,32 +139,21 @@ Classy::DefaultMenu method remove {val} {
 	Classy::Default remove app [getprivate $object options(-key)] $val
 }
 
-Classy::DefaultMenu method _motion {X Y} {
-	private $object posted
-	set posted [winfo containing $X $Y]
-	if {"$posted"==".classy__.defaultmenu.options.list"} {
-		set x [expr $X-[winfo rootx .classy__.defaultmenu.options]]
-		set y [expr $Y-[winfo rooty .classy__.defaultmenu.options]]
-		set index [.classy__.defaultmenu index @$x,$y]
-		.classy__.defaultmenu activate $index
-	}
-}
-
-
 #doc {DefaultMenu command removemenu} cmd {
 #pathname removemenu 
 #} descr {
 # remove the DefaultMenu menu from the screen
 #}
-Classy::DefaultMenu method removemenu {} {
-	private $object focus
+Classy::DefaultMenu method removemenu {args} {
+	private $object focus options
 	focus $focus
 	wm withdraw .classy__.defaultmenu
-	bind $object <Motion> {}
 	.classy__.defaultmenu hide
 	Classy::Default set geometry $object [Classy::Default get geometry .classy__.defaultmenu]
+	if {("$options(-command)" != "") && ("$args" != "")} {
+		uplevel $options(-command) $args
+	}
 }
-
 
 #doc {DefaultMenu command place} cmd {
 #pathname place 
@@ -211,3 +184,29 @@ Classy::DefaultMenu method place {} {
 	wm deiconify .classy__.defaultmenu
 	raise .classy__.defaultmenu
 }
+
+Classy::DefaultMenu method _action {} {
+	private $object posted
+	set w .classy__.defaultmenu
+	if {"$posted"==".classy__.defaultmenu.options.list.list"} {
+		$w invoke go
+		$object removemenu
+	} elseif {"$posted"=="$w.actions.close"} {
+		$w invoke close
+	} elseif {"$posted"=="$w.actions.add"} {
+		$w invoke add
+	}
+}
+
+Classy::DefaultMenu method _motion {X Y} {
+	private $object posted
+	set posted [winfo containing $X $Y]
+	if {"$posted"==".classy__.defaultmenu.options.list.list"} {
+		set x [expr $X-[winfo rootx .classy__.defaultmenu.options]]
+		set y [expr $Y-[winfo rooty .classy__.defaultmenu.options]]
+		set index [.classy__.defaultmenu index @$x,$y]
+		.classy__.defaultmenu activate $index
+		.classy__.defaultmenu set $index
+	}
+}
+

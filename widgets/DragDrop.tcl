@@ -36,6 +36,13 @@ Class subclass Classy::DragDrop
 Classy::export DragDrop {}
 
 # ------------------------------------------------------------------
+#  Class destroy
+# ------------------------------------------------------------------
+
+Classy::DragDrop classmethod destroy {} {
+	$object abort
+}
+# ------------------------------------------------------------------
 #  Methods
 # ------------------------------------------------------------------
 
@@ -56,9 +63,14 @@ Classy::export DragDrop {}
 # $value is the default value given for the drop if no type is specified.
 # the options are the same as for the Classy::DragDrop configure method.
 #}
-Classy::DragDrop method start {from value args} {
+Classy::DragDrop method start {x y value args} {
+	set from [winfo containing $x $y]
 	private $object data types ftypes
-	set from [winfo containing [winfo pointerx $from] [winfo pointery $from]]
+	if [info exists data(from)] {
+		bindtags $data(from) $data(bindtags)
+		$data(from) configure -cursor $data(cursor)
+		unset data(from)
+	}
 	catch {unset types}
 	set types() {}
 	catch {unset ftypes}
@@ -108,6 +120,7 @@ Classy::DragDrop method start {from value args} {
 		catch {send -- $app ::class::setprivate Classy::DragDrop data(remote) [list [tk appname]]}
 	}
 	focus $from
+	update idletasks
 }
 
 #doc {DragDrop command configure} cmd {
@@ -273,6 +286,9 @@ Classy::DragDrop method _events {app x y} {
 #}
 Classy::DragDrop method move {} {
 	private $object data
+	if ![info exists data(prev)] {
+		$object abort
+	}
 	set w .classy__.dragdrop
 	set x [winfo pointerx $w]
 	set y [winfo pointery $w]
@@ -360,11 +376,14 @@ Classy::DragDrop method get {{type {}}} {
 #}
 Classy::DragDrop method abort {} {
 	private $object data
+	if [info exists data(from)] {
+		bindtags $data(from) $data(bindtags)
+		$data(from) configure -cursor $data(cursor)
+		unset data(from)
+	}
 	set w .classy__.dragdrop
 	wm withdraw $w
 	wm geometry $w +10000+10000
-	bindtags $data(from) $data(bindtags)
-	$data(from) configure -cursor $data(cursor)
 }
 
 #doc {DragDrop command drop} cmd {
@@ -375,14 +394,16 @@ Classy::DragDrop method abort {} {
 #}
 Classy::DragDrop method drop {} {
 	private $object data
+	if ![info exists data(from)] return
+	bindtags $data(from) $data(bindtags)
+	$data(from) configure -cursor $data(cursor)
+	unset data(from)
 	set w .classy__.dragdrop
 	set x [winfo pointerx $w]
 	set y [winfo pointery $w]
     wm geometry  $w +[expr {[winfo pointerx $w]+1}]+[expr {[winfo pointery $w]+1}]
 	wm withdraw $w
 	wm geometry $w +10000+10000
-	bindtags $data(from) $data(bindtags)
-	$data(from) configure -cursor $data(cursor)
 	set dropw [winfo containing $x $y]
 	if {"$dropw" != ""} {
 		event generate $dropw <<Drop>>

@@ -1,35 +1,30 @@
-## ---- Basic Buttons ----
-## Action {The Action button is used to select something, to invoke a button, etc.}
-setevent <<Action>> <1>
-## Adjust {The Adjust button provides an alternative action, eg. invoke button without closing dialog, etc}
-setevent <<Adjust>> <2>
-## {X paste} {paste the currently selected characters}
-setevent <<MXPaste>> <2>
-## Menu {The Menu button can pop up a menu}
-setevent <<Menu>> <3>
-## Execute {execute action, like when selecting in a listbox}
-setevent <<MExecute>> <Double-1>
-## {Adjust Execute} {executes an alternative action, like when selecting in a listbox, but without removing the dialog it is in}
-setevent <<MExecuteAjust>> <Double-2>
-## {icursor} {set the insertion cursor, without removing the selection}
-setevent <<MIcursor>> <Control-1>
-## {position} {set the a scrollbar to the give position}
-setevent <<MPosition>> <Control-1> <Control-2>
+#ClassyTcl mouse configuration file
 
-## ---- Change selection ----
-## {Select word} {Select entire words}
-setevent <<MSelectWord>> <Double-1>
-## {Select line} {Select entire lines}
-setevent <<MSelectLine>> <Triple-1>
-## {Extend} {extend the current selection}
-setevent <<MExtend>> <Shift-1>
-## {Extend by words} {extend the current selection by entire words}
-setevent <<MExtendWord>> <Double-Shift-1>
-## {Extend by lines} {extend the current selection by entire lines}
-setevent <<MExtendLine>> <Triple-Shift-1>
-## {Add} {add to the current selection}
-setevent <<MAdd>> <Control-1>
-## {Add by words} {add to the current selection by entire words}
-setevent <<MAddWord>> <Double-Control-1>
-## {Add by lines} {add to the current selection by entire lines}
-setevent <<MAddLine>> <Triple-Control-1>
+Classy::configmouse {Basic Buttons} {
+	Action <<Action>> <1> {The Action button is used to select something, to invoke a button, etc.}
+	Adjust <<Adjust>> <2> {The Adjust button provides an alternative action, eg. invoke button without closing dialog, etc}
+	{X paste} <<MXPaste>> <2> {paste the currently selected characters}
+	MainMenu <<MainMenu>> <Control-3> {The MainMenu button is used to pop up the main menu}
+	Menu <<Menu>> <3> {The Menu button can pop up a menu}
+	Execute <<MExecute>> <Double-1> {execute action, like when selecting in a listbox}
+	{Adjust Execute} <<MExecuteAjust>> <Double-2> {executes an alternative action, like when selecting in a listbox, but without removing the dialog it is in}
+	{icursor} <<MIcursor>> <Control-1> {set the insertion cursor, without removing the selection}
+	{position} <<MPosition>> {<Control-1> <Control-2>} {set the a scrollbar to the give position}
+}
+
+Classy::configmouse {Change selection} {
+	{Select word} <<MSelectWord>> <Double-1> {Select entire words}
+	{Select line} <<MSelectLine>> <Triple-1> {Select entire lines}
+	{Extend} <<MExtend>> <Shift-1> {extend the current selection}
+	{Extend by words} <<MExtendWord>> <Double-Shift-1> {extend the current selection by entire words}
+	{Extend by lines} <<MExtendLine>> <Triple-Shift-1> {extend the current selection by entire lines}
+	{Add} <<MAdd>> <Control-1> {add to the current selection}
+	{Add by words} <<MAddWord>> <Double-Control-1> {add to the current selection by entire words}
+	{Add by lines} <<MAddLine>> <Triple-Control-1> {add to the current selection by entire lines}
+}
+
+Classy::configmouse {Drag & Drop keys} {
+	{start drag} <<Drag>> {<B1-Motion>} {start drag}
+	{drag move} <<Drag-Move>> {<KeyPress-Control_L> <KeyPress-Control_R>} {move instead of copy}
+	{drag link} <<Drag-Link>> {<KeyPress-Shift_L> <KeyPress-Shift_R>} {link instead of copy}
+}

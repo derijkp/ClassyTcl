@@ -150,7 +150,7 @@ Classy::ChartGrid method configure {args} {
 Classy::ChartGrid method _drawgrid {} {
 	private $object options
 	set canvas $options(-canvas)
-	if {"$canvas" == ""} return
+	if ![winfo exists $canvas] return
 	set tag $options(-tag)
 
 	set xstart [lindex $options(-area) 0]
