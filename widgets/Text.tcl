@@ -27,9 +27,9 @@ if 0 {
 proc ::Classy::Text {} {}
 proc Text {} {}
 }
-catch {Classy::Text destroy}
 
 source [file join $::class::dir widgets Textbnd.tcl]
+update idletasks
 
 # ------------------------------------------------------------------
 #  Widget creation
@@ -40,12 +40,6 @@ Classy::export Text {}
 
 Classy::Text classmethod init {args} {
 	super text
-#	text $object.text
-#	
-#	grid $object.text -sticky nwse
-#	grid columnconfigure $object 0 -weight 1
-#	grid rowconfigure $object 0 -weight 1
-
 	# REM Initialise options and variables
 	# ------------------------------------
 	private $object undobuffer redobuffer linked textchanged

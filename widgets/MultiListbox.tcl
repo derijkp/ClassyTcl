@@ -21,7 +21,6 @@ if 0 {
 proc ::Classy::MultiListbox {} {}
 proc MultiListbox {} {}
 }
-catch {Classy::MultiListbox destroy}
 
 bind Classy::MultiListbox <<Action>> {set w [winfo parent %W];$w select [$w nearest %y]}
 bind Classy::MultiListbox <<Action-Motion>> {set w [winfo parent %W];$w select [$w nearest %y]}

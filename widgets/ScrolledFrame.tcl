@@ -21,7 +21,6 @@ if 0 {
 proc ::Classy::ScrolledFrame {} {}
 proc ScrolledFrame {} {}
 }
-catch {Classy::ScrolledFrame destroy}
 
 bind Classy::ScrolledFrame <Configure> {Classy::todo %W redraw}
 

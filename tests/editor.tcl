@@ -5,10 +5,7 @@ exec wish8.0 "$0" "$@"
 source tools.tcl
 
 test Classy::Editor {Editor and find} {
-	clean
-	tk appname test
-	package require ClassyTcl
-	eval destroy [winfo children .]
+	classyclean
 	Classy::Editor .try \
 		-loadcommand "wm title . "
 	pack .try -fill both -expand yes
@@ -18,10 +15,7 @@ test Classy::Editor {Editor and find} {
 } {try}
 
 test Classy::Editor {edit and insert} {
-	clean
-	eval destroy [winfo children .]
-	tk appname test
-	package require ClassyTcl
+	classyclean
 	set w [edit try/try.tcl]
 	wm geometry $w +0+0
 	$w.editor insert end try
@@ -29,10 +23,7 @@ test Classy::Editor {edit and insert} {
 } {try}
 
 test Classy::Editor {links} {
-	clean
-	eval destroy [winfo children .]
-	tk appname test
-	package require ClassyTcl
+	classyclean
 	toplevel .t
 	wm geometry .t +0+0
 	Classy::Editor .t.try -width 20 -height 10
@@ -52,4 +43,3 @@ test Classy::Editor {links} {
 } {try}
 
 testsummarize
-catch {unset errors}

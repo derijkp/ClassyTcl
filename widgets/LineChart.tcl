@@ -43,7 +43,6 @@ if 0 {
 proc ::Classy::LineChart {} {}
 proc LineChart {} {}
 }
-catch {Classy::LineChart destroy}
 
 # ------------------------------------------------------------------
 #  Widget creation

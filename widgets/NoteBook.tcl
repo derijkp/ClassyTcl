@@ -23,7 +23,7 @@ if 0 {
 proc ::Classy::NoteBook {} {}
 proc NoteBook {} {}
 }
-catch {Classy::NoteBook destroy}
+
 option add *Classy::NoteBook.Background [option get . darkBackground DarkBackground] widgetDefault
 #option add *Classy::NoteBook.book.borderWidth 2 widgetDefault
 #option add *Classy::NoteBook.Button.borderWidth 2 widgetDefault

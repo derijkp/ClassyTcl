@@ -35,7 +35,6 @@ if 0 {
 proc ::Classy::Dialog {} {}
 proc Dialog {} {}
 }
-catch {Classy::Dialog destroy}
 
 option add *Classy::Dialog.options.relief raised widgetDefault
 option add *Classy::Dialog.options.highlightThickness 0 widgetDefault

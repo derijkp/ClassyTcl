@@ -17,7 +17,7 @@ CC = gcc
 DEFS =  -DHAVE_UNISTD_H=1 -DHAVE_LIMITS_H=1 -DSTDC_HEADERS=1 -DHAVE_SYS_TIME_H=1 -DTIME_WITH_SYS_TIME=1 
 
 SHLIB_LD = gcc -shared
-LIBS = -L/usr/X11R6/lib -lX11 -ldl  -lm
+LIBS = -L/usr/X11R6/lib -lX11 -ldl  -lieee -lm
 SHLIB_CFLAGS = -fPIC
 SHLIB_LD_LIBS = 
 SHLIB_SUFFIX = .so
@@ -29,8 +29,8 @@ TK_LIB_SPEC = -L/usr/local/lib -ltk8.0
 
 CC_SWITCHES = $(CFLAGS) $(SHLIB_CFLAGS) $(DEFS) -I$(TCL_SRC)/unix -I$(TCL_SRC)/generic \
 			 -I${TK_SRC}/generic -I${TK_SRC}/xlib/X11 ${X11_INCLUDES}
-CLASSYOBJS= class.o classyInit.o
-SRCS= class.c classyInit.c
+CLASSYOBJS= class.o private.o classyInit.o
+SRCS= class.c var.c classyInit.c
 
 # --------------------------- Rules -----------------------------
 
@@ -41,6 +41,9 @@ classy$(SHLIB_SUFFIX): $(CLASSYOBJS)
 
 classytcl: tclAppInit.o $(CLASSYOBJS)
 	$(CC) $(CFLAGS) -o classytcl tclAppInit.o $(CLASSYOBJS) ${TCL_LIB_SPEC} ${LIBS}
+
+classywish: tkAppInit.o $(CLASSYOBJS)
+	$(CC) $(CFLAGS) -o classywish tkAppInit.o $(CLASSYOBJS) ${TCL_LIB_SPEC} ${TK_LIB_SPEC} ${LIBS}
 
 clean:
 	rm -f *.o ../classy$(SHLIB_SUFFIX) ../win/*.csm ../win/tmp/* ../*.dll

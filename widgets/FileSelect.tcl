@@ -21,7 +21,6 @@ if 0 {
 proc ::Classy::FileSelect {} {}
 proc FileSelect {} {}
 }
-catch {Classy::FileSelect destroy}
 
 if {"[Classy::Default get app Classy__FileSelect__curdir]"==""} {
 	Classy::Default set app Classy__FileSelect__curdir [pwd]

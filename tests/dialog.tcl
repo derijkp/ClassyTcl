@@ -5,10 +5,7 @@ exec wish8.0 "$0" "$@"
 source tools.tcl
 
 test Classy::Dialog {create and test go button} {
-	clean
-	eval destroy [winfo children .]
-	tk appname test
-	package require ClassyTcl
+	classyclean
 	Classy::Dialog .try
 	.try add go "Go" {puts stdout go;set ::try go} default
 	.try add test "Test" {puts stdout test;set ::try test}
@@ -19,10 +16,7 @@ test Classy::Dialog {create and test go button} {
 } {go}
 
 test Classy::Dialog {create and test default button} {
-	clean
-	eval destroy [winfo children .]
-	tk appname test
-	package require ClassyTcl
+	classyclean
 	Classy::Dialog .try
 	.try add go "Go" {puts stdout go;set ::try go} default
 	.try add test "Test" {puts stdout test;set ::try test}
@@ -33,10 +27,7 @@ test Classy::Dialog {create and test default button} {
 } {go}
 
 test Classy::Dialog {create and test escape} {
-	clean
-	eval destroy [winfo children .]
-	tk appname test
-	package require ClassyTcl
+	classyclean
 	Classy::Dialog .try
 	.try add go "Go" {puts stdout go;set ::try go} default
 	.try add test "Test" {puts stdout test;set ::try test}
@@ -47,10 +38,7 @@ test Classy::Dialog {create and test escape} {
 } {1}
 
 test Classy::Dialog {create and test test button} {
-	clean
-	eval destroy [winfo children .]
-	tk appname test
-	package require ClassyTcl
+	classyclean
 	Classy::Dialog .try
 	.try add go "Go" {puts stdout go;set ::try go} default
 	.try add test "Test" {puts stdout test;set ::try test}
@@ -60,11 +48,19 @@ test Classy::Dialog {create and test test button} {
 	set ::try
 } {test}
 
+test Classy::Dialog {error in go button} {
+	classyclean
+	Classy::Dialog .try
+	.try add go "Go" {error error} default
+	.try add test "Test" {puts stdout test;set ::try test}
+	set ::try 1
+	update
+	.try invoke go
+	set ::try
+} {error} 1
+
 test Classy::Dialog {add options} {
-	clean
-	eval destroy [winfo children .]
-	tk appname test
-	package require ClassyTcl
+	classyclean
 	Classy::Dialog .try
 	.try add go "Go" {puts stdout go;set ::try go} default
 	.try add test "Test" {puts stdout test;set ::try test}
@@ -81,10 +77,7 @@ test Classy::Dialog {add options} {
 } {test2}
 
 test Classy::Dialog {no shifting} {
-	clean
-	eval destroy [winfo children .]
-	tk appname test
-	package require ClassyTcl
+	classyclean
 	Classy::Dialog .try -closecommand {
 		destroy .try
 		Classy::Dialog .try
@@ -96,10 +89,7 @@ test Classy::Dialog {no shifting} {
 } {1}
 
 test Classy::SelectDialog {create and configure} {
-	clean
-	eval destroy [winfo children .]
-	tk appname test
-	package require ClassyTcl
+	classyclean
 	Classy::SelectDialog .try
 	.try configure -command {
 		set ::try [.try get]
@@ -113,10 +103,7 @@ test Classy::SelectDialog {create and configure} {
 } {ermee}
 
 test Classy::SelectDialog {hide if cache} {
-	clean
-	eval destroy [winfo children .]
-	tk appname test
-	package require ClassyTcl
+	classyclean
 	Classy::SelectDialog .try -cache 1
 	update
 	.try invoke go
@@ -124,10 +111,7 @@ test Classy::SelectDialog {hide if cache} {
 } {1}
 
 test Classy::SelectDialog {destroy if no cache} {
-	clean
-	eval destroy [winfo children .]
-	tk appname test
-	package require ClassyTcl
+	classyclean
 	Classy::SelectDialog .try
 	update
 	.try invoke go
@@ -136,10 +120,7 @@ test Classy::SelectDialog {destroy if no cache} {
 } {0}
 
 test Classy::SelectDialog {add item} {
-	clean
-	eval destroy [winfo children .]
-	tk appname test
-	package require ClassyTcl
+	classyclean
 	Classy::SelectDialog .try -command {puts [.try get]}
 	.try configure -addcommand {puts add:$::try;set temp {ok end}}
 	.try configure -addvariable try
@@ -154,18 +135,12 @@ test Classy::SelectDialog {add item} {
 } {ok}
 
 test Classy::yorn {basic} {
-	clean
-	eval destroy [winfo children .]
-	tk appname test
-	package require ClassyTcl
+	classyclean
 	Classy::yorn "answer yes please"
 } {1}
 
 test Classy::FileSelect {basic} {
-	clean
-	eval destroy [winfo children .]
-	tk appname test
-	package require ClassyTcl
+	classyclean
 	Classy::FileSelect .try
 	.try configure -textvariable try2 -selectmode persistent \
 	    -default try -command {set ::try [.try get]}
@@ -180,41 +155,27 @@ test Classy::FileSelect {basic} {
 } {dialog.tcl}
 
 test Classy::selectfile {basic} {
-	clean
-	eval destroy [winfo children .]
-	tk appname test
-	package require ClassyTcl
+	classyclean
 	file tail [Classy::selectfile -initialdir [pwd] -initialfile dialog.tcl]
 } {dialog.tcl}
 
 test Classy::InputBox {basic} {
-	clean
-	eval destroy [winfo children .]
-	tk appname test
-	package require ClassyTcl
+	classyclean
 	Classy::InputBox .try -title Open -buttontext Open
 	.try set try
 	.try get
 } {try}
 
 test Classy::SaveBox {basic} {
-	clean
-	eval destroy [winfo children .]
-	tk appname test
-	package require ClassyTcl
+	classyclean
 	Classy::SaveBox .try -textvariable colfile
 	.try set try
 	file tail [.try get]
 } {try}
 
 test Classy::savefile {basic} {
-	clean
-	eval destroy [winfo children .]
-	tk appname test
-	package require ClassyTcl
+	classyclean
 	file tail [Classy::savefile -initialfile try]
 } {try}
 
 testsummarize
-catch {unset errors}
-

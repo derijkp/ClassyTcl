@@ -34,7 +34,6 @@ if 0 {
 proc ::Classy::Tree {} {}
 proc Tree {} {}
 }
-catch {Classy::Tree destroy}
 
 # ------------------------------------------------------------------
 #  Widget creation

@@ -159,8 +159,8 @@ proc ::class::setoption {class object option value} {
 			return -code error "unknown option \"$option\""
 		}
 	} else {
-		if [catch {::class::${class},,m,_set${option} $class $object $value} result] {
-			return -code error "error while setting option $option to \"$value\": $result"
+		if [catch {$object _set${option} $value} result] {
+			return -errorinfo $::errorInfo -code error "error while setting option $option to \"$value\": $result"
 		} else {
 			set value $result
 		}
@@ -215,6 +215,7 @@ Widget classmethod init {args} {
 			eval $args
 		}
 	} result] {
+		catch {destroy $object}
 		rename ::class::tempcmd $object
 		return -code error $result
 	}
@@ -441,19 +442,24 @@ Widget classmethod chainallmethods {widget widgettype} {
 	if {"$widget" == {$object}} {
 		set widget {::class::Tk_$object}
 	}
-	catch {destroy .class,,temp}
-	$widgettype .class,,temp
-	foreach method [::class::getwidgetmethods .class,,temp] {
-#		if [regexp {^configure$|^config$|^cget$|^destroy$|^class$|^private$|^component$} $method] continue
+	set num 1
+	while {[winfo exists .class,,temp$num]} {
+		incr num
+	}
+	$widgettype .class,,temp$num
+	foreach method [::class::getwidgetmethods .class,,temp$num] {
+		if [regexp {^cget$|^class$|^component$|^config$|^configure$|^destroy$|^private$|^trace$} $method] continue
 		if {"[::$class method $method]" == ""} {
 			if {"$method" != "destroy"} {
-				::$class method $method {args} "uplevel 2 $widget $method \$args"
+				::$class method $method {args} "uplevel 1 $widget $method \$args"
 			} else {
-				::$class method destroy {} "uplevel 2 $widget $method \$args"
+				::$class method destroy {} "uplevel 1 $widget $method \$args"
 			}
 		}
 	}
-	destroy .class,,temp
+	destroy .class,,temp$num
+if {"$class" != "Classy::Editor"} {
+}
 }
 
 #doc {Widget classmethod chainoptions} cmd {

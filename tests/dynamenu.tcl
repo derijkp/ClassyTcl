@@ -37,11 +37,7 @@ proc getmenu {} {
 }
 
 test Classy::DynaMenu {popopmenu} {
-	clean
-	eval destroy [winfo children .]
-	tk appname test
-	package require ClassyTcl
-
+	classyclean
 	text .b -width 10 -height 5
 	text .t -width 10 -height 5
 	pack .b .t -side left -fill both -expand yes
@@ -56,11 +52,8 @@ test Classy::DynaMenu {popopmenu} {
 } {1}
 
 test Classy::DynaMenu {find definition} {
-	clean
+	classyclean
 	. configure -menu {}
-	eval destroy [winfo children .]
-	tk appname test
-	package require ClassyTcl
 	option add *Classy::Test.Menu $::trydata widgetDefault
 
 	text .t -width 10 -height 5
@@ -72,10 +65,7 @@ test Classy::DynaMenu {find definition} {
 } {1}
 
 test Classy::DynaMenu {redefine error} {
-	clean
-	eval destroy [winfo children .]
-	tk appname test
-	package require ClassyTcl
+	classyclean
 	text .t -width 10 -height 5
 	pack .t -side left -fill both -expand yes
 	Classy::DynaMenu define Test $::trydata
@@ -87,17 +77,13 @@ test Classy::DynaMenu {redefine error} {
 } {1}
 
 test Classy::DynaMenu {non existing cmdw} {
-	clean
-	eval destroy [winfo children .]
-	tk appname test
-	package require ClassyTcl
+	classyclean
 	Classy::DynaMenu define Test $::trydata
 	Classy::DynaMenu makemenu Test .top .t TestBind .
 	text .t -width 10 -height 5
 	pack .t -side left -fill both -expand yes
 	bindtags .t "TestBind [bindtags .t]"
 	update
-} {1}
+} {}
 
 testsummarize
-catch {unset errors}

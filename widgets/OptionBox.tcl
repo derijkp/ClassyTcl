@@ -22,7 +22,6 @@ if 0 {
 proc ::Classy::OptionBox {} {}
 proc OptionBox {} {}
 }
-catch {Classy::OptionBox destroy}
 
 option add *Classy::OptionBox.relief raised widgetDefault
 #option add *Classy::OptionBox.label.anchor w widgetDefault

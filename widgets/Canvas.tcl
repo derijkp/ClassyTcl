@@ -20,7 +20,6 @@ if 0 {
 proc ::Classy::Canvas {} {}
 proc Canvas {} {}
 }
-catch {Classy::Canvas destroy}
 
 # ------------------------------------------------------------------
 #  Widget creation

@@ -3,8 +3,8 @@
 exec wish8.0 "$0" "$@"
 
 source tools.tcl
-eval destroy [winfo children .]
-catch {Tree destroy}
+classyclean
+
 set object try
 package require ClassyTcl
 proc browse {tree dir} {
@@ -57,4 +57,5 @@ if 0 {
 }
 # tree addnode ~ -image folder
 
-#manualtest
+manualtest
+testsummarize

@@ -28,7 +28,6 @@ if 0 {
 proc ::Classy::SelectDialog {} {}
 proc SelectDialog {} {}
 }
-catch {Classy::SelectDialog destroy}
 
 # ------------------------------------------------------------------
 #  Widget creation

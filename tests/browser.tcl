@@ -2,9 +2,8 @@
 # the next line restarts using wish \
 exec wish8.0 "$0" "$@"
 
-catch {Browser destroy}
 source tools.tcl
-package require ClassyTcl
+classyclean
 set object .try
 proc browse {dir {pre {sm_}}} {
 	if {"$dir" == ""} return
@@ -67,3 +66,5 @@ browse .. {}
 
 .try configure -order column -minx 0 -miny 0 -dataunder 1
 
+manualtest
+testsummarize

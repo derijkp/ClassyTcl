@@ -22,7 +22,6 @@ if 0 {
 proc ::Classy::OptionMenu {} {}
 proc OptionMenu {} {}
 }
-catch {Classy::OptionMenu destroy}
 
 # ------------------------------------------------------------------
 #  Widget creation

@@ -19,7 +19,6 @@ if 0 {
 proc ::Classy::Paned {} {}
 proc Paned {} {}
 }
-catch {Classy::Paned destroy}
 
 option add *Classy::Paned.cursor sb_h_double_arrow widgetDefault
 option add *Classy::Paned.width 3 widgetDefault

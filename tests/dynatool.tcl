@@ -5,10 +5,7 @@ exec wish8.0 "$0" "$@"
 source tools.tcl 
 
 test Classy::DynaTool {text} {
-	clean
-	eval destroy [winfo children .]
-	tk appname test
-	package require ClassyTcl
+	classyclean
 	Classy::DynaTool define Test {
 		action open "Open" {puts open}
 		action "Test" "Test" {puts test}
@@ -23,10 +20,7 @@ test Classy::DynaTool {text} {
 } {1}
 
 test Classy::DynaTool {pictures} {
-	clean
-	eval destroy [winfo children .]
-	tk appname test
-	package require ClassyTcl
+	classyclean
 	Classy::DynaTool define Test {
 		action print "Print" {puts print}
 		action "OK" "OK" {puts OK}
@@ -41,10 +35,7 @@ test Classy::DynaTool {pictures} {
 } {1}
 
 test Classy::DynaTool {pictures} {
-	clean
-	eval destroy [winfo children .]
-	tk appname test
-	package require ClassyTcl
+	classyclean
 	Classy::DynaTool maketool Classy::Editor .t .text
 	pack .t -fill x
 	text .text
@@ -53,10 +44,7 @@ test Classy::DynaTool {pictures} {
 } {1}
 
 test Classy::DynaTool {text} {
-	clean
-	eval destroy [winfo children .]
-	tk appname test
-	package require ClassyTcl
+	classyclean
 	Classy::DynaTool define Test {
 		action "Test" "Test" {puts test}
 		action "OK" "OK" {puts OK}
@@ -72,4 +60,3 @@ test Classy::DynaTool {text} {
 } {1}
 
 testsummarize
-catch {unset errors}

@@ -1,3 +1,24 @@
+
+package require ClassyTcl
+Class new try
+try trace {lappend try}
+try class
+
+package require ClassyTcl
+Classy::Text .try
+Classy::Text .try2
+
+package require ClassyTcl
+Classy::Editor .try \
+	-loadcommand "wm title . "
+Classy::Editor .try2 \
+	-loadcommand "wm title . "
+
+source ../widgets/Text.tcl
+source ../widgets/Editor.tcl
+
+pack .try
+
 class::reinit
 Class classmethod nop {} {}
 time {Class nop} 5000

@@ -40,7 +40,6 @@ if 0 {
 proc ::Classy::DynaMenu {} {}
 proc DynaMenu {} {}
 }
-catch {Classy::DynaMenu destroy}
 
 option add *Classy::TopMenu.Button.padY 0 widgetDefault
 option add *Classy::TopMenu.Checkbutton.padY 1 widgetDefault
@@ -377,10 +376,14 @@ Classy::DynaMenu method delete {menutype} {
 #}
 Classy::DynaMenu method cmdw {menu {cmdw {}}} {
 	private $object cmdws base
-	if {"$cmdw"==""} {
-		return $cmdws($base($menu))
-	} else {
+	if [info exists base($menu)] {
 		set basemenu $base($menu)
+	} else {
+		set basemenu $menu
+	}
+	if {"$cmdw"==""} {
+		return $cmdws($basemenu)
+	} else {
 		if {"$cmdws($basemenu)"=="$cmdw"} {return $cmdw}
 		set cmdws($basemenu) $cmdw
 		private $object checks
@@ -417,7 +420,7 @@ Classy::DynaMenu method post {menu {x {}} {y {}}} {
 # invoke the item given by $index in $curmenu
 #}
 Classy::DynaMenu method invoke {curmenu index} {
-	$curmenu invoke $index
+	uplevel $curmenu invoke $index
 }
 
 #doc {DynaMenu confmenu} cmd {

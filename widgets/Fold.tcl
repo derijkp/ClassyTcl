@@ -22,7 +22,6 @@ if 0 {
 proc ::Classy::Fold {} {}
 proc Fold {} {}
 }
-catch {Classy::Fold destroy}
 
 option add *Classy::Fold.relief flat widgetDefault
 option add *Classy::Fold.knob.relief flat widgetDefault

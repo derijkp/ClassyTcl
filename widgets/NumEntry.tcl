@@ -26,13 +26,12 @@ if 0 {
 proc ::Classy::NumEntry {} {}
 proc NumEntry {} {}
 }
-catch {Classy::NumEntry destroy}
 
 # ------------------------------------------------------------------
 #  Creation
 # ------------------------------------------------------------------
 
-Entry subclass Classy::NumEntry
+Classy::Entry subclass Classy::NumEntry
 Classy::export NumEntry {}
 
 Classy::NumEntry classmethod init {args} {

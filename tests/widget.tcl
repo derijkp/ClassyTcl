@@ -6,7 +6,7 @@ source tools.tcl
 option add *Try 1
 
 test Widget {configure no args} {
-	clean
+	classyclean
 	destroy .try
 	Widget addoption -try {try Try 1}
 	Widget .try
@@ -14,7 +14,7 @@ test Widget {configure no args} {
 } {-try try Try 1 1}
 
 test Widget {configure 1 arg} {
-	clean
+	classyclean
 	destroy .try
 	Widget addoption -try {try Try 1}
 	Widget .try
@@ -22,7 +22,7 @@ test Widget {configure 1 arg} {
 } {-try try Try 1 1}
 
 test Widget {configure 2 args} {
-	clean
+	classyclean
 	destroy .try
 	Widget addoption -try {try Try 1}
 	Widget .try
@@ -31,7 +31,7 @@ test Widget {configure 2 args} {
 } {2}
 
 test Widget {configure get from option database} {
-	clean
+	classyclean
 	destroy .try
 	option add *Try 2
 	Widget addoption -try {try Try 1}
@@ -40,7 +40,7 @@ test Widget {configure get from option database} {
 } {2}
 
 test Widget {configure get from option database} {
-	clean
+	classyclean
 	destroy .try
 	option add *Try 2
 	Widget addoption -try {try Try 1}
@@ -50,7 +50,7 @@ test Widget {configure get from option database} {
 } {-try try Try 1 2}
 
 test Widget {configure no args} {
-	clean
+	classyclean
 	destroy .try
 	Widget component entry {$object.entry}
 	Widget .try
@@ -58,17 +58,17 @@ test Widget {configure no args} {
 } {.try.entry}
 
 test Widget {init entry} {
-	clean
+	classyclean
 	destroy .try
 	Widget subclass Test
 	Test classmethod init {} {
 		super entry
 	}
-	[Test .try] cget -validate
-} {none}
+	Test .try
+} {::class::Tk_.try}
 
 test Widget {init entry with args} {
-	clean
+	classyclean
 	destroy .try
 	Widget subclass Test
 	Test classmethod init {} {
@@ -78,7 +78,7 @@ test Widget {init entry with args} {
 } {try}
 
 test Widget {pass args in init} {
-	clean
+	classyclean
 	destroy .try
 	Widget subclass Test
 	Test classmethod init {args} {
@@ -91,4 +91,3 @@ test Widget {pass args in init} {
 } {test}
 
 testsummarize
-catch {unset errors}

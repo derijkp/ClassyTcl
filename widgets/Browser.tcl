@@ -19,7 +19,6 @@ if 0 {
 proc ::Classy::Browser {} {}
 proc Browser {} {}
 }
-catch {Classy::Browser destroy}
 
 # ------------------------------------------------------------------
 #  Widget creation

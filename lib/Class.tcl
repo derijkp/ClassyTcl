@@ -114,11 +114,11 @@ namespace eval ::class {
 	namespace export super
 	namespace export private setprivate getprivate privatevar
 }
-if [catch {package require Extral 0.96}] {
-	proc ::class::leval {args} {
-		eval [eval concat $args]
-	}
-}
+#if [catch {package require Extral 0.96}] {
+#	proc ::class::leval {args} {
+#		eval [eval concat $args]
+#	}
+#}
 
 if {"[info commands ::class::reinit]" != ""} {
 	set noc 0
@@ -192,7 +192,7 @@ proc ::class::new {class arg} {
 	set ::class::parent($object) $class
 	set ::class::${class},,child($object) 1
 	set body {
-		if [catch {leval ::class::@class@,,m,${cmd} @class@ @object@ $args} result] {
+		if [catch {uplevel ::class::@class@,,m,${cmd} @class@ @object@ $args} result] {
 			return -code error -errorinfo [set ::errorInfo] [class::classerror @class@ @object@ $result $cmd $args]
 		}
 		return $result
@@ -202,10 +202,10 @@ proc ::class::new {class arg} {
 	proc ::$object {cmd args} $body
 	set ::class::current $class
 	if [info exists ::class::${class},,init] {
-		if [catch {leval ::class::${class},,init [list $class] $arg} result] {
+		if [catch {uplevel ::class::${class},,init [list $class] $arg} result] {
 			set errorInfo [set ::errorInfo]
 			::class::objectdestroy $class $object
-			return -code error -errorinfo $errorInfo "init of class [set ::class::current] failed: $result"
+			return -code error -errorinfo $errorInfo $result
 		} else {
 			return $result
 		}
@@ -213,7 +213,7 @@ proc ::class::new {class arg} {
 		if [catch {eval super [lrange $arg 1 end]} result] {
 			set errorInfo [set ::errorInfo]
 			::class::objectdestroy $class $object
-			return -code error -errorinfo $errorInfo "init of class [set ::class::current] failed: $result"
+			return -code error -errorinfo $errorInfo $result
 		} else {
 			return $result
 		}
@@ -668,11 +668,11 @@ namespace eval ::class {
 proc ::Class {cmd args} {
 	if [regexp {^\.} $cmd] {set args [concat $cmd $args];set cmd new}
 	if {"[info commands ::class::Class,,cm,${cmd}]" != ""} {
-		if [catch {leval ::class::Class,,cm,${cmd} Class $args} result] {
+		if [catch {uplevel ::class::Class,,cm,${cmd} Class $args} result] {
 			set error [::class::classerror Class Class $result $cmd $args]
 			return -code error -errorinfo [set ::errorInfo] $error
 		}
-	} elseif [catch {leval ::class::Class,,m,${cmd} Class Class $args} result] {
+	} elseif [catch {uplevel ::class::Class,,m,${cmd} Class Class $args} result] {
 		set error [::class::classerror Class Class $result $cmd $args]
 		return -code error -errorinfo [set ::errorInfo] $error
 	}
@@ -857,27 +857,18 @@ proc ::class::getprivate {object var} {
 	set ::class::${object},,v,$var
 }
 
-proc ::class::traceobject {object command {level 1}} {
-	::class::untraceobject $object
-	set class [set ::class::parent($object)]
-	if ![info exists ::class::${class},,child($object)] {
-		error "Object $object doesn't exists"
-	}
-	set temp [varsubst {command level} {
-		if {("$level"=="all")||("[info level]"=="$level")} {uplevel #0 $command [list "\$object [list $cmd] $args\n"]}
-		# object trace done
-	}]
-	append temp [info body $object]
-	proc ::$object [info args $object] $temp
-}
-
-proc ::class::untraceobject {object} {
-	set class [set ::class::parent($object)]
-	if ![info exists ::class::${class},,child($object)] {
-		error "Object $object doesn't exists"
-	}
+Class method trace {command} {
 	set temp [info body $object]
 	regsub "^.*# object trace done\n" $temp {} temp
+	if {"$command" != ""} {
+		set temp {
+			@command@ [eval list {@object@ [list $cmd]} $args]
+			# object trace done
+		}
+		regsub -all {@command@} $temp $command temp
+		regsub -all {@object@} $temp [list $object] temp
+		append temp [info body $object]
+	}
 	proc ::$object [info args $object] $temp
 }
 

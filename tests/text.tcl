@@ -5,17 +5,14 @@ exec wish8.0 "$0" "$@"
 source tools.tcl
 
 test Classy::Text {create and configure} {
-	clean
-	destroy .try
-	tk appname test
-	package require ClassyTcl
+	classyclean
 	Classy::Text .try
 	pack .try -fill both -expand yes
 	.try cget -wrap
 } {char}
 
 test Classy::Text {insert} {
-	clean
+	classyclean
 	destroy .try
 	Classy::Text .try
 	pack .try
@@ -25,8 +22,7 @@ test Classy::Text {insert} {
 }
 
 test Classy::Text {undo} {
-	clean
-	destroy .try
+	classyclean
 	Classy::Text .try
 	pack .try
 	.try insert end "try"
@@ -37,5 +33,3 @@ test Classy::Text {undo} {
 }
 
 testsummarize
-catch {unset errors}
-

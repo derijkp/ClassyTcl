@@ -18,7 +18,6 @@ if 0 {
 proc ::Classy::FileEntry {} {}
 proc FileEntry {} {}
 }
-catch {Classy::FileEntry destroy}
 
 # ------------------------------------------------------------------
 #  Widget creation

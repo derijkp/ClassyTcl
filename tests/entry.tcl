@@ -5,10 +5,7 @@ exec wish8.0 "$0" "$@"
 source tools.tcl
 
 test Classy::Entry {create and configure} {
-	clean
-	eval destroy [winfo children .]
-	tk appname test
-	package require ClassyTcl
+	classyclean
 	Classy::Entry .try
 	pack .try
 	.try configure -label test
@@ -16,18 +13,14 @@ test Classy::Entry {create and configure} {
 } {test}
 
 test Classy::Entry {create with configuration configure} {
-	clean
-	tk appname test
-	package require ClassyTcl
+	classyclean
 	Classy::Entry .try -label try
 	pack .try
 	.try cget -label
 } {try}
 
 test Classy::Entry {create, destroy, create} {
-	clean
-	tk appname test
-	package require ClassyTcl
+	classyclean
 	Classy::Entry .try -label try
 	pack .try
 	destroy .try
@@ -37,27 +30,21 @@ test Classy::Entry {create, destroy, create} {
 } {}
 
 test Classy::Entry {create with configuration configure} {
-	clean
-	tk appname test
-	package require ClassyTcl
+	classyclean
 	Classy::Entry .try -label try -orient vert
 	pack .try
 	.try cget -orient
 } {vertical}
 
 test Classy::Entry {create with configuration configure} {
-	clean
-	tk appname test
-	package require ClassyTcl
+	classyclean
 	Classy::Entry .try -label int -constraint {[0-9]}
 	pack .try
 	.try cget -constraint
 } {[0-9]}
 
 test Classy::Entry {command} {
-	clean
-	tk appname test
-	package require ClassyTcl
+	classyclean
 	Classy::Entry .try -label try -command {set ::c 1}
 	pack .try
 	set ::c 0
@@ -66,9 +53,7 @@ test Classy::Entry {command} {
 } {1}
 
 test Classy::Entry {constraint} {
-	clean
-	tk appname test
-	package require ClassyTcl
+	classyclean
 	Classy::Entry .try -label try -constraint {^[a-z]*$}
 	pack .try
 	.try set try
@@ -77,10 +62,7 @@ test Classy::Entry {constraint} {
 } {try}
 
 test Classy::FileEntry {create and configure} {
-	clean
-	eval destroy [winfo children .]
-	tk appname test
-	package require ClassyTcl
+	classyclean
 	Classy::FileEntry .try
 	pack .try
 	.try configure -label test
@@ -88,4 +70,3 @@ test Classy::FileEntry {create and configure} {
 } {test}
 
 testsummarize
-catch {unset errors}

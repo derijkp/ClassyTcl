@@ -21,7 +21,6 @@ if 0 {
 proc ::Classy::FontSelect {} {}
 proc FontSelect {} {}
 }
-catch {Classy::FontSelect destroy}
 
 option add *Classy::FontSelect.relief raised widgetDefault
 

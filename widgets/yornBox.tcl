@@ -18,7 +18,6 @@ if 0 {
 proc ::Classy::YornBox {} {}
 proc YornBox {} {}
 }
-catch {Classy::YornBox destroy}
 
 # ------------------------------------------------------------------
 #  Widget creation

@@ -28,7 +28,6 @@ if 0 {
 proc ::Classy::Default {} {}
 proc Default {} {}
 }
-catch {Classy::Default destroy}
 
 # ------------------------------------------------------------------
 #  Widget creation

@@ -5,10 +5,7 @@ exec wish8.0 "$0" "$@"
 source tools.tcl
 
 test ColorEntry {create and configure} {
-	clean
-	eval destroy [winfo children .]
-	tk appname test
-	package require ClassyTcl
+	classyclean
 	Classy::ColorEntry .try
 	pack .try
 	.try set green
@@ -16,10 +13,7 @@ test ColorEntry {create and configure} {
 } {green}
 
 test ColorHSV {create and configure} {
-	clean
-	eval destroy [winfo children .]
-	tk appname test
-	package require ClassyTcl
+	classyclean
 	Classy::ColorHSV .try
 	pack .try
 	.try set green
@@ -27,10 +21,7 @@ test ColorHSV {create and configure} {
 } {#00ff00}
 
 test ColorHSV {command} {
-	clean
-	eval destroy [winfo children .]
-	tk appname test
-	package require ClassyTcl
+	classyclean
 	set ::try 0
 	Classy::ColorHSV .try -command {set ::try 1}
 	pack .try
@@ -40,10 +31,7 @@ test ColorHSV {command} {
 } {1}
 
 test ColorRGB {create and configure} {
-	clean
-	eval destroy [winfo children .]
-	tk appname test
-	package require ClassyTcl
+	classyclean
 	Classy::ColorRGB .try
 	pack .try
 	.try set green
@@ -51,10 +39,7 @@ test ColorRGB {create and configure} {
 } {#00ff00}
 
 test ColorRGB {command} {
-	clean
-	eval destroy [winfo children .]
-	tk appname test
-	package require ClassyTcl
+	classyclean
 	set ::try 0
 	Classy::ColorRGB .try -command {set ::try 1}
 	pack .try
@@ -64,10 +49,7 @@ test ColorRGB {command} {
 } {1}
 
 test ColorSample {create and configure} {
-	clean
-	eval destroy [winfo children .]
-	tk appname test
-	package require ClassyTcl
+	classyclean
 	Classy::ColorSample .try
 	pack .try
 	.try set green
@@ -75,10 +57,7 @@ test ColorSample {create and configure} {
 } {green}
 
 test ColorSelect {create and configure} {
-	clean
-	eval destroy [winfo children .]
-	tk appname test
-	package require ClassyTcl
+	classyclean
 	Classy::ColorSelect .try
 	pack .try -fill both -expand yes
 	.try set green
@@ -86,14 +65,9 @@ test ColorSelect {create and configure} {
 } {#00ff00}
 
 test getcolor {getcolor} {
-	clean
-	eval destroy [winfo children .]
-	tk appname test
-	package require ClassyTcl
+	classyclean
 	option add *GetColor Peos startupFile
 	Classy::getcolor -initialcolor yellow
 } {#ffff00}
 
 testsummarize
-catch {unset errors}
-

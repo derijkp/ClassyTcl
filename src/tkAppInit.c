@@ -1,23 +1,19 @@
 /* 
- * tclAppInit.c --
+ * tkAppInit.c --
  *
- *	Provides a default version of the main program and Tcl_AppInit
- *	procedure for Tcl applications (without Tk).
+ *	Provides a default version of the Tcl_AppInit procedure for
+ *	use in wish and similar Tk-based applications.
  *
  * Copyright (c) 1993 The Regents of the University of California.
- * Copyright (c) 1994-1997 Sun Microsystems, Inc.
+ * Copyright (c) 1994 Sun Microsystems, Inc.
  *
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * SCCS: @(#) tclAppInit.c 1.20 97/03/24 14:29:43
+ * SCCS: @(#) tkAppInit.c 1.22 96/05/29 09:47:08
  */
 
-#ifdef TCL_XT_TEST
-#include <X11/Intrinsic.h>
-#endif
-
-#include "tcl.h"
+#include "tk.h"
 
 /*
  * The following variable is a special hack that is needed in order for
@@ -27,14 +23,9 @@
 extern int matherr();
 int *tclDummyMathPtr = (int *) matherr;
 
-
-#ifdef TCL_TEST
-EXTERN int		TclObjTest_Init _ANSI_ARGS_((Tcl_Interp *interp));
-EXTERN int		Tcltest_Init _ANSI_ARGS_((Tcl_Interp *interp));
-#endif /* TCL_TEST */
-#ifdef TCL_XT_TEST
-EXTERN int		Tclxttest_Init _ANSI_ARGS_((Tcl_Interp *interp));
-#endif
+#ifdef TK_TEST
+EXTERN int		Tktest_Init _ANSI_ARGS_((Tcl_Interp *interp));
+#endif /* TK_TEST */
 
 /*
  *----------------------------------------------------------------------
@@ -44,7 +35,7 @@ EXTERN int		Tclxttest_Init _ANSI_ARGS_((Tcl_Interp *interp));
  *	This is the main program for the application.
  *
  * Results:
- *	None: Tcl_Main never returns here, so this procedure never
+ *	None: Tk_Main never returns here, so this procedure never
  *	returns either.
  *
  * Side effects:
@@ -58,10 +49,7 @@ main(argc, argv)
     int argc;			/* Number of command-line arguments. */
     char **argv;		/* Values of command-line arguments. */
 {
-#ifdef TCL_XT_TEST
-    XtToolkitInitialize();
-#endif
-    Tcl_Main(argc, argv, Tcl_AppInit);
+    Tk_Main(argc, argv, Tcl_AppInit);
     return 0;			/* Needed only to prevent compiler warning. */
 }
 
@@ -91,22 +79,18 @@ Tcl_AppInit(interp)
     if (Tcl_Init(interp) == TCL_ERROR) {
 	return TCL_ERROR;
     }
-
-#ifdef TCL_TEST
-#ifdef TCL_XT_TEST
-     if (Tclxttest_Init(interp) == TCL_ERROR) {
-	 return TCL_ERROR;
-     }
-#endif
-    if (Tcltest_Init(interp) == TCL_ERROR) {
+    if (Tk_Init(interp) == TCL_ERROR) {
 	return TCL_ERROR;
     }
-    Tcl_StaticPackage(interp, "Tcltest", Tcltest_Init,
+    Tcl_StaticPackage(interp, "Tk", Tk_Init, Tk_SafeInit);
+#ifdef TK_TEST
+    if (Tktest_Init(interp) == TCL_ERROR) {
+	return TCL_ERROR;
+    }
+    Tcl_StaticPackage(interp, "Tktest", Tktest_Init,
             (Tcl_PackageInitProc *) NULL);
-    if (TclObjTest_Init(interp) == TCL_ERROR) {
-	return TCL_ERROR;
-    }
-#endif /* TCL_TEST */
+#endif /* TK_TEST */
+
 
     /*
      * Call the init procedures for included packages.  Each call should
@@ -134,6 +118,6 @@ Tcl_AppInit(interp)
      * then no user-specific startup file will be run under any conditions.
      */
 
-    Tcl_SetVar(interp, "tcl_rcFileName", "~/.tclshrc", TCL_GLOBAL_ONLY);
+    Tcl_SetVar(interp, "tcl_rcFileName", "~/.wishrc", TCL_GLOBAL_ONLY);
     return TCL_OK;
 }

@@ -5,23 +5,23 @@ exec wish8.0 "$0" "$@"
 source tools.tcl
 
 test NumEntry {create and configure} {
-	clean
+	classyclean
 	destroy .try
-	NumEntry .try
+	Classy::NumEntry .try
 	pack .try
 	.try configure -label test
 	.try cget -label
 } {test}
 
 test NumEntry {create with configuration configure} {
-	clean
+	classyclean
 	NumEntry .try -label try
 	pack .try
 	.try cget -label
 } {try}
 
 test NumEntry {create, destroy, create} {
-	clean
+	classyclean
 	NumEntry .try -label try
 	pack .try
 	destroy .try
@@ -31,21 +31,21 @@ test NumEntry {create, destroy, create} {
 } {}
 
 test NumEntry {create with configuration configure} {
-	clean
+	classyclean
 	NumEntry .try -label try -orient vert
 	pack .try
 	.try cget -orient
 } {vertical}
 
 test NumEntry {create with configuration configure} {
-	clean
+	classyclean
 	NumEntry .try -label int -constraint int
 	pack .try
 	.try cget -constraint
 } {^(-?)[0-9]*$}
 
 test NumEntry {min} {
-	clean
+	classyclean
 	NumEntry .try -label try -min 0 -max 10
 	pack .try
 	.try set 5
@@ -54,7 +54,7 @@ test NumEntry {min} {
 } {5}
 
 test NumEntry {max} {
-	clean
+	classyclean
 	NumEntry .try -label try -min 0 -max 10
 	pack .try
 	.try set 5
@@ -63,7 +63,7 @@ test NumEntry {max} {
 } {5}
 
 test NumEntry {int} {
-	clean
+	classyclean
 	NumEntry .try -label try -min 0 -max 10 -constraint int
 	pack .try
 	.try set 5
@@ -72,4 +72,3 @@ test NumEntry {int} {
 } {5}
 
 testsummarize
-catch {unset errors}

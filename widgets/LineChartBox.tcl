@@ -22,7 +22,6 @@ if 0 {
 proc ::Classy::LineChartBox {} {}
 proc LineChartBox {} {}
 }
-catch {Classy::LineChartBox destroy}
 
 # ------------------------------------------------------------------
 #  Widget creation

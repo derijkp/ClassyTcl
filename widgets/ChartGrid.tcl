@@ -41,7 +41,6 @@ if 0 {
 proc ::Classy::ChartGrid {} {}
 proc ChartGrid {} {}
 }
-catch {Classy::ChartGrid destroy}
 
 # ------------------------------------------------------------------
 #  Widget creation

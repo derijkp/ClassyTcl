@@ -5,10 +5,7 @@ exec wish8.0 "$0" "$@"
 source tools.tcl
 
 test Classy::Canvas {create and configure} {
-	clean
-	eval destroy [winfo children .]
-	tk appname test
-	package require ClassyTcl
+	classyclean
 	Classy::Canvas .try
 	pack .try
 	set id [.try create text 10 10 -text "A"]
@@ -16,10 +13,7 @@ test Classy::Canvas {create and configure} {
 } {-text {} {} {} A}
 
 test Classy::Canvas {undo} {
-	clean
-	eval destroy [winfo children .]
-	tk appname test
-	package require ClassyTcl
+	classyclean
 	Classy::Canvas .try
 	pack .try
 	.try create text 10 10 -text "A"
@@ -30,5 +24,3 @@ test Classy::Canvas {undo} {
 } {1}
 
 testsummarize
-catch {unset errors}
-

@@ -36,6 +36,27 @@ test class {Class destroy -> children destroyed?} {
 	try
 } {invalid command name "try"} 1
 
+test class {object destroy in method} {
+	clean
+	Class method try {} {
+		$object destroy
+	}
+	Class new try
+	try try
+	try
+} {invalid command name "try"} 1
+
+test class {object destroy in destroy} {
+	clean
+	Class subclass Test
+	Test method destroy {} {
+		$object destroy
+	}
+	Test new try
+	try destroy
+	try
+} {invalid command name "try"} 1
+
 test class {nop} {
 	clean
 	Class method nop {} {}
@@ -105,26 +126,26 @@ test class {subclass methods} {
 	clean
 	Class subclass Subclass
 	Subclass method
-} {class destroy private}
+} {class destroy private trace}
 
 test class {try method} {
 	clean
 	Class method addclass {} {}
 	Class method
-} {addclass class destroy private}
+} {addclass class destroy private trace}
 
 test class {do not show _method} {
 	clean
 	Class method _test {} {}
 	Class method
-} {class destroy private}
+} {class destroy private trace}
 
 test class {do not show _method for instance} {
 	clean
 	Class method _test {} {}
 	Class new try
 	try try
-} {bad option "try": must be class, destroy, private} 1
+} {bad option "try": must be class, destroy, private, trace} 1
 
 test class {subclass destroy: test command} {
 	clean
@@ -176,7 +197,7 @@ test class {add method} {
 	clean
 	Class method nop {} {}
 	Class method
-} {class destroy nop private}
+} {class destroy nop private trace}
 
 test class {add method: works?} {
 	clean
@@ -201,7 +222,7 @@ test class {subclass inherits new methods} {
 	Class method nop {} {}
 	Class subclass Subclass
 	Subclass method
-} {class destroy nop private}
+} {class destroy nop private trace}
 
 test class {inherit method: works?} {
 	clean
@@ -280,7 +301,7 @@ test class {error in init} {
 		error error
 	}
 	Test new try
-} {init of class Test failed: error} 1
+} {error} 1
 
 test class {redefining init: test class} {
 	clean
@@ -313,7 +334,7 @@ test class {redefining init: error in init} {
 		error "test error"
 	}
 	Test new try
-} {init of class Test failed: test error} 1
+} {test error} 1
 
 test class {redefining init: error in init -> test object} {
 	clean
@@ -336,7 +357,7 @@ test class {redefining 2 inits: error in init} {
 		return [list [super] 2]
 	}
 	Test2 new try
-} {init of class Test failed: test error} 1
+} {test error} 1
 
 test Class {method} {
 	clean
@@ -607,7 +628,7 @@ test class {classmethod, method} {
 		return ok
 	}
 	Class method
-} {class destroy private}
+} {class destroy private trace}
 
 test class {classdestroy different from destroy: class} {
 	clean
@@ -748,7 +769,7 @@ test class {class in namespace: methods} {
 	::try::Test method set {arg} {setprivate $object try $arg}
 	::try::Test method get {} {getprivate $object try}
 	::try::Test method
-} {class destroy get private set}
+} {class destroy get private set trace}
 
 test class {class and instance in namespace: variables} {
 	clean
@@ -800,17 +821,43 @@ test class {propagate classvars: dont overwrite newly defined} {
 	Test private try
 } {Test}
 
+test class {test super args} {
+	clean
+	Class subclass Test
+	Test classmethod init {args} {
+		return $args
+	}
+	Test subclass Test2
+	Test2 classmethod init {args} {
+		return [super data]
+	}
+	Test2 subclass Test3
+	Test3 classmethod init {args} {
+		return [super]
+	}
+	Test3 new try
+} {data}
+
 test class {trace object} {
 	clean
+	catch {rename try {}}
 	Class new try
 	set ::try ""
-	class::traceobject try {append ::try} 3
+	try trace {lappend ::try}
 	try class
-	class::untraceobject try
+	try trace {}
 	try class
 	set ::try
-} {$object class 
-}
+} {{try class} {try trace {}}}
+
+test class {trace class} {
+	clean
+	set ::try ""
+	Class trace {lappend ::try}
+	Class class
+	Class trace {}
+	Class class
+	set ::try
+} {{Class class} {Class trace {}}}
 
 testsummarize
-catch {unset errors}

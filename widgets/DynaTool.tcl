@@ -40,7 +40,6 @@ if 0 {
 proc ::Classy::DynaTool {} {}
 proc DynaTool {} {}
 }
-catch {Classy::DynaTool destroy}
 
 option add *Classy::Tool.Button.padY 0 widgetDefault
 option add *Classy::Tool.Checkbutton.padY 1 widgetDefault

@@ -22,7 +22,6 @@ if 0 {
 proc ::Classy::Configurator {} {}
 #proc Configurator {} {}
 }
-catch {Classy::Configurator destroy}
 
 # ------------------------------------------------------------------
 #  Widget creation

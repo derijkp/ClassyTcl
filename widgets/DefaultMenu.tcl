@@ -25,7 +25,6 @@ if 0 {
 proc ::Classy::DefaultMenu {} {}
 proc DefaultMenu {} {}
 }
-catch {Classy::DefaultMenu destroy}
 
 # ------------------------------------------------------------------
 #  Widget creation

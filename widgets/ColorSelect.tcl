@@ -24,7 +24,6 @@ if 0 {
 proc ::Classy::ColorSelect {} {}
 proc ColorSelect {} {}
 }
-catch {Classy::ColorSelect destroy}
 
 # ------------------------------------------------------------------
 #  Widget creation

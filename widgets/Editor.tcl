@@ -22,7 +22,6 @@ if 0 {
 proc ::Classy::Editor {} {}
 proc Editor {} {}
 }
-catch {Classy::Editor destroy}
 
 option add *Classy:Editor.KeySearchReopen Control-Alt-r widgetDefault
 option add *Classy::Editor.KeyMatchingBrackets "Alt-bracketleft" widgetDefault
@@ -47,7 +46,7 @@ Classy::Editor classmethod init {args} {
 			set top [winfo toplevel $object]
 			if ![regexp {\*$} [wm title $top]] {catch [wm title $top "[wm title $top] *"]}
 		}]
-	bindtags $object.edit "$object Classy::Text $object.edit all"
+	bindtags $object.edit [list $object Classy::Text $object.edit all]
 	scrollbar $object.vbar -orient vertical -command "$object.edit yview"
 	scrollbar $object.hbar -orient horizontal -command "$object.edit xview"
 
@@ -154,12 +153,12 @@ Classy::Editor method destroy {} {
 # ------------------------------------------------------------------
 
 Classy::Editor chainallmethods {$object.edit} Classy::Text
-
 #doc {Editor command cut} cmd {
 #pathname cut 
 #} descr {
 #}
 Classy::Editor method cut {} {
+puts ok[info level]
 	private $object replace
 	clipboard clear -displayof $object			  
 	catch {									
@@ -653,6 +652,13 @@ Classy::Editor method indent {number} {
 	}
 }
 
+proc Classy::trace {var command} {
+	lshift command
+	if {[info level] == 1} {
+		lappend $var "\$object $command"
+	}
+}
+
 #doc {Editor command macro} cmd {
 #pathname macro 
 #} descr {
@@ -660,8 +666,8 @@ Classy::Editor method indent {number} {
 Classy::Editor method macro {} {
 	set obj $object
 	Classy::Dialog $object.macro -title "Make macro" -closecommand [varsubst object {
-		::class::untraceobject $object
-		::class::untraceobject $object.edit
+		$object trace {}
+		$object.edit trace {}
 		catch {unset [privatevar $object macro]}
 		destroy $object.macro
 	}] -resize {1 1}
@@ -673,15 +679,17 @@ Classy::Editor method macro {} {
 		$record configure -text "Recording ..." -state disabled
 		$stop configure -state normal
 		focus $object
-		::class::traceobject $object [list append [privatevar $object macro]] 1
-		::class::traceobject $object.edit [list append [privatevar $object macro]] 1
+		$object trace [list Classy::trace [privatevar $object macro]]
+		$object.edit trace [list Classy::trace [privatevar $object macro]]
 	}]
 	$stop configure -command [varsubst {stop record object} {
 		$record configure -text "Record" -state normal
 		$stop configure -state disabled
-		::class::untraceobject $object
-		::class::untraceobject $object.edit
-		$object.macro.options.text insert end [set [privatevar $object macro]]
+		$object trace {}
+		$object.edit trace {}
+		set text [set [privatevar $object macro]]
+		set len [llength $text]
+		$object.macro.options.text insert end [join [lrange $text 0 [expr $len-3]] "\n"]
 		catch {unset [privatevar $object macro]}
 	}]
 	$stop configure -state disabled
@@ -709,13 +717,13 @@ Classy::Editor method macro {} {
 	scrollbar $object.macro.options.scroll -command "$object.macro.options.text yview"
 	Classy::Text $object.macro.options.text -yscrollcommand "$object.macro.options.scroll set" -width 20 -height 10
 
-	if {"$macrokey"==""} {set macrokey F5}
-	if {"$macroname"==""} {set macroname $macrokey}
+	if {"$macroname"==""} {set macroname temp}
 	pack $object.macro.options.key -side bottom -fill x
 	pack $object.macro.options.name -side bottom -fill x
 	pack $object.macro.options.scroll -fill y -side right
 	pack $object.macro.options.text -fill both -expand yes
 	$object getmacro
+	if {"$macrokey"==""} {set macrokey F5}
 }
 
 #doc {Editor command setmacro} cmd {

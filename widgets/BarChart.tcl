@@ -48,7 +48,6 @@ if 0 {
 proc ::Classy::BarChart {} {}
 proc BarChart {} {}
 }
-catch {Classy::BarChart destroy}
 
 # ------------------------------------------------------------------
 #  Widget creation

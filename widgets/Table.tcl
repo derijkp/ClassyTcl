@@ -37,7 +37,6 @@ if 0 {
 proc ::Classy::Table {} {}
 proc Table {} {}
 }
-catch {Classy::Table destroy}
 
 option add *Classy::Table.base.Entry.highlightThickness 0 widgetDefault
 option add *Classy::Table.base.Entry.borderWidth 1 widgetDefault

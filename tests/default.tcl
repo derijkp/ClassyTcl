@@ -5,18 +5,14 @@ exec wish8.0 "$0" "$@"
 source tools.tcl
 
 test Classy::Default {set and get} {
-	clean
-	tk appname test
-	package require ClassyTcl [pwd]
+	classyclean
 	Classy::Default set app try 2
 	Classy::Default set app try 1
 	Classy::Default get app try
 } {1}
 
 test Classy::Default {add} {
-	clean
-	tk appname test
-	package require ClassyTcl [pwd]
+	classyclean
 	Classy::Default clear
 	Classy::Default add app try 1
 	Classy::Default add app try {try it}
@@ -24,9 +20,7 @@ test Classy::Default {add} {
 } {{try it} 1}
 
 test Classy::Default {remove} {
-	clean
-	tk appname test
-	package require ClassyTcl [pwd]
+	classyclean
 	Classy::Default clear
 	Classy::Default set app try {{try it} 1}
 	Classy::Default remove app try {try it}
@@ -34,9 +28,7 @@ test Classy::Default {remove} {
 } {1}
 
 test Classy::DefaultMenu {create and configure} {
-	clean
-	tk appname test
-	package require ClassyTcl [pwd]
+	classyclean
 	entry .e
 	Classy::DefaultMenu .try -key try -command {.e delete 0 end;.e insert 0 [.try get]} -getcommand {.e get}
 	pack .e .try -side left
@@ -48,4 +40,3 @@ test Classy::DefaultMenu {create and configure} {
 } {1}
 
 testsummarize
-catch {unset errors}

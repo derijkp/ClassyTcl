@@ -18,7 +18,6 @@ if 0 {
 proc ::Classy::Balloon {} {}
 proc Balloon {} {}
 }
-catch {Classy::Balloon destroy}
 
 option add *Balloon.font {Helvetica 6 normal} widgetDefault
 option add *Balloon.text.background yellow widgetDefault

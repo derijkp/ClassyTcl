@@ -21,7 +21,6 @@ if 0 {
 proc ::Classy::ColorRGB {} {}
 proc ColorRGB {} {}
 }
-catch {Classy::ColorRGB destroy}
 
 # ------------------------------------------------------------------
 #  Widget creation

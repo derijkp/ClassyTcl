@@ -22,7 +22,6 @@ if 0 {
 proc ::Classy::HTML {} {}
 proc HTML {} {}
 }
-catch {Classy::HTML destroy}
 
 source [file join $::class::dir html_library-0.3 html_library.tcl]
 

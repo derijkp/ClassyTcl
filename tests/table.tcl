@@ -5,9 +5,7 @@ exec wish8.0 "$0" "$@"
 source tools.tcl
 
 test Classy::Table {create and configure} {
-	clean
-	destroy .try
-	package require ClassyTcl
+	classyclean
 	proc getcommand {object w row col} {
 		if {$col == 1} {
 			$w configure -bg gray
@@ -50,5 +48,3 @@ test Classy::Table {create and configure} {
 
 
 #testsummarize
-catch {unset errors}
-

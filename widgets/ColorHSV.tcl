@@ -25,7 +25,6 @@ if 0 {
 proc ::Classy::ColorHSV {} {}
 proc ColorHSV {} {}
 }
-catch {Classy::ColorHSV destroy}
 
 # ------------------------------------------------------------------
 #  Widget creation

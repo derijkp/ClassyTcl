@@ -23,7 +23,6 @@ if 0 {
 proc ::Classy::ColorSample {} {}
 proc ColorSample {} {}
 }
-catch {Classy::ColorSample destroy}
 
 # ------------------------------------------------------------------
 #  Widget creation

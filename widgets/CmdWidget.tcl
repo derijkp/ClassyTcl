@@ -31,7 +31,6 @@ if 0 {
 proc ::Classy::CmdWidget {} {}
 proc CmdWidget {} {}
 }
-catch {Classy::CmdWidget destroy}
 
 source [file join $::class::dir widgets CmdWidgetbnd.tcl]
 auto_load varsubst

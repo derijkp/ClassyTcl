@@ -23,7 +23,6 @@ if 0 {
 proc ::Classy::Help {} {}
 proc Help {} {}
 }
-catch {Classy::Help destroy}
 
 laddnew ::Classy::help_path [file join $class::dir help]
 

@@ -21,7 +21,6 @@ if 0 {
 proc ::Classy::InputBox {} {}
 proc InputBox {} {}
 }
-catch {Classy::InputBox destroy}
 
 # ------------------------------------------------------------------
 #  Widget creation

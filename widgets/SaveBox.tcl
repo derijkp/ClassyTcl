@@ -21,7 +21,6 @@ if 0 {
 proc ::Classy::SaveBox {} {}
 proc SaveBox {} {}
 }
-catch {Classy::SaveBox destroy}
 
 # ------------------------------------------------------------------
 #  Widget creation

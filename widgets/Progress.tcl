@@ -25,7 +25,6 @@ if 0 {
 proc ::Classy::Progress {} {}
 proc Progress {} {}
 }
-catch {Classy::Progress destroy}
 
 # ------------------------------------------------------------------
 #  Widget creation

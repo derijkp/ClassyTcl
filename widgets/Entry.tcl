@@ -29,7 +29,6 @@ if 0 {
 proc ::Classy::Entry {} {}
 proc Entry {} {}
 }
-catch {Classy::Entry destroy}
 
 option add *Classy::Entry.highlightThickness 0 widgetDefault
 option add *Classy::Entry*Frame.highlightThickness 0 widgetDefault
@@ -89,7 +88,6 @@ Classy::Entry classmethod init {args} {
 # ------------------------------------------------------------------
 
 Classy::Entry chainoptions {$object.entry}
-
 
 #doc {Entry options -orient} option {-orient orient Orient} descr {
 # determines the position of the label relative to the entry: horizontal or vertical

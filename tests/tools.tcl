@@ -1,3 +1,6 @@
+if ![info exists classy_tools] {
+set classy_tools 1
+
 package require Class
 
 catch {tk appname test}
@@ -11,6 +14,14 @@ proc clean {} {
 	catch {Class destroy}
 	catch {eval destroy [winfo children .]}
 	catch {. configure -menu {}}
+}
+
+proc classyclean {} {
+	catch {Class destroy}
+	catch {eval destroy [winfo children .]}
+	catch {. configure -menu {}}
+	tk appname test
+	package require ClassyTcl
 }
 
 proc test {name description script expected {causeerror 0}} {
@@ -48,14 +59,21 @@ proc manualtest {{message {}}} {
 	button .manualtest.b -text Ok -command {destroy .manualtest}
 	pack .manualtest.m
 	pack .manualtest.b
-	wm geometry .manualtest +[expr [winfo pointerx .] - 20]+[expr [winfo pointery .] - 20]
+#	regexp {^([0-9]+)x([0-9]+)\+([0-9]+)\+([0-9]+)$} [winfo geometry .] temp w h x y
+	wm geometry .manualtest +[expr [winfo screenwidth .]/2]+[expr [winfo screenheight .]/2]
+#	wm geometry .manualtest +[expr $x+$w/2]+[expr $y+$h/2]
 	tkwait window .manualtest
 }
 
 proc testsummarize {} {
 	global errors
 	if [info exists errors] {
-		set error "***********************\nThere were errors in the tests"
+		global currenttest
+		if [info exists currenttest] {
+			set error "***********************\nThere were errors in testfile $currenttest"
+		} else {
+			set error "***********************\nThere were errors in the tests"
+		}
 		foreach {test err} $errors {
 			append error "\n$test  ----------------------------"
 			append error "\n$err"
@@ -69,10 +87,12 @@ proc testsummarize {} {
 			text .error.text
 			pack .error.text -expand yes -fill both
 			.error.text insert end $error
-			button .error.b -text Exit -command {exit}
+			button .error.b -text Exit -command {destroy .error}
 			pack .error.b
-			wm geometry .error +[expr [winfo pointerx .] - 100]+[expr [winfo pointery .] - 100]
+			wm geometry .error +[expr [winfo screenwidth .]/2]+[expr [winfo screenheight .]/2]
 		}
+		tkwait window .error
+		unset errors
 	} else {
 		catch {destroy .final}
 		if ![catch {toplevel .final}] {
@@ -80,7 +100,7 @@ proc testsummarize {} {
 			button .final.b -text Exit -command exit
 			pack .final.m
 			pack .final.b
-			wm geometry .final +[expr [winfo pointerx .] - 20]+[expr [winfo pointery .] - 20]
+			wm geometry .final +[expr [winfo screenwidth .]/2]+[expr [winfo screenheight .]/2]
 		} else {
 			puts "All tests ok"
 		}
@@ -88,3 +108,4 @@ proc testsummarize {} {
 }
 
 if [info exists errors] {unset errors}
+}
