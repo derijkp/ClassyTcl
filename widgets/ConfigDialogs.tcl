@@ -26,12 +26,11 @@ proc Classy::config args {# ClassyTcl generated Toplevel
 	grid $window.frame -row 0 -column 2 -sticky nesw
 	grid columnconfigure $window 2 -weight 1
 	grid rowconfigure $window 0 -weight 1
-
 	# Parse this
 	$window configure \
 		-destroycommand [list destroy $window]
 	$window.paned1 configure \
-		-window [varsubst window {$window.treewidget1}]
+		-window [varsubst window {$window.browse}]
 	$window.browse configure \
 		-endnodecommand [varsubst window {invoke node {Classy::Config open $window.browse $node}}] \
 		-opencommand [varsubst window {invoke node {Classy::Config browse $window.browse $node}}]
@@ -40,8 +39,13 @@ $window.browse addnode {} appuser -text "Application user"
 $window.browse addnode {} appdef -text "Application default"
 $window.browse addnode {} user -text "ClassyTcl user"
 $window.browse addnode {} def -text "ClassyTcl default"
+Classy::Config browse $window.browse appuser
+set child [lindex [$window.browse children appuser] 0]
+Classy::Config browse $window.browse $child
+set child [lindex [$window.browse children $child] 0]
+Classy::Config open $window.browse $child
+$window configure -resize [list [winfo reqwidth $window] [winfo reqheight $window]]
 }
-
 
 proc Classy::config_saveas args {# ClassyTcl generated Dialog
 	if [regexp {^\.} $args] {
@@ -80,9 +84,6 @@ set var $opt(-variable)
 # ClassyTcl Finalise
 $window.options.level set $opt(-level)
 }
-
-
-
 
 proc Classy::config_tool args {# ClassyTcl generated Frame
 	if [regexp {^\.} $args] {

@@ -11,8 +11,7 @@ test Classy::Paned {basic} {
 	grid .l1 .try .l2 -sticky nwse
 	grid columnconfigure . 2 -weight 1
 	manualtest
-	set try 1
-} {1}
+} {}
 
 test Classy::OptionBox {basic} {
 	classyclean
@@ -43,8 +42,7 @@ test Classy::RepeatButton {basic} {
 	Classy::RepeatButton .try -text try -command {puts ok}
 	pack .try
 	manualtest
-	set try 1
-} {1}
+} {}
 
 test Classy::Progress {basic} {
 	classyclean
@@ -131,6 +129,7 @@ test Classy::MultiFrame {basic} {
 	frame .try.f1 -bg gray
 	frame .try.f2 -bg blue
 	.try select f2
+	update
 	winfo viewable .try.f2
 } {1}
 

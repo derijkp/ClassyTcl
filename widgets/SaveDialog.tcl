@@ -65,7 +65,7 @@ Classy::SaveDialog classmethod init {args} {
 
 	if {"$args" != ""} {eval $object configure $args}
 
-	bind $object.options.icon <<Action-Motion>> "DragDrop start %W $object"
+	bind $object.options.icon <<Action-Motion>> "DragDrop start %X %Y $object"
 	focus $object.options.entry.entry
 }
 

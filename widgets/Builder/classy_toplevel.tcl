@@ -58,7 +58,7 @@ proc ::Classy::WindowBuilder::generate_Classy::Toplevel {object base} {
 	append body [$object generatebindings $base $outw]
 	set children ""
 	foreach child [winfo children $base] {
-		if [regexp "^$base.classy__\[a-z\]+\$" $child] continue
+		if [regexp "^$base.classy__\[a-z0-9\]+\$" $child] continue
 		if [regexp "^$base.#classy__#menu_" $child] continue
 		lappend children $child
 	}

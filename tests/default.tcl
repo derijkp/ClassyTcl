@@ -36,7 +36,6 @@ test Classy::DefaultMenu {create and configure} {
 	Classy::Default set app try {ertu fghfh dfhjdf dffj}
 	bind .e <F3> {.try menu}
 	manualtest
-	set ::try 1
-} {1}
+} {}
 
 testsummarize

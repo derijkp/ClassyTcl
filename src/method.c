@@ -894,3 +894,109 @@ extern int Classy_CreateMethod(
 	}
 }
 
+int Classy_InfoMethodinfo(
+	Tcl_Interp *interp,
+	Class *class,
+	Object *object,
+	int argc,
+	Tcl_Obj *CONST argv[])
+{
+	Tcl_HashEntry *entry;
+	Method *method;
+	char *option,*name,*cmd;
+	int optionlen;
+
+	if (object != NULL) {
+		cmd = Tcl_GetStringFromObj(object->name,NULL);
+	} else {
+		cmd = Tcl_GetStringFromObj(class->class,NULL);
+	}
+	option = Tcl_GetStringFromObj(argv[0],&optionlen);
+	name = Tcl_GetStringFromObj(argv[1],NULL);
+	entry = Tcl_FindHashEntry(&(class->methods), name);
+	if (entry == NULL) {
+		Tcl_ResetResult(interp);
+		Tcl_AppendResult(interp,"class \"",cmd,
+			" does not have a method \"", name, "\"", (char *)NULL);
+		return TCL_ERROR;
+	}
+	method = (Method *)Tcl_GetHashValue(entry);
+	Tcl_ResetResult(interp);
+	if (method->proc == NULL) {
+		Tcl_AppendResult(interp,"classmethod \"",name,
+			"\" of ",cmd , "\" is defined in C", (char *)NULL);
+		return TCL_ERROR;
+	}
+	if ((optionlen == 4) &&(strncmp(option,"body",4) == 0)) {
+		Tcl_VarEval(interp,"info body ::class::",Tcl_GetStringFromObj(class->class,NULL),",,m,",name,(char *)NULL);
+		return TCL_OK;
+	} else if ((optionlen == 4) &&(strncmp(option,"args",4) == 0)) {
+		Tcl_VarEval(interp,"lrange [info args ::class::",Tcl_GetStringFromObj(class->class,NULL),",,m,",name,"] 2 end",(char *)NULL);
+		return TCL_OK;
+	} else if ((optionlen == 7) &&(strncmp(option,"default",7) == 0)) {
+		if (argc != 4) {
+			Tcl_AppendResult(interp,"wrong # args: should be \"",
+				cmd,
+				" info classmethod default arg varname\"", (char *)NULL);
+			return TCL_ERROR;
+		}
+		Tcl_VarEval(interp,"info default ::class::",Tcl_GetStringFromObj(class->class,NULL),",,m,",name,
+			" ",Tcl_GetStringFromObj(argv[2],NULL)," ",Tcl_GetStringFromObj(argv[3],NULL), (char *)NULL);
+		return TCL_OK;
+	} else {
+		Tcl_AppendResult(interp,"wrong option \"",option,
+			"\" must be body, args or default", (char *)NULL);
+		return TCL_ERROR;
+	}
+}
+
+int Classy_InfoClassMethodinfo(
+	Tcl_Interp *interp,
+	Class *class,
+	int argc,
+	Tcl_Obj *CONST argv[])
+{
+	Tcl_HashEntry *entry;
+	Method *method;
+	char *option,*name;
+	int optionlen;
+
+	option = Tcl_GetStringFromObj(argv[0],&optionlen);
+	name = Tcl_GetStringFromObj(argv[1],NULL);
+	entry = Tcl_FindHashEntry(&(class->classmethods), name);
+	if (entry == NULL) {
+		Tcl_ResetResult(interp);
+		Tcl_AppendResult(interp,"class \"",Tcl_GetStringFromObj(class->class,NULL),
+			" does not have a classmethod \"", name, "\"", (char *)NULL);
+		return TCL_ERROR;
+	}
+	method = (Method *)Tcl_GetHashValue(entry);
+	Tcl_ResetResult(interp);
+	if (method->proc == NULL) {
+		Tcl_AppendResult(interp,"classmethod \"",name,
+			"\" of class ",Tcl_GetStringFromObj(class->class,NULL) , "\" is defined in C", (char *)NULL);
+		return TCL_ERROR;
+	}
+	if ((optionlen == 4) &&(strncmp(option,"body",4) == 0)) {
+		Tcl_VarEval(interp,"info body ::class::",Tcl_GetStringFromObj(class->class,NULL),",,cm,",name,(char *)NULL);
+		return TCL_OK;
+	} else if ((optionlen == 4) &&(strncmp(option,"args",4) == 0)) {
+		Tcl_VarEval(interp,"lrange [info args ::class::",Tcl_GetStringFromObj(class->class,NULL),",,cm,",name,"] 1 end",(char *)NULL);
+		return TCL_OK;
+	} else if ((optionlen == 7) &&(strncmp(option,"default",7) == 0)) {
+		if (argc != 4) {
+			Tcl_AppendResult(interp,"wrong # args: should be \"",
+				Tcl_GetStringFromObj(class->class,NULL),
+				" info classmethod default arg varname\"", (char *)NULL);
+			return TCL_ERROR;
+		}
+		Tcl_VarEval(interp,"info default ::class::",Tcl_GetStringFromObj(class->class,NULL),",,cm,",name,
+			" ",Tcl_GetStringFromObj(argv[2],NULL)," ",Tcl_GetStringFromObj(argv[3],NULL), (char *)NULL);
+		return TCL_OK;
+	} else {
+		Tcl_AppendResult(interp,"wrong option \"",option,
+			"\" must be body, args or default", (char *)NULL);
+		return TCL_ERROR;
+	}
+}
+

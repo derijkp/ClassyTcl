@@ -198,6 +198,7 @@ int Classy_NewClassMethod(
 	while(1) {
 		if (tempclass->init != NULL) {
 			classcurrent = tempclass;
+			Tcl_ResetResult(interp);
 			error = Classy_ExecMethod(interp,tempclass->init,class,object,argc-1,argv+1);
 			if (error != TCL_OK) {
 				Tcl_Obj *errorObj, *errorinfo;
@@ -218,9 +219,11 @@ int Classy_NewClassMethod(
 			break;
 		}
 		tempclass = tempclass->parent;
-		if (tempclass == NULL) break;
+		if (tempclass == NULL) {
+		Tcl_SetObjResult(interp,name);
+			break;
+		}
 	}
-	Tcl_SetObjResult(interp,name);
 	return TCL_OK;
 }
 

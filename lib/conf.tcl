@@ -189,7 +189,7 @@ proc Classy::geticon {name {reload {}}} {
 	set file ""
 	foreach type {appuser appdef user def} {
 		set base [file join $::Classy::dir($type) icons $name]
-		foreach type {{} .xpm .gif} {
+		foreach type {{} .xpm .gif .xbm} {
 			if [file readable $base$type] {
 				set file $base$type
 			}
@@ -199,21 +199,21 @@ proc Classy::geticon {name {reload {}}} {
 		error "Could not find icon \"$name\""
 	} else {
 		if {"[file extension $file]"==".xbm"} {
-			image create bitmap Classy::icon_$name -file $file
+			image create bitmap ::Classy::icon_$name -file $file
 		} elseif {"[file extension $file]"==".xpm"} {
 			global tcl_platform
 			package require Img
 			if {"$tcl_platform(platform)"=="windows"} {
-				image create photo Classy::icon_$name -file $file
+				image create photo ::Classy::icon_$name -file $file
 			} else {
-				image create pixmap Classy::icon_$name -file $file
+				image create pixmap ::Classy::icon_$name -file $file
 			}
 		} else {
-			image create photo Classy::icon_$name -file $file
+			image create photo ::Classy::icon_$name -file $file
 		}
 	}
-	set ::Classy::icons($name) Classy::icon_$name
-	return Classy::icon_$name
+	set ::Classy::icons($name) ::Classy::icon_$name
+	return ::Classy::icon_$name
 }
 
 proc Classy::loadconf {conf args} {

@@ -22,12 +22,27 @@ proc WindowBuilder {} {}
 }
 
 source [file join $::class::dir widgets WindowBuilderTypes.tcl]
-option add *Classy::WindowBuilder_select.background black
+option add *Classy::WindowBuilder_select.background black widgetDefault
+option add *Classy::WindowBuilder_select.highlightBackground black widgetDefault
+option add *Classy::WindowBuilder_select.nonstickyForeground black widgetDefault
+option add *Classy::WindowBuilder_select.nonstickyBackground white widgetDefault
+option add *Classy::WindowBuilder_select.stickyBackground black widgetDefault
+option add *Classy::WindowBuilder_select.stickyForeground black widgetDefault
+option add *Classy::WindowBuilder_select.width 5 widgetDefault
+option add *Classy::WindowBuilder_select.height 5 widgetDefault
+option add *Classy::WindowBuilder_tool.highlightThickness 0 widgetDefault
+option add *Classy::WindowBuilder_tool.indel.background [option get . darkBackground DarkBackground] widgetDefault
+option add *Classy::WindowBuilder_tool.resize.background [option get . darkBackground DarkBackground] widgetDefault
 
-bind Classy::WindowBuilder <<ButtonRelease-Action>> "\[Classy::WindowBuilder_win %W\] select %W"
+bind Classy::WindowBuilder_select <<ButtonPress-Action>> "\[Classy::WindowBuilder_win %W\] _sticky start %W %X %Y"
+bind Classy::WindowBuilder_select <<Action-Motion>> "\[Classy::WindowBuilder_win %W\] _sticky motion %W %X %Y"
+bind Classy::WindowBuilder_select <<ButtonRelease-Action>> "\[Classy::WindowBuilder_win %W\] _sticky action %W %X %Y"
+bind Classy::WindowBuilder_tool <<Drop>> "\[Classy::WindowBuilder_win %W\] drop %W"
+
 bind Classy::WindowBuilder <<Adjust>> "\[Classy::WindowBuilder_win %W\] insertname %W"
 bind Classy::WindowBuilder <<Drag>> "\[Classy::WindowBuilder_win %W\] drag %W %X %Y"
-bind Classy::WindowBuilder <<Drop>> "\[Classy::WindowBuilder_win %W\] drop %W"
+bind Classy::WindowBuilder <<Drop>> "\[Classy::WindowBuilder_win %W\] drop %W;break"
+bind Classy::WindowBuilder <<ButtonRelease-Action>> "\[Classy::WindowBuilder_win %W\] select %W"
 bind Classy::WindowBuilder <Configure> "\[Classy::WindowBuilder_win %W\] _configure %W"
 
 # ------------------------------------------------------------------
@@ -54,55 +69,52 @@ Classy::WindowBuilder classmethod init {args} {
 		grid $object.children -in $object.toolhold -row 0 -column 1 -sticky nsew
 		grid $object.current -in $object.toolhold -row 0 -column 2 -sticky nsew
 		grid columnconfigure $object.toolhold 2 -weight 1
-	Classy::DynaTool $object.icons -type Classy::WindowBuilder_icons -cmdw $object
+	Classy::DynaTool $object.icons -type Classy::WindowBuilder_icons -cmdw $object -width 25
 	foreach c [winfo children $object.icons] {
 		if {"[winfo class $c]" == "Button"} {
 			set command [$c cget -command]
 			regexp { add ([^ {}]+)} $command temp type
 			set name [string tolower $type]
 			regsub -all : $name _ name
-			bind $c <<Drag>> "DragDrop start %W $type -types [list [list create $command]] -image [Classy::geticon Builder/$name]"			
+			bind $c <<Drag>> "DragDrop start %X %Y $type -types [list [list create $command]] -image [Classy::geticon Builder/$name]"			
 		}
 	}
+	Classy::Paned $object.pane -window $object.icons -orient vertical
 	Classy::NoteBook $object.book
-	$object.book configure -width 100 -height 100
-	$object.book propagate off
-	frame $object.edit
-	$object.book manage Special $object.edit -sticky nwse -command [list $object drawedit]
-	$object _createattributes $object.attr
-	$object.book manage Attributes $object.attr -sticky nwse -command [list $object attribute rebuild]
-	$object _createbindings $object.bindings
-	$object.book manage Bindings $object.bindings -sticky nwse -command [list $object bindings rebuild]
-	$object _creategeometry $object.geom
-	$object.book manage Geometry $object.geom -sticky nwse
-	$object _createcode $object.code
-	$object.book manage Code $object.code -sticky nwse
-	$object.book select Special
-	frame $object.fcode
-	Classy::Text $object.fcode.text -wrap none -width 10 -height 10 -state disabled -cursor X_cursor \
-		-xscrollcommand [list $object.fcode.hscroll set] -yscrollcommand [list $object.fcode.vscroll set]
-	scrollbar $object.fcode.vscroll -orient vertical -command [list $object.fcode.text yview]
-	scrollbar $object.fcode.hscroll -orient horizontal -command [list $object.fcode.text xview]
-	grid $object.fcode.text $object.fcode.vscroll -sticky nwse
-	grid $object.fcode.hscroll -sticky we
-	grid columnconfigure $object.fcode 0 -weight 1
-	grid rowconfigure $object.fcode 0 -weight 1
-	$object.book manage "Final Code" $object.fcode -sticky nwse -command [list $object finalcode]
-	$object _createfastgeometry $object.fastgeom
-
-	grid $object.toolhold -row 0 -column 0 -columnspan 2 -sticky ew
-	grid $object.icons -row 1 -column 0 -columnspan 2 -sticky ew
-	grid $object.fastgeom -row 2 -column 0 -sticky nsew
-	grid $object.book -row 2 -column 1 -sticky nsew
-	grid rowconfigure $object 2 -weight 1	
-	grid columnconfigure $object 1 -weight 1	
-
+		$object.book configure -width 100 -height 100
+		$object.book propagate off
+		frame $object.edit
+		$object.book manage Special $object.edit -sticky nwse -command [list $object drawedit]
+		$object _createattributes $object.attr
+		$object.book manage Attributes $object.attr -sticky nwse -command [list $object attribute rebuild]
+		$object _createbindings $object.bindings
+		$object.book manage Bindings $object.bindings -sticky nwse -command [list $object bindings rebuild]
+		$object _creategeometry $object.geom
+		$object.book manage Geometry $object.geom -sticky nwse
+		$object _createcode $object.code
+		$object.book manage Code $object.code -sticky nwse
+		$object.book select Special
+		frame $object.fcode
+			Classy::Text $object.fcode.text -wrap none -width 10 -height 10 -state disabled -cursor X_cursor \
+				-xscrollcommand [list $object.fcode.hscroll set] -yscrollcommand [list $object.fcode.vscroll set]
+			scrollbar $object.fcode.vscroll -orient vertical -command [list $object.fcode.text yview]
+			scrollbar $object.fcode.hscroll -orient horizontal -command [list $object.fcode.text xview]
+			grid $object.fcode.text $object.fcode.vscroll -sticky nwse
+			grid $object.fcode.hscroll -sticky we
+			grid columnconfigure $object.fcode 0 -weight 1
+			grid rowconfigure $object.fcode 0 -weight 1
+		$object.book manage "Final Code" $object.fcode -sticky nwse -command [list $object finalcode]
+	grid $object.toolhold -row 0 -column 0 -columnspan 3 -sticky ew
+	grid $object.icons -row 1 -column 0 -sticky new
+	grid $object.pane -row 1 -column 1 -sticky ns
+	grid $object.book -row 1 -column 2 -sticky nsew
+	grid rowconfigure $object 1 -weight 1
+	grid columnconfigure $object 2 -weight 1
+	grid columnconfigure $object 0 -minsize 75
 	# REM Initialise options and variables
 	# ------------------------------------
-
 	# REM Create bindings
 	# --------------------
-
 	# REM Configure initial arguments
 	# -------------------------------
 	if {"$args" != ""} {eval $object configure $args}
@@ -130,14 +142,14 @@ Classy::WindowBuilder method destroy {} {
 #  Methods
 # ------------------------------------------------------------------
 Classy::WindowBuilder method select {w} {
-putsvars w
 	private $object current prev data
 	if [info exists data(redir,$w)] {set w $data(redir,$w)}
 	set window $data(base)
 	switch -glob -- $w {
 		{} {
 			catch {unset current}
-			$object _drawselectedw {}
+			set current(w) ""
+			Classy::todo $object redraw
 			return
 		}
 		"Select parent" {
@@ -151,30 +163,36 @@ putsvars w
 		}
 	}
 	if [info exists data(redir,$w)] {set w $data(redir,$w)}
-	$object _drawselectedw $w
 	if {[string first $data(base) $w] != 0} return
 	catch {unset current}
 	set current(w) $w
+	if {"$w" == $data(base)} {
+		set current(p) $data(base)
+	} elseif [info exists data(parent,$w)] {
+		set current(p) $data(parent,$w)
+	} else {
+		set current(p) [winfo parent $w]
+	}
 	$object geometryset rebuild
 	switch [$object.book get] {
 		Attributes {$object attribute rebuild}
 		Bindings {$object bindings rebuild}
 	}
-	$object drawedit
 	$object.current nocmdset [$object outw $w]
 	set flist ""
 	if [catch {$w children} list] {
 		set list [winfo children $w]
 	}
-	foreach item [lremove $list $object.work.classy__nw $object.work.classy__n $object.work.classy__ne \
-		$object.work.classy__e $object.work.classy__se $object.work.classy__s $object.work.classy__sw $object.work.classy__w] {
-		if ![info exists data(redir,$item)] {
+	foreach item $list {
+		if {![regexp {\.classy__[a-z]$} $item] && ![info exists data(redir,$item)]} {
 			lappend flist $item
 		}
 	}
 	$object.children configure -list [concat {Select {Select parent}} $flist]
 	$object.children set Select
 	focus $w
+	Classy::todo $object drawedit
+	Classy::todo $object redraw
 }
 
 Classy::WindowBuilder method current {} {
@@ -192,6 +210,125 @@ Classy::WindowBuilder method insertname {w} {
 	}
 }
 
+Classy::WindowBuilder method redraw {{always 0}} {
+	$object _drawborders $always
+	$object _drawselectedw
+}
+
+Classy::WindowBuilder method _drawborders {{always 0}} {
+	private $object current border
+	if [info exists border(always)] {
+		set always 1
+		unset border(always)
+	}
+	if ![info exists current(p)] return
+	set parent $current(p)
+	set colsize [grid size $parent]
+	set rowsize [lpop colsize]
+	if [info exists border(parent)] {
+		if {"$border(parent)" == "$parent"} {
+			incr colsize -2
+			incr rowsize -2
+			while {$rowsize>0} {
+				if {[grid rowconfigure $parent $rowsize -weight] != 0} break
+				if {"[Classy::griditem $parent 0 $rowsize $colsize $rowsize]" != ""} break
+				incr rowsize -1
+			}
+			while {$colsize>0} {
+				if {[grid columnconfigure $parent $colsize -weight] != 0} break
+				if {"[Classy::griditem $parent $colsize 0 $colsize $rowsize]" != ""} break
+				incr colsize -1
+			}
+			incr colsize
+			incr rowsize
+			if !$always {
+				if {($colsize == $border(colsize)) && ($rowsize == $border(rowsize))} {
+					return
+				}
+			}
+		}
+		foreach win [grid slaves $border(parent)] {
+			if [regexp {.classy__[a-z0-9]+$} $win] {grid forget $win}
+		}
+	}
+	if {"$parent" != "$object"} {
+		if {$rowsize == 0} {set rowsize 1}
+		if {$colsize == 0} {set colsize 1}
+		set w $object.work
+		set border(rowsize) $rowsize
+		set border(colsize) $colsize
+		set colpos [expr {$colsize+1}]
+		set rowpos [expr {$rowsize+1}]
+		if ![winfo exists $w.classy__cend] {
+			set b $w.classy__rend
+			button $b -image [Classy::geticon Builder/indel_row] \
+				-highlightthickness 0
+			bindtags $b "Classy::WindowBuilder_tool [bindtags $b]"
+			$b configure -command "$object _indelrow end"
+			set b $w.classy__cend
+			button $b -image [Classy::geticon Builder/indel_col] \
+				-highlightthickness 0
+			bindtags $b "Classy::WindowBuilder_tool [bindtags $b]"
+			$b configure -command "$object _indelcol end"
+		}
+		grid $w.classy__cend -in $parent -row $rowpos -col $colsize -sticky nsew
+		grid $w.classy__rend -in $parent -row $rowsize -col $colpos -sticky nsew
+		raise $w.classy__cend
+		raise $w.classy__rend
+		for {set i 0} {$i < $colsize} {incr i} {
+			set b $w.classy__c$i
+			if ![winfo exists $b] {
+				frame $b -bd 0 -class Classy::WindowBuilder_tool
+				button $b.indel -image [Classy::geticon Builder/indel_col] \
+					-highlightthickness 0 \
+					-command "$object _indelcol $i"
+				button $b.resize -highlightthickness 0
+				bindtags $b.indel "Classy::WindowBuilder_tool [bindtags $b.indel]"
+				bindtags $b.resize "Classy::WindowBuilder_tool [bindtags $b.resize]"
+				grid $b.indel $b.resize -sticky nsew
+				grid columnconfigure $b 1 -weight 1
+			}
+			if [grid columnconfigure $parent $i -weight] {
+				$b.resize configure -image [Classy::geticon Builder/resize_col] \
+						-command "$object geometryset columnweight 0 $i"
+			} else {
+				$b.resize configure -image [Classy::geticon Builder/noresize_col] \
+						-command "$object geometryset columnweight 1 $i"
+			}
+			grid $b -in $parent -row $rowpos -col $i -sticky nsew
+			raise $w.classy__c$i
+		}
+		for {set i 0} {$i < $rowsize} {incr i} {
+			set b $w.classy__r$i
+			if ![winfo exists $b] {
+				frame $b -bd 0 -class Classy::WindowBuilder_tool
+				button $b.indel -image [Classy::geticon Builder/indel_row] \
+					-highlightthickness 0 \
+					-command "$object _indelrow $i"
+				button $b.resize -highlightthickness 0
+				bindtags $b.indel "Classy::WindowBuilder_tool [bindtags $b.indel]"
+				bindtags $b.resize "Classy::WindowBuilder_tool [bindtags $b.resize]"
+				grid $b.indel -sticky nsew
+				grid $b.resize -sticky nsew
+				grid rowconfigure $b 1 -weight 1
+			}
+			if [grid rowconfigure $parent $i -weight] {
+				$b.resize configure -image [Classy::geticon Builder/resize_row] \
+						-command "$object geometryset rowweight 0 $i"
+			} else {
+				$b.resize configure -image [Classy::geticon Builder/noresize_row] \
+						-command "$object geometryset rowweight 1 $i"
+			}
+			grid $w.classy__r$i -in $parent -row $i -col $colpos -sticky nsew
+			raise $w.classy__r$i
+		}
+	} else {
+		set border(rowsize) 0
+		set border(colsize) 0
+	}
+	set border(parent) $parent
+}
+
 Classy::WindowBuilder method _drawselectedw {args} {
 	private $object current data
 	if {"$args" == ""} {
@@ -200,29 +337,61 @@ Classy::WindowBuilder method _drawselectedw {args} {
 	} else {
 		set selw [lindex $args 0]
 	}
-	set w $object.work
-	if ![winfo exists $w.classy__nw] {
-		foreach name {nw n ne e se s sw w} {
-			catch {frame $w.classy__$name -width 6 -height 6 -class Classy::WindowBuilder_select}
-		}
-	}
 	if {"$selw" == ""} {
 		foreach name {nw n ne e se s sw w} {
 			catch {place forget $w.classy__$name}
 		}
 	} else {
-		set x [expr {[winfo rootx $selw] - [winfo rootx $object.work]}]
-		set y [expr {[winfo rooty $selw] - [winfo rooty $object.work]}]
-		set wi [winfo width $selw]
-		set he [winfo height $selw]
-		place $w.classy__nw -x [expr {$x-3}] -y [expr {$y-3}]
-		place $w.classy__n -x [expr {$x+$wi/2-3}] -y [expr {$y-3}]
-		place $w.classy__ne -x [expr {$x+$wi-3}] -y [expr {$y-3}]
-		place $w.classy__e -x [expr {$x+$wi-3}] -y [expr {$y+$he/2-3}]
-		place $w.classy__se -x [expr {$x+$wi-3}] -y [expr {$y+$he-3}]
-		place $w.classy__s -x [expr {$x+$wi/2-3}] -y [expr {$y+$he-3}]
-		place $w.classy__sw -x [expr {$x-3}] -y [expr {$y+$he-3}]
-		place $w.classy__w -x [expr {$x-3}] -y [expr {$y+$he/2-3}]
+		
+		array set current [grid info $selw]
+		set w $object.work
+		if ![winfo exists $w.classy__nw] {
+			foreach name {nw n ne e se s sw w} {
+				catch {frame $w.classy__$name -class Classy::WindowBuilder_select}
+			}
+			$w.classy__se configure -cursor sizing
+			$w.classy__e configure -cursor sb_h_double_arrow
+			$w.classy__s configure -cursor sb_v_double_arrow
+		}
+		foreach name {n e s w} {
+			if {[string first $name $current(-sticky)] != -1} {
+				set current(sticky$name) 1
+			} else {
+				set current(sticky$name) 0
+			}
+			if $current(sticky$name) {
+				$w.classy__$name configure -bg [option get $w.classy__$name stickyBackground Background] \
+					-highlightbackground [option get $w.classy__$name stickyForeground Foreground]
+			} else {
+				$w.classy__$name configure -bg [option get $w.classy__$name nonstickyBackground Background] \
+					-highlightbackground [option get $w.classy__$name nonstickyForeground Foreground]
+			}
+		}
+		set sx [expr {([$w.classy__nw cget -width]+1)/2}]
+		set sy [expr {([$w.classy__nw cget -height]+1)/2}]
+		if [info exists current(-in)] {
+			set p $current(-in)
+			set bbox [grid bbox $p $current(-column) $current(-row) \
+				[expr {$current(-column)+$current(-columnspan)-1}] \
+				[expr {$current(-row)+$current(-rowspan)-1}]]
+			set x [expr {[winfo rootx $p] - [winfo rootx $object.work]+[lindex $bbox 0]}]
+			set y [expr {[winfo rooty $p] - [winfo rooty $object.work]+[lindex $bbox 1]}]
+			set wi [lindex $bbox 2]
+			set he [lindex $bbox 3]
+		} else {
+			set x [expr {[winfo rootx $selw] - [winfo rootx $object.work]}]
+			set y [expr {[winfo rooty $selw] - [winfo rooty $object.work]}]
+			set wi [expr {[winfo width $selw]-2*[$selw cget -bd]}]
+			set he [expr {[winfo height $selw]-2*[$selw cget -bd]}]
+		}
+		place $w.classy__nw -x [expr {$x-$sx}] -y [expr {$y-$sy}]
+		place $w.classy__n -x [expr {$x+$wi/2-$sx}] -y [expr {$y-$sy}]
+		place $w.classy__ne -x [expr {$x+$wi-$sx}] -y [expr {$y-$sy}]
+		place $w.classy__e -x [expr {$x+$wi-$sx}] -y [expr {$y+$he/2-$sy}]
+		place $w.classy__se -x [expr {$x+$wi-$sx}] -y [expr {$y+$he-$sy}]
+		place $w.classy__s -x [expr {$x+$wi/2-$sx}] -y [expr {$y+$he-$sy}]
+		place $w.classy__sw -x [expr {$x-$sx}] -y [expr {$y+$he-$sy}]
+		place $w.classy__w -x [expr {$x-$sx}] -y [expr {$y+$he/2-$sy}]
 		foreach name {nw n ne e se s sw w} {
 			catch {raise $w.classy__$name}
 		}
@@ -230,7 +399,19 @@ Classy::WindowBuilder method _drawselectedw {args} {
 }
 
 Classy::WindowBuilder method add {type args} {
-	private $object current currentgrid
+	private $object current data
+	if {"$type" == "Classy::DynaMenu"} {
+		if {"$data(type)" != "toplevel"} {
+			error "A main menu can only be added to a toplevel"
+		}
+		set base $data(base)
+		if {"$data(opt-mainmenu,$base)" != ""} return
+		$base configure -menu [eval Classy::DynaMenu menu Classy::Dummy $base]
+		set data(opt-mainmenu,$base) Classy::Dummy
+		set data(opt-menuwin,$base) $base
+		Classy::todo $object select $base
+		return {}
+	}
 	set w [$object newname [string tolower [namespace tail $type]]]
 	if {"[info commands ::Classy::WindowBuilder::add_$type]" == ""} {
 		auto_load ::Classy::WindowBuilder::add_$type
@@ -242,22 +423,26 @@ Classy::WindowBuilder method add {type args} {
 		$type $w
 		if {"$args" != ""} {eval $w configure $args}
 	}
-	if ![info exists currentgrid(-column)] {
-		set currentgrid(-column) 0
+	if {"$current(-column)" == ""} {
+		set current(-column) 0
 	}
 	if [winfo exists $w] {
-		set p [winfo parent $w]
-		set row [$object newpos $p $currentgrid(-column)]
-		grid $w -sticky nwse -column $currentgrid(-column) -row $row
+		if ![info exists data(drop)] {
+			set p [winfo parent $w]
+			set row [$object newpos $p $current(-column)]
+			grid $w -sticky nwse -column $current(-column) -row $row
+		}
 		$object startedit $w
 		$object select $w
 	}
+	Classy::todo $object redraw
 	return $result
 }
 
 Classy::WindowBuilder method newpos {p col} {
 	set row -1
 	foreach slave [grid slaves $p -column $col] {
+		if [regexp {.classy__[a-z0-9]+$} $slave] continue
 		set temp [structlget [grid info $slave] -row]
 		if {$temp > $row} {set row $temp}
 	}
@@ -267,10 +452,10 @@ Classy::WindowBuilder method newpos {p col} {
 
 Classy::WindowBuilder method newname {{base w}} {
 	private $object current
-	if [info exists ::Classy::WindowBuilder::parents([$object itemclass $current(w)])] {
+	if [info exists ::Classy::WindowBuilder::parents([winfo class $current(w)])] {
 		set parent $current(w)
 	} else {
-		set parent [winfo parent $current(w)]
+		set parent $current(p)
 	}
 	if {"[pack slaves $parent]" != ""} {
 		error "Parent has packed slaves: cannot mix gridder and packer"
@@ -286,7 +471,7 @@ Classy::WindowBuilder method newname {{base w}} {
 }
 
 Classy::WindowBuilder method close {} {
-	private $object data current
+	private $object data current border
 	if [info exists data(base)] {
 		if ![Classy::yorn "Are you sure you want to abort the current editing session"] {
 			return 1
@@ -300,6 +485,7 @@ Classy::WindowBuilder method close {} {
 	}
 	catch {unset current}
 	catch {unset data}
+	catch {unset border}
 	wm withdraw $object
 	return 0
 }
@@ -406,13 +592,13 @@ Classy::WindowBuilder method code {{function {}}} {
 }
 
 Classy::WindowBuilder method open {file function} {
-putsvars file function
 	global auto_index
-	private $object data
+	private $object data current border
 	wm title $object $function
 	catch {destroy $object.work}
 	catch {unset current}
 	catch {unset data}
+	catch {unset border}
 	set data(tags) [list Classy::WindowBuilder [DynaMenu bindtag Classy::WindowBuilder]]
 	set data(opt) 1
 	set data(param) {}
@@ -468,6 +654,7 @@ putsvars file function
 	$object parsecode $data(code)
 	$object startedit $data(base)
 	if $error {return -code error -errorinfo $errorinfo $result}
+	Classy::todo select $data(base)
 }
 
 Classy::WindowBuilder method parsecode {code {window {}}} {
@@ -714,10 +901,12 @@ Classy::WindowBuilder method current {args} {
 
 Classy::WindowBuilder method drawedit {} {
 	private $object current
+update idletasks
 	eval destroy [winfo children $object.edit]
 	Classy::cleargrid $object.edit
 	if ![info exists current(w)] return
 	if {"$current(w)" == ""} return
+puts $current(w)
 	set type [$object itemclass $current(w)]
 	if {"[info commands ::Classy::WindowBuilder::edit_$type]" == ""} {
 		auto_load ::Classy::WindowBuilder::edit_$type
@@ -930,191 +1119,265 @@ Classy::WindowBuilder method save {} {
 	return $result
 }
 
-Classy::WindowBuilder method gridremovecolumn {p col} {
-	set slaves [grid slaves $p -column $col]
-	if {"$slaves" != ""} {error "cannot remove column $col: it is not empty"}
-	set colsize [grid size $p]
-	set rowsize [lpop colsize]
-	incr col
-	for {set i $col} {$i<$colsize} {incr i} {
-		set to [expr {$i-1}]
-		foreach slave [grid slaves $p -column $i] {
-			set info [grid info $slave]
-			grid $slave -column $to
+Classy::WindowBuilder method gridremovecolumn {p pos} {
+	foreach slave [grid slaves $p -column $pos] {
+		if {"$slave" == "$object.work.classy__c$pos"} continue
+		if {[structlget [grid info $slave] -column] == $pos} {
+			error "cannot remove column $pos: it is not empty"
+			return
 		}
+	}
+	foreach slave [grid slaves $p] {
+		if [regexp {\.classy__[a-z0-9]+$} $slave] continue
+		array set info [grid info $slave]
+		set c $info(-column)
+		if {$c > $pos} {
+			grid $slave -column [expr {$c-1}]
+		} elseif {[expr {$c+$info(-columnspan)}] > $pos} {
+			grid $slave -columnspan [expr {$info(-columnspan)-1}]
+		}
+	}
+	
+	set colsize [lindex [grid size $p] 0]
+	incr pos
+	for {set i $pos} {$i<$colsize} {incr i} {
+		set to [expr {$i-1}]
 		eval grid columnconfigure $p $to [grid columnconfigure $p $i]
 	}
 	grid columnconfigure $p $i -weight 0 -pad 0 -minsize 0
+	Classy::todo $object redraw
 }
 
-Classy::WindowBuilder method gridremoverow {p row} {
-	set slaves [grid slaves $p -row $row]
-	if {"$slaves" != ""} {error "cannot remove row $row: it is not empty"}
-	set colsize [grid size $p]
-	set rowsize [lpop colsize]
-	incr row
-	for {set i $row} {$i<$rowsize} {incr i} {
-		set to [expr {$i-1}]
-		foreach slave [grid slaves $p -row $i] {
-			set info [grid info $slave]
-			grid $slave -row $to
+Classy::WindowBuilder method gridinsertcolumn {p pos} {
+	foreach slave [grid slaves $p] {
+		if [regexp {\.classy__[a-z0-9]+$} $slave] continue
+		array set info [grid info $slave]
+		set c $info(-column)
+		if {$c >= $pos} {
+			grid $slave -column [expr {$c+1}]
+		} elseif {[expr {$c+$info(-columnspan)}] > $pos} {
+			grid $slave -columnspan [expr {$info(-columnspan)+1}]
 		}
+	}
+	set colsize [lindex [grid size $p] 0]
+	set i $colsize
+	incr i -1
+	for {} {$i>=$pos} {incr i -1} {
+		set to [expr {$i+1}]
+		eval grid columnconfigure $p $to [grid columnconfigure $p $i]
+	}
+	grid columnconfigure $p $pos -weight 0 -pad 0 -minsize 0
+	Classy::todo $object redraw
+}
+
+Classy::WindowBuilder method gridremoverow {p pos} {
+	foreach slave [grid slaves $p -row $pos] {
+		if {"$slave" == "$object.work.classy__r$pos"} continue
+		if {[structlget [grid info $slave] -row] == $pos} {
+			error "cannot remove row $pos: it is not empty"
+			return
+		}
+	}
+	foreach slave [grid slaves $p] {
+		if [regexp {\.classy__[a-z0-9]+$} $slave] continue
+		array set info [grid info $slave]
+		set c $info(-row)
+		if {$c > $pos} {
+			grid $slave -row [expr {$c-1}]
+		} elseif {[expr {$c+$info(-rowspan)}] > $pos} {
+			grid $slave -rowspan [expr {$info(-rowspan)-1}]
+		}
+	}
+	
+	set rowsize [lindex [grid size $p] 1]
+	grid rowconfigure $p $pos -weight 0 -pad 0 -minsize 0
+	incr pos
+	for {set i $pos} {$i<$rowsize} {incr i} {
+		set to [expr {$i-1}]
 		eval grid rowconfigure $p $to [grid rowconfigure $p $i]
 	}
 	grid rowconfigure $p $i -weight 0 -pad 0 -minsize 0
+	Classy::todo $object redraw 1
 }
 
-Classy::WindowBuilder method gridinsertcolumn {p col} {
-	set colsize [grid size $p]
-	set rowsize [lpop colsize]
-	set i $colsize
-	incr i -1
-	for {} {$i>=$col} {incr i -1} {
-		set to [expr {$i+1}]
-		foreach slave [grid slaves $p -column $i] {
-			set info [grid info $slave]
-			grid $slave -column $to -row [structlget $info -row]
+Classy::WindowBuilder method gridinsertrow {p pos} {
+	foreach slave [grid slaves $p] {
+		if [regexp {\.classy__[a-z0-9]+$} $slave] continue
+		array set info [grid info $slave]
+		set c $info(-row)
+		if {$c >= $pos} {
+			grid $slave -row [expr {$c+1}]
+		} elseif {[expr {$c+$info(-rowspan)}] > $pos} {
+			grid $slave -rowspan [expr {$info(-rowspan)+1}]
 		}
-		eval grid columnconfigure $p $to [grid columnconfigure $p $i]
 	}
-	grid columnconfigure $p $col -weight 0 -pad 0 -minsize 0
-}
-
-Classy::WindowBuilder method gridinsertrow {p row} {
-	set colsize [grid size $p]
-	set rowsize [lpop colsize]
+	set rowsize [lindex [grid size $p] 1]
 	set i $rowsize
 	incr i -1
-	for {} {$i>=$row} {incr i -1} {
+	for {} {$i>=$pos} {incr i -1} {
 		set to [expr {$i+1}]
-		foreach slave [grid slaves $p -row $i] {
-			set info [grid info $slave]
-			grid $slave -column [structlget $info -column] -row $to
-		}
 		eval grid rowconfigure $p $to [grid rowconfigure $p $i]
 	}
-	grid rowconfigure $p $row -weight 0 -pad 0 -minsize 0
+	grid rowconfigure $p $pos -weight 0 -pad 0 -minsize 0
+	Classy::todo $object redraw
 }
 
-Classy::WindowBuilder method gridmovecol {p row from to} {
-	foreach slave [grid slaves $p] {
-		set info [grid info $slave]
-		set slaves([structlget $info -row],[structlget $info -column]) $slave
+Classy::WindowBuilder method _indelcol {pos} {
+	private $object current
+	if {"$pos" == "end"} {
+		set size [expr {[lindex [grid size $current(p)] 0]-2}]
+		grid columnconfigure $current(p) $size -weight 1
+		Classy::todo $object redraw
+		return
 	}
-	if {"[$object.fastgeom.sel get]" == "Move window"} {
-		if ![info exists slaves($row,$from)] return
-		set colsize [grid size $p]
-		set rowsize [lpop colsize]
-		set w $slaves($row,$from)
-		unset slaves($row,$from)
-		if {$to < 0} {
-			if {"[array names slaves *,$from]" == ""} return
-			$object gridinsertcolumn $p 0
-			grid $w -column 0 -row $row
-		} elseif ![info exists slaves($row,$to)] {
-			grid $w -column $to -row $row
-		} else {
-			set pos $row
-			while ([info exists slaves($pos,$to)]) {
-				grid configure $slaves($pos,$to) -row [expr {$pos+1}]
-				incr pos
-			}
-			grid $w -column $to -row $row
+	foreach slave [grid slaves $current(p) -column $pos] {
+		if {"$slave" == "$object.work.classy__c$pos"} continue
+		if {[structlget [grid info $slave] -column] == $pos} {
+			$object gridinsertcolumn $current(p) $pos
+			return
 		}
-		if {"[grid slaves $p -column $from]" == ""} {
-			$object gridremovecolumn $p $from
+	}
+	$object gridremovecolumn $current(p) $pos
+	Classy::todo $object redraw 1
+}
+
+Classy::WindowBuilder method _indelrow {pos} {
+	private $object current
+	if {"$pos" == "end"} {
+		set size [expr {[lindex [grid size $current(p)] 1]-2}]
+		grid rowconfigure $current(p) $size -weight 1
+		Classy::todo $object redraw
+		return
+	}
+	foreach slave [grid slaves $current(p) -row $pos] {
+		if {"$slave" == "$object.work.classy__r$pos"} continue
+		if {[structlget [grid info $slave] -row] == $pos} {
+			$object gridinsertrow $current(p) $pos
+			return
 		}
+	}
+	$object gridremoverow $current(p) $pos
+	Classy::todo $object redraw 1
+}
+
+Classy::WindowBuilder method switch {p w col row} {
+	set to [Classy::griditem $p $col $row]
+	if {"$to" == ""} {
+		$object _place $w $p $col $row
 	} else {
-		if {$from == $to} return
-		if {$from < $to} {incr to} else {incr from}
-		$object gridinsertcolumn $p $to
-		foreach slave [grid slaves $p -column $from] {
-			set info [grid info $slave]
-			grid $slave -row [structlget $info -row] -column $to
-		}
-		eval grid columnconfigure $p $to [grid columnconfigure $p $from]
-		$object gridremovecolumn $p $from
-	}
-}
-
-proc gi {} {
-	private .try.dedit currentgrid
-	set p .try.dedit.work.options
-	foreach slave [grid slaves $p] {
-		set info [grid info $slave]
-		puts "grid $slave -row [structlget $info -row] -column [structlget $info -column]"
-	}	
-	puts "set from $currentgrid(-row)"
-	puts "set col $currentgrid(-column)"
-}
-
-Classy::WindowBuilder method gridmoverow {p col from to} {
-	foreach slave [grid slaves $p] {
-		set info [grid info $slave]
-		set slaves([structlget $info -row],[structlget $info -column]) $slave
-	}
-	if {"[$object.fastgeom.sel get]" == "Move window"} {
-		if ![info exists slaves($from,$col)] return
-		set colsize [grid size $p]
-		set rowsize [lpop colsize]
-		set w $slaves($from,$col)
-		unset slaves($from,$col)
-		if {$to < 0} {
-			if {"[array names slaves $from,*]" == ""} return
-			$object gridinsertrow $p 0
-			grid $w -column $col -row 0
-		} elseif ![info exists slaves($to,$col)] {
-			grid $w -column $col -row $to
-		} elseif {$from>$to} {
-			set pos $to
-			while ([info exists slaves($pos,$col)]) {
-				if {$pos == $from} break
-				grid configure $slaves($pos,$col) -row [expr {$pos+1}] -column $col
-				incr pos
-			}
-			grid $w -column $col -row $to
-		} else {
-			set pos $to
-			while ([info exists slaves($pos,$col)]) {
-				if {$pos == $from} break
-				grid configure $slaves($pos,$col) -row [expr {$pos-1}] -column $col
-				incr pos -1
-			}
-			grid $w -column $col -row $to
-		}
-		if {"[grid slaves $p -row $from]" == ""} {
-			$object gridremoverow $p $from
-		}
-	} else {
-		if {$from == $to} return
-		if {$from < $to} {incr to} else {incr from}
-		$object gridinsertrow $p $to
-		foreach slave [grid slaves $p -row $from] {
-			set info [grid info $slave]
-			grid $slave -row $to -column [structlget $info -column]
-		}
-		eval grid rowconfigure $p $to [grid rowconfigure $p $from]
-		$object gridremoverow $p $from
-	}
-}
-
-Classy::WindowBuilder method gridremove {p col row} {
-	if [info exists slave($row)] {
-		set w $slave($row)	
+		array set info [grid info $w]
 		grid forget $w
-	} else {
-		set w ""
+		$object _place $to $p $info(-column) $info(-row)
+		unset info(-row)
+		unset info(-column)
+		eval grid $w -col $col -row $row [array get info]
+		$object _place $w $p $col $row
 	}
-	foreach slave [grid slaves $p -column $col] {
-		set slave([structlget [grid info $slave] -row]) $slave
-	}
-	set pos $row
-	while ([info exists slave($pos)]) {
-		grid configure $slave($pos) -row [expr {$pos+1}]
-		incr pos
-	}
-	return $w
 }
+
+#Classy::WindowBuilder method gridmovecol {p row from to} {
+#	foreach slave [grid slaves $p] {
+#		set info [grid info $slave]
+#		set slaves([structlget $info -row],[structlget $info -column]) $slave
+#	}
+#	if ![info exists slaves($row,$from)] return
+#	set colsize [grid size $p]
+#	set rowsize [lpop colsize]
+#	set w $slaves($row,$from)
+#	unset slaves($row,$from)
+#	if {$to < 0} {
+#		if {"[array names slaves *,$from]" == ""} return
+#		$object gridinsertcolumn $p 0
+#		grid $w -column 0 -row $row
+#	} elseif ![info exists slaves($row,$to)] {
+#		grid $w -column $to -row $row
+#	} else {
+#		set pos $row
+#		while ([info exists slaves($pos,$to)]) {
+#			grid configure $slaves($pos,$to) -row [expr {$pos+1}]
+#			incr pos
+#		}
+#		grid $w -column $to -row $row
+#	}
+#	if {"[grid slaves $p -column $from]" == ""} {
+#		$object gridremovecolumn $p $from
+#	}
+#}
+#
+#Classy::WindowBuilder method gridmoverow {p col from to} {
+#	foreach slave [grid slaves $p] {
+#		array set info [grid info $slave]
+#		for {set x 0} {$x < $info(-columnspan)} {incr x} {
+#			for {set y 0} {$y < $info(-rowspan)} {incr y} {
+#				set slaves([expr {$info(-row)+$y}],[expr {$info(-column)+$x}]) $slave
+#			}
+#		}
+#	}
+#	if ![info exists slaves($from,$col)] return
+#	set colsize [grid size $p]
+#	set rowsize [lpop colsize]
+#	set w $slaves($from,$col)
+#	set colspan [structlget [grid info $w] -columnspan]
+#	set rowspan [structlget [grid info $w] -rowspan]
+#	for {set x 0} {$x<$colspan} {incr x} {
+#		for {set y 0} {$y<$rowspan} {incr y} {
+#			unset slaves([expr {$from+$y}],[expr {$col+$x}])
+#			if [info exists slaves([expr {$col+$y}],[expr {$col+$x}])] {set free 0}
+#		}
+#	}
+#	if {$to < 0} {
+#		if {"[array names slaves $from,*]" == ""} return
+#		$object gridinsertrow $p 0
+#		grid $w -column $col -row 0
+#	} else {
+#		set free 1
+#		for {set x 0} {$x<$colspan} {incr x} {
+#			for {set y 0} {$y<$rowspan} {incr y} {
+#				if [info exists slaves([expr {$to+$y}],[expr {$col+$x}])] {set free 0}
+#			}
+#		}
+#		if $free {
+#			grid $w -column $col -row $to
+#		} elseif {$from<$to} {
+#			set pos $to
+#			while ([info exists slaves($pos,$col)]) {
+#				if {$pos == $from} break
+#				grid configure $slaves($pos,$col) -row [expr {$pos-1}] -column $col
+#				incr pos -1
+#			}
+#			grid $w -column $col -row $to
+#		} else {
+#			set pos $to
+#			while ([info exists slaves($pos,$col)]) {
+#				if {$pos == $from} break
+#				grid configure $slaves($pos,$col) -row [expr {$pos+1}] -column $col
+#				incr pos
+#			}
+#			grid $w -column $col -row $to
+#		}
+#	}
+#	if {"[grid slaves $p -row $from]" == ""} {
+#		$object gridremoverow $p $from
+#	}
+#}
+
+#Classy::WindowBuilder method gridremove {p col row} {
+#	if [info exists slave($row)] {
+#		set w $slave($row)	
+#		grid forget $w
+#	} else {
+#		set w ""
+#	}
+#	foreach slave [grid slaves $p -column $col] {
+#		set slave([structlget [grid info $slave] -row]) $slave
+#	}
+#	set pos $row
+#	while ([info exists slave($pos)]) {
+#		grid configure $slave($pos) -row [expr {$pos+1}]
+#		incr pos
+#	}
+#	return $w
+#}
 
 Classy::WindowBuilder method gridinsert {p col row} {
 	foreach slave [grid slaves $p -column $col] {
@@ -1127,226 +1390,275 @@ Classy::WindowBuilder method gridinsert {p col row} {
 	}
 }
 
-Classy::WindowBuilder method geometryset {type {value {}}} {
-	private $object current currentgrid
+Classy::WindowBuilder method _sticky {action w x y} {
+	private $object current
+	if {"$action" == "start"} {
+		set current(done) 0
+		set current(x) $x
+		set current(y) $y
+	} elseif {"$action" == "motion"} {
+		regexp {s$|e$|se$} $w side
+		if ![info exists side] return
+		set X [expr {$x - [winfo rootx $current(p)]}]
+		set Y [expr {$y - [winfo rooty $current(p)]}]
+		raise $object.work.classy__$side
+		set col [grid location $current(p) $X $Y]
+		set row [lpop col]
+		set colspan $current(-columnspan)
+		set rowspan $current(-rowspan)
+		if {"$side" == "e"} {
+			set colspan [expr {$col - $current(-column)+1}]
+			if {$colspan < 1} {set colspan 1}
+		} elseif {"$side" == "s"} {
+			set rowspan [expr {$row - $current(-row)+1}]
+			if {$rowspan < 1} {set rowspan 1}
+		} else {
+			set colspan [expr {$col - $current(-column)+1}]
+			if {$colspan < 1} {set colspan 1}
+			set rowspan [expr {$row - $current(-row)+1}]
+			if {$rowspan < 1} {set rowspan 1}
+		}
+		if {$colspan < $current(-columnspan)} {
+			$object geometryset -columnspan $colspan
+		} elseif {$colspan > $current(-columnspan)} {
+			set list [Classy::griditem $current(p) \
+				[expr {$current(-column)+$current(-columnspan)}] \
+				$current(-row) \
+				[expr {$current(-column)+$colspan-1}] \
+				[expr {$current(-row)+$rowspan-1}]]
+			if {"$list" == ""} {
+				$object geometryset -columnspan $colspan
+			}
+		}
+		if {$rowspan < $current(-rowspan)} {
+			$object geometryset -rowspan $rowspan
+		} elseif {$rowspan > $current(-rowspan)} {
+			set list [Classy::griditem $current(p) \
+				$current(-column) \
+				[expr {$current(-row)+$current(-rowspan)}] \
+				[expr {$current(-column)+$colspan-1}] \
+				[expr {$current(-row)+$rowspan-1}]]
+			if {"$list" == ""} {
+				$object geometryset -rowspan $rowspan
+			}
+		}
+	} elseif {"$action" == "action"} {
+		if !$current(done) {
+			if {([expr {abs($current(x)-$x)}]>2)||([expr {abs($current(y)-$y)}]>2)} return
+			regexp {n$|s$|e$|w$} $w side
+			if {"$side" != ""} {
+				if ![info exists current(sticky$side)] return
+				if $current(sticky$side) {
+					set current(sticky$side) 0
+				} else {
+					set current(sticky$side) 1
+				}
+				$object geometryset dir
+			}
+		}
+	}
+}
+
+Classy::WindowBuilder method geometryset {type {value {}} {pos {}}} {
+	private $object current
 	if {"$type" != "rebuild"} {
-		if ![info exists currentgrid(-in)] {
+		if ![info exists current(-in)] {
 			return -code error "Not managed by grid"
 		}
-		set p $currentgrid(-in)
+		set p $current(-in)
 	}
+	set code [catch {
 	switch -- $type {
 		up {
-			$object gridmoverow $p $currentgrid(-column) $currentgrid(-row) [expr {$currentgrid(-row)-1}]
+			if {"$pos" == ""} {set pos $current(-row)}
+			$object switch $p $current(w) $current(-column) [expr {$pos-1}]
 		}
 		down {
-			$object gridmoverow $p $currentgrid(-column) $currentgrid(-row) [expr {$currentgrid(-row)+1}]
+			if {"$pos" == ""} {set pos $current(-row)}
+			$object switch $p $current(w) $current(-column) [expr {$pos+1}]
 		}
 		left {
-			$object gridmovecol $p $currentgrid(-row) $currentgrid(-column) [expr {$currentgrid(-column)-1}]
+			if {"$pos" == ""} {set pos $current(-column)}
+			$object switch $p $current(w) [expr {$pos-1}] $current(-row)
 		}
 		right {
-			$object gridmovecol $p $currentgrid(-row) $currentgrid(-column) [expr {$currentgrid(-column)+1}]
+			if {"$pos" == ""} {set pos $current(-column)}
+			$object switch $p $current(w) [expr {$pos+1}] $current(-row)
+		}
+		spanup {
+			grid $current(w) -rowspan [expr {$current(-rowspan)-1}]
+		}
+		spandown {
+			grid $current(w) -rowspan [expr {$current(-rowspan)+1}]
+		}
+		spanleft {
+			grid $current(w) -columnspan [expr {$current(-columnspan)-1}]
+		}
+		spanright {
+			grid $current(w) -columnspan [expr {$current(-columnspan)+1}]
 		}
 		columnweight {
-			grid columnconfigure $p $currentgrid(-column) -weight $value
+			if {"$pos" == ""} {
+				set pos $current(-column)
+				set parent $p
+			} else {
+				set parent $current(p)
+			}
+			grid columnconfigure $parent $pos -weight $value
+			set w $object.work
+			if $value {
+				$w.classy__c$pos.resize configure -image [Classy::geticon Builder/resize_col] \
+						-command "$object geometryset columnweight 0 $pos"
+			} else {
+				$w.classy__c$pos.resize configure -image [Classy::geticon Builder/noresize_col] \
+						-command "$object geometryset columnweight 1 $pos"
+			}
 		}
 		rowweight {
-			grid rowconfigure $p $currentgrid(-row) -weight $value
-		}
-		resizecolumn {
-			grid columnconfigure $p $currentgrid(-column) -weight $value
-		}
-		resizerow {
-			grid rowconfigure $p $currentgrid(-row) -weight $value
+			if {"$pos" == ""} {
+				set pos $current(-row)
+				set parent $p
+			} else {
+				set parent $current(p)
+			}
+			grid rowconfigure $parent $pos -weight $value
+			set w $object.work
+			if $value {
+				$w.classy__r$pos.resize configure -image [Classy::geticon Builder/resize_row] \
+						-command "$object geometryset rowweight 0 $pos"
+			} else {
+				$w.classy__r$pos.resize configure -image [Classy::geticon Builder/noresize_row] \
+						-command "$object geometryset rowweight 1 $pos"
+			}
 		}
 		-row {
-			$object gridmoverow $p $currentgrid(-column) $currentgrid(-row) $value
+			$object _place $current(w) $p $current(-column) $value
 		}
 		-column {
-			$object gridmovecol $p $currentgrid(-row) $currentgrid(-column) $value
+			$object _place $current(w) $p $value $current(-row)
 		}
-		rebuild {}
+		-rowspan {
+			grid $current(w) -rowspan $value
+		}
+		-columnspan {
+			grid $current(w) -columnspan $value
+		}
+		rebuild {
+		}
+		-sticky {
+			grid configure $current(w) -sticky $value
+			$object.geom.fast.sticky set $value
+			set value ""
+			foreach dir {n s e w} {
+				if {[string first $dir $value] != -1} {
+					set current(sticky$dir) 1
+				} else {
+					set current(sticky$dir) 0
+				}
+			}
+		}		
 		dir {
 			set value ""
 			foreach dir {n s e w} {
-				if $currentgrid(sticky$dir) {
+				if $current(sticky$dir) {
 					append value $dir
 				}
 			}
 			grid configure $current(w) -sticky $value
+			$object.geom.fast.sticky set $value
 		}		
 		default {
 			grid configure $current(w) $type $value
 		}
 	}
-	catch {unset currentgrid}
-	array set currentgrid [grid info $current(w)]
-	if ![info exists currentgrid(-in)] return
-	set p $currentgrid(-in)
+	} result]
+#	catch {unset current}
+	catch {unset current(-in)}
+	array set current [grid info $current(w)]
+	if ![info exists current(-in)] return
+	set p $current(-in)
 	foreach option {weight minsize pad} {
-		set currentgrid(row$option) [grid rowconfigure $p $currentgrid(-row) -$option]
-		set currentgrid(column$option) [grid columnconfigure $p $currentgrid(-column) -$option]
+		set current(row$option) [grid rowconfigure $p $current(-row) -$option]
+		set current(column$option) [grid columnconfigure $p $current(-column) -$option]
 	}
-	if $currentgrid(rowweight) {set currentgrid(rowresize) 1} else {set currentgrid(rowresize) 0}
-	if $currentgrid(columnweight) {set currentgrid(columnresize) 1} else {set currentgrid(columnresize) 0}
-	foreach {type id option} {
-		row row -row
-		row weight rowweight
-		row min rowminsize
-		row rpad rowpad
-		row span -rowspan
-		row pad -padx
-		row ipad -ipadx
-		column column -column
-		column weight columnweight
-		column min columnminsize
-		column cpad columnpad
-		column span -columnspan
-		column pad -pady
-		column ipad -ipady
-	} {
-		$object.geom.$type.$id nocmdset $currentgrid($option)
+	if $current(rowweight) {
+		set current(rowresize) 1
+	} else {
+		set current(rowresize) 0
 	}
-	$object.fastgeom.column nocmdset $currentgrid(-column)
-	$object.fastgeom.row nocmdset $currentgrid(-row)
-	$object.fastgeom.columnspan nocmdset $currentgrid(-columnspan)
-	$object.fastgeom.rowspan nocmdset $currentgrid(-rowspan)
-	$object.fastgeom.sticky nocmdset $currentgrid(-sticky)
+	if $current(columnweight) {
+		set current(columnresize) 1
+	} else {
+		set current(columnresize) 0
+	}
 	foreach dir {n s e w} {
-		if [regexp $dir $currentgrid(-sticky)] {
-			$object.fastgeom.st.$dir select
+		if [regexp $dir $current(-sticky)] {
+			set current(sticky$dir) 1
 		} else {
-			$object.fastgeom.st.$dir deselect
+			set current(sticky$dir) 0
 		}
 	}
+	if $code {return -code error -errorinfo $::errorInfo $result}
 	update idletasks
-	Classy::todo $object _drawselectedw
+	Classy::todo $object redraw
 }
 
 Classy::WindowBuilder method _creategeometry {w} {
-	private $object currentgrid
+	private $object current
 	frame $w 
-#	set w .try.dedit.geom
-#	eval destroy [winfo children $w]
-#	Classy::cleargrid $w
+
+	set w .try.dedit.geom
+	eval destroy [winfo children $w]
+	Classy::cleargrid $w
+	frame $w.fast -relief groove -bd 2
+	grid $w.fast -row 0 -column 0 -sticky we -columnspan 2
+		Classy::NumEntry $w.fast.row -label Row -labelwidth 6 -constraint int -width 2 \
+			 -command "$object geometryset -row" \
+			 -textvariable [privatevar $object current(-row)]
+		Classy::NumEntry $w.fast.column -label Column -labelwidth 6 -constraint int -width 2 \
+			 -command "$object geometryset -column" \
+			 -textvariable [privatevar $object current(-column)]
+		Classy::Selector $w.fast.sticky -type sticky -label Sticky \
+			-variable [privatevar $object current(-sticky)] \
+			-command "$object geometryset -sticky"
+		grid $w.fast.row -in $w.fast -row 0 -column 0 -sticky n
+		grid $w.fast.column -in $w.fast -row 1 -column 0 -sticky n
+		grid $w.fast.sticky -in $w.fast -row 0 -column 1 -rowspan 3
+		grid columnconfigure $w.fast 3 -weight 1
 	frame $w.row -relief groove -bd 2
-	grid $w.row -row 0 -column 1 -sticky we
+	grid $w.row -row 1 -column 1 -sticky we
 		label $w.row.label -text "Row"
 		grid $w.row.label -sticky we
 	frame $w.column -relief groove -bd 2
-	grid $w.column -row 0 -column 0 -sticky we
+	grid $w.column -row 1 -column 0 -sticky we
 		label $w.column.label -text "Column"
 		grid $w.column.label -sticky we
 		foreach {type id label option} {
-			column column "Column" -column
 			column span "Span" -columnspan
 			column weight "Resize" columnweight
-			column cpad "Column pad" cpad
+			column cpad "Column pad" columnpad
 			column min "Minimum size" columnminsize
-			column pad "External padding" -pady
-			column ipad "internal padding" -ipady
-			row row "Row" -row
+			column pad "External padding" -padx
+			column ipad "internal padding" -ipadx
 			row span "Span" -rowspan
 			row weight "Resize" rowweight
-			row rpad "Row pad" rpad
+			row rpad "Row pad" rowpad
 			row min "Minimum size" rowminsize
-			row pad "External padding" -padx
-			row ipad "internal padding" -ipadx
+			row pad "External padding" -pady
+			row ipad "internal padding" -ipady
 		} {
 			Classy::NumEntry $w.$type.$id -label $label -labelwidth 15 -constraint int -width 1 \
-				 -command "$object geometryset $option"
+				 -command "$object geometryset $option" -textvariable [privatevar $object current($option)]
 			grid $w.$type.$id -sticky we
 		}
 		grid rowconfigure $w.row 100 -weight 1
 		grid columnconfigure $w.row 0 -weight 1
 		grid rowconfigure $w.column 100 -weight 1
 		grid columnconfigure $w.column 0 -weight 1
-	grid rowconfigure $w 1 -weight 1
+	grid rowconfigure $w 2 -weight 1
 	grid columnconfigure $w 0 -weight 1
 	grid columnconfigure $w 1 -weight 1
-}
 
-Classy::WindowBuilder method _createfastgeometry {w} {
-	private $object currentgrid
-	frame $w 
-#	set w .try.dedit.fastgeom
-#	eval destroy [winfo children $w]
-#	Classy::cleargrid $w
-	frame $w.move
-	grid $w.move -row 0 -column 0 -columnspan 2
-		button $w.move.up -image [Classy::geticon Builder/arrow_up] -anchor c -command "$object geometryset up"
-		button $w.move.down -image [Classy::geticon Builder/arrow_down] -anchor c -command "$object geometryset down"
-		button $w.move.left -image [Classy::geticon Builder/arrow_left] -anchor c -command "$object geometryset left"
-		button $w.move.right -image [Classy::geticon Builder/arrow_right] -anchor c -command "$object geometryset right"
-		grid $w.move.up -row 0 -column 1
-		grid $w.move.down -row 2 -column 1
-		grid $w.move.right -row 1 -column 2
-		grid $w.move.left -row 1 -column 0
-	Classy::OptionMenu $w.sel -list {{Move window} {Move row/col}}
-	$w.sel set {Move window}
-	Classy::NumEntry $w.row -label "Row" -labelwidth 6 -constraint int -width 4 \
-		 -command "$object geometryset -row"
-	Classy::NumEntry $w.column -label "Column" -labelwidth 6 -constraint int -width 4 \
-		 -command "$object geometryset -row"
-	grid $w.sel -row 1 -column 0 -sticky we
-	grid $w.row -row 2 -column 0 -sticky we
-	grid $w.column -row 3 -column 0 -sticky we
-	frame $w.resize
-	grid $w.resize -row 4 -column 0 -sticky we
-		button $w.resize.all -text "Resize" -command "$object geometryset resizerow 1;$object geometryset resizecolumn 1"
-		set var [privatevar $object currentgrid(rowresize)]
-		checkbutton $w.resize.row -image [Classy::geticon Builder/resize_row] -indicatoron 0 -anchor c \
-			-variable $var \
-			-command "$object geometryset resizerow \[set $var\]"
-		set var [privatevar $object currentgrid(columnresize)]
-		checkbutton $w.resize.column -image [Classy::geticon Builder/resize_col] -indicatoron 0 -anchor c \
-			-variable $var \
-			-command "$object geometryset resizecolumn \[set $var\]"
-		grid $w.resize.all -row 0 -column 0 -sticky we
-		grid $w.resize.row -row 0 -column 1 -sticky we
-		grid $w.resize.column -row 0 -column 2 -sticky we
-		grid columnconfigure $w.resize 3 -weight 1
-	Classy::Entry $w.sticky -command "$object geometryset -sticky" -width 4 \
-		-label Sticky -labelwidth 6
-	grid $w.sticky -row 5 -column 0 -sticky we
-	frame $w.st
-	grid $w.st -row 6 -column 0
-		checkbutton $w.st.n -image [Classy::geticon Builder/sticky_n] -indicatoron 0 -anchor c \
-			-variable [privatevar $object currentgrid(stickyn)] \
-			-command "$object geometryset dir"
-		checkbutton $w.st.s -image [Classy::geticon Builder/sticky_s] -indicatoron 0 -anchor c \
-			-variable [privatevar $object currentgrid(stickys)] \
-			-command "$object geometryset dir"
-		checkbutton $w.st.e -image [Classy::geticon Builder/sticky_e] -indicatoron 0 -anchor c \
-			-variable [privatevar $object currentgrid(stickye)] \
-			-command "$object geometryset dir"
-		checkbutton $w.st.w -image [Classy::geticon Builder/sticky_w] -indicatoron 0 -anchor c \
-			-variable [privatevar $object currentgrid(stickyw)] \
-			-command "$object geometryset dir"
-		button $w.st.all -image [Classy::geticon Builder/sticky_all] -anchor c \
-			 -command "$w.sticky set nesw"
-		button $w.st.none -image [Classy::geticon Builder/sticky_none] -anchor c \
-			 -command "$w.sticky set {}"
-		button $w.st.we -image [Classy::geticon Builder/sticky_we] -anchor c \
-			 -command "$w.sticky set we"
-		button $w.st.ns -image [Classy::geticon Builder/sticky_ns] -anchor c \
-			 -command "$w.sticky set ns"
-		grid $w.st.none -row 7 -column 1 -sticky we
-		grid $w.st.n -row 6 -column 1 -sticky we
-		grid $w.st.s -row 8 -column 1 -sticky we
-		grid $w.st.e -row 7 -column 2 -sticky we
-		grid $w.st.w -row 7 -column 0 -sticky e
-		grid $w.st.we -row 6 -column 3 -sticky e
-		grid $w.st.ns -row 7 -column 3 -sticky e
-		grid $w.st.all -row 8 -column 3 -sticky e
-	Classy::NumEntry $w.rowspan -label "Rowspan" -labelwidth 9 -constraint int -width 2 \
-		 -command "$object geometryset -rowspan"
-	Classy::NumEntry $w.columnspan -label "Columnspan" -labelwidth 9 -constraint int -width 2 \
-		 -command "$object geometryset -columnspan"
-	grid $w.rowspan -row 7 -column 0 -sticky we
-	grid $w.columnspan -row 8 -column 0 -sticky we
-	grid rowconfigure $w 100 -weight 1
 }
 
 Classy::WindowBuilder method attribute {action args} {
@@ -1472,7 +1784,7 @@ Classy::WindowBuilder method attribute {action args} {
 		}
 	}
 	update idletasks
-	Classy::todo $object _drawselectedw
+	Classy::todo $object redraw
 }
 
 Classy::WindowBuilder method _createattributeedit {v option title {w 0}} {
@@ -1607,7 +1919,7 @@ Classy::WindowBuilder method bindings {action args} {
 		}
 	}
 	update idletasks
-	Classy::todo $object _drawselectedw
+	Classy::todo $object redraw
 }
 
 Classy::WindowBuilder method _createbindings {w} {
@@ -1766,13 +2078,22 @@ Classy::WindowBuilder method drag {w x y} {
 }
 
 Classy::WindowBuilder method drop {dst} {
-	private $object data
+	private $object data current
 	set window $data(base)
+	set border ""
+	if [regexp "^$object.work.classy__(c|r)" $dst temp border] {
+		if {"[winfo class $dst]" != "Classy::WindowBuilder_tool"} {
+			set dst [winfo parent $dst]
+		}
+		set dst [structlget [grid info $dst] -in]
+	}
 	if {"[DragDrop types create]" != ""} {
 		set type [DragDrop get]
 		set cmd [DragDrop get create]
 		set ::Classy::targetwindow $dst
+		set data(drop) 1
 		set src [uplevel #0 $cmd]
+		unset data(drop)
 		unset ::Classy::targetwindow
 		if {"$src" == ""} {return ""}
 		set outsrc [$object outw $src]
@@ -1783,10 +2104,12 @@ Classy::WindowBuilder method drop {dst} {
 		}
 		set outsrc [DragDrop get]
 		eval set src $outsrc
+		if {"$current(w)" == "$src"} {
+			Classy::todo $object select $src
+		}
 		set checkrename 1
 	}
 	set outdst [$object outw $dst]
-	if {"$src" == "$dst"} return
 	if {"$src" == "$outsrc"} {error "\"$outsrc\" is not a window in this dialog"}
 	set p [winfo parent $src]
 	if ![info exists ::Classy::WindowBuilder::parents([$object itemclass $dst])] {
@@ -1811,15 +2134,57 @@ Classy::WindowBuilder method drop {dst} {
 		$object rename $src [$object outw $newname]
 		set src $newname
 	}
-	array set ta [grid info $src]
-	if {$ta(-row) != $row} {
-		$object gridmoverow $newp $ta(-column) $ta(-row) $row
+	if {"$newp" == "$current(p)"} {
+		if {"$border" == "r"} {incr col -1}
+		if {"$border" == "c"} {incr row -1}
 	}
-	if {$ta(-column) != $col} {
-		$object gridmovecol $newp $row $ta(-column) $col
+	if {$col == -1} {
+		$object _indelcol 0
+		set col 0
 	}
+	if {$row == -1} {
+		$object _indelrow 0
+		set row 0
+	}
+	$object _place $src $newp $col $row
 	update idletasks
 	Classy::todo $object _drawselectedw
+}
+
+Classy::WindowBuilder method _place {w parent col row} {
+	set infostring [grid info $w]
+	if {"$infostring" == ""} {
+		set colspan 1
+		set rowspan 1
+		set sticky nsew
+	} else {
+		array set info $infostring
+		set colspan $info(-columnspan)
+		set rowspan $info(-rowspan)
+		set sticky $info(-sticky)
+	}
+	if {"[lremove [Classy::griditem $parent $col $row] $w]" != ""} {
+		return
+	}
+	set ecol [expr {$col+$colspan-1}]
+	set erow [expr {$row+$rowspan-1}]
+	if {"[lremove [Classy::griditem $parent $col $row $ecol $erow] $w]" != ""} {
+		set i $col
+		while {$i <= $ecol} {
+			if {"[lremove [Classy::griditem $parent $i $row] $w]" != ""} break
+			incr i
+		}
+		set colspan [expr {$i-$col}]
+		set ecol $i
+		incr ecol -1
+		set i $row
+		while {$i <= $erow} {
+			if {"[lremove [Classy::griditem $parent $col $i $ecol $i] $w]" != ""} break
+			incr i
+		}
+		set rowspan [expr {$i-$row}]
+	}
+	grid $w -column $col -row $row -in $parent -columnspan $colspan -rowspan $rowspan -sticky $sticky
 }
 
 Classy::WindowBuilder method _dialogoption {def limit option} {
@@ -1940,5 +2305,23 @@ Classy::WindowBuilder method _configure {window} {
 	if {"[info commands ::Classy::WindowBuilder::configure_$class]" != ""} {
 		uplevel #0 ::Classy::WindowBuilder::configure_$class $object $window
 	}
-	$object _drawselectedw
+	Classy::todo $object redraw
 }
+
+proc cleargi {} {
+	foreach w [winfo children .try.dedit.work] {
+		if [regexp {\.classy__[a-z0-9]+$} $w] {destroy $w}
+	}
+}
+
+proc gi {} {
+	private .try.dedit current
+	set p .try.dedit.work.options
+	foreach slave [grid slaves $p] {
+		set info [grid info $slave]
+		puts "grid $slave -row [structlget $info -row] -column [structlget $info -column]"
+	}	
+	puts "set from $current(-row)"
+	puts "set col $current(-column)"
+}
+

@@ -84,4 +84,12 @@ test Classy::Selector {text variable} {
 	set ::try
 } {try}
 
+test Classy::Selector {sticky} {
+	classyclean
+	Classy::Selector .try -type sticky -label Try -variable try -command puts
+	pack .try -fill both -expand yes
+	.try set ns
+	.try get
+} {n}
+
 testsummarize

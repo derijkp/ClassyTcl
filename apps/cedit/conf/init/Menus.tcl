@@ -7,7 +7,7 @@ menu file "File" {
 	action Save "Save" "%W save"
 	action SaveAs "Save as" "%W savedialog"
 	action Reopen "Reopen" "%W reopenlist"
-	action Editor "New editor" "edit newfile"
+	action New "New editor" "edit newfile"
 	action Cmd "Command window" {Classy::cmd}
 	action SaveState "Save state" {savestate}
 	separator

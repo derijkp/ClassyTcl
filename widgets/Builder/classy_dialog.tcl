@@ -12,6 +12,7 @@ proc ::Classy::WindowBuilder::start_Classy::Dialog {object base} {
 	bindtags $base.actions.close Classy::none
 	$object startedit [winfo children $base.options]
 	set data(redir,$base.actions) $base
+	set data(parent,$base.options) $base.options
 	foreach w [list $base $base.actions $base.options] {
 		bindtags $w $data(tags)
 	}

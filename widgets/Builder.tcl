@@ -32,8 +32,6 @@ Classy::Builder classmethod init {args} {
 	super -keepgeometry all -resize {10 10}
 	set w [Classy::window $object]
 	private $object browse
-	Classy::DynaMenu makemenu Classy::Builder .classy__.buildermenu $object Classy::BuilderMenu
-	bindtags $object [list $object Classy::Builder all]
 	Classy::DynaTool $object.tool -type Classy::Builder -cmdw $object
 	frame $object.bframe
 	Classy::TreeWidget $object.browse -width 80 -height 10 -takefocus 1 \
@@ -103,7 +101,7 @@ Classy::Builder method destroy {} {
 #  Methods
 # ------------------------------------------------------------------
 
-Classy::Builder method close {} {
+Classy::Builder method closeedit {} {
 	private $object open
 	if ![info exists open(type)] {return 0}
 	switch $open(type) {
@@ -138,6 +136,9 @@ Classy::Builder method new {type {name {}}} {
 	private $object browse options defdir
 	if {[lsearch {color font misc key mouse menu tool} $browse(type)] != -1} {
 		set type $browse(type)
+		set configfile 1
+	} else {
+		set configfile 0
 	}
 	if {"$name" == ""} {
 		catch {destroy $object.temp}
@@ -146,6 +147,7 @@ Classy::Builder method new {type {name {}}} {
 		return
 	}
 	set browse(type) $type
+	set file $browse(file)
 	if {"$type" == "file"} {
 		if ![regexp {\.tcl$} $name] {append name .tcl}
 		if [file isdir $browse(file)] {
@@ -168,13 +170,15 @@ Classy::Builder method new {type {name {}}} {
 		}
 		$object.browse selection set $base
 		return
+	} elseif {"$type" == "config"} {
+		if !$configfile {error "file \"$file\" is not a configuration file"}
+	} else {
+		if [info exists auto_index($name)] {
+			set file [lindex $auto_index($name) 1]
+			if ![Classy::yorn "function \"$name\" probably exists in file \"$file\"! continue anyway?"] return
+		}
+		if [file isdir $file] {return -code error "please select a file instead of a directory"}
 	}
-	if [info exists auto_index($name)] {
-		set file [lindex $auto_index($name) 1]
-		if ![Classy::yorn "function \"$name\" probably exists in file \"$file\"! continue anyway?"] return
-	}
-	set file $browse(file)
-	if [file isdir $file] {return -code error "please select a file instead of a directory"}
 	switch $type {
 		function {
 			set f [open $file a]
@@ -183,15 +187,15 @@ Classy::Builder method new {type {name {}}} {
 			close $f
 		}
 		dialog {
-			$object _creatededit $object.dedit
+#			$object _creatededit $object.dedit
 			$object.dedit new dialog $name $file
 		}
 		toplevel {
-			$object _creatededit $object.dedit
+#			$object _creatededit $object.dedit
 			$object.dedit new toplevel $name $file
 		}
 		frame {
-			$object _creatededit $object.dedit
+#			$object _creatededit $object.dedit
 			$object.dedit new frame $name $file
 		}
 		color - font - misc - key - mouse - menu - tool {
@@ -225,10 +229,9 @@ Classy::Builder method _creatededit {w} {
 }
 
 Classy::Builder method open {file function type} {
-putsvars file function type
 	global auto_index
 	private $object browse open
-	if [$object close] return
+	if [$object closeedit] return
 	set browse(base) [list $file $function $type]
 	set browse(file) $file
 	set browse(name) $function
@@ -243,7 +246,7 @@ putsvars file function type
 		}
 		dir {}
 		file {
-			$object fedit $object.fedit $file {} {}
+			edit $file
 		}
 		function {
 			$object fedit $object.fedit $file $function $type
@@ -389,28 +392,29 @@ Classy::Builder method infile {cmd file args} {
 }
 
 Classy::Builder method cut {} {
+	$object copy
+	$object delete
+}
+
+Classy::Builder method delete {} {
 	global auto_index
 	private $object options browse
 	set file $browse(file)
 	switch $browse(type) {
 		file {
-			set browse(clipbf) $file
-			set browse(clipb) [readfile $file]
-			clipboard clear
-			clipboard append [readfile $file]
 			file rename -force $file $file~
 			$object.browse deletenode $browse(base)
 			return $file
 		}
 		dir - color - font - misc - key - mouse - menu - tool {
+			set function $browse(name)
+			$object infile delete $file $function
+			$object.browse selection set {}
+			$object.browse deletenode $browse(base)
+			return $function
 		}
 		default {
 			set function $browse(name)
-			set work [$object infile get $file $function]
-			set browse(clipbf) {}
-			set browse(clipb) $work
-			clipboard clear
-			clipboard append $work
 			$object infile delete $file $function
 			catch {auto_mkindex [file dirname $file] *.tcl}
 			catch {unset auto_index($function)}
@@ -425,6 +429,7 @@ Classy::Builder method copy {} {
 	global auto_index
 	private $object options browse
 	set file $browse(file)
+	set browse(cliptype) $browse(type)
 	switch $browse(type) {
 		file {
 			set browse(clipbf) $file
@@ -434,11 +439,22 @@ Classy::Builder method copy {} {
 			return $file
 		}
 		color - font - misc - key - mouse - menu - tool {
-			set browse(clipbf) $file
-			set browse(clipb) [readfile $file]
-			clipboard clear
-			clipboard append $browse(clipb)
-			return $file
+			if {"[lindex $browse(base) 1]" == ""} {
+				set browse(clipbf) $file
+				set browse(clipb) [readfile $file]
+				clipboard clear
+				clipboard append $browse(clipb)
+				return $file
+			} else {
+				set browse(clipb) {}
+				set function $browse(name)
+				set work [$object infile get $file $function]
+				set browse(clipbf) {}
+				set browse(clipb) $work
+				clipboard clear
+				clipboard append $work
+				return $work
+			}
 		}
 		dir {
 			error "Cannot copy dir to clipboard"
@@ -464,12 +480,24 @@ Classy::Builder method paste {{file {}}} {
 	}
 	if [file isdir $file] {
 		if {"$browse(clipbf)" == ""} {
-			set file [file join $file clipboard.tcl]
+			set base [file join $file clipboard]
 		} else {
-			set file [file join $file [file tail $browse(clipbf)]]
+			set tail [file tail $browse(clipbf)]
+			set base [file join $file [file root $tail]]
 		}
+		if [file exists $base.tcl] {
+			set num 1
+			while {[file exists $base#$num.tcl]} {incr num}
+			set base $base#$num
+		}
+		writefile $base.tcl $browse(clipb)
+		$object closenode $browse(base)
+		$object opennode $browse(base)
+	} elseif {"$browse(clipbf)" != ""} {
+		error "Can only paste file in directory"
+	} else {
+		$object infile add $file $browse(clipb)
 	}
-	$object infile add $file $browse(clipb)
 }
 
 Classy::Builder method save {} {
@@ -630,6 +658,7 @@ Classy::Builder method _drawtree {} {
 }
 
 Classy::Builder method fedit {w file function type} {
+putsvars w file function type
 	if ![winfo exists $w] {
 		Classy::Toplevel $w -keepgeometry all -resize {2 2}
 		Classy::Editor $w.edit -closecommand "$w hide"
@@ -637,8 +666,14 @@ Classy::Builder method fedit {w file function type} {
 	} else {
 		$w place
 	}
-	wm title $w $file
-	$w.edit load $file
+	$w.edit set [$object infile get $file $function]
+	$w configure -title $function
+	$w.edit textchanged 0
+	$w.edit configure -savecommand [list invoke code [varsubst {object file function w} {
+		$object infile set $file $function $code
+		$w.edit textchanged 0
+		$w configure -title $function
+	}]]
 	if {"$function" != ""} {
 		switch $type {
 			function {set pattern "proc $function "}

@@ -64,8 +64,8 @@ Classy::DragDrop classmethod destroy {} {
 # the options are the same as for the Classy::DragDrop configure method.
 #}
 Classy::DragDrop method start {x y value args} {
-	set from [winfo containing $x $y]
 	private $object data types ftypes
+	set from [winfo containing $x $y]
 	if [info exists data(from)] {
 		bindtags $data(from) $data(bindtags)
 		$data(from) configure -cursor $data(cursor)
@@ -116,8 +116,8 @@ Classy::DragDrop method start {x y value args} {
 	eval $object configure $args
 	bindtags $from {Classy::DragDrop_extra Classy::DragDrop}
     foreach app [lremove [winfo interps] [tk appname]] {
-		catch {send -- $app ::class::setprivate Classy::DragDrop data(prev) {{}} }
-		catch {send -- $app ::class::setprivate Classy::DragDrop data(remote) [list [tk appname]]}
+		send -async -- $app ::class::setprivate Classy::DragDrop data(prev) {{}}
+		send -async -- $app ::class::setprivate Classy::DragDrop data(remote) [list [tk appname]]
 	}
 	focus $from
 	update idletasks
@@ -144,7 +144,7 @@ Classy::DragDrop method start {x y value args} {
 Classy::DragDrop method configure {args} {
 	private $object data types ftypes
 	if [info exists data(remote)] {
-		send -- $data(remote) Classy::DragDrop configure $args
+		send -async -- $data(remote) Classy::DragDrop configure $args
 	} else {
 		if {[llength $args] == 0} {
 			set list {}
@@ -315,7 +315,7 @@ Classy::DragDrop method move {} {
 		event generate $dropw <<Drag-Motion>> -x $rx -y $ry
 	} else {
 	    foreach app [lremove [winfo interps] $curapp] {
-			catch {send -- $app Classy::DragDrop _events [list $curapp] $x $y} res
+			send -async -- $app Classy::DragDrop _events [list $curapp] $x $y
 		}
 	}
 	set data(prev) $dropw
@@ -401,7 +401,7 @@ Classy::DragDrop method drop {} {
 	set w .classy__.dragdrop
 	set x [winfo pointerx $w]
 	set y [winfo pointery $w]
-    wm geometry  $w +[expr {[winfo pointerx $w]+1}]+[expr {[winfo pointery $w]+1}]
+    wm geometry $w +[expr {[winfo pointerx $w]+1}]+[expr {[winfo pointery $w]+1}]
 	wm withdraw $w
 	wm geometry $w +10000+10000
 	set dropw [winfo containing $x $y]
@@ -413,8 +413,8 @@ Classy::DragDrop method drop {} {
 	        if {"$dropw" != ""} break
 	    }
 		if {"$dropw" != ""} {
-			send -- $appl [list catch [list Classy::DragDrop _remote [tk appname]]]
-			send -- $appl [list catch [list event generate $dropw <<Drop>>]]
+			send -async -- $appl [list catch [list Classy::DragDrop _remote [tk appname]]]
+			send -async -- $appl [list catch [list event generate $dropw <<Drop>>]]
 		}
 	}
 }

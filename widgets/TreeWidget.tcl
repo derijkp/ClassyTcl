@@ -7,6 +7,9 @@
 #doc TreeWidget title {
 #TreeWidget
 #} descr {
+# subclass of <a href="../basic/widget.html">Widget</a>
+# The tree widget is a canvas widget with an associated <a href="../widget/Tree.html">Tree 
+# widget</a>.
 #}
 #doc {TreeWidget options} h2 {
 #	TreeWidget specific options
@@ -142,17 +145,17 @@ Classy::TreeWidget method _action {x y} {
 	set node [$object.tree node $x $y]
 	if {"$node" == ""} return
 	switch [$object.tree type $node] {
-		e {
+		end {
 			if {"$options(-endnodecommand)" == ""} return
 			uplevel #0 $options(-endnodecommand) [list $node]
 		}
-		f {
+		open {
 			if {"$options(-closecommand)" != ""} {
 				uplevel #0 $options(-closecommand) [list $node]
 			}
 			$object clearnode $node
 		}
-		c {
+		closed {
 			if {"$options(-opencommand)" == ""} return
 			uplevel #0 $options(-opencommand) [list $node]
 		}

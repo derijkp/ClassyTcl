@@ -92,7 +92,7 @@ Classy::DefaultMenu method _init {} {
 			-command "#" -addcommand "#" -deletecommand "#" -addvariable [privatevar $object add]
 	}
 	after cancel "$w place"
-#	$w place
+	wm geometry $w +1000000+1000000
 	wm withdraw $w
 }
 

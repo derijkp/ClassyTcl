@@ -192,7 +192,9 @@ Classy::Config method _reconfigurecolor {list} {
 
 Classy::Config method load {type level name var} {
 	upvar #0 $var data
+	catch {set close $data(close)}
 	catch {unset data}
+	catch {set data(close) $close}
 	set data(names) ""
 	set data(changed) 0
 	if {"$level" == ""} {set level appuser}
@@ -577,7 +579,7 @@ Classy::Config method clear {var} {
 }
 
 Classy::Config method open {w name} {
-#	$w selection set $name
+	$w selection set $name
 	set level [lindex $name 0]
 	set type [lindex $name 1]
 	set name [lindex $name 2]
@@ -587,18 +589,21 @@ Classy::Config method open {w name} {
 			catch {destroy $win}
 			Classy::config_frame $win -level $level -name $name -type $type
 			[winfo parent $w].frame select gen
+			set ::${win}(close) "destroy [winfo parent $w]"
 		}
 		Toolbars {
 			set win [winfo parent $w].frame.gen
 			catch {destroy $win}
 			Classy::config_tool $win -level $level -name $name
 			[winfo parent $w].frame select gen
+			set ::${win}(close) "destroy [winfo parent $w]"
 		}
 		Menus {
 			set win [winfo parent $w].frame.gen
 			catch {destroy $win}
 			Classy::config_menu $win -level $level -name $name
 			[winfo parent $w].frame select gen
+			set ::${win}(close) "destroy [winfo parent $w]"
 		}
 		default {
 			private $object data
@@ -610,7 +615,7 @@ Classy::Config method open {w name} {
 				-command [list $object save [privatevar $object data]]
 			[winfo parent $w].frame select gen
 		}
-	}		
+	}
 }
 
 Classy::Config method config {type name {level appuser}} {

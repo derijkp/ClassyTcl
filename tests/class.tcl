@@ -891,15 +891,47 @@ test class {object info error} {
 	try info children
 } {wrong option "children" must be parent, class, methods or method} 1
 
+test class {method introspection: args} {
+	clean
+	Base method test {{a 1}} {puts $a}
+	Base classmethod test {{a 1}} {puts $a}
+	Base info method args test
+} {a}
+
 test class {method introspection: body} {
 	clean
 	Base method test {{a 1}} {puts $a}
 	Base classmethod test {{a 1}} {puts $a}
-	Base info methods
-	Base info classmethod default test a try
-	Base info method default test a try
 	Base info method body test
 } {puts $a}
+
+test class {method introspection: default} {
+	clean
+	Base method test {{a 1}} {puts $a}
+	Base classmethod test {{a 1}} {puts $a}
+	Base info method default test a try
+} {1}
+
+test class {classmethod introspection: args} {
+	clean
+	Base method test {{a 1}} {puts $a}
+	Base classmethod test {{a 1}} {puts $a}
+	Base info classmethod args test
+} {a}
+
+test class {classmethod introspection: body} {
+	clean
+	Base method test {{a 1}} {puts $a}
+	Base classmethod test {{a 1}} {puts $a}
+	Base info classmethod body test
+} {puts $a}
+
+test class {classmethod introspection: default} {
+	clean
+	Base method test {{a 1}} {puts $a}
+	Base classmethod test {{a 1}} {puts $a}
+	Base info classmethod default test a try
+} {1}
 
 test class {trace object} {
 	clean

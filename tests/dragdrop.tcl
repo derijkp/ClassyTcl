@@ -50,3 +50,5 @@ Classy::Entry .ce -label try
 pack .ce
 .ce set try
 bind .ce <<Drag>> {DragDrop start %X %Y [.ce get];break}
+
+manualtest

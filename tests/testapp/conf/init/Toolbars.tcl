@@ -1,7 +1,7 @@
 #Application tool configuration file
 
 Classy::configtool MainTool {Application main toolbar} {
-	action open "Open" {error "cannot load \"[Classy::selectfile -title Open -selectmode persistent]\" yet}
+	action open "Open" {error "cannot load \"[Classy::selectfile -title Open -selectmode persistent]\" yet"}
 	action save "Save" {error "saving not implemented yet"}
 	action print "Print" {error "print not implemented yet"}
 	action undo "Undo" {error "undo not implemented yet"}
@@ -13,5 +13,7 @@ Classy::configtool MainTool {Application main toolbar} {
 	separator
 
 
+
 }
+
 

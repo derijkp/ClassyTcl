@@ -85,7 +85,7 @@ Classy::DynaTool addoption -type {type Type {}} {
 	catch {unset data(slaves)}
 	set list [splitcomplete $tooldata($value)]
 	if {[lsearch -regexp $list "^\[\t \]*nodisplay\[\t \]*\$"] != -1} {
-		$object configure -height 0 -width 0
+		[Classy::window $object] configure -height 0 -width $options(-width)
 		return
 	}
 	foreach current $list {
@@ -154,6 +154,10 @@ Classy::DynaTool addoption -type {type Type {}} {
 
 Classy::DynaTool addoption -cmdw {cmdw Cmdw {}} {
 	$object cmdw $value
+}
+
+Classy::DynaTool addoption -width {width Width 0} {
+	[Classy::window $object] configure -width $value
 }
 
 # ------------------------------------------------------------------
@@ -340,7 +344,7 @@ Classy::DynaTool method reqheight {tool} {
 }
 
 Classy::DynaTool method _placetopfirst {} {
-	private $object data
+	private $object data options
 	set mh 0
 	set x 0
 	if [info exists data(slaves)] {
@@ -364,9 +368,11 @@ Classy::DynaTool method _placetopfirst {} {
 		}
 	}
 	incr mh [$object cget -bd]
-	$object configure -height $mh -width [expr $x+2*[$object cget -bd]+1]
+	[Classy::window $object] configure -height $mh
+	if {$options(-width) == 0} {
+		[Classy::window $object] configure -width [expr $x+2*[$object cget -bd]+1]
+	}
 }
-
 
 Classy::DynaTool method redraw {} {
 	private $object data

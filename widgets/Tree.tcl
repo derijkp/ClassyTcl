@@ -408,7 +408,11 @@ Classy::Tree method exists {node} {
 #}
 Classy::Tree method type {node} {
 	private $object data
-	return [structlget $data($node) t]
+	switch [structlget $data($node) t] {
+		c {return closed}
+		f {return open}
+		e {return end}
+	}
 }
 
 #doc {Tree command node} cmd {
@@ -425,6 +429,22 @@ Classy::Tree method node {index {y {}}} {
 	}
 	set tags [$canvas itemcget $index -tags]
 	return [lindex $tags 2]
+}
+
+#doc {Tree command what} cmd {
+# pathname what index
+# pathname what x y
+#} descr {
+#}
+Classy::Tree method what {index {y {}}} {
+	private $object data options
+	set canvas $options(-canvas)
+	if {"$canvas" == ""} return
+	if {"$y" != ""} {
+		set index [lindex [$canvas find overlapping [$canvas canvasx $index] [$canvas canvasy $y] [$canvas canvasx $index] [$canvas canvasy $y]] end]
+	}
+	set tags [$canvas itemcget $index -tags]
+	return [lindex $tags 3]
 }
 
 #doc {Tree command parentnode} cmd {

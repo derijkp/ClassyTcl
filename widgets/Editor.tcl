@@ -1163,7 +1163,7 @@ proc Classy::title {w title} {
 	wm iconname $w $title
 }
 
-proc edit {args} {
+proc Classy::edit {args} {
 #	if {"$args"==""} {set args "Newfile"}
 	set w .classy__.edit
 	set num 1
@@ -1179,3 +1179,5 @@ proc edit {args} {
 	}
 	return $w
 }
+
+catch {Classy::export edit {}}

@@ -108,6 +108,8 @@ menu sel "File" {
 	action DefaultDir "Application dir" {%W configure -dir {}}
 	action Dir "Select dir" {%W configure -dir [Classy::selectfile -default Classy::Builder]}
 	action Save "Save" {%W save}
+	separator
+	action Close "Close" {destroy %W}
 }
 menu add "Add" {
 	action newfile "New file" {%W new file}
@@ -123,7 +125,7 @@ menu edit "Edit" {
 	separator
 	action Copy "Copy" {%W copy}
 	action Cut "Cut" {%W cut}
-	action Delete "Delete" {%W cut}
+	action Delete "Delete" {%W delete}
 	action Paste "Paste" {%W paste}
 }
 menu help "Help" {
@@ -151,6 +153,10 @@ menu edit "Edit" {
 	action Down "Move down" {[Classy::WindowBuilder_win %W] geometryset down}
 	action Left "Move left" {[Classy::WindowBuilder_win %W] geometryset left}
 	action Right "Move right" {[Classy::WindowBuilder_win %W] geometryset right}
+	action SelectUp "Rowspan smaller" {[Classy::WindowBuilder_win %W] geometryset spanup}
+	action SelectDown "Rowspan larger" {[Classy::WindowBuilder_win %W] geometryset spandown}
+	action SelectLeft "Columnspan smaller" {[Classy::WindowBuilder_win %W] geometryset spanleft}
+	action SelectRight "Columnspan larger" {[Classy::WindowBuilder_win %W] geometryset spanright}
 }
 menu tk "Tk" {
 	action AddFrame Frame {[Classy::WindowBuilder_win %W] add frame}

@@ -104,6 +104,7 @@ Classy::Toplevel addoption -resize {resize Resize {1 1}} {
 	if {$y>1} {set minh $y ; set y 1}
 	wm resizable $object $x $y
 	wm minsize $object $minw $minh
+	Classy::todo $object place
 	return $value
 }
 

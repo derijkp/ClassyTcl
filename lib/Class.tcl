@@ -517,7 +517,7 @@ proc ::class::info_ {class object arg} {
 					return $body
 				}
 				args {
-					return [info args ::class::${class},,m,$name]
+					return [lrange [info args ::class::${class},,m,$name] 2 end]
 				}
 				default {
 					if {$len != 5} {
@@ -540,11 +540,11 @@ proc ::class::info_ {class object arg} {
 						return $body
 					}
 					args {
-						return [info args ::class::${class},,cm,$name]
+						return [lrange [info args ::class::${class},,cm,$name] 1 end]
 					}
 					default {
 						if {$len != 5} {
-							return -code error "wrong # args: should be \"$object info classmethod default arg varname\""
+							return -code error "wrong # args: should be \"$class info classmethod default arg varname\""
 						}
 						return [uplevel 2 info default ::class::${class},,cm,$name [lindex $arg 3] [lindex $arg 4]]
 					}
@@ -552,6 +552,8 @@ proc ::class::info_ {class object arg} {
 						return -code error "wrong option \"[lindex $arg 0]\" must be body, args or default"
 					}
 				}
+			} else {
+				return -code error "object cannot have classmethods"
 			}
 		}
 	}

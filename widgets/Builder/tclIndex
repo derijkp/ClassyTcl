@@ -7,6 +7,7 @@
 # a script that loads the command.
 
 set auto_index(::Classy::WindowBuilder::start_Classy::Toplevel) [list source [file join $dir classy_toplevel.tcl]]
+set auto_index(::Classy::WindowBuilder::attr_Classy::Toplevel_-destroycommand) [list source [file join $dir classy_toplevel.tcl]]
 set auto_index(::Classy::WindowBuilder::edit_Classy::Toplevel) [list source [file join $dir classy_toplevel.tcl]]
 set auto_index(::Classy::WindowBuilder::generate_Classy::Toplevel) [list source [file join $dir classy_toplevel.tcl]]
 set auto_index(::Classy::WindowBuilder::start_Classy::Dialog) [list source [file join $dir classy_dialog.tcl]]
@@ -113,9 +114,6 @@ set auto_index(::Classy::WindowBuilder::edit_Classy::Canvas) [list source [file 
 set auto_index(::Classy::WindowBuilder::start_Classy::Topframe) [list source [file join $dir classy_topframe.tcl]]
 set auto_index(::Classy::WindowBuilder::edit_Classy::Topframe) [list source [file join $dir classy_topframe.tcl]]
 set auto_index(::Classy::WindowBuilder::generate_Classy::Topframe) [list source [file join $dir classy_topframe.tcl]]
-set auto_index(::Classy::WindowBuilder::add_Classy::DynaMenu) [list source [file join $dir classy_dynamenu.tcl]]
-set auto_index(::Classy::WindowBuilder::delete_Classy::DynaMenu) [list source [file join $dir classy_dynamenu.tcl]]
-set auto_index(::Classy::WindowBuilder::edit_Classy::DynaMenu) [list source [file join $dir classy_dynamenu.tcl]]
 set auto_index(::Classy::WindowBuilder::add_Classy::ListBox) [list source [file join $dir classy_listbox.tcl]]
 set auto_index(::Classy::WindowBuilder::edit_Classy::ListBox) [list source [file join $dir classy_listbox.tcl]]
 set auto_index(::Classy::WindowBuilder::generate_Classy::ListBox) [list source [file join $dir classy_listbox.tcl]]
@@ -127,6 +125,8 @@ set auto_index(::Classy::WindowBuilder::generate_Classy::ScrolledText) [list sou
 set auto_index(::Classy::WindowBuilder::add_Classy::DynaTool) [list source [file join $dir classy_dynatool.tcl]]
 set auto_index(::Classy::WindowBuilder::start_Classy::DynaTool) [list source [file join $dir classy_dynatool.tcl]]
 set auto_index(::Classy::WindowBuilder::delete_Classy::DynaTool) [list source [file join $dir classy_dynatool.tcl]]
+set auto_index(::Classy::WindowBuilder::configure_Classy::DynaTool) [list source [file join $dir classy_dynatool.tcl]]
+set auto_index(::Classy::WindowBuilder::attr_Classy::DynaTool_-type) [list source [file join $dir classy_dynatool.tcl]]
 set auto_index(::Classy::WindowBuilder::edit_Classy::DynaTool) [list source [file join $dir classy_dynatool.tcl]]
 set auto_index(::Classy::WindowBuilder::generate_Classy::DynaTool) [list source [file join $dir classy_dynatool.tcl]]
 set auto_index(::Classy::WindowBuilder::add_Classy::MultiFrame) [list source [file join $dir classy_multiframe.tcl]]

@@ -27,19 +27,19 @@ proc ::Classy::cleartodo {object} {
 }
 
 proc ::Classy::handletodo {object} {
-	if [info exists ::Classy::__todolist__$object] {
-		upvar ::Classy::__todolist__$object todolist
-		if {"$todolist"!=""} {
-			if {"[info commands $object]" == ""} {unset todolist;return}
-			foreach todoitem $todolist {
+	upvar ::Classy::__todolist__$object todolist
+	if [info exists todolist] {
+		set list $todolist
+		unset todolist
+		if {"$list"!=""} {
+			if {"[info commands $object]" == ""} {return}
+			foreach todoitem $list {
 				if [catch {eval $object $todoitem} result] {
 					global errorInfo
-					unset todolist
 					return -code error -errorinfo $errorInfo $result
 				}
 			}
 		}
-		catch {unset todolist}
 	}
 }
 
@@ -178,6 +178,26 @@ proc Classy::cleargrid w {
 		if {$row != 0} {
 			grid rowconfigure $w [expr {$row-1}] -weight 0
 		}
+	}
+}
+
+proc Classy::griditem {w col row args} {
+#putsvars w col row args
+	if {"$args" == ""} {
+		return [lcommon [grid slaves $w -column $col] [grid slaves $w -row $row]]
+	} else {
+		set result ""
+		set endcol [lindex $args 0]
+		set endrow [lindex $args 1]
+		for {} {$row <= $endrow} {incr row} {
+			for {set x $col} {$x <= $endcol} {incr x} {
+				set item [lcommon [grid slaves $w -column $x] [grid slaves $w -row $row]]
+				if {"$item" != ""} {
+					lappend result $item
+				}
+			}
+		}
+		return $result
 	}
 }
 

@@ -61,7 +61,7 @@ classyclean
 set object .try
 Browser .try -list [glob [pwd]/*]
 pack .try -fill both -expand yes
-bind .try <<Action-Motion>> {DragDrop start %W test}
+bind .try <<Drag>> {DragDrop start %X %Y test}
 
 .try configure -gettext gettext -getimage getimage -getdata getdata
 bind [.try component canvas] <<Action>> {

@@ -99,6 +99,9 @@ Classy::Selector method set {item} {
 		set varname $options(-variable)
 	}
 	uplevel #0 [list set $varname $item]
+	if {"$options(-type)" == "sticky"} {
+		$object _stickyset $item
+	}
 }
 
 #doc {Selector command get} cmd {
@@ -117,6 +120,9 @@ Classy::Selector method get {} {
 
 Classy::Selector method _command {value} {
 	private $object options
+	if {"$options(-type)" == "sticky"} {
+		$object _stickyset $value
+	}
 	if {"$options(-command)" != ""} {
 		uplevel #0 $options(-command) [list $value]
 	}
@@ -312,6 +318,70 @@ Classy::Selector method redraw {} {
 			}
 			grid columnconfigure $object $column -weight 1
 		}
+		sticky {
+			Classy::Entry $object.value -textvariable $var \
+				-command "$object _command" -label $title -orient vertical \
+				-orient vertical
+			frame $v.select
+			grid $v.select -row 6 -column 0
+			checkbutton $v.select.n -image [Classy::geticon Builder/sticky_n] -indicatoron 0 -anchor c \
+				-variable [privatevar $object sticky(n)] \
+				-command "$object _stickyset"
+			checkbutton $v.select.s -image [Classy::geticon Builder/sticky_s] -indicatoron 0 -anchor c \
+				-variable [privatevar $object sticky(s)] \
+				-command "$object _stickyset"
+			checkbutton $v.select.e -image [Classy::geticon Builder/sticky_e] -indicatoron 0 -anchor c \
+				-variable [privatevar $object sticky(e)] \
+				-command "$object _stickyset"
+			checkbutton $v.select.w -image [Classy::geticon Builder/sticky_w] -indicatoron 0 -anchor c \
+				-variable [privatevar $object sticky(w)] \
+				-command "$object _stickyset"
+			button $v.select.all -image [Classy::geticon Builder/sticky_all] -anchor c \
+				 -command "$object.value set nesw"
+			button $v.select.none -image [Classy::geticon Builder/sticky_none] -anchor c \
+				 -command "$object.value set {}"
+			button $v.select.we -image [Classy::geticon Builder/sticky_we] -anchor c \
+				 -command "$object.value set we"
+			button $v.select.ns -image [Classy::geticon Builder/sticky_ns] -anchor c \
+				 -command "$object.value set ns"
+			grid $v.select.none -row 7 -column 1 -sticky we
+			grid $v.select.n -row 6 -column 1 -sticky we
+			grid $v.select.s -row 8 -column 1 -sticky we
+			grid $v.select.e -row 7 -column 2 -sticky we
+			grid $v.select.w -row 7 -column 0 -sticky e
+			grid $v.select.we -row 6 -column 3 -sticky e
+			grid $v.select.ns -row 7 -column 3 -sticky e
+			grid $v.select.all -row 8 -column 3 -sticky e
+			grid $v.select -row 0 -column 0 -sticky nwe
+			grid $v.value -row 0 -column 1 -sticky nwe
+			grid columnconfigure $v 1 -weight 1
+			grid rowconfigure $object 2 -weight 1
+			$object _stickyset [$v.value get]
+		}
 	}
 	Classy::canceltodo $object redraw
+}
+
+Classy::Selector method _stickyset {args} {
+putsvars args
+	private $object sticky
+	if {"$args" == ""} {
+		set value ""
+		foreach dir {n s e w} {
+			if $sticky($dir) {
+				append value $dir
+			}
+		}
+		$object.value set $value
+	} else {
+		set value [lindex $args 0]
+		foreach dir {n s e w} {
+			if {[string first $dir $value] != -1} {
+				set sticky($dir) 1
+			} else {
+				set sticky($dir) 0
+			}
+		}
+		$object.value nocmdset $value
+	}
 }

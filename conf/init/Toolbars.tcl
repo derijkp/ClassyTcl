@@ -47,30 +47,28 @@ Classy::configtool Classy::WindowBuilder {toolbar used in the ClassyTcl WindowBu
 }
 
 Classy::configtool Classy::WindowBuilder_icons {Tk widget toolbar used in the ClassyTcl WindowBuilder} {
-	label Tk "Tk Widgets"
+	action Builder/classy__dynamenu {Main Menu} {%W add Classy::DynaMenu}
+	action Builder/classy__dynatool {Toolbar} {%W add Classy::DynaTool}
 	action Builder/frame Frame {%W add frame}
 	action Builder/entry Entry {%W add entry}
-	action Builder/label Label {%W add label}
+	action Builder/classy__entry {ClassyTcl Entry} {%W add Classy::Entry}
+	action Builder/classy__numentry {ClassyTcl Numerical Entry} {%W add Classy::NumEntry}
 	action Builder/button Button {%W add button}
 	action Builder/checkbutton {Check button} {%W add checkbutton}
 	action Builder/radiobutton {Radio button} {%W add radiobutton}
+	action Builder/label Label {%W add label}
+	action Builder/classy__message "ClassyTcl Message" {%W add Classy::Message}
 	action Builder/message Message {%W add message}
 	action Builder/vscroll "Vertical Scrollbar" {%W add scrollbar -orient vertical}
 	action Builder/hscroll "Horizontal Scrollbar" {%W add scrollbar -orient horizontal}
 	action Builder/listbox Listbox {%W add listbox}
-	action Builder/text Text {%W add text}
-	action Builder/canvas Canvas {%W add canvas}
-	action Builder/scale Scale {%W add scale}
-	label Classy "ClassyTcl widgets"
-	action Builder/classy__dynamenu {Main Menu} {%W add Classy::DynaMenu}
-	action Builder/classy__dynatool {Toolbar} {%W add Classy::DynaTool}
-	action Builder/classy__entry {ClassyTcl Entry} {%W add Classy::Entry}
-	action Builder/classy__numentry {ClassyTcl Numerical Entry} {%W add Classy::NumEntry}
 	action Builder/classy__listbox {ClassyTcl ListBox} {%W add Classy::ListBox}
-	action Builder/classy__scrolledtext {ClassyTcl scrolled Text} {%W add Classy::ScrolledText}
-	action Builder/classy__message "ClassyTcl Message" {%W add Classy::Message}
+	action Builder/text Text {%W add text}
 	action Builder/classy__text {ClassyTcl Text} {%W add Classy::Text}
+	action Builder/classy__scrolledtext {ClassyTcl scrolled Text} {%W add Classy::ScrolledText}
+	action Builder/canvas Canvas {%W add canvas}
 	action Builder/classy__canvas {ClassyTcl Canvas} {%W add Classy::Canvas}
+	action Builder/scale Scale {%W add scale}
 	action Builder/classy__notebook {Notebook with tabs} {%W add Classy::NoteBook}
 	action Builder/classy__optionbox {ClassyTcl OptionBox} {%W add Classy::OptionBox}
 	action Builder/classy__optionmenu {ClassyTcl OptionMenu} {%W add Classy::OptionMenu}
@@ -81,9 +79,9 @@ Classy::configtool Classy::WindowBuilder_icons {Tk widget toolbar used in the Cl
 	action Builder/classy__fold {Fold} {%W add Classy::Fold}
 	action Builder/classy__fontselect {Font select} {%W add button -text "Select font" -command {set font [Classy::getfont]}}
 	action Builder/classy__colorselect {Color select} {%W add button -text "Select color" -command {set color [Classy::getcolor]}}
+	action Builder/classy__selector {Selector} {%W add Classy::Selector}
 	action Builder/classy__treewidget {Tree widget} {%W add Classy::TreeWidget}
 	action Builder/classy__browser {Browser} {%W add Classy::Browser}
-	action Builder/classy__selector {Selector} {%W add Classy::Selector}
 }
 
 Classy::configtool Classy::Dummy {toolbar used as a dummy in the ClassyTcl WindowBuilder} {

@@ -1,0 +1,1 @@
+#Application color configuration file

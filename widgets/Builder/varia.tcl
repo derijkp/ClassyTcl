@@ -20,7 +20,7 @@ proc ::Classy::WindowBuilder::add_button {object base args} {
 
 proc ::Classy::WindowBuilder::add_checkbutton {object base args} {
 	checkbutton $base -text button
-	eval $w configure $args
+	eval $base configure $args
 	return $base
 }
 

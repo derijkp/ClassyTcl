@@ -26,6 +26,7 @@ Classy::configkey File {
 	LoadNext <<LoadNext>> <Control-Alt-o> {LoadNext key}
 	Save <<Save>> <Alt-s> {Save key}
 	SaveAs <<SaveAs>> <Alt-S> {SaveAs key}
+	New <<New>> <Alt-n> {New key}
 	Quit <<Quit>> <Alt-Q> {Quit key}
 	Close <<Close>> <Alt-q> {Close key}
 	Reopen <<Reopen>> <Alt-r> {Reopen key}

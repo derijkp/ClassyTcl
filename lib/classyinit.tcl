@@ -89,6 +89,10 @@ proc class::bind {w} {
 
 proc class::rebind {w bindw} {
 	if {"$bindw" != ""} {
+		if [info exists ::class::rebind($w)] {
+			class::rebind $::class::rebind($w) $bindw
+			bindtags $::class::rebind($w) [lreplace [bindtags $::class::rebind($w)] 1 0]
+		}
 		set ::class::rebind($w) $bindw
 		bindtags $w [concat $w [bindtags $bindw]]
 	} else {
@@ -114,7 +118,15 @@ if {"[info commands ::Tk::focus]" == ""} {
 		}
 	}
 	proc ::class::refocus {w focusw} {
-		set ::class::refocus($w) $focusw
+		if {"$focusw" != ""} {
+			if [info exists ::class::refocus($focusw)] {
+				class::refocus $w $::class::refocus($focusw)
+			} else {
+				set ::class::refocus($w) $focusw
+			}
+		} else {
+			unset ::class::refocus($w)
+		}
 	}
 }
 

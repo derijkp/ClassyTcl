@@ -12,7 +12,8 @@
 #include "class.h"
 #include "method.h"
 
-void Classy_FreeClass(Class *class) {
+void Classy_FreeClass(char *clientdata) {
+	Class *class = (Class *)clientdata;
 	Tcl_HashEntry *entry;
 	Tcl_HashSearch search;
 	Method *method;
@@ -384,6 +385,30 @@ int Classy_InfoMethod(
 			Tcl_AppendResult(interp,"wrong # args: should be \"",Tcl_GetStringFromObj(genname,NULL),
 				" info classmethods ?pattern?\"", (char *)NULL);
 			return TCL_ERROR;
+		}
+	} else if ((optionlen == 6)&&(strncmp(option,"method",optionlen) == 0)) {
+		if (argc < 3) {
+			Tcl_ResetResult(interp);
+			Tcl_AppendResult(interp,"wrong # args: should be \"",Tcl_GetStringFromObj(genname,NULL),
+				" info method option name ?...?\"", (char *)NULL);
+			return TCL_ERROR;
+		} else {
+			return Classy_InfoMethodinfo(interp,class,object,argc-1,argv+1);
+		}
+	} else if ((optionlen == 11)&&(strncmp(option,"classmethod",optionlen) == 0)) {
+		if (argc < 3) {
+			Tcl_ResetResult(interp);
+			Tcl_AppendResult(interp,"wrong # args: should be \"",Tcl_GetStringFromObj(genname,NULL),
+				" info classmethod option name ?...?\"", (char *)NULL);
+			return TCL_ERROR;
+		} else {
+			if (object == NULL) {
+				return Classy_InfoClassMethodinfo(interp,class,argc-1,argv+1);
+			} else {
+				Tcl_ResetResult(interp);
+				Tcl_AppendResult(interp,"object cannot have classmethods", (char *)NULL);
+				return TCL_ERROR;
+			}
 		}
 	}
 	if (object == NULL) {
