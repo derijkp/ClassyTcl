@@ -1,7 +1,7 @@
 #
 # ClassyTcl Widgets 
 # ----------------- Peter De Rijk
-#
+
 # Widget
 # ----------------------------------------------------------------------
 #doc Widget title {
@@ -452,8 +452,8 @@ Widget classmethod chainallmethods {widget widgettype} {
 		}
 	}
 	destroy .class,,temp$num
-if {"$class" != "Classy::Editor"} {
-}
+	if {"$class" != "Classy::Editor"} {
+	}
 }
 
 #doc {Widget classmethod chainoptions} cmd {

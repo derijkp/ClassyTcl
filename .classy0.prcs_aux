@@ -613,7 +613,7 @@
 (help/widgets/ChartGrid.html 1221 934792220 e/51_ChartGrid. 1.5)
 (help/widgets/selectfile.html 449 934792220 e/15_selectfile 1.5)
 (tests/autoload_test/main.tcl 292 921749090 q/4_main.tcl 1.1)
-(lib/Widget.tcl 17548 928482994 d/41_Widget.tcl 1.13.1.7)
+(lib/Widget.tcl 17549 941037815 d/41_Widget.tcl 1.13.1.8)
 (html_library-0.3/README 646 900493641 17_README 1.2)
 (tests/try/Edit/init.tcl 4748 928482994 d/5_init.tcl 1.2)
 (widgets/tclIndex 11962 934792220 c/21_tclIndex 1.14.1.7)
