@@ -39,7 +39,7 @@ Classy::export Editor {}
 
 Classy::Editor classmethod init {args} {
 	super
-	set w [::Classy::widget $object]
+	set w [::Classy::window $object]
 	$w configure -highlightthickness 0 -borderwidth 0
 	Classy::Text $object.edit -wrap none -tabs 24 -yscrollcommand [list $object.vbar set] \
 		-xscrollcommand [list $object.hbar set] -changedcommand [varsubst object {
@@ -331,7 +331,7 @@ Classy::Editor method closefile {} {
 	set cur(prevmarker,$curfile) $prevmarker
 	set curmarkers($curfile) [$object marker lget]
 	if {"$curmarkers($curfile)" == ""} {unset curmarkers($curfile)}
-	[::Classy::widget $object.edit] delete 1.0 end
+	[::Classy::window $object.edit] delete 1.0 end
 	$object.edit unlink
 	set temp [::Classy::fullpath $curfile]
 	if [info exists editing($temp)] {
@@ -360,7 +360,7 @@ Classy::Editor method load {{file {}} args} {
 			error "Cannot open directory \"$curfile\""
 		}
 		set f [open $curfile r]
-		[::Classy::widget $object.edit] insert end [read $f]
+		[::Classy::window $object.edit] insert end [read $f]
 		close $f
 		$object clearundo
 		$object textchanged 0
@@ -435,7 +435,7 @@ Classy::Editor method reopenlist {} {
 	Classy::SelectDialog $w -title "Reopen list" \
 		-command "$object load \[$w get\]" \
 		-deletecommand "$object forget \[$w get\]"
-	$w fill $reopenlist
+	$w fill [lsort $reopenlist]
 	$w set $curfile
 }
 
@@ -450,7 +450,7 @@ Classy::Editor method findsel {dir} {
 		if {"$dir" == "-forwards"} {set index sel.last} else {set index sel.first}
 		set findwhat [$object get sel.first sel.last]
 	}
-	$object find $findwhat $dir -exact
+	$object find $findwhat $dir
 }
 
 Classy::Editor method replace-find {dir} {
@@ -477,7 +477,6 @@ Classy::Editor method find {what args} {
 	if ![regexp -- {-exact|-regexp} $args] {
 		lappend args -$options(-searchtype)
 	}
-
 	set stopindex {}
 	if [regexp -- {-backwards} $args] {
 		set nextcmd "$object loadprev"
@@ -496,16 +495,16 @@ Classy::Editor method find {what args} {
 		set startfile $curfile
 		set startpos [$object index $index]
 		if [$object compare $startpos != $stopindex] {
-			set pos [eval {$object search -count number} $args -- {$what} $index $stopindex]
+			set pos [eval {$object search -count ::Classy::number} $args -- {$what} $index $stopindex]
 		} else {
 			set pos ""
 		}
 		while {"$pos" == ""} {
 			eval $nextcmd
 			if {"$curfile" != "$startfile"} {
-				set pos [eval {$object search -count number} $args -- {$what} $startindex $stopindex]
+				set pos [eval {$object search -count ::Classy::number} $args -- {$what} $startindex $stopindex]
 			} else {
-				set pos [eval {$object search -count number} $args -- {$what} $startindex $startpos]
+				set pos [eval {$object search -count ::Classy::number} $args -- {$what} $startindex $startpos]
 				break
 			}
 		}
@@ -553,10 +552,10 @@ Classy::Editor method replace {args} {
 			set stop 1.0
 		}
 		while 1 {
-			set pos [eval {$object search -count number} -$options(-searchdir) -$options(-searchtype) -$options(-searchcase) \
+			set pos [eval {$object search -count ::Classy::number} -$options(-searchdir) -$options(-searchtype) -$options(-searchcase) \
 				-- {$findwhat} $start $stop]
 			if {"$pos"==""} {break}
-			$object delete $pos "$pos + $number c"
+			$object delete $pos "$pos + $::Classy::number c"
 			$object insert $pos $replace
 			set start [$object index "$pos + [string length $replace] c"]
 		}
@@ -991,7 +990,7 @@ Classy::Editor method matchingbrackets {} {
 #}
 Classy::Editor method marker {command args} {
 	private $object marker
-	set we [::Classy::widget $object.edit]
+	set we [::Classy::window $object.edit]
 	set arg [lindex $args 0]
 	switch $command {
 		set {
@@ -1109,13 +1108,13 @@ Classy::Editor method _reconfigure {} {
 	 		-selectforeground selectForeground Background
 			-troughcolor troughColor Background
 		} {
-			catch {[::Classy::widget $w] configure $option [option get $w $name $class]}
+			catch {[::Classy::window $w] configure $option [option get $w $name $class]}
 		}
 	}
 	if [winfo exists $object.find] {
 		Classy::Configurator _reconfigure $object.find
 	}
-	[::Classy::widget $object] configure -highlightthickness 0 -borderwidth 0
+	[::Classy::window $object] configure -highlightthickness 0 -borderwidth 0
 	eval grid forget [winfo children $object]
 	if {[option get $object showTool ShowTool]} {
 		catch {Classy::Configurator _reconfigure $object.tool}

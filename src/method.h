@@ -39,3 +39,6 @@ Classy_Method Classy_ClassMethodClassMethod;
 Classy_Method Classy_DeleteClassMethodClassMethod;
 Classy_Method Classy_MethodClassMethod;
 Classy_Method Classy_DeleteMethodClassMethod;
+
+int Classy_InfoClassMethods _ANSI_ARGS_((Tcl_Interp *interp,Class *class,Tcl_Obj *pattern));
+int Classy_InfoMethods _ANSI_ARGS_((Tcl_Interp *interp,Class *class,Tcl_Obj *pattern));

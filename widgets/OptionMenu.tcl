@@ -80,7 +80,7 @@ Classy::OptionMenu chainallmethods {$object} menubutton
 #} descr {
 #}
 Classy::OptionMenu method get {} {
-	return [[Classy::widget $object] cget -text]
+	return [[Classy::window $object] cget -text]
 }
 
 #doc {OptionMenu command set} cmd {
@@ -90,7 +90,7 @@ Classy::OptionMenu method get {} {
 Classy::OptionMenu method set {value} {
 	set list [getprivate $object options(-list)]
 	if {[lsearch $list $value]!=-1} {
-		set [[Classy::widget $object] cget -textvariable] $value
+		set [[Classy::window $object] cget -textvariable] $value
 	}
 }
 

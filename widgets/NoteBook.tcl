@@ -173,7 +173,7 @@ Classy::NoteBook method propagate {{state {}}} {
 			set reqwidth [expr $reqwidth + 2*$bd + 1 + $x]
 			set reqheight [expr [winfo reqheight $object.book] + 2*$bd]
 		}
-		[Classy::widget $object] configure -width $reqwidth -height $reqheight
+		[Classy::window $object] configure -width $reqwidth -height $reqheight
 	} else {
 		grid propagate $object.book $state
 	}

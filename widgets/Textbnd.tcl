@@ -284,7 +284,7 @@ set tkPriv(prevPos) {}
 proc Classy::Text_SelectTo {w x y} {
 	global tkPriv
 
-	set w [Classy::widget $w]
+	set w [Classy::window $w]
 	set cur [$w index @$x,$y]
 	if [catch {$w index anchor}] {
 		$w mark set anchor $cur
@@ -376,7 +376,7 @@ proc Classy::Text_AutoScan {w} {
 proc Classy::Text_ResetAnchor {w index} {
 	global tkPriv
 
-	set w [Classy::widget $w]
+	set w [Classy::window $w]
 	if {[$w tag ranges sel] == ""} {
 		$w mark set anchor $index
 		return

@@ -139,7 +139,7 @@ Classy::Help method gethelp {name} {
 Classy::Help method save {filename {how {}}} {
 	private $object.html html
 	if {"$how" == "text"} {
-		writefile $filename [[Classy::widget $object.html] get 1.0 end]
+		writefile $filename [[Classy::window $object.html] get 1.0 end]
 	} else {
 		writefile $filename $html
 	}

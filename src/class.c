@@ -83,8 +83,9 @@ int Classy_ClassObjCmd(
 		Tcl_Obj *cmd;
 		cmd = Tcl_DuplicateObj(class->trace);
 		error = Tcl_ListObjAppendElement(interp, cmd, Tcl_NewListObj(argc,argv));
-		if (error != TCL_OK) {return error;}
+		if (error != TCL_OK) {Tcl_DecrRefCount(cmd);return error;}
 		error = Tcl_EvalObj(interp,cmd);
+		Tcl_DecrRefCount(cmd);
 		if (error != TCL_OK) {return error;}
 	}
 	argv++;
@@ -105,6 +106,7 @@ int Classy_ClassObjCmd(
 			Tcl_Obj *errorObj=Tcl_NewStringObj("\nwhile invoking classmethod \"",29);
 			Tcl_AppendStringsToObj(errorObj, cmd, "\" of class \"", Tcl_GetStringFromObj(class->class,NULL), "\"\n", (char *) NULL);
 			Tcl_AddObjErrorInfo(interp, Tcl_GetStringFromObj(errorObj,NULL), -1);
+			Tcl_DecrRefCount(errorObj);
 		}
 		return error;
 	}
@@ -117,13 +119,14 @@ int Classy_ClassObjCmd(
 			Tcl_Obj *errorObj=Tcl_NewStringObj("\nwhile invoking method \"",24);
 			Tcl_AppendStringsToObj(errorObj, cmd, "\" of class \"", Tcl_GetStringFromObj(class->class,NULL), "\"", (char *) NULL);
 			Tcl_AddObjErrorInfo(interp, Tcl_GetStringFromObj(errorObj,NULL), -1);
+			Tcl_DecrRefCount(errorObj);
 		}
 		return error;
 	} else {
 		Tcl_Obj *result, **objv;
 		int objc,i;
 		Tcl_ResetResult(interp);
-		error = Classy_ClassMethodClassMethod(interp,class,NULL,0,NULL);
+		error = Classy_InfoClassMethods(interp,class,NULL);
 		if (error != TCL_OK) {return error;}
 		result = Tcl_GetObjResult(interp);
 		Tcl_IncrRefCount(result);
@@ -277,53 +280,113 @@ int Classy_ClassDestroyObjCmd(
 	return TCL_OK;
 }
 
-int Classy_ClassMethod(
+int Classy_InfoMethod(
 	Tcl_Interp *interp,
 	Class *class,
 	Object *object,
 	int argc,
 	Tcl_Obj *CONST argv[])
 {
-	Tcl_SetObjResult(interp,class->class);
-	return TCL_OK;
-}
-
-int Classy_ParentClassMethod(
-	Tcl_Interp *interp,
-	Class *class,
-	Object *object,
-	int argc,
-	Tcl_Obj *CONST argv[])
-{
-	Tcl_SetObjResult(interp,class->parent->class);
-	return TCL_OK;
-}
-
-int Classy_ChildrenClassMethod(
-	Tcl_Interp *interp,
-	Class *class,
-	Object *object,
-	int argc,
-	Tcl_Obj *CONST argv[])
-{
-	Tcl_HashEntry *entry;
-	Tcl_HashSearch search;
-	Tcl_Obj *temp;
-	char *name;
-	int error;
-
-	entry = Tcl_FirstHashEntry(&(class->children), &search);
-	while(1) {
-		if (entry == NULL) break;
-		name = Tcl_GetHashKey(&(class->methods),entry);
-		Tcl_AppendElement(interp, name);
-		entry = Tcl_NextHashEntry(&search);
+	Tcl_Obj *genname;
+	char *option;
+	int optionlen;
+	if (object != NULL) {genname = object->name;} else {genname = class->class;}
+	if (argc < 1) {
+		Tcl_ResetResult(interp);
+		Tcl_AppendResult(interp,"wrong # args: should be \"",Tcl_GetStringFromObj(genname,NULL),
+			" info option ?...?\"", (char *)NULL);
+		return TCL_ERROR;
 	}
-	temp = Tcl_NewStringObj("lsort",5);
-	error = Tcl_ListObjAppendElement(interp,temp,Tcl_GetObjResult(interp));
-	if (error != TCL_OK) {return error;}
-	error = Tcl_EvalObj(interp,temp);
-	return error;
+	option = Tcl_GetStringFromObj(argv[0],&optionlen);
+	if ((optionlen == 6)&&(strncmp(option,"parent",optionlen) == 0)) {
+		if (object == NULL) {
+			Tcl_SetObjResult(interp,class->parent->class);
+			return TCL_OK;
+		} else {
+			Tcl_SetObjResult(interp,class->class);
+			return TCL_OK;
+		}
+	} else if ((optionlen == 5)&&(strncmp(option,"class",optionlen) == 0)) {
+		Tcl_SetObjResult(interp,class->class);
+		return TCL_OK;
+	} else if ((optionlen == 8)&&(strncmp(option,"children",optionlen) == 0)) {
+		Tcl_HashEntry *entry;
+		Tcl_HashSearch search;
+		Tcl_Obj *temp;
+		char *name;
+		int error;
+	
+		if (object == NULL) {
+			entry = Tcl_FirstHashEntry(&(class->children), &search);
+			while(1) {
+				if (entry == NULL) break;
+				name = Tcl_GetHashKey(&(class->children),entry);
+				Tcl_AppendElement(interp, name);
+				entry = Tcl_NextHashEntry(&search);
+			}
+			temp = Tcl_NewStringObj("lsort",5);
+			error = Tcl_ListObjAppendElement(interp,temp,Tcl_GetObjResult(interp));
+			if (error != TCL_OK) {Tcl_DecrRefCount(temp);return error;}
+			error = Tcl_EvalObj(interp,temp);
+			Tcl_DecrRefCount(temp);
+			return error;
+		}
+	} else if ((optionlen == 10)&&(strncmp(option,"subclasses",optionlen) == 0)) {
+		Tcl_HashEntry *entry;
+		Tcl_HashSearch search;
+		Tcl_Obj *temp;
+		char *name;
+		int error;
+	
+		if (object == NULL) {
+			entry = Tcl_FirstHashEntry(&(class->subclasses), &search);
+			while(1) {
+				if (entry == NULL) break;
+				name = Tcl_GetHashKey(&(class->subclasses),entry);
+				Tcl_AppendElement(interp, name);
+				entry = Tcl_NextHashEntry(&search);
+			}
+			temp = Tcl_NewStringObj("lsort",5);
+			error = Tcl_ListObjAppendElement(interp,temp,Tcl_GetObjResult(interp));
+			if (error != TCL_OK) {Tcl_DecrRefCount(temp);return error;}
+			error = Tcl_EvalObj(interp,temp);
+			Tcl_DecrRefCount(temp);
+			return error;
+		}
+	} else if ((optionlen == 7)&&(strncmp(option,"methods",optionlen) == 0)) {
+		if (argc == 1) {
+			return Classy_InfoMethods(interp,class,NULL);
+		} else if (argc == 2) {
+			return Classy_InfoMethods(interp,class,argv[1]);
+		} else {
+			Tcl_ResetResult(interp);
+			Tcl_AppendResult(interp,"wrong # args: should be \"",Tcl_GetStringFromObj(genname,NULL),
+				" info methods ?pattern?\"", (char *)NULL);
+			return TCL_ERROR;
+		}
+	} else if ((optionlen == 12)&&(strncmp(option,"classmethods",optionlen) == 0)) {
+		if (argc == 1) {
+			return Classy_InfoClassMethods(interp,class,NULL);
+		} else if (argc == 2) {
+			return Classy_InfoClassMethods(interp,class,argv[1]);
+		} else {
+			Tcl_ResetResult(interp);
+			Tcl_AppendResult(interp,"wrong # args: should be \"",Tcl_GetStringFromObj(genname,NULL),
+				" info classmethods ?pattern?\"", (char *)NULL);
+			return TCL_ERROR;
+		}
+	}
+	if (object == NULL) {
+		Tcl_ResetResult(interp);
+		Tcl_AppendResult(interp,"wrong option \"",option,
+			"\" must be parent, class, children, subclasses, methods, method, classmethods or classmethod", (char *)NULL);
+		return TCL_ERROR;
+	} else {
+		Tcl_ResetResult(interp);
+		Tcl_AppendResult(interp,"wrong option \"",option,
+			"\" must be parent, class, methods or method", (char *)NULL);
+		return TCL_ERROR;
+	}
 }
 
 Classy_Method Classy_PrivateClassMethod;
@@ -362,10 +425,8 @@ int Classy_CreateClass(interp)
 	Classy_CreateClassMethod(interp,"::Class","method",Classy_MethodClassMethod);
 	Classy_CreateClassMethod(interp,"::Class","deletemethod",Classy_DeleteMethodClassMethod);
 	Classy_CreateClassMethod(interp,"::Class","subclass",Classy_SubclassClassMethod);
-	Classy_CreateClassMethod(interp,"::Class","parent",Classy_ParentClassMethod);
-	Classy_CreateClassMethod(interp,"::Class","children",Classy_ChildrenClassMethod);
 	Classy_CreateClassMethod(interp,"::Class","private",Classy_PrivateClassMethod);
-	Classy_CreateMethod(interp,"::Class","class",Classy_ClassMethod);
+	Classy_CreateMethod(interp,"::Class","info",Classy_InfoMethod);
 	Classy_CreateMethod(interp,"::Class","private",Classy_PrivateMethod);
 	Classy_CreateMethod(interp,"::Class","trace",Classy_TraceMethod);
 	entry = Tcl_CreateHashEntry(&(class->methods),"destroy",&new);

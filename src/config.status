@@ -2,7 +2,7 @@
 # Generated automatically by configure.
 # Run this file to recreate the current configuration.
 # This directory was configured as follows,
-# on host belgarath:
+# on host peos:
 #
 # ./configure 
 #
@@ -63,11 +63,11 @@ s%@SHLIB_SUFFIX@%.so%g
 s%@SHLIB_VERSION@%%g
 s%@TCL_BUILD_LIB_SPEC@%-L/home/peter/tcl/tcl8.0/unix -ltcl8.0%g
 s%@TCL_LIB_SPEC@%-L/usr/local/lib -ltcl8.0%g
-s%@TCL_LIBS@%-ldl  -lieee -lm%g
+s%@TCL_LIBS@%-ldl  -lm%g
 s%@TCL_VERSION@%8.0%g
 s%@TCL_SRC_DIR@%/home/peter/tcl/tcl8.0%g
 s%@TK_DEFS@% -DHAVE_UNISTD_H=1 -DHAVE_LIMITS_H=1 -DSTDC_HEADERS=1 -DHAVE_SYS_TIME_H=1 -DTIME_WITH_SYS_TIME=1 %g
-s%@TK_LIBS@%-L/usr/X11R6/lib -lX11 -ldl  -lieee -lm%g
+s%@TK_LIBS@%-L/usr/X11R6/lib -lX11 -ldl  -lm%g
 s%@TK_XINCLUDES@%-I/usr/X11R6/include%g
 s%@TK_XLIBSW@%-L/usr/X11R6/lib -lX11%g
 s%@TK_BUILD_LIB_SPEC@%-L/home/peter/tcl/tk8.0/unix -ltk8.0%g

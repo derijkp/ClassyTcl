@@ -145,7 +145,7 @@ proc Classy::parseopt {real variable possible {remain {}}} {
 	}
 }
 
-proc ::Classy::widget {object} {
+proc ::Classy::window {object} {
 	if {"[info commands ::class::Tk_$object]"!=""} {
 		return ::class::Tk_$object
 	} else {
@@ -153,12 +153,16 @@ proc ::Classy::widget {object} {
 	}
 }
 
-proc ::Classy::object {object} {
-	if {"[info commands ::class::Tk_$object]"!=""} {
-		return ::class::Tk_$object
-	} else {
-		return $object
+proc ::Classy::object {window} {
+	set c $window
+	while 1 {
+		if {"[info commands ::class::Tk_$c]"!=""} {
+			return $c
+		}
+		set c [winfo parent $c]
+		if {"$c" == "."} break
 	}
+	return -code error "\"$window\" is not part of a Widget"
 }
 
 # For debugging purposes only

@@ -96,7 +96,7 @@ Classy::DynaMenu method makemenu {menutype menu cmdw bindtag {menuroot {}}} {
 	if {"[option get $root menuType MenuType]"=="top"} {
 		set mtype($menu) top
 		$menu configure -type menubar
-		[Classy::widget $root] configure -menu $menu
+		[Classy::window $root] configure -menu $menu
 	} else {
 		set mtype($menu) popup
 	}

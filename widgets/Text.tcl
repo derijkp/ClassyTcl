@@ -92,7 +92,7 @@ Classy::Text chainallmethods {$object} text
 #}
 Classy::Text method link {{lw {}}} {
 	private $object undobuffer redobuffer linked
-	set w [Classy::widget $object]
+	set w [Classy::window $object]
 	if {"$lw"==""} {return $linked}
 	if {[lsearch -exact $linked $lw]!=-1} {return $linked}
 	if ![winfo exists $lw] {error "Couldn't link: $lw does not exists"}
@@ -133,7 +133,7 @@ Classy::Text method unlink {} {
 #} descr {
 #}
 Classy::Text method textinsert {s} {
-	set w [Classy::widget $object]
+	set w [Classy::window $object]
 	if {($s == "") || ([$w cget -state] == "disabled")} {
 		return
 	}
@@ -153,7 +153,7 @@ Classy::Text method textinsert {s} {
 #}
 Classy::Text method insert {index chars args} {
 	private $object undobuffer redobuffer linked textchanged
-	set w [Classy::widget $object]
+	set w [Classy::window $object]
 	set redobuffer ""
 	if {([$w cget -state] == "disabled") || ("$chars"=="")} return
 	set ins [$w index insert]
@@ -170,7 +170,7 @@ Classy::Text method insert {index chars args} {
 
 Classy::Text method _linkinsert {index chars args} {
 	private $object undobuffer redobuffer linked textchanged
-	set w [Classy::widget $object]
+	set w [Classy::window $object]
 	set redobuffer ""
 	$w mark set insert $index
 	eval {$w insert insert $chars} $args
@@ -215,7 +215,7 @@ Classy::Text method _changed {} {
 #}
 Classy::Text method delete {args} {
 	private $object undobuffer redobuffer linked textchanged
-	set w [Classy::widget $object]
+	set w [Classy::window $object]
 	set redobuffer ""
 	if {([$w cget -state] == "disabled") || ![llength $args]} return
 	if {$args == ""} {
@@ -239,7 +239,7 @@ Classy::Text method delete {args} {
 
 Classy::Text method _linkdelete {index1 index2 args} {
 	private $object undobuffer redobuffer textchanged
-	set w [Classy::widget $object]
+	set w [Classy::window $object]
 	set redobuffer ""
 	lappend undobuffer [list Delete [$w get $index1 $index2] $index1 $index2]
 	$w delete $index1 $index2
@@ -252,7 +252,7 @@ Classy::Text method _linkdelete {index1 index2 args} {
 #}
 Classy::Text method undo {{link {}}} {
 	private $object undobuffer redobuffer
-	set w [Classy::widget $object]
+	set w [Classy::window $object]
 	if {$undobuffer == ""} {
 		error "Nothing to undo"
 	}
@@ -283,7 +283,7 @@ Classy::Text method undo {{link {}}} {
 #}
 Classy::Text method redo {{link {}}} {
 	private $object undobuffer redobuffer
-	set w [Classy::widget $object]
+	set w [Classy::window $object]
 	if {$redobuffer == ""} {
 		error "Nothing to redo"
 	}
@@ -382,7 +382,7 @@ Classy::Text method findsel {dir} {
 #} descr {
 #}
 Classy::Text method select {mode} {
-	set w [Classy::widget $object]
+	set w [Classy::window $object]
 	global tkPriv
 	switch $mode {
 		left {
@@ -456,7 +456,7 @@ Classy::Text method select {mode} {
 #} descr {
 #}
 Classy::Text method move {mode} {
-	set w [Classy::widget $object]
+	set w [Classy::window $object]
 	global tkPriv
 	switch $mode {
 		left {
@@ -512,7 +512,7 @@ Classy::Text method move {mode} {
 #} descr {
 #}
 Classy::Text method backspace {} {
-	set w [Classy::widget $object]
+	set w [Classy::window $object]
 	if {[$object tag nextrange sel 1.0 end] != ""} {
 		$object delete sel.first sel.last
 	} elseif [$w compare insert != 1.0] {
@@ -539,7 +539,7 @@ Classy::Text method textdelete {} {
 #} descr {
 #}
 Classy::Text method position {index} {
-	set w [Classy::widget $object]
+	set w [Classy::window $object]
 	global tkPriv
 
 	regexp {(.*)\.(.*)} $index temp y x

@@ -57,5 +57,5 @@ EXTERN int Classy_CreateMethod _ANSI_ARGS_((Tcl_Interp *interp,
 	Classy_Method *func));
 
 EXTERN Tcl_Obj *Classy_ObjectPrivateVar(
-	Tcl_Obj *name,
-	Tcl_Obj *var);
+	char *name,
+	char *var);

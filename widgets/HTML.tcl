@@ -68,7 +68,7 @@ Classy::export HTML {}
 Classy::HTML classmethod init {args} {
 	super text
 	bindtags $object [list $object Classy::HTML . all]
-	set w [Classy::widget $object]
+	set w [Classy::window $object]
 	$w tag bind link <<Action>> {%W geturl [%W linkat %x %y]}
 
 	::html::init_win $object
@@ -359,7 +359,7 @@ Classy::HTML method geturl {url {query {}}} {
 	if {"$type" == "text/html"} {
 		::html::parse_html $html [list ::html::render $object]
 	} else {
-		[Classy::widget $object] insert end $html
+		[Classy::window $object] insert end $html
 	}
 	set currentquery $query
 	Classy::busy remove $object
@@ -527,5 +527,5 @@ Classy::HTML method linkat {x y} {
 # objectName bindlink <3> {puts [%W linkat %x %y]}
 #}
 Classy::HTML method bindlink {args} {
-	eval [Classy::widget $object] tag bind link $args
+	eval [Classy::window $object] tag bind link $args
 }

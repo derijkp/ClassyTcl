@@ -50,8 +50,9 @@ int Classy_ObjectObjCmd(
 		Tcl_Obj *cmd;
 		cmd = Tcl_DuplicateObj(object->trace);
 		error = Tcl_ListObjAppendElement(interp, cmd, Tcl_NewListObj(argc,argv));
-		if (error != TCL_OK) {return error;}
+		if (error != TCL_OK) {Tcl_DecrRefCount(cmd);return error;}
 		error = Tcl_EvalObj(interp,cmd);
+		Tcl_DecrRefCount(cmd);
 		if (error != TCL_OK) {return error;}
 	}
 	cmd = Tcl_GetStringFromObj(argv[1],NULL);
@@ -60,13 +61,13 @@ int Classy_ObjectObjCmd(
 	entry = Tcl_FindHashEntry(&(class->methods), cmd);
 	if (entry != NULL) {
 		Method *method;
-		Tcl_Obj *name = Tcl_DuplicateObj(object->name);
 		method = (Method *)Tcl_GetHashValue(entry);
 		error = Classy_ExecMethod(interp,method,class,object,argc,argv);
 		if (error != TCL_OK) {
-			Tcl_Obj *errorObj=Tcl_NewStringObj("\nwhile invoking method \"",24);
-			Tcl_AppendStringsToObj(errorObj, cmd, "\" of object \"", Tcl_GetStringFromObj(name,NULL), "\"\n", (char *) NULL);
+			Tcl_Obj *errorObj = Tcl_NewStringObj("\nwhile invoking method \"",24);
+			Tcl_AppendStringsToObj(errorObj, cmd, "\" of object \"", Tcl_GetStringFromObj(object->name,NULL), "\"\n", (char *) NULL);
 			Tcl_AddObjErrorInfo(interp, Tcl_GetStringFromObj(errorObj,NULL), -1);
+			Tcl_DecrRefCount(errorObj);
 			return error;
 		}
 		return TCL_OK;
@@ -74,7 +75,7 @@ int Classy_ObjectObjCmd(
 		Tcl_Obj *result, **objv;
 		int objc,i;
 		Tcl_ResetResult(interp);
-		error = Classy_MethodClassMethod(interp,class,object,0,NULL);
+		error = Classy_InfoMethods(interp,class,NULL);
 		if (error != TCL_OK) {return error;}
 		result = Tcl_GetObjResult(interp);
 		Tcl_IncrRefCount(result);
@@ -135,7 +136,7 @@ int Classy_NewClassMethod(
 {
 	Class *tempclass;
 	Tcl_HashEntry *entry;
-	Tcl_Obj *name;
+	Tcl_Obj *name,*tempobj;
 	Tcl_CmdInfo cmdinfo;
 	char *string;
 	int len,pos,found,error,new;
@@ -193,11 +194,12 @@ int Classy_NewClassMethod(
 			classcurrent = tempclass;
 			error = Classy_ExecMethod(interp,tempclass->init,class,object,argc-1,argv+1);
 			if (error != TCL_OK) {
-				Tcl_Obj *name = Tcl_DuplicateObj(object->name);
 				Tcl_Obj *errorObj, *errorinfo;
 				errorObj = Tcl_GetObjResult(interp);
 				Tcl_IncrRefCount(errorObj);
-				errorinfo = Tcl_ObjGetVar2(interp, Tcl_NewStringObj("errorInfo",-1), NULL, TCL_GLOBAL_ONLY);
+				tempobj = Tcl_NewStringObj("errorInfo",-1);
+				errorinfo = Tcl_ObjGetVar2(interp, tempobj, NULL, TCL_GLOBAL_ONLY);
+				Tcl_DecrRefCount(tempobj);
 				Tcl_IncrRefCount(errorinfo);
 				Tcl_DeleteCommandFromToken(interp,object->token);
 				Tcl_ResetResult(interp);
@@ -205,11 +207,6 @@ int Classy_NewClassMethod(
 				Tcl_SetObjResult(interp,errorObj);
 				Tcl_DecrRefCount(errorObj);
 				Tcl_DecrRefCount(errorinfo);
-				if (error == TCL_ERROR) {
-					Tcl_Obj *errorObj=Tcl_NewStringObj("\nwhile invoking init method of object \"",39);
-					Tcl_AppendStringsToObj(errorObj, Tcl_GetStringFromObj(name,NULL), "\"\n", (char *) NULL);
-					Tcl_AddObjErrorInfo(interp, Tcl_GetStringFromObj(errorObj,NULL), -1);
-				}
 			}
 			return error;
 		}

@@ -62,9 +62,6 @@ set object .try
 
 Browser .try -gettext gettext -getimage getimage -getdata getdata
 pack .try -fill both -expand yes
-
-.try configure -list [getdir try]
-
 bind [.try component canvas] <<Action>> {
 	set name [.try name %x %y]
 	set type [.try type %x %y]
@@ -81,18 +78,53 @@ bind [.try component canvas] <<Action>> {
 		puts $name
 	}
 }
-.try configure -order list -minx 0 -miny 0 -data {perm owner size date} \
-	-dataunder 0 -getimage getsmimage
+.try configure -list [getdir try]
 
-.try configure -order column -data {perm owner size date} -minx 0 -miny 0
+test browser {row nodata largeimage} {
+	.try configure -order row -data {} -getimage getimage
+	manualtest
+} {}
 
-.try configure -order list -minx 0 -miny 0 -dataunder 0
+test browser {list data smallimage} {
+	.try configure -order list -minx 0 -miny 0 -data {perm owner size date} \
+		-dataunder 0 -getimage getsmimage
+	manualtest
+} {}
 
-.try configure -order row -minx 0 -miny 0 -dataunder 1
+test browser {column data (side) smallimage} {
+	.try configure -order column -data {perm owner size date} -minx 0 -miny 0 -dataunder 0
+	manualtest
+} {}
 
-.try configure -order column -minx 0 -miny 0 -dataunder 1
+test browser {row data (under) smallimage} {
+	.try configure -order row -minx 0 -miny 0 -dataunder 1
+	manualtest
+} {}
+	
+test browser {row data (under) largeimage} {
+	.try configure -order row -minx 0 -miny 0 -dataunder 1 -getimage getimage
+	manualtest
+} {}
+	
+test browser {column data (side) largeimage} {
+	.try configure -order column -minx 0 -miny 0 -dataunder 1 -getimage getimage
+	manualtest
+} {}
+	
+test browser {column data (side) largeimage} {
+	.try configure -order list -minx 0 -miny 0 -dataunder 0 -getimage getimage
+	manualtest
+} {}
 
-.try configure -order list -minx 0 -miny 0 -dataunder 0 -getimage getsmimage
+test browser {list data (under) largeimage} {
+	.try configure -order list -minx 0 -miny 0 -dataunder 1 -getimage getimage
+	manualtest
+} {}
+	
+test browser {list data (side) smallimage} {
+	.try configure -order list -minx 0 -miny 0 -dataunder 0 -getimage getsmimage
+	manualtest
+} {}
+	
 
-# manualtest
-# testsummarize
+testsummarize

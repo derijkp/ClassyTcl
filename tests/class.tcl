@@ -4,159 +4,179 @@ exec tclsh8.0 "$0" "$@"
 
 source tools.tcl
 
+test class {subclass and destroy} {
+	Class subclass Test
+	Test destroy
+} {}
+
+test class {destroy subclasses} {
+	catch {Base destroy}
+	Class subclass Base
+	Base subclass Test
+	Base destroy
+	Test
+} {invalid command name "Test"} 1
+
+test class {find subclasses} {
+	clean
+	Base subclass Test
+	Base info subclasses
+} {Test}
+
 test class {create object 2 times} {
 	clean
-	Class new try
-	Class new try
+	Base new try
+	Base new try
 } {command "try" exists} 1
 
 test class {create object with short name} {
 	clean
-	Class new t
+	Base new t
 } {t}
 
 test class {object destroy and recreate} {
 	clean
-	Class new try
+	Base new try
 	try destroy
-	Class new try
+	Base new try
 } {try}
 
 test class {object destroy and test command} {
 	clean
-	Class new try
+	Base new try
 	try destroy
-	try
-} {invalid command name "try"} 1
+	info command try
+} {}
 
-test class {Class destroy -> children destroyed?} {
+test class {Base destroy -> children destroyed?} {
 	clean
-	Class new try
-	Class destroy
-	try
-} {invalid command name "try"} 1
+	Base new try
+	Base destroy
+	info command try
+} {}
 
 test class {object destroy in method} {
 	clean
-	Class method try {} {
+	Base method try {} {
 		$object destroy
 	}
-	Class new try
+	Base new try
 	try try
-	try
-} {invalid command name "try"} 1
+	info command try
+} {}
 
 test class {object destroy in destroy} {
 	clean
-	Class subclass Test
+	Base subclass Test
 	Test method destroy {} {
 		$object destroy
 	}
 	Test new try
 	try destroy
-	try
-} {invalid command name "try"} 1
+	info command try
+} {}
 
 test class {nop} {
 	clean
-	Class method nop {} {}
-	Class new try
+	Base method nop {} {}
+	Base new try
 	puts [time {try nop} 1000]
 } {}
 
 test class {args} {
 	clean
-	Class method try {a} {return "$object:$a"}
-	Class new try
+	Base method try {a} {return "$object:$a"}
+	Base new try
 	puts [time {try try 1} 1000]
 	try try 1
 } {try:1}
 
 test class {object class} {
 	clean
-	Class new try
-	try class
-} {Class}
+	Base new try
+	try info class
+} {Base}
 
 test class {object command} {
 	clean
-	Class new try
+	Base new try
 	try
 } {no value given for parameter "cmd" to "try"} 1
 
 test class {object command} {
 	clean
-	Class new try
+	Base new try
 	try destroy
-	try
-} {invalid command name "try"} 1
+	info command try
+} {}
 
 test class {don't overwrite objects} {
 	clean
-	Class new try
-	Class new try
+	Base new try
+	Base new try
 } {command "try" exists} 1
 
 test class {don't overwrite classes} {
 	clean
-	Class subclass Test
-	Class subclass Test
+	Base subclass Test
+	Base subclass Test
 } {command "Test" exists} 1
 
 test class {delete child classes when destroyed ?} {
 	clean
-	Class subclass Test
-	Class destroy
-	Class subclass Test
-} {Test}
+	Base subclass Test
+	Test subclass Try
+	Test destroy
+	Base subclass Try
+} {Try}
 
 test class {subclass parent} {
 	clean
-	Class subclass Subclass
-	Subclass parent
-} {Class}
+	Base subclass Subclass
+	Subclass info parent
+} {Base}
 
 test class {subclass cmd} {
 	clean
-	Class subclass Subclass
+	Base subclass Subclass
 	Subclass
 } {no value given for parameter "cmd" to "Subclass"} 1
 
 test class {subclass methods} {
 	clean
-	Class subclass Subclass
-	Subclass method
-} {class destroy private trace}
+	Base subclass Subclass
+	Subclass info methods
+} {destroy info private trace}
 
 test class {try method} {
 	clean
-	Class method addclass {} {}
-	Class method
-} {addclass class destroy private trace}
+	Base method addclass {} {}
+	Base info methods
+} {addclass destroy info private trace}
 
 test class {do not show _method} {
 	clean
-	Class method _test {} {}
-	Class method
-} {class destroy private trace}
+	Base method _test {} {}
+	Base info methods
+} {destroy info private trace}
 
 test class {do not show _method for instance} {
 	clean
-	Class method _test {} {}
-	Class new try
+	Base method _test {} {}
+	Base new try
 	try try
-} {bad option "try": must be class, destroy, private, trace} 1
+} {bad option "try": must be destroy, info, private, trace} 1
 
 test class {subclass destroy: test command} {
 	clean
-	Class subclass Test
+	Base subclass Test
 	Test destroy
 	Test
 } {invalid command name "Test"} 1
 
 test class {subclass with instance destroy: test command} {
 	clean
-	Class subclass Test
+	Base subclass Test
 	Test new try
 	Test destroy
 	try
@@ -164,126 +184,126 @@ test class {subclass with instance destroy: test command} {
 
 test class {subclass with instance destroy: test children} {
 	clean
-	Class subclass Test
+	Base subclass Test
 	Test new try
 	Test destroy
-	Class children
+	Base info children
 } {}
 
 test class {subclass with instance and subclass destroy: test children} {
 	clean
-	Class subclass Test
+	Base subclass Test
 	Test new try
 	Test subclass Test2
 	Test destroy
-	Class children
+	Base info children
 } {}
 
-test Class {subclass destroy: test method} {
+test class {subclass destroy: test method} {
 	clean
-	Class subclass Test
+	Base subclass Test
 	Test destroy
 	Test method nop {} {}
 } {invalid command name "Test"} 1
 
-test class {Class destroy: destroyed subclass?} {
+test class {Base destroy: destroyed subclass?} {
 	clean
-	Class subclass Subclass
-	Class destroy
+	Base subclass Subclass
+	Base destroy
 	Subclass
 } {invalid command name "Subclass"} 1
 
 test class {add method} {
 	clean
-	Class method nop {} {}
-	Class method
-} {class destroy nop private trace}
+	Base method nop {} {}
+	Base info methods
+} {destroy info nop private trace}
 
 test class {add method: works?} {
 	clean
-	Class method try {} {return ok}
-	Class try
+	Base method try {} {return ok}
+	Base try
 } {ok}
 
 test class {add method: works with arguments} {
 	clean
-	Class method try {a} {return $a}
-	Class try ok
+	Base method try {a} {return $a}
+	Base try ok
 } {ok}
 
 test class {add method: wrong # arguments} {
 	clean
-	Class method try {a} {return $a}
-	Class try
-} {wrong # args: should be "Class try a"} 1
+	Base method try {a} {return $a}
+	Base try
+} {wrong # args: should be "Base try a"} 1
 
 test class {subclass inherits new methods} {
 	clean
-	Class method nop {} {}
-	Class subclass Subclass
-	Subclass method
-} {class destroy nop private trace}
+	Base method nop {} {}
+	Base subclass Subclass
+	Subclass info methods
+} {destroy info nop private trace}
 
 test class {inherit method: works?} {
 	clean
-	Class method try {} {return ok}
-	Class subclass Subclass
+	Base method try {} {return ok}
+	Base subclass Subclass
 	Subclass try
 } {ok}
 
 test class {inherit method: works with arguments} {
 	clean
-	Class method try {a} {return $a}
-	Class subclass Subclass
+	Base method try {a} {return $a}
+	Base subclass Subclass
 	Subclass try ok
 } {ok}
 
 test class {inherit method: works with defaults} {
 	clean
-	Class method try {a {b 1}} {return "$a $b"}
-	Class subclass Subclass
+	Base method try {a {b 1}} {return "$a $b"}
+	Base subclass Subclass
 	Subclass try ok
 } {ok 1}
 
 test class {inherit classmethod: works?} {
 	clean
-	Class classmethod try {} {return ok}
-	Class subclass Subclass
+	Base classmethod try {} {return ok}
+	Base subclass Subclass
 	Subclass try
 } {ok}
 
 test class {inherit classmethod: works with arguments} {
 	clean
-	Class classmethod try {a} {return $a}
-	Class subclass Subclass
+	Base classmethod try {a} {return $a}
+	Base subclass Subclass
 	Subclass try ok
 } {ok}
 
 test class {inherit classmethod: works with defaults} {
 	clean
-	Class classmethod try {a {b 1}} {return "$a $b"}
-	Class subclass Subclass
+	Base classmethod try {a {b 1}} {return "$a $b"}
+	Base subclass Subclass
 	Subclass try ok
 } {ok 1}
 
 test class {inherit method: wrong # arguments} {
 	clean
-	Class method try {a} {return $a}
-	Class subclass Subclass
+	Base method try {a} {return $a}
+	Base subclass Subclass
 	Subclass try
 } {wrong # args: should be "Subclass try a"} 1
 
 test class {new} {
 	clean
-	Class subclass Subclass
-	Class new try
-	Class new try2
-	Class children
+	Base subclass Subclass
+	Base new try
+	Base new try2
+	Base info children
 } {try try2}
 
 test class {redefining init} {
 	clean
-	Class subclass Test
+	Base subclass Test
 	Test classmethod init {} {
 		return [list [super] 1]
 	}
@@ -296,7 +316,7 @@ test class {redefining init} {
 
 test class {error in init} {
 	clean
-	Class subclass Test
+	Base subclass Test
 	Test classmethod init {} {
 		error error
 	}
@@ -305,7 +325,7 @@ test class {error in init} {
 
 test class {redefining init: test class} {
 	clean
-	Class subclass Test
+	Base subclass Test
 	Test method init {} {
 		return [list [super] 1]
 	}
@@ -314,12 +334,12 @@ test class {redefining init: test class} {
 		return [list [super] 2]
 	}
 	Test2 new try
-	try class
+	try info class
 } {Test2}
 
 test class {redefining init: 1 of 2} {
 	clean
-	Class subclass Test
+	Base subclass Test
 	Test classmethod init {} {
 		return [list [super] 1]
 	}
@@ -329,7 +349,7 @@ test class {redefining init: 1 of 2} {
 
 test class {redefining init: error in init} {
 	clean
-	Class subclass Test
+	Base subclass Test
 	Test classmethod init {} {
 		error "test error"
 	}
@@ -338,7 +358,7 @@ test class {redefining init: error in init} {
 
 test class {redefining init: error in init -> test object} {
 	clean
-	Class subclass Test
+	Base subclass Test
 	Test classmethod init {} {
 		error "test error"
 	}
@@ -348,7 +368,7 @@ test class {redefining init: error in init -> test object} {
 
 test class {redefining 2 inits: error in init} {
 	clean
-	Class subclass Test
+	Base subclass Test
 	Test classmethod init {} {
 		error "test error"
 	}
@@ -359,16 +379,16 @@ test class {redefining 2 inits: error in init} {
 	Test2 new try
 } {test error} 1
 
-test Class {method} {
+test class {method} {
 	clean
-	Class subclass Test
+	Base subclass Test
 	Test method try {} {return try}
 	Test try
 } {try}
 
-test Class {redefine destroy: check redefinition} {
+test class {redefine destroy: check redefinition} {
 	clean
-	Class subclass Test
+	Base subclass Test
 	Test method destroy {} {set ::c ok}
 	Test new try
 	set ::c ""
@@ -376,33 +396,33 @@ test Class {redefine destroy: check redefinition} {
 	set ::c
 } {ok}
 
-test Class {redefine destroy: check destruction} {
+test class {redefine destroy: check destruction} {
 	clean
-	Class subclass Test
+	Base subclass Test
 	Test method destroy {} {set ::c ok}
 	Test new try
 	try destroy
 	try
 } {invalid command name "try"} 1
 
-test Class {redefine destroy: error in destruction} {
+test class {redefine destroy: error in destruction} {
 	clean
-	Class subclass Test
+	Base subclass Test
 	Test method destroy {} {return ok}
 	Test new try
 	try destroy
 	try
 } {invalid command name "try"} 1
 
-test Class {redefine destroy: give arguments error} {
+test class {redefine destroy: give arguments error} {
 	clean
-	Class subclass Test
+	Base subclass Test
 	Test method destroy {test} {return ok}
 } {destroy method cannot have arguments} 1
 
-test Class {redefine destroy: multiple} {
+test class {redefine destroy: multiple} {
 	clean
-	Class subclass Test
+	Base subclass Test
 	Test method destroy {} {set ::test "[set ::test] ok1"}
 	Test subclass Test2
 	Test2 method destroy {} {set ::test ok2}
@@ -412,9 +432,9 @@ test Class {redefine destroy: multiple} {
 	set ::test
 } {ok2 ok1}
 
-test Class {set private vars in new} {
+test class {set private vars in new} {
 	clean
-	Class subclass Test
+	Base subclass Test
 	Test classmethod init {} {
 		private $object a b
 		set a t1
@@ -434,9 +454,9 @@ test Class {set private vars in new} {
 	try test
 } {t1 t2}
 
-test Class {set private vars in method} {
+test class {set private vars in method} {
 	clean
-	Class subclass Test
+	Base subclass Test
 	Test classmethod init {} {
 		private $object a b
 		set a t1
@@ -457,49 +477,49 @@ test Class {set private vars in method} {
 	try test
 } {8 9}
 
-test Class {test method arguments: too many} {
+test class {test method arguments: too many} {
 	clean
-	Class method try {ai bi} {
+	Base method try {ai bi} {
 		private $object a b
 		set a $ai
 		set b $bi
 	}
-	Class try 1 1 1
-} {wrong # args: should be "Class try ai bi"} 1
+	Base try 1 1 1
+} {wrong # args: should be "Base try ai bi"} 1
 
-test Class {test method arguments: not enough} {
+test class {test method arguments: not enough} {
 	clean
-	Class method try {ai bi} {
+	Base method try {ai bi} {
 		private $object a b
 		set a $ai
 		set b $bi
 	}
-	Class try 1
-} {wrong # args: should be "Class try ai bi"} 1
+	Base try 1
+} {wrong # args: should be "Base try ai bi"} 1
 
-test Class {test method arguments: ok} {
+test class {test method arguments: ok} {
 	clean
-	Class method try {ai bi} {
+	Base method try {ai bi} {
 		private $object a b
 		set a $ai
 		set b $bi
 	}
-	Class try 1 1
+	Base try 1 1
 } {1}
 
-test Class {test class variables} {
+test class {test class variables} {
 	clean
-	Class private a 1
-	Class method set {val} {
+	Base private a 1
+	Base method set {val} {
 		private $class a
 		set a $val
 	}
-	Class method test {} {
+	Base method test {} {
 		private $class a
 		return $a
 	}
-	Class new try1
-	Class new try2
+	Base new try1
+	Base new try2
 	try1 set 1
 	try2 set 2
 	try1 test
@@ -507,48 +527,70 @@ test Class {test class variables} {
 
 test class {delete method: works?} {
 	clean
-	Class method try {} {return ok}
-	Class deletemethod try
-	Class new try
+	Base method try {} {return ok}
+	Base deletemethod try
+	Base info methods
+} {destroy info private trace}
+
+test class {delete method: propagate works?} {
+	clean
+	Base method try {} {return ok}
+	Base subclass Test
+	Base deletemethod try
+	Test info methods
+} {destroy info private trace}
+
+test class {delete classmethod: propagate works?} {
+	clean
+	Base classmethod try {} {return ok}
+	Base subclass Test
+	Base deleteclassmethod try
+	Test info classmethods
+} {classmethod deleteclassmethod deletemethod destroy method new private subclass}
+
+test class {info classmethods with pattern} {
+	clean
+	Base classmethod try {} {return ok}
+	Base info classmethods try
 } {try}
 
 test class {delete class method: works?} {
 	clean
-	Class classmethod try {} {return ok}
-	Class deleteclassmethod try
-	Class classmethod try
+	Base classmethod try {} {return ok}
+	Base deleteclassmethod try
+	Base info classmethods try
 } {}
 
 test class {list class private} {
 	clean
-	Class private try 1
-	Class private try2 1
-	Class private
+	Base private try 1
+	Base private try2 1
+	Base private
 } {try try2}
 
 test class {class private} {
 	clean
-	Class private try 1
-	Class private try
+	Base private try 1
+	Base private try
 } {1}
 
 test class {class private non existing} {
 	clean
-	Class private try
-} {"Class" does not have a private variable "try"} 1
+	Base private try
+} {"Base" does not have a private variable "try"} 1
 
 test class {inherit class private} {
 	clean
-	Class private try 1
-	Class subclass Test
+	Base private try 1
+	Base subclass Test
 	Test method get {} {getprivate $class try}
 	Test get
 } {1}
 
 test class {override class private} {
 	clean
-	Class private try 1
-	Class subclass Test
+	Base private try 1
+	Base subclass Test
 	Test private try 2
 	Test method get {} {getprivate $class try}
 	Test get
@@ -556,46 +598,46 @@ test class {override class private} {
 
 test class {override class private} {
 	clean
-	Class method get {} {getprivate $class try}
-	Class private try 1
-	Class subclass Test
+	Base method get {} {getprivate $class try}
+	Base private try 1
+	Base subclass Test
 	Test private try 2
-	Class get
+	Base get
 } {1}
 
 test class {class private array} {
 	clean
-	Class private try(a) 1
-	Class private try(a)
+	Base private try(a) 1
+	Base private try(a)
 } {1}
 
 test class {class private array with multiple values} {
 	clean
-	Class private try(a) 1
-	Class private try(b) 2
-	Class method test {} {
+	Base private try(a) 1
+	Base private try(b) 2
+	Base method test {} {
 		private $class try try
 		return "$try(a) $try(b)"
 	}
-	Class test
+	Base test
 } {1 2}
 
 test class {class private array with multiple values} {
 	clean
-	Class private try(a) 1
-	Class private try(b) 2
-	Class method test {} {
+	Base private try(a) 1
+	Base private try(b) 2
+	Base method test {} {
 		private $class try try
 		return "$try(a) $try(b)"
 	}
-	Class test
+	Base test
 } {1 2}
 
 test class {inherit class private array with multiple values} {
 	clean
-	Class private try(a) 1
-	Class private try(b) 2
-	Class subclass Test
+	Base private try(a) 1
+	Base private try(b) 2
+	Base subclass Test
 	Test method test {} {
 		private $class try try
 		return "$try(a) $try(b)"
@@ -605,7 +647,7 @@ test class {inherit class private array with multiple values} {
 
 test class {classdestroy} {
 	clean
-	Class subclass Test
+	Base subclass Test
 	Test classmethod destroy {} {
 		set ::c 2
 	}
@@ -616,23 +658,23 @@ test class {classdestroy} {
 
 test class {classmethod} {
 	clean
-	Class classmethod test {} {
+	Base classmethod test {} {
 		return ok
 	}
-	Class classmethod
-} {children classmethod deleteclassmethod deletemethod destroy method new parent private subclass test}
+	Base info classmethods
+} {classmethod deleteclassmethod deletemethod destroy method new private subclass test}
 
 test class {classmethod, method} {
 	clean
-	Class classmethod test {} {
+	Base classmethod test {} {
 		return ok
 	}
-	Class method
-} {class destroy private trace}
+	Base info methods
+} {destroy info private trace}
 
 test class {classdestroy different from destroy: class} {
 	clean
-	Class subclass Test
+	Base subclass Test
 	Test classmethod destroy {} {
 		set ::c class
 	}
@@ -646,7 +688,7 @@ test class {classdestroy different from destroy: class} {
 
 test class {classdestroy different from destroy: instance} {
 	clean
-	Class subclass Test
+	Base subclass Test
 	Test classmethod destroy {} {
 		set ::c class
 	}
@@ -661,15 +703,15 @@ test class {classdestroy different from destroy: instance} {
 
 test class {error in method} {
 	clean
-	Class method try {} {error try}
-	Class new try
+	Base method try {} {error try}
+	Base new try
 	try try
 } {try} 1
 
 test class {error in method} {
 	clean
-	Class method try {} {return -code error try}
-	Class new try
+	Base method try {} {return -code error try}
+	Base new try
 	try try
 } {try} 1
 
@@ -677,24 +719,24 @@ test class {instance in namespace} {
 	clean
 	namespace eval ::try {}
 	catch {::try::try destroy}
-	Class new ::try::try
-	::try::try class
-} {Class}
+	Base new ::try::try
+	::try::try info class
+} {Base}
 
 test class {instance in namespace: not in main} {
 	clean
 	namespace eval ::try {}
 	catch {::try::try destroy}
-	Class new ::try::try
-	try class
+	Base new ::try::try
+	try info class
 } {invalid command name "try"} 1
 
 test class {instance in namespace: destroy} {
 	clean
 	namespace eval ::try {}
 	catch {::try::try destroy}
-	Class new ::try::try
-	Class destroy
+	Base new ::try::try
+	Base destroy
 	try::try class
 } {invalid command name "try::try"} 1
 
@@ -702,9 +744,9 @@ test class {instance in namespace: using variables} {
 	clean
 	namespace eval ::try {}
 	catch {::try::try destroy}
-	Class method set {arg} {setprivate $object try $arg}
-	Class method get {} {getprivate $object try}
-	Class new ::try::try
+	Base method set {arg} {setprivate $object try $arg}
+	Base method get {} {getprivate $object try}
+	Base new ::try::try
 	try::try set ok
 	try::try get
 } {ok}
@@ -713,9 +755,9 @@ test class {instance in namespace: using variables, call from namespace} {
 	clean
 	namespace eval ::try {}
 	catch {::try::try destroy}
-	Class method set {arg} {setprivate $object try $arg}
-	Class method get {} {getprivate $object try}
-	Class new ::try::try
+	Base method set {arg} {setprivate $object try $arg}
+	Base method get {} {getprivate $object try}
+	Base new ::try::try
 	try::try set ok
 	namespace eval try {try get}
 } {ok}
@@ -724,10 +766,10 @@ test class {instance in namespace: using variables, different in ::} {
 	clean
 	namespace eval ::try {}
 	catch {::try::try destroy}
-	Class method set {arg} {setprivate $object try $arg}
-	Class method get {} {getprivate $object try}
-	Class new ::try::try
-	Class new try
+	Base method set {arg} {setprivate $object try $arg}
+	Base method get {} {getprivate $object try}
+	Base new ::try::try
+	Base new try
 	try set try
 	try::try set ok
 	try get
@@ -736,7 +778,7 @@ test class {instance in namespace: using variables, different in ::} {
 test class {class in namespace} {
 	clean
 	namespace eval ::try {}
-	Class subclass ::try::Test
+	Base subclass ::try::Test
 	::try::Test method try {} {return ok}
 	::try::Test new try
 	try try
@@ -745,16 +787,16 @@ test class {class in namespace} {
 test class {class in namespace: destroy} {
 	clean
 	namespace eval ::try {}
-	Class subclass ::try::Test
+	Base subclass ::try::Test
 	::try::Test new try
-	Class destroy
+	Base destroy
 	try::Test class
 } {invalid command name "try::Test"} 1
 
 test class {class in namespace: variables} {
 	clean
 	namespace eval ::try {}
-	Class subclass ::try::Test
+	Base subclass ::try::Test
 	::try::Test method set {arg} {setprivate $object try $arg}
 	::try::Test method get {} {getprivate $object try}
 	::try::Test new try
@@ -765,16 +807,16 @@ test class {class in namespace: variables} {
 test class {class in namespace: methods} {
 	clean
 	namespace eval ::try {}
-	Class subclass ::try::Test
+	Base subclass ::try::Test
 	::try::Test method set {arg} {setprivate $object try $arg}
 	::try::Test method get {} {getprivate $object try}
-	::try::Test method
-} {class destroy get private set trace}
+	::try::Test info methods
+} {destroy get info private set trace}
 
 test class {class and instance in namespace: variables} {
 	clean
 	namespace eval ::try {}
-	Class subclass ::try::Test
+	Base subclass ::try::Test
 	::try::Test method set {arg} {setprivate $object try $arg}
 	::try::Test method get {} {getprivate $object try}
 	::try::Test new try::try
@@ -784,46 +826,46 @@ test class {class and instance in namespace: variables} {
 
 test class {propagate method to non existing} {
 	clean
-	Class subclass Test
-	Class method try {} {return ok}
+	Base subclass Test
+	Base method try {} {return ok}
 	Test try
 } {ok}
 
 test class {propagate method to overwrite} {
 	clean
-	Class method try {} {return notok}
-	Class subclass Test
-	Class method try {} {return ok}
+	Base method try {} {return notok}
+	Base subclass Test
+	Base method try {} {return ok}
 	Test try
 } {ok}
 
 test class {propagate method: dont overwrite new methods} {
 	clean
-	Class subclass Test
+	Base subclass Test
 	Test method try {} {return Test}
-	Class method try {} {return Class}
+	Base method try {} {return Base}
 	Test try
 } {Test}
 
 test class {propagate classvars} {
 	clean
-	Class private try notok
-	Class subclass Test
-	Class private try ok
+	Base private try notok
+	Base subclass Test
+	Base private try ok
 	Test private try
 } {ok}
 
 test class {propagate classvars: dont overwrite newly defined} {
 	clean
-	Class subclass Test
+	Base subclass Test
 	Test private try Test
-	Class private try Class
+	Base private try Base
 	Test private try
 } {Test}
 
 test class {test super args} {
 	clean
-	Class subclass Test
+	Base subclass Test
 	Test classmethod init {args} {
 		return $args
 	}
@@ -838,26 +880,47 @@ test class {test super args} {
 	Test3 new try
 } {data}
 
+test class {class info error} {
+	clean
+	Base info e
+} {wrong option "e" must be parent, class, children, subclasses, methods, method, classmethods or classmethod} 1
+
+test class {object info error} {
+	clean
+	Base new try
+	try info children
+} {wrong option "children" must be parent, class, methods or method} 1
+
+test class {method introspection: body} {
+	clean
+	Base method test {{a 1}} {puts $a}
+	Base classmethod test {{a 1}} {puts $a}
+	Base info methods
+	Base info classmethod default test a try
+	Base info method default test a try
+	Base info method body test
+} {puts $a}
+
 test class {trace object} {
 	clean
 	catch {rename try {}}
-	Class new try
+	Base new try
 	set ::try ""
 	try trace {lappend ::try}
-	try class
+	try info class
 	try trace {}
-	try class
+	try info class
 	set ::try
-} {{try class} {try trace {}}}
+} {{try info class} {try trace {}}}
 
 test class {trace class} {
 	clean
 	set ::try ""
-	Class trace {lappend ::try}
-	Class class
-	Class trace {}
-	Class class
+	Base trace {lappend ::try}
+	Base info class
+	Base trace {}
+	Base info class
 	set ::try
-} {{Class class} {Class trace {}}}
+} {{Base info class} {Base trace {}}}
 
 testsummarize

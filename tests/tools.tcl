@@ -1,31 +1,62 @@
 if ![info exists classy_tools] {
 set classy_tools 1
-
 package require Class
-
 catch {tk appname test}
-
+catch {package require ClassyTcl}
 catch {
 wm geometry . +[expr [winfo screenwidth .]/2 - [winfo width .]/2]+[expr [winfo screenheight .]/2 - [winfo height .]/2]
 raise .
 }
 
+if ![info exists testleak] {
+	if {"$argv" != ""} {
+		set testleak [lindex $argv 0]
+	} else {
+		set testleak 0
+	}
+}
+
 proc clean {} {
-	catch {Class destroy}
+	catch {Base destroy}
 	catch {eval destroy [winfo children .]}
 	catch {. configure -menu {}}
+	Class subclass Base
 }
 
 proc classyclean {} {
-	catch {Class destroy}
+	catch {Widget destroy}
 	catch {eval destroy [winfo children .]}
 	catch {. configure -menu {}}
-	tk appname test
-	package require ClassyTcl
 }
 
-proc test {name description script expected {causeerror 0}} {
-	global errors
+#proc test {name description script expected {causeerror 0}} {
+#	global errors
+#	
+#	puts "testing $name: $description"
+#	proc tools__try {} $script
+#	set error [catch tools__try result]
+#	if $causeerror {
+#		if !$error {
+#			puts "test should cause an error\nresult is \n$result"
+#			lappend errors "$name:$description" "test should cause an error\nresult is \n$result"
+#			return
+#		}	
+#	} else {
+#		if $error {
+#			puts "test caused an error\nerror is \n$result\n"
+#			lappend errors "$name:$description" "test caused an error\nerror is \n$result\n"
+#			return
+#		}
+#	}
+#	if {"$result"!="$expected"} {
+#		puts "error: result is:\n$result\nshould be\n$expected"
+#		lappend errors "$name:$description" "error: result is:\n$result\nshould be\n$expected"
+#	}
+#	return
+#}
+
+proc test {name description script expected {causeerror 0} args} {
+	global errors testleak
 	
 	puts "testing $name: $description"
 	proc tools__try {} $script
@@ -47,9 +78,21 @@ proc test {name description script expected {causeerror 0}} {
 		puts "error: result is:\n$result\nshould be\n$expected"
 		lappend errors "$name:$description" "error: result is:\n$result\nshould be\n$expected"
 	}
+	if $testleak {
+		set line1 [lindex [split [exec ps l [pid]] "\n"] 1]
+		time {set error [catch tools__try result]} $testleak
+		set line2 [lindex [split [exec ps l [pid]] "\n"] 1]
+		if {([lindex $line1 6] != [lindex $line2 6])||([lindex $line1 7] != [lindex $line2 7])} {
+			if {"$args" != "noleak"} {
+				puts "possible leak:"
+				puts $line1
+				puts $line2
+				puts "\n"
+			}
+		}
+	}
 	return
 }
-
 
 proc manualtest {{message {}}} {
 	destroy .manualtest
@@ -59,9 +102,7 @@ proc manualtest {{message {}}} {
 	button .manualtest.b -text Ok -command {destroy .manualtest}
 	pack .manualtest.m
 	pack .manualtest.b
-#	regexp {^([0-9]+)x([0-9]+)\+([0-9]+)\+([0-9]+)$} [winfo geometry .] temp w h x y
 	wm geometry .manualtest +[expr [winfo screenwidth .]/2]+[expr [winfo screenheight .]/2]
-#	wm geometry .manualtest +[expr $x+$w/2]+[expr $y+$h/2]
 	tkwait window .manualtest
 }
 
@@ -107,5 +148,10 @@ proc testsummarize {} {
 	}
 }
 
-if [info exists errors] {unset errors}
+catch {unset errors}
+if $testleak {
+	test test {initialise all memory for testing with leak detection} {
+		set try 1
+	} 1 0 noleak
+}
 }

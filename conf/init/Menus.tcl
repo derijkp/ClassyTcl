@@ -27,7 +27,7 @@ menu find "Find" {
 	action ReplaceFindNext "Replace & Find next" "%W replace-find -forwards"
 	action FindPrev "Find prev" "%W findsel -backwards"
 	action ReplaceFindPrev "Replace & Find prev" "%W replace-find -backwards"
-	check SearchReopen "Search Reopen" {-variable [privatevar %W searchreopen]}
+	check SearchReopen "Search Reopen" {-variable [privatevar %W options(-searchreopen)]}
 	action FindFunction "Find Tcl function" "%W findfunction"
 }
 menu select "Select" {
