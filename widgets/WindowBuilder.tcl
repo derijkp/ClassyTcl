@@ -6,6 +6,8 @@
 # ----------------------------------------------------------------------
 #doc WindowBuilder title {
 #WindowBuilder
+#} index none shortdescr {
+# a widget used in the ClassyTcl builder
 #} descr {
 # subclass of <a href="../basic/Widget.html">Widget</a><br>
 #}
@@ -490,56 +492,56 @@ Classy::WindowBuilder method close {} {
 	return 0
 }
 
-Classy::WindowBuilder method new {type function file} {
-	global auto_index
-	if [file isdir $file] {return -code error "please select a file instead of a directory"}
-	set f [open $file a]
-	switch $type {
-		dialog {
-			puts $f "\nproc $function args \{# ClassyTcl generated Dialog"
-			puts $f "\tif \[regexp \{^\\.\} \$args] \{"
-			puts $f "\t\tset window \[lshift args\]"
-			puts $f "\t\} else \{"
-			puts $f "\t\tset window .$function"
-			puts $f "\t\}"
-			puts $f "\tClassy::parseopt \$args opt {}"
-			puts $f "\t# Create windows"
-			puts $f "\tClassy::Dialog \$window \\"
-			puts $f "\t\t-destroycommand \[list destroy \$window\]"
-			puts $f "\t#Initialisation code"			
-			puts $f "\}"
-		}
-		toplevel {
-			puts $f "\nproc $function args \{# ClassyTcl generated Toplevel"
-			puts $f "\tif \[regexp \{^\\.\} \$args] \{"
-			puts $f "\t\tset window \[lshift args\]"
-			puts $f "\t\} else \{"
-			puts $f "\t\tset window .$function"
-			puts $f "\t\}"
-			puts $f "\tClassy::parseopt \$args opt {}"
-			puts $f "\t# Create windows"
-			puts $f "\tClassy::Toplevel \$window \\"
-			puts $f "\t\t-destroycommand \[list destroy \$window\]"
-			puts $f "\t#Initialisation code"			
-			puts $f "\}"
-		}
-		frame {
-			puts $f "\nproc $function args \{# ClassyTcl generated Frame"
-			puts $f "\tif \[regexp \{^\\.\} \$args] \{"
-			puts $f "\t\tset window \[lshift args\]"
-			puts $f "\t\} else \{"
-			puts $f "\t\tset window .$function"
-			puts $f "\t\}"
-			puts $f "\tClassy::parseopt \$args opt {}"
-			puts $f "\t# Create windows"
-			puts $f "\tframe \$window \\"
-			puts $f "\t\t-class Classy::Topframe"
-			puts $f "\t#Initialisation code"			
-			puts $f "\}"
-		}
-	}
-	close $f
-}
+#Classy::WindowBuilder method new {type function file} {
+#	global auto_index
+#	if [file isdir $file] {return -code error "please select a file instead of a directory"}
+#	set f [open $file a]
+#	switch $type {
+#		dialog {
+#			puts $f "\nproc $function args \{# ClassyTcl generated Dialog"
+#			puts $f "\tif \[regexp \{^\\.\} \$args] \{"
+#			puts $f "\t\tset window \[lshift args\]"
+#			puts $f "\t\} else \{"
+#			puts $f "\t\tset window .$function"
+#			puts $f "\t\}"
+#			puts $f "\tClassy::parseopt \$args opt {}"
+#			puts $f "\t# Create windows"
+#			puts $f "\tClassy::Dialog \$window \\"
+#			puts $f "\t\t-destroycommand \[list destroy \$window\]"
+#			puts $f "\t# End windows"
+#			puts $f "\}"
+#		}
+#		toplevel {
+#			puts $f "\nproc $function args \{# ClassyTcl generated Toplevel"
+#			puts $f "\tif \[regexp \{^\\.\} \$args] \{"
+#			puts $f "\t\tset window \[lshift args\]"
+#			puts $f "\t\} else \{"
+#			puts $f "\t\tset window .$function"
+#			puts $f "\t\}"
+#			puts $f "\tClassy::parseopt \$args opt {}"
+#			puts $f "\t# Create windows"
+#			puts $f "\tClassy::Toplevel \$window \\"
+#			puts $f "\t\t-destroycommand \[list destroy \$window\]"
+#			puts $f "\t# End windows"
+#			puts $f "\}"
+#		}
+#		frame {
+#			puts $f "\nproc $function args \{# ClassyTcl generated Frame"
+#			puts $f "\tif \[regexp \{^\\.\} \$args] \{"
+#			puts $f "\t\tset window \[lshift args\]"
+#			puts $f "\t\} else \{"
+#			puts $f "\t\tset window .$function"
+#			puts $f "\t\}"
+#			puts $f "\tClassy::parseopt \$args opt {}"
+#			puts $f "\t# Create windows"
+#			puts $f "\tframe \$window \\"
+#			puts $f "\t\t-class Classy::Topframe"
+#			puts $f "\t# End windows"
+#			puts $f "\}"
+#		}
+#	}
+#	close $f
+#}
 
 Classy::WindowBuilder method code {{function {}}} {
 	private $object current data
@@ -569,6 +571,7 @@ Classy::WindowBuilder method code {{function {}}} {
 	append body "\tClassy::parseopt \$args opt [list $list]\n"
 	append body "\t# Create windows\n"
 	append body [$object generate $base]
+	append body "\t# End windows\n"
 	set init [string trimright [$object.code.book.f2.initialise get]]
 	if {"$init" != ""} {
 		append body "# ClassyTcl Initialise\n"
@@ -606,27 +609,28 @@ Classy::WindowBuilder method open {file function} {
 	set data(function) $function
 	set data(file) $file
 	set data(code) $code
+	set start [string first "# Create windows" $code]
+	set end [string first "# End windows" $code]
+	incr end -1
+	set wincode [string range $code $start $end]
 	switch -regexp -- $code {
 		{# ClassyTcl generated Dialog}  {
-			uplevel #0 $code
 			set data(type) dialog
-			set error [catch {::$function $object.work} result]
-			set errorinfo $::errorInfo
+			set window $object.work
+			eval $wincode
 			set data(base) $object.work
 		}
 		{# ClassyTcl generated Toplevel}  {
-			uplevel #0 $code
 			set data(type) toplevel
-			set error [catch {::$function $object.work} result]
-			set errorinfo $::errorInfo
+			set window $object.work
+			eval $wincode
 			set data(base) $object.work
 		}
 		{# ClassyTcl generated Frame}  {
-			uplevel #0 $code
 			set data(type) frame
 			Classy::Toplevel $object.work -resize {2 2}
-			set error [catch {::$function $object.work.frame} result]
-			set errorinfo $::errorInfo
+			set window $object.work.frame
+			eval $wincode
 			grid $object.work.frame -row 0 -column 0 -sticky nsew
 			grid columnconfigure $object.work 0 -weight 1
 			grid rowconfigure $object.work 0 -weight 1
@@ -637,7 +641,6 @@ Classy::WindowBuilder method open {file function} {
 		}
 	}
 	update idletasks
-	if ![winfo exists $object.work] {error $result}
 	set geom [Classy::Default get geometry $object.work.keep]
 	if {"$geom" != ""} {
 		wm geometry $object.work $geom
@@ -653,7 +656,6 @@ Classy::WindowBuilder method open {file function} {
 	}
 	$object parsecode $data(code)
 	$object startedit $data(base)
-	if $error {return -code error -errorinfo $errorinfo $result}
 	Classy::todo select $data(base)
 }
 
@@ -1022,7 +1024,7 @@ Classy::WindowBuilder method generatebindings {base outw} {
 		} else {
 			set binding [list [bind $base $event]]
 		}
-		append body "\tbind $outw $event $binding\n"
+		append data(parse) "\tbind $outw $event $binding\n"
 	}
 	return $body
 }
@@ -1108,13 +1110,13 @@ Classy::WindowBuilder method save {} {
 	set file $data(file)
 	set function $data(function)
 	set code [$object code]
-	uplevel #0 $code
 	if ![info complete $code] {
 		error "error: generated code not complete (contains unmatched braces, parentheses, ...)"
 	}
+	uplevel #0 $code
 	Classy::Builder infile set $file $function $code
-	catch {auto_mkindex [file dirname $file] *.tcl}
-	set auto_index($function) [list source $file]
+#	catch {auto_mkindex [file dirname $file] *.tcl}
+#	set auto_index($function) [list source $file]
 	set result $function
 	return $result
 }
@@ -1606,10 +1608,9 @@ Classy::WindowBuilder method geometryset {type {value {}} {pos {}}} {
 Classy::WindowBuilder method _creategeometry {w} {
 	private $object current
 	frame $w 
-
-	set w .try.dedit.geom
-	eval destroy [winfo children $w]
-	Classy::cleargrid $w
+#	set w .try.dedit.geom
+#	eval destroy [winfo children $w]
+#	Classy::cleargrid $w
 	frame $w.fast -relief groove -bd 2
 	grid $w.fast -row 0 -column 0 -sticky we -columnspan 2
 		Classy::NumEntry $w.fast.row -label Row -labelwidth 6 -constraint int -width 2 \
@@ -2074,7 +2075,9 @@ Classy::WindowBuilder method drag {w x y} {
 	}
 	set name [string tolower [$object itemclass $rw]]
 	regsub -all : $name _ name
-	DragDrop start $x $y [$object outw $rw] -image [Classy::geticon Builder/$name]
+	if ![catch {set image [Classy::geticon Builder/$name]}] {
+		DragDrop start $x $y [$object outw $rw] -image $image
+	}
 }
 
 Classy::WindowBuilder method drop {dst} {
@@ -2308,20 +2311,20 @@ Classy::WindowBuilder method _configure {window} {
 	Classy::todo $object redraw
 }
 
-proc cleargi {} {
-	foreach w [winfo children .try.dedit.work] {
-		if [regexp {\.classy__[a-z0-9]+$} $w] {destroy $w}
-	}
-}
-
-proc gi {} {
-	private .try.dedit current
-	set p .try.dedit.work.options
-	foreach slave [grid slaves $p] {
-		set info [grid info $slave]
-		puts "grid $slave -row [structlget $info -row] -column [structlget $info -column]"
-	}	
-	puts "set from $current(-row)"
-	puts "set col $current(-column)"
-}
+#proc cleargi {} {
+#	foreach w [winfo children .try.dedit.work] {
+#		if [regexp {\.classy__[a-z0-9]+$} $w] {destroy $w}
+#	}
+#}
+#
+#proc gi {} {
+#	private .try.dedit current
+#	set p .try.dedit.work.options
+#	foreach slave [grid slaves $p] {
+#		set info [grid info $slave]
+#		puts "grid $slave -row [structlget $info -row] -column [structlget $info -column]"
+#	}	
+#	puts "set from $current(-row)"
+#	puts "set col $current(-column)"
+#}
 

@@ -6,6 +6,10 @@
 # ----------------------------------------------------------------------
 #doc InputDialog title {
 #InputDialog
+#} index {
+# Dialogs
+#} shortdescr {
+# Dialog with one entry
 #} descr {
 # subclass of <a href="Dialog.html">Dialog</a><br>
 # creates a Dialog with an Entry widget.

@@ -6,6 +6,10 @@
 # ----------------------------------------------------------------------
 #doc ScrolledFrame title {
 #ScrolledFrame
+#} index {
+# Tk improvements
+#} shortdescr {
+# frame with auto scroll bars
 #} descr {
 # subclass of <a href="../basic/Widget.html">Widget</a><br>
 # creates a view frame in which a component frame is displayed.

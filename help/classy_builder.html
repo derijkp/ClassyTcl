@@ -1,0 +1,70 @@
+<HEAD>
+<TITLE>ClassyTcl Builder</TITLE>
+</HEAD>
+<BODY>
+<h1>ClassyTcl Builder</h1>
+The ClassyTcl Builder can be used to graphically create interfaces. It 
+is invoked via the <b>cbuild</b> command in the bin ClassyTcl directory.
+
+<h2>Creating an application</h2>
+You can either invoke cbuild with the name of the application you want to create,
+or start cbuild without parameters. If you dont give any parameters a file 
+selection dialog will be presented where you can select or type in the 
+application name. If no file with this name exists, an application of that 
+name will be created. An editing session will be started automatically.
+
+<h2>Application structure</h2>
+The application consists of a directory with the given name. This directory 
+contains one executable script with the same name, that is used to start up 
+the application. It also contains the directories lib, conf and help, that
+contain code, configuration information and help files respectively. 
+You may not move this executable out of the application directory;
+However, symlinks to this executable will correctly start the application.
+<p>
+The newly created application contains one code file main.tcl with to functions:
+main and mainw. The function main is called by the startup script, and should
+always be present for the appliction to work. In this function, you can put
+all code to initialise the application. In the new app, main only invokes 
+the function mainw. The function mainw is a special function, which in the new 
+app will create a toplevel with an example menu and toolbar. 
+
+<h2>Editing an application</h2>
+An editing session on an application can be started in several ways:
+You can either invoke cbuild with the name of the application to be edited,
+invoke cbuild without parameters, and select the application to be edited in a file 
+selection dialog, or run the application with "-builder" as the first parameter.
+<p>
+The builder works within the program to be edited. This means that you can do 
+realistic testing. So when invoking the builder on an appliction, the application 
+will start up normally, but will show one window extra: the builder window. 
+
+<h2>The builder window</h2>
+By default, the builder window shows the files in the code directory of
+the application. Clicking on such a file will show (or hide), the functions
+in this file. Some types of functions such as dialogs and toplevels are displayed
+and treated differently. Double clicking on a dialog or 
+a toplevel will start the <a href="classy_windowbuilder">window builder</a>.
+Double clicking on a plain function will start the function editor on this function. 
+Double cliking a file will start a text editor on the entire file.
+<P>
+In the builder you can also remove, add, copy, paste or rename files and functions.
+You can also browse and edit the configuration and help directories (from 
+the File menu). The configuration dir contains several subdirectories. The init 
+subdir contains the default application configuration files. The data in 
+them will be edited with <a href="classy_configure">configuration dialogs</a>
+
+<h2>Configuration settings</h2>
+In the <a href="classy_configure">configuration system</a>, settings for different 
+types of configuration are handled the following way:
+The color, font and Misc settings are changed in the options database. You can
+see the actual option Pattern by opening the "Advanced" fold. The buttons and 
+entries in this fold can also be used to add, change or delete options.
+The key and mouse configuration settings are changed by defining (or redefining) 
+virtual events. These virtual events can be used directly by bindings in your 
+application, or automatically via the <a href="widgets/DynaMenu.html">DynaMenu</a> 
+system. Toolbars and Menu configurations provide the definitions for 
+<a href="widgets/DynaTool.html">DynaTool</a> and 
+<a href="widgets/DynaMenu.html">DynaMenu</a>.
+
+</body>
+

@@ -234,15 +234,6 @@ proc Classy::setoption {key value} {
 	}
 }
 
-#proc Classy::setfont {key value} {
-#	if {"$value" == ""} {
-#	} elseif [regexp {^Font$|^BoldFont$|^ItalicFont$|^BoldItalicFont$|^NonPropFont$} $value] {
-#		option add $key [option get . $value $value] widgetDefault
-#	} else {
-#		option add $key $value widgetDefault
-#	}
-#}
-
 proc Classy::initconf {{types {Fonts Colors Misc Keys Mouse Menus Toolbars}}} {
 	if {([lsearch $types Keys] != -1) || ([lsearch $types Mouse] != -1)} {
 		set event 1

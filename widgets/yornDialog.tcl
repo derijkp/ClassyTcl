@@ -9,6 +9,10 @@
 #} descr {
 # subclass of <a href="Dialog.html">Dialog</a><br>
 # creates a dialog which presents the user with a yes or no choice.
+#} index {
+# Dialogs
+#} shortdescr {
+# yes or no dialog: used by the command Classy::yorn
 #}
 #doc {yornDialog options} h2 {
 #	yornDialog specific options

@@ -6,6 +6,10 @@
 # ----------------------------------------------------------------------
 #doc ColorSample title {
 #ColorSample
+#} index {
+# Selectors
+#} shortdescr {
+# Select a color from a number of sample colors
 #} descr {
 # subclass of <a href="../basic/Widget.html">Widget</a><br>
 # select color from a number of sample colors

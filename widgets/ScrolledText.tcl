@@ -6,6 +6,10 @@
 # ----------------------------------------------------------------------
 #doc ScrolledText title {
 #ScrolledText
+#} index {
+# Tk improvements
+#} shortdescr {
+# ClassyTcl Text with auto scroll bars
 #} descr {
 # subclass of <a href="../basic/Widget.html">Widget</a><br>
 # creates a Classy::Text with automatic scrollbars.

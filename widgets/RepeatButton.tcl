@@ -6,6 +6,10 @@
 # ----------------------------------------------------------------------
 #doc RepeatButton title {
 #RepeatButton
+#} index {
+# Tk improvements
+#} shortdescr {
+# holding the button repeatidly executes it command
 #} descr {
 # creates a widget which behaves like a Tk button, but which repeats the 
 # associated command when the user keeps the button pressed.

@@ -6,6 +6,10 @@
 # ----------------------------------------------------------------------
 #doc savefile title {
 #savefile
+#} index {
+# Dialogs
+#} shortdescr {
+# select a file name to save a file to
 #}
 # Next is to get the attention of auto_mkindex
 if 0 {

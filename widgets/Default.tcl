@@ -6,6 +6,11 @@
 # ----------------------------------------------------------------------
 #doc Default title {
 #Default
+#} index {
+# Common tools
+#} shortdescr {
+# class (not a widget) used by the default mechanism
+#Default
 #} descr {
 # subclass of <a href="../basic/Class.html">Class</a><br>
 # The class Default is used to query and change default values

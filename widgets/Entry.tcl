@@ -6,6 +6,10 @@
 # ----------------------------------------------------------------------
 #doc Entry title {
 #Entry
+#} index {
+# Tk improvements
+#} shortdescr {
+#entry with label, constraints, command, defaultmenu
 #} descr {
 # subclass of <a href="../basic/Widget.html">Widget</a><br>
 # The ClassyTcl entry has all the options and commands of the Tk entry, but

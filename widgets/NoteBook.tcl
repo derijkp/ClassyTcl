@@ -6,6 +6,10 @@
 # ----------------------------------------------------------------------
 #doc NoteBook title {
 #NoteBook
+#} index {
+# New widgets
+#} shortdescr {
+# several sheets to be selected by clicking on tabs
 #} descr {
 # subclass of <a href="../basic/Widget.html">Widget</a><br>
 # create a notebook widget. A notebook has several frames which can be 
@@ -326,7 +330,7 @@ Classy::NoteBook method button {label} {
 }
 
 #doc {NoteBook command delete} cmd {
-#pathname delete label 
+#pathname delete label
 #} descr {
 #}
 Classy::NoteBook method delete {label} {
@@ -347,7 +351,7 @@ Classy::NoteBook method delete {label} {
 }
 
 #doc {NoteBook command rename} cmd {
-#pathname delete label 
+#pathname rename oldlabel  newlabel
 #} descr {
 #}
 Classy::NoteBook method rename {old new} {
@@ -377,7 +381,7 @@ Classy::NoteBook method rename {old new} {
 }
 
 #doc {NoteBook command reorder} cmd {
-#pathname delete label 
+#pathname reorder label ?label? ...
 #} descr {
 #}
 Classy::NoteBook method reorder {args} {

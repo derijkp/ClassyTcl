@@ -110,6 +110,7 @@ menu sel "File" {
 	action Save "Save" {%W save}
 	separator
 	action Close "Close" {destroy %W}
+	action Exit "Exit" {exit}
 }
 menu add "Add" {
 	action newfile "New file" {%W new file}
@@ -129,7 +130,7 @@ menu edit "Edit" {
 	action Paste "Paste" {%W paste}
 }
 menu help "Help" {
-	action Help "Builder" {Classy::help widgets/Builder}
+	action Help "Builder" {Classy::help classy_builder}
 	separator
 	action HelpClassyTcl "ClassyTcl" {Classy::help ClassyTcl}
 	action HelpHelp "Help" {Classy::help help}
@@ -141,6 +142,9 @@ menu sel "File" {
 	action New "New" {[Classy::WindowBuilder_win %W] new}
 	action Save "Save" {[Classy::WindowBuilder_win %W] save}
 	action Delete "Delete" {[Classy::WindowBuilder_win %W] delete}
+	action Editor "New editor" "edit newfile"
+	action Cmd "Command window" {Classy::cmd}
+	separator
 	action Close "Close" {[Classy::WindowBuilder_win %W] close}
 }
 menu edit "Edit" {
@@ -197,8 +201,8 @@ menu classytcl "ClassyTcl" {
 	action AddClassy::browser {Browser} {[Classy::WindowBuilder_win %W] add Classy::Browser}
 }
 menu help "Help" {
-	action Help "Window Builder" {Classy::help widgets/WindowBuilder}
-	action HelpBuilder "Builder" {Classy::help widgets/Builder}
+	action Help "Window Builder" {Classy::help classy_windowbuilder}
+	action HelpBuilder "Builder" {Classy::help classy_builder}
 	separator
 	action HelpClassyTcl "ClassyTcl" {Classy::help ClassyTcl}
 	action HelpHelp "Help" {Classy::help help}

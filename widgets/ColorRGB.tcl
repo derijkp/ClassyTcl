@@ -6,6 +6,10 @@
 # ----------------------------------------------------------------------
 #doc ColorRGB title {
 #ColorRGB
+#} index {
+# Selectors
+#} shortdescr {
+# RGB color selection widget
 #} descr {
 # subclass of <a href="../basic/Widget.html">Widget</a><br>
 # select a color by setting red green and blue values

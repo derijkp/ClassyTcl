@@ -6,6 +6,11 @@
 # ----------------------------------------------------------------------
 #doc getcolor title {
 #getcolor
+#} index {
+# Dialogs
+#} shortdescr {
+# select a color
+#getcolor
 #}
 # Next is to get the attention of auto_mkindex
 if 0 {
@@ -15,6 +20,10 @@ proc getcolor {} {}
 
 #doc {getcolor getcolor} cmd {
 #getcolor ?option value ...?
+#} index {
+# Dialogs
+#} shortdescr {
+# returns a color selected by the user
 #} descr {
 # returns a color selected by the user. The selectmethod depends om the
 # ClassyTcl configuration. Possible options are

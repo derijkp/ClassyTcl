@@ -96,5 +96,6 @@ Classy::configtool Classy::Config {} {
 	action Clear {Clear} {::Classy::Config clear %W}
 	action Reconfigure {Reconfigure} {::Classy::Config reconfigure %W}
 	action Restore {Restore} {::Classy::Config restore %W %W}
+	action Help {Help} {::Classy::help classy_configure}
 	action Close {Close} {if [info exists %W(close)] {eval [set %W(close)]}}
 }

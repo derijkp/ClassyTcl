@@ -6,6 +6,10 @@
 # ----------------------------------------------------------------------
 #doc getfont title {
 #getfont
+#} index {
+# Dialogs
+#} shortdescr {
+# returns a font selected by the user
 #}
 # Next is to get the attention of auto_mkindex
 if 0 {

@@ -207,12 +207,11 @@ test Classy::savefile {basic} {
 
 testsummarize
 
-
-
+test Classy::yorn {basic} {
 	source tools.tcl
 	classyclean
-	Classy::SelectDialog .try
-	.try configure -command puts
-	.try fill {hallo daar {Hoe gaat het?} ermee jo}
-	update
-	set ::try ""
+	set name try
+	Classy::Toplevel .try
+	set name
+} {1}
+

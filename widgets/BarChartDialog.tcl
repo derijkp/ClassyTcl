@@ -6,6 +6,10 @@
 # ----------------------------------------------------------------------
 #doc BarChartDialog title {
 #BarChartDialog
+#} index {
+# Charts
+#} shortdescr {
+# Dialog presenting a barchart and several options for its display
 #} descr {
 # subclass of <a href="Dialog.html">Dialog</a><br>
 #}
@@ -45,14 +49,14 @@ Classy::BarChartDialog classmethod init {args} {
 	grid rowconfigure $w.view 0 -weight 1
 	frame $w.controls
 	checkbutton $w.stacked -text "Stacked" -variable [privatevar $object.options.chart options(-stacked)] \
-		-onvalue 1 -offvalue 0 -command "$object newvalues"
+		-onvalue 1 -offvalue 0 -command "$object _newvalues"
 	checkbutton $w.percent -text "Percentages" -variable [privatevar $object.options.chart options(-percentages)]\
-		-onvalue 1 -offvalue 0 -command "$object newvalues"
+		-onvalue 1 -offvalue 0 -command "$object _newvalues"
 	Classy::NumEntry $w.displace -label "Displace" -width 5 -min {-1} -max 1 -increment 0.1 \
-		-command "$object newvalues" -textvariable [privatevar $object.options.chart options(-displace)]
+		-command "$object _newvalues" -textvariable [privatevar $object.options.chart options(-displace)]
 	$w.displace nocmdset 0
 	Classy::NumEntry $w.barwidth -label "Barwidth" -width 5 -min 0 -max 1 -increment 0.1 \
-		-command "$object newvalues" -textvariable [privatevar $object.options.chart options(-barwidth)]
+		-command "$object _newvalues" -textvariable [privatevar $object.options.chart options(-barwidth)]
 	$w.barwidth nocmdset 1
 	grid $w.stacked $w.percent $w.displace $w.barwidth -in $w.controls -sticky we
 	pack $w.view -fill both -expand yes
@@ -124,11 +128,7 @@ Classy::BarChartDialog addoption -yrange {yRange YRange {0 100}} {
 #  Methods
 # ------------------------------------------------------------------
 
-#doc {BarChartDialog command newvalues} cmd {
-#pathname newvalues 
-#} descr {
-#}
-Classy::BarChartDialog method newvalues {args} {
+Classy::BarChartDialog method _newvalues {args} {
 	private $object keepyrange keepchartheight
 	set w $object.options
 	if {[$w.chart configure -percentages] == 1} {
@@ -140,6 +140,8 @@ Classy::BarChartDialog method newvalues {args} {
 
 #doc {BarChartDialog command dataset} cmd {
 #pathname dataset name data
+# A barchart can have several ranges of data. Each range has a name.
+# This method is used to set (or change) the data in a range.
 #} descr {
 #}
 Classy::BarChartDialog method dataset {name data} {
@@ -149,6 +151,7 @@ Classy::BarChartDialog method dataset {name data} {
 #doc {BarChartDialog command dataget} cmd {
 #pathname dataget name
 #} descr {
+# returns the current data in range $name
 #}
 Classy::BarChartDialog method dataget {name} {
 	$object.options.chart dataget $name
@@ -157,6 +160,7 @@ Classy::BarChartDialog method dataget {name} {
 #doc {BarChartDialog command datadelete} cmd {
 #pathname datadelete name
 #} descr {
+# delete the range with name $name
 #}
 Classy::BarChartDialog method datadelete {name} {
 	$object.options.chart datadelete $name
@@ -185,13 +189,13 @@ Classy::BarChartDialog method switchdata {item} {
 #doc {BarChartDialog command dataconfigure} cmd {
 #pathname dataconfigure
 #} descr {
+# pop up a dialog to change the properties of the barchart data
 #}
 Classy::BarChartDialog method dataconfigure {} {
 	private $object width data
 	set chart $object.options.chart
 	Classy::Dialog $object.configure -title "Data configure" -keepgeometry no
 	set w $object.configure.options
-
 	set num 0
 #	set elements "[$chart ranges] [array names data]"
 	foreach element [$chart ranges] {
@@ -207,7 +211,6 @@ Classy::BarChartDialog method dataconfigure {} {
 			$b configure -bg $color
 		}]
 		$b configure -bg [lindex [$chart barconfigure "$element" -fill] 4]
-
 		button $w.line$num -text "Line color" -command [varsubst {b chart element} {
 			set color [lindex [$chart barconfigure "$element" -outline] 4]
 			set color [Classy::getcolor -initialcolor $color -title "$element fill color"]
@@ -215,11 +218,9 @@ Classy::BarChartDialog method dataconfigure {} {
 			$b configure -fg $color
 		}]
 		$b configure -fg [lindex [$chart barconfigure "$element" -outline] 4]
-
 		Classy::NumEntry $w.width$num -label "Line width" -width 5 \
 			-command [list $chart barconfigure $element -width]
 		$w.width$num	set [lindex [$chart barconfigure $element -width] 4]
-
 		grid $w.label$num $w.fill$num $w.line$num $w.width$num -sticky we
 		incr num
 	}
@@ -228,6 +229,7 @@ Classy::BarChartDialog method dataconfigure {} {
 #doc {BarChartDialog command rangeconfigure} cmd {
 #pathname rangeconfigure 
 #} descr {
+# pop up a dialog to change the properties of the barchart ranges
 #}
 Classy::BarChartDialog method rangeconfigure {} {
 	private $object options

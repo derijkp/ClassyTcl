@@ -6,12 +6,12 @@
 # ----------------------------------------------------------------------
 #doc MultiFrame title {
 #MultiFrame
+#} index {
+# New widgets
+#} shortdescr {
+# placeholder for several frames
 #} descr {
 # subclass of <a href="../basic/Widget.html">Widget</a><br>
-# creates a view frame in which a component frame is displayed.
-# If the component frame is larger than the view frame, scrollbars
-# are automatically added.
-# The component frame is available as component frame
 #}
 #doc {MultiFrame command} h2 {
 #	MultiFrame specific methods

@@ -6,14 +6,18 @@
 # ----------------------------------------------------------------------
 #doc Dialog title {
 #Dialog
+#} index {
+# Dialogs
+#} shortdescr {
+# dialog with intelligent placing, easy adding of buttons, ...
 #} descr {
 # subclass of <a href="../basic/Toplevel.html">Toplevel</a><br>
 # Dialog produces "intelligent" dialog. They have a simple option to
-#make tehm resizable or not. They automatically assume a reasonable
+#make them resizable or not. They automatically assume a reasonable
 #minimum size based on their content (The dialog will be placed on the
 #screen and its size calculated at the first idle moment after dialog 
 #creation. The dialog will place itself so that the mouse pointer is 
-#is positioned over it, without being place partly out of the screen.
+#is positioned over it, without being placed partly out of the screen.
 #If it is resized, it remembers its size for the next display.
 #<p>
 #By default, the dialog has a "Close" button that destroys the dialog
@@ -226,11 +230,11 @@ Classy::Dialog method button {{button {}}} {
 #} descr {
 #Without arguments, the method returns a list of all persistent buttons
 #Option can be:
-#<dl>
-#<dt>set<dt>make only the given buttons persistent
-#<dt>add<dt>make the given buttons persistent
-#<dt>remove<dt>make the given buttons not persistent
-#</dl>
+#<ul>
+#<li><b>set</b>: make only the given buttons persistent
+#<li><b>add</b>: make the given buttons persistent
+#<li><b>remove</b>: make the given buttons not persistent
+#</ul>
 #}
 Classy::Dialog method persistent {{option {}} args} {
 	private $object persistent

@@ -6,6 +6,10 @@
 # ----------------------------------------------------------------------
 #doc Canvas title {
 #Canvas
+#} index {
+# Tk improvements
+#} shortdescr {
+# Canvas with zoom, undo/redo, rotate,save and load, group
 #} descr {
 # subclass of <a href="../basic/Widget.html">Widget</a><br>
 # Classy::Canvas creates a canvas widget that supports undo and redo, 

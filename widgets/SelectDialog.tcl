@@ -6,6 +6,10 @@
 # ----------------------------------------------------------------------
 #doc SelectDialog title {
 #SelectDialog
+#} index {
+# Dialogs
+#} shortdescr {
+# make a selection out of a list
 #} descr {
 # subclass of <a href="Dialog.html">Dialog</a><br>
 # creates a selection dialog. It allows selection out of a list of

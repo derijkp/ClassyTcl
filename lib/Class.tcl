@@ -11,80 +11,12 @@
 #doc Class title {
 #Class
 #} descr {
-# The class named Class is the basis of all classes and object in ClassyTcl.
+# The class named Class forms the basis of the 
+# <a href="../classy_object_system.html">ClassyTcl object system</a>. It is the
+# superclass of all classes and object in ClassyTcl.
 # Class provides the functionality to produce classes and objects. Class 
 # will normally not be used by itself to create objects.
 #}
-#doc {Class intro} h2 {
-#	Introduction
-#} descr {
-# <h3>Classes and objects</h3>
-# In ClassyTcl classes and objects are very similar: they are both 
-# entities that combine data and methods (actions that can be performed).
-# However, classes are usually used as a template to produce a number
-# of objects or instances. The class of an object determines wich
-# data it stores, and which methods it has available.<p>
-# New classes can be created by subclassing existing classes. The subclass
-# inherits the data and methods of its parent class. Extra data and methods
-# can be added after the new class is created. Inherited methods can be
-# replaced or removed.<p>
-# When the package ClassyTcl is loaded, it will create one base class 
-# named Class. All other classes and object will be derived from this
-# base class.<p>
-#
-# <h3>Classmethods and methods</h3>
-# Class provides two types of methods:
-#<dl>
-#<dt>classmethods
-#<dd>
-# A classmethod is a command associated with a class.
-# A new classmethod can be defined using the classmethod 
-# <i>classmethod</i> (which is defined in the basic class named <i>Class</i>
-# and always inherited).
-# A classmethod can be invoked using the command:
-# <pre>SomeClass classmethod ?...?</pre>
-# Classmethods are only available to their class, and cannot be invoked
-# from instances (objects) of that class.
-#<dt>methods
-#<dd>
-# A method can be defined using the classmethod <i>method</i>.
-# A method of a class is available to all instances (objects) of the
-# class (and to the the class itself).
-# A method can be invoked using a command of the form:
-# <pre>pathName method ?...?</pre>
-#</dl>
-# Methods and classmethods starting with an underscore are hidden: they
-# can be invoked, but are not shown when methods are queried.
-# A class can have both a method and a classmethod with the same name.
-# If this is the case, the method is invoked when doing:
-# <pre>pathName name ?...?</pre>
-# and the classmethod is used when doing:
-# <pre>ClassName name ?...?</pre>
-# <p>A new object can be created using the command (classmethod <i>new</i>):
-# <pre>SomeClass new object</pre>
-# A new class can be created using the command (classmethod <i>subclass</i>):
-# <pre>SomeClass subclass SubClass</pre>
-# <h3>private variables</h3>
-# Each object (or class) can store its data in private variables. A private
-# variable should only be used by the object owning it. In ClassyTcl
-# private variables are only protected by convention; An object or 
-# function can access the private variables of another object, which is
-# great for debugging. However, it is not usually good object oriented 
-# programming practice to rely on this feature for your programs (data 
-# encapsulation). Private variables can be accessed using the following commands:
-#<dl>
-#<dt>private object var ?var? ...
-#<dd>make the local variables in the list refer to the private variables of $object
-#<dt>setprivate object var value
-#<dd>set the private variable $var of object $object to $value
-#<dt>getprivate object var
-#<dd>returns the current value of the private variable $var of object $object
-#<dt>privatevar object var
-#<dd>returns the fully specified name of the private variable $var of object $object. This
-#can eg. be used to link a private variable to an entry:
-#<pre>entry .e -textvariable [privatevar someobject somevar]</pre>
-#</dl>
-#
 #}
 
 #doc {Class cm} h2 {
@@ -429,17 +361,36 @@ proc ::class::propagatedeletemethod {class type name} {
 	}
 }
 
-#doc {Class cm info} cmd {
+#doc {Class m info} cmd {
 # pathName info <u>option</u> ?...?
 #} descr {
-#<dl>
-#<dt>pathName info class<dd>
-# returns the class of the object given by pathName
-#<dt>pathName info methods ?pattern?<dd>
-# returns a list of all available 
-# methods except the hidden methods (those starting with an underscore
-# is returned. When it is invoked with one argument, a list
-# of all methods matching the pattern is returned
+#<b>pathName info class</b><br>
+# returns the class of pathName<br>
+#<b>pathName info classmethods ?pattern?</b><br>
+# returns a list of all available classmethods except the hidden ones (those starting 
+# with an underscore is returned. When it is invoked with one argument, a list
+# of all classmethods matching the pattern is returned<br>
+#<b>pathName info methods ?pattern?</b><br>
+# returns a list of all available methods except the hidden methods (those starting 
+# with an underscore is returned. When it is invoked with one argument, a list
+# of all methods matching the pattern is returned<br>
+#<b>pathName info parent</b><br>
+# returns the parent of pathName<br>
+#<b>pathName info children</b><br>
+# returns the children of pathName<br>
+#<b>pathName info subclasses</b><br>
+# returns the subclasses pathName<br>
+#<b>pathName info classmethod option name ...</b><br>
+# returns information about the classmethod $name of pathName. Following options are supported:
+#<ul>
+#<li> body: returns the body of the classmethod (if it is defined in Tcl)
+#<li> args: returns the arguments of the classmethod
+#<li> default arg varname: returns 0 if the argument $arg does not have a default value, 
+# otherwise it returns 1, and places the default value in the variable varname
+#</ul>
+#<br><b>pathName info method option name ...</b><br>
+# returns information about the method $name of pathName. It takes the same options 
+# as "info classmethod"
 #}
 proc ::class::info_ {class object arg} {
 	set len [llength $arg]
@@ -566,10 +517,6 @@ proc ::class::info_ {class object arg} {
 
 #doc {Class cm method} cmd {
 # ClassName method <u>name</u> <u>args</u> <u>body</u>
-#<br>
-# ClassName method <u>pattern</u>
-#<br>
-# ClassName method body/args <u>name</u>
 #} descr {
 # define a new method named $<u>name</u> for class ClassName.
 # Whenever the method is invoked, the contents of body will be executed.
@@ -580,11 +527,6 @@ proc ::class::info_ {class object arg} {
 # They contain the name of respectively the class and the object that
 # invoked the method. If the method was invoked from a class, the values
 # of variables class and object will be identical (name of the class).
-#<br>
-# When method is invoked without arguments, a list of all available 
-# methods except the hidden methods (those starting with an underscore
-# is returned. When it is invoked with one argument, a list
-# of all methods matching the pattern is returned
 #}
 proc ::class::method {class arg} {
 	set len [llength $arg]
@@ -617,8 +559,6 @@ proc ::class::method {class arg} {
 
 #doc {Class cm classmethod} cmd {
 # ClassName classmethod <u>name</u> <u>args</u> <u>body</u>
-#<br>
-# ClassName classmethod <u>pattern</u>
 #} descr {
 # define a new classmethod named $<u>name</u> for class ClassName.
 # Whenever the classmethod is invoked, the contents of body will be executed.
@@ -628,12 +568,6 @@ proc ::class::method {class arg} {
 # In body two extra local variables are available named class and object.
 # Because a classmethod can only be invoked from a class, they are both
 # contain the name of the class that invoked the method.
-#<br>
-# delete the method named $<u>name</u> from class ClassName.
-# When classmethod is invoked without arguments, a list of all available 
-# classmethods except the hidden methods (those starting with an underscore)
-# is returned. When it is invoked with one argument, a list
-# of all classmethods matching the pattern is returned
 #}
 proc ::class::classmethod {class arg} {
 	set len [llength $arg]
@@ -782,7 +716,7 @@ proc ::Class {cmd args} {
 }
 
 # Class classmethods
-# -------------
+# ------------------
 proc ::class::Class,,cm,classmethod {class args} {
 #Class
 	::class::classmethod $class $args
@@ -848,7 +782,7 @@ proc ::class::Class,,m,info {class object args} {
 # =========================================
 #
 #doc {Class m private} cmd {
-# ClassName private ?<u>name</u>? ?<u>value</u>?
+# pathName private ?<u>name</u>? ?<u>value</u>?
 #} descr {
 # private is used to get or change data associated with an object.
 # Without arguments a list of all private variables is returned.

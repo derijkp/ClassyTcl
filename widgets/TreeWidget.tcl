@@ -6,6 +6,10 @@
 # ----------------------------------------------------------------------
 #doc TreeWidget title {
 #TreeWidget
+#} index {
+# New widgets
+#} shortdescr {
+# a tree widget
 #} descr {
 # subclass of <a href="../basic/widget.html">Widget</a>
 # The tree widget is a canvas widget with an associated <a href="../widget/Tree.html">Tree 

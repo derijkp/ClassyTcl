@@ -6,6 +6,10 @@
 # ----------------------------------------------------------------------
 #doc DefaultMenu title {
 #DefaultMenu
+#} index {
+# Common tools
+#} shortdescr {
+# button with menu to select from user definable defaults
 #} descr {
 # subclass of <a href="../basic/Widget.html">Widget</a><br>
 # creates a button which pops up a <a href="SelectDialog.html">selection 

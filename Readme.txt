@@ -1,70 +1,120 @@
-ExtraL
-======  extra commands for Tcl
+ClassyTcl
+========= Object system, widget set and GUI builder for Tcl/Tk
         by Peter De Rijk (Universiteit Antwerpen) 
 
-What is ExtraL
---------------
+What is ClassyTcl
+-----------------
+Object system
+The first component of ClassyTcl is an object system for Tcl, which 
+has both a Tcl and a C version available. It doesn't require patches 
+to the Tcl core, making keeping up with new releases easier. Performance 
+is very adequate. The C version is gives extra speed, and makes it 
+possible to implement some methods in C (usually also for performance reasons).
 
-Extral is a generally useful library which extends Tcl with a.o.:
-	- extral list manipulation commands
-	- array manipulation
-	- atexit
-	- dbm support: file based, gdbm and bsd-db support
-	- tempfile
-	- filing commands
-	- light eval (Viktor Dukhovni)
-	
-The name comes from the fact that ExtraL originally only contained
-extra list processing commands to overcome some of the performance 
-problems in Tcl when processing large lists. Later other commands
-were added. With the advent of the Tcl byte compiler, the 
-performance is not such a great issue any longer, but I still find 
-many of the list manipulation functions very convenient, and some 
-of those that were now rewritten using the object system in C are 
-still faster. 
-Most functions are now also available in Tcl-only form as well. Using 
-the C code just gives a speedup.
+GUI Builder
 
-You can find a short description of the commands in the files in the 
-docs subdirectory. For some of the commands, you can find out a lot 
-by checking the testing suite in the directory tests.
 
-INCOMPATIBLE CHANGES
---------------------
-There were some incompatible changes with previous releases:
-lremove syntax is now: lremove list indices
+Widget set
+Included in the distribution is a large set of new widgets, written using
+the object system. While the object system itself only requires Tcl (>=8.0),
+the widgets that come with it require Tk (of course), and another freely
+available extension called ExtraL. ExtraL also does not require compiled code, 
+but can be speeded up by having it available. In the widget set you will find:
+Tk improvements
+ - Classy::Entry : entry with label, constraints, command
+ - Classy::NumEntry : numerical entry
+ - Classy::FileEntry " Classy::Entry with file browse button
+ - Classy::Text : text with undo/redo and linking (~multiple views)
+ - Classy::Canvas : Canvas with undo/redo, rotate, save and load, zoom
+ - Classy::Toplevel : toplevel that can places itself gracefully, can remember its geometry, 
+                      can have a command executed upon destruction
+ - Classy::ListBox
+ - Classy::Message
+ - Classy::RepeatButton
+ - Classy::ScrolledFrame
+ - Classy::ScrolledText
+Common Tools
+ - Classy::DragDrop
+ - Classy::DynaMenu
+ - Classy::DynaTool
+ - Classy::Balloon: balloon help
+ - Classy::Default
+ - Classy::DefaultMenu
+ - Classy::Help
+ - Classy::Paned
+ - Classy::Config
+New widgets
+ - Classy::Editor
+ - Classy::NoteBook
+ - Classy::OptionBox
+ - Classy::OptionMenu
+ - Classy::CmdWidget
+ - Classy::Browser: 
+ - Classy::Fold
+ - Classy::Table
+ - Classy::Tree
+ - Classy::TreeWidget
+ - Classy::WindowBuilder
+ - Classy::HTML
+ - Classy::ChartGrid
+ - Classy::BarChart
+ - Classy::LineChart
+ - Classy::MultiFrame
+ - Classy::MultiListbox
+ - Classy::Progress
+Dialogs
+ - Classy::Dialog : inteligent dialog placing, easy adding of buttons
+ - Classy::savefile
+ - Classy::selectfile
+ - Classy::getcolor
+ - Classy::getfont
+ - Classy::yorn
+ - Classy::InputDialog
+ - Classy::SaveDialog
+ - Classy::SelectDialog
+ - Classy::yornDialog
+ - Classy::BarChartDialog
+ - Classy::LineChartDialog
+ - Classy::ProgressDialog
+Selectors
+ - Classy::Selector : multi-type selector
+ - Classy::FileSelect : class used by selectfile
+ - Classy::FontSelect : class used by getfont
+ - Classy::ColorSelect : class used in getcolor
+ - Classy::ColorEntry
+ - Classy::ColorHSV
+ - Classy::ColorRGB
+ - Classy::ColorSample
 
-I feel like I misnamed some commands in the previous releases. This 
-has been changed now:
-lmerge acts like the former "lmanip mangle"
-lunmerge acts like the reverse of lmerge
-lmanip mangle does the previous "lmanip merge"
+Unfortunately documentation is often somewhat limited, but
+besides the documentation, you can learn a lot from sources.
 
 Installation
 ------------
-You should be able to obtain the latest version of ExtraL via anonymous ftp
-on rrna.uia.ac.be. in the directory /pub/tcl
+You should be able to obtain the latest versions of ClassyTcl and ExtraL
+on our server rrna.uia.ac.be via WWW or anonymous ftp (directory /pub/tcl).
+Both Extral and ClassyTcl are implemented as loadable packages. The ClassyTcl
+object systen can be used by putting the directories (after unpacking) 
+somewhere appropriate and using the command
+package require Class
+To use the widgets that come with the distribution, use the command
+package require ClassyTcl
+after naming the application (tk appname ?name?). The application name
+will be used for managing defaults and configuration options.
 
-This package can be build as a loadable object to Tcl8.0. Go to the
-src directory and type
+To make the compiled version from the sources:
+go to the src directory and type
 ./configure --with-tcl=<path of tcl distribution>
 Then run make. This should produce the loadable module. The build.tcl and
 buildwin.tcl files are a tool to make a nice package in a different
 directory.
 
-If you want to make gdbm and bsd-db support, you will have to create a 
-libgdbm.a and libdb.a (should position independend code) and put these
-in the extern directory together with their header files. (gdbm.h and 
-db_185.h) and do a 
-make gdbm.so
-make bsddbm.so
-
 How to contact me
 -----------------
 I will do my best to reply as fast as I can to any problems, etc.
-However, the development of extraL is not my only task,
+However, the development of ClassyTcl is only my only task,
 which is why my response might not be always as fast as you would
-like (although I get a very good average).
+like.
 
 Peter De Rijk
 University of Antwerp (UIA)
@@ -80,7 +130,7 @@ web: http://rrna.uia.ac.be/~peter/personal/peter.html
 Legalities
 ----------
 
-ExtraL is Copyright Peter De Rijk, University of Antwerp (UIA), 1995 The
+ClassyTcl is Copyright Peter De Rijk, University of Antwerp (UIA), 1998. The
 following terms apply to all files associated with the software unless
 explicitly disclaimed in individual files.
 

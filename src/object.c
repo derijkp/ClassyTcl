@@ -114,7 +114,7 @@ void Classy_ObjectDestroy(ClientData clientdata) {
 	string = Tcl_GetStringFromObj(object->name,NULL);
 	entry = Tcl_FindHashEntry(&(class->children),string);
 	if (entry != NULL) {Tcl_DeleteHashEntry(entry);}
-	Tcl_VarEval(class->interp,"foreach var [info vars ::class::", string,",,*] {unset $var}", (char *)NULL);
+	Tcl_VarEval(class->interp,"foreach ::class::var [info vars ::class::", string,",,*] {unset $::class::var}", (char *)NULL);
 	Tcl_EventuallyFree(clientdata,Classy_FreeObject);
 	Tcl_Release(clientdata);
 }

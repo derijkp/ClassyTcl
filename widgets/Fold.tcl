@@ -6,6 +6,10 @@
 # ----------------------------------------------------------------------
 #doc Fold title {
 #Fold
+#} index {
+# New widgets
+#} shortdescr {
+# foldable frame
 #} descr {
 # subclass of <a href="../basic/Widget.html">Widget</a><br>
 # creates a foldable frame. The actual frame is available as component 

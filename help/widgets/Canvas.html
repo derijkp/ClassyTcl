@@ -9,9 +9,13 @@ Canvas
 </h1>
 
  subclass of <a href="../basic/Widget.html">Widget</a><br>
- Classy::Canvas creates a canvas widget with undo and redo. All options
- and commands are the same as for canvas, with those for undo and redo
- added.
+ Classy::Canvas creates a canvas widget that supports undo and redo, 
+ save and load, selection and grouping. Most options
+ and commands are identical to those of the standard Tk canvas.<br>
+ Classy::Canvas reserves tags starting with an underscore (_) for internal
+ use (temporary tags, grouping etc.). You should not add or remove such tags, 
+ except for the group names returned by the group method.
+ they should be ignored
 
 <h2>
 	Canvas specific methods
@@ -37,5 +41,49 @@ pathname redo
 pathname noundo ?args?
 </b><dd>
  execute command without storing in undo buffer
+<b><dt>
+pathname addtag tag searchCommand ?arg ...?
+</b><dd>
+ This command is identical to that of the standard canvas widget, but supports
+ some extra searchcommanda:
+<dl>
+<dt>items<dd> all given items
+<dt>tags<dd> all items with one of the given tags
+<dt>andtags<dd> all items with all of the given tags
+ </dl>
+<b><dt>
+pathname find tag searchCommand ?arg ...?
+</b><dd>
+ This command is identical to that of the standard canvas widget, but supports
+ some extra searchcommanda:
+<dl>
+<dt>tags<dd> all items with one of the given tags
+<dt>andtags<dd> all items with all of the given tags
+ </dl>
+<b><dt>
+pathname selection ?action? ?args?
+</b><dd>
+ Change the current selection of canvas objects; has the following subcommands:
+<dl>
+<dt>set<dd>set the current selection: args are the itemnumbers or tags of the items that must be selected
+<dt>get<dd>get itemnames of all canvas items in the selection
+<dt>add<dd>add items corresponding to the given itemnumbers or tags
+<dt>clear<dd>clear the selection
+<dt>remove<dd>remve items corresponding to the given itemnumbers or tags
+<dt>redraw<dd>redraw the selection
+</dl>
+<b><dt>
+pathname group searchcommand ?arg? ...
+</b><dd>
+ creates a new group, consisting of items found by the searchcommand. searchcommand
+ has the same options as in the addtag method. The method returns the name of the
+ group. The group name can be used as a tag, in order to perform actions on group 
+ member. Adding the group name as a tag to an item will add the item to the group.
+<b><dt>
+pathname findgroup tagOrId
+</b><dd>
+ returns the main group of an item: This is the last one the item was added to.
+ If tagOrId is a tag  that  refers  to more than one item, the first
+ (lowest) such item is used.
 
 </body>

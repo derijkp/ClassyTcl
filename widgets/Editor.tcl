@@ -6,6 +6,10 @@
 # ----------------------------------------------------------------------
 #doc Editor title {
 #Editor
+#} index {
+# New widgets
+#} shortdescr {
+# reasonably advanced text editor in a widget
 #} descr {
 # subclass of <a href="../basic/Widget.html">Widget</a><br>
 # The Editor widget provides a fairly complete editor with undo redo
@@ -388,7 +392,7 @@ Classy::Editor method load {{file {}} args} {
 			lappend reopenlist [::Classy::fullpath $otherfile]
 		}
 	}
-	set reopenlist [lmanip remdup $reopenlist]
+	set reopenlist [lremdup $reopenlist]
 	set reopenlist [lsort $reopenlist]
 	set loadcommand [getprivate $object options(-loadcommand)]
 	if {"$loadcommand" != ""} {

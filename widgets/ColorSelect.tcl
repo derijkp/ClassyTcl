@@ -6,6 +6,10 @@
 # ----------------------------------------------------------------------
 #doc ColorSelect title {
 #ColorSelect
+#} index {
+# Selectors
+#} shortdescr {
+# color select widget: choose your method
 #} descr {
 # subclass of <a href="../basic/Widget.html">Widget</a><br>
 # A colorselector where the user can select a color using

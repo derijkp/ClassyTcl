@@ -6,6 +6,10 @@
 # ----------------------------------------------------------------------
 #doc selectfile title {
 #selectfile
+#} index {
+# Dialogs
+#} shortdescr {
+# select a file to open
 #}
 # Next is to get the attention of auto_mkindex
 if 0 {

@@ -6,6 +6,10 @@
 # ----------------------------------------------------------------------
 #doc ProgressDialog title {
 #ProgressDialog
+#} index {
+# Dialogs
+#} shortdescr {
+# show progress of some proces in a dialog
 #} descr {
 # subclass of <a href="Dialog.html">Dialog</a><br>
 # creates a dialog in which the ProgressDialog of some action will be displayed.

@@ -6,6 +6,10 @@
 # ----------------------------------------------------------------------
 #doc Table title {
 #Table
+#} index {
+# New widgets
+#} shortdescr {
+# a table ...
 #} descr {
 # subclass of <a href="../basic/Widget.html">Widget</a><br>
 # creates a table of entries or text fields. This acts much like a spreadsheet. It supports

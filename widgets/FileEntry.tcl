@@ -6,6 +6,10 @@
 # ----------------------------------------------------------------------
 #doc FileEntry title {
 #FileEntry
+#} index {
+# Tk improvements
+#} shortdescr {
+# <a gref="Entry.html">Classy::Entry</a> with file browse button
 #} descr {
 # subclass of <a href="Entry.html">Entry</a><br>
 # provides nearly the same options and methods as Entry,

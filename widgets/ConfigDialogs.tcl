@@ -1,6 +1,5 @@
 #Functions
 
-
 proc Classy::config args {# ClassyTcl generated Toplevel
 	if [regexp {^\.} $args] {
 		set window [lshift args]
@@ -125,6 +124,7 @@ proc Classy::config_tool args {# ClassyTcl generated Frame
 	grid $window.dynatool1 -row 0 -column 0 -columnspan 3 -sticky nesw
 	grid columnconfigure $window 1 -weight 1
 	grid rowconfigure $window 2 -weight 1
+	# End windows
 
 # ClassyTcl Initialise
 set name $opt(-name)

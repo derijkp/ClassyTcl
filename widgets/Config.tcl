@@ -6,14 +6,16 @@
 # ----------------------------------------------------------------------
 #doc Config title {
 #Config
+#} index {
+# Common tools
+#} shortdescr {
+# class used in the <a href="../classy_configure.html">configuration system</a>
 #} descr {
-# subclass of <a href="../basic/Widget.html">Widget</a><br>
-#}
-#doc {Config options} h2 {
-#	Config specific options
+# The <a href="../classy_configure.html">configuration system</a> is quite extensive, but 
+# does not have extensive documentation (yet). This class provides some commands used here.
 #}
 #doc {Config command} h2 {
-#	Config specific methods
+#	Config methods
 #}
 # Next is to get the attention of auto_mkindex
 if 0 {
@@ -54,10 +56,6 @@ Classy::Config addoption -closecommand {closeCommand CloseCommand {}} {
 #  destroy
 # ------------------------------------------------------------------
 
-#doc {Config command destroy} cmd {
-#pathname destroy 
-#} descr {
-#}
 Classy::Config method destroy {} {
 }
 
@@ -560,7 +558,9 @@ Classy::Config method changelevel {var window} {
 	switch $data(ltype) {
 		Fonts - Colors - Misc - Keys - Mouse {
 			$window.list configure -content $data(names)
-			$window.list activate [lindex $select 0]
+			if {"[lindex $select 0]" != ""} {
+				$window.list activate [lindex $select 0]
+			}
 		}
 		Toolbars - Menus {
 			$window.value set $data(c)
@@ -618,37 +618,6 @@ Classy::Config method open {w name} {
 	}
 }
 
-Classy::Config method config {type name {level appuser}} {
-	catch {destroy .classy__.config}
-	Classy::Toplevel .classy__.config -title $name -keepgeometry all
-	set win .classy__.config.frame
-	catch {set type [structlget {color Colors font Fonts misc Misc mouse Mouse key Keys menu Menus tool Toolbars} $type]}
-	switch $type {
-		Fonts - Colors - Misc - Keys - Mouse {
-			Classy::config_frame $win -level $level -name $name -type $type
-		}
-		Toolbars {
-			Classy::config_tool $win -level $level -name $name
-		}
-		Menus {
-			Classy::config_menu $win -level $level -name $name
-		}
-		default {
-			private $object data
-			$object load $type $level $name [privatevar $object data]
-			Classy::Selector $win -type text -label $data(help) \
-				-variable [privatevar $object data(c)] \
-				-command [list $object save [privatevar $object data]]
-		}
-	}		
-	pack $win -fill both -expand yes
-	set ::${win}(close) {destroy .classy__.config}
-}
-
-Classy::Config method dialog {} {
-	Classy::config .classy__.configdialog
-}
-
 Classy::Config method newconfig {type level {name {}}} {
 	if {"$name" == ""} {
 		catch {destroy .classy__.temp}
@@ -681,5 +650,47 @@ Classy::Config method newconfig {type level {name {}}} {
 	Classy::Builder infile set $file $name $code
 	uplevel #0 $code
 	return
+}
+
+#doc {Config command dialog} cmd {
+#Config dialog
+#} descr {
+# display the general configuration dialog
+#}
+Classy::Config method dialog {} {
+	Classy::config .classy__.configdialog
+}
+
+#doc {Config command config} cmd {
+#Config config type name ?level?
+#} descr {
+# display a dialog to configure the specific configuration block (name) of the given 
+# type (font,color,misc,key,mouse,tool or menu)
+#}
+Classy::Config method config {type name {level appuser}} {
+	catch {destroy .classy__.config}
+	Classy::Toplevel .classy__.config -title $name -keepgeometry all
+	set win .classy__.config.frame
+	catch {set type [structlget {color Colors font Fonts misc Misc mouse Mouse key Keys menu Menus tool Toolbars} $type]}
+	switch $type {
+		Fonts - Colors - Misc - Keys - Mouse {
+			Classy::config_frame $win -level $level -name $name -type $type
+		}
+		Toolbars {
+			Classy::config_tool $win -level $level -name $name
+		}
+		Menus {
+			Classy::config_menu $win -level $level -name $name
+		}
+		default {
+			private $object data
+			$object load $type $level $name [privatevar $object data]
+			Classy::Selector $win -type text -label $data(help) \
+				-variable [privatevar $object data(c)] \
+				-command [list $object save [privatevar $object data]]
+		}
+	}		
+	pack $win -fill both -expand yes
+	set ::${win}(close) {destroy .classy__.config}
 }
 

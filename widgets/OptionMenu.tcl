@@ -6,6 +6,10 @@
 # ----------------------------------------------------------------------
 #doc OptionMenu title {
 #OptionMenu
+#} index {
+# New widgets
+#} shortdescr {
+# select between different values using a menu
 #} descr {
 # subclass of <a href="../basic/Widget.html">Widget</a><br>
 # creates an optionmenu, a widget in which the user can select between

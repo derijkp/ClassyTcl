@@ -6,6 +6,10 @@
 # ----------------------------------------------------------------------
 #doc OptionBox title {
 #OptionBox
+#} index {
+# New widgets
+#} shortdescr {
+# select between different values
 #} descr {
 # subclass of <a href="../basic/Widget.html">Widget</a><br>
 # creates an optionbox, a widget in which the user can select between

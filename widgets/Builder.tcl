@@ -6,8 +6,10 @@
 # ----------------------------------------------------------------------
 #doc Builder title {
 #Builder
+#} index none shortdescr {
+# widget used by the ClassyTcl Builder
 #} descr {
-# subclass of <a href="../basic/Widget.html">Widget</a><br>
+# The builder is used to easily build ClassyTcl applications
 #}
 #doc {Builder options} h2 {
 #	Builder specific options
@@ -94,7 +96,12 @@ Classy::Builder addoption -dir {dir Directory code} {
 #} descr {
 #}
 Classy::Builder method destroy {} {
-	$object.browse destroy
+	if {"winfo children .]" == ".classy__"} {
+		if ![Classy::yorn "Close application?"] return
+		exit
+	} else {
+		$object.browse destroy
+	}
 }
 
 # ------------------------------------------------------------------
@@ -181,22 +188,52 @@ Classy::Builder method new {type {name {}}} {
 	}
 	switch $type {
 		function {
-			set f [open $file a]
-			puts $f "\nproc [list $name] \{\} \{"
-			puts $f "\}"
-			close $f
+			$object infile set $file $name "proc [list $name] \{\} \{\}"
 		}
 		dialog {
-#			$object _creatededit $object.dedit
-			$object.dedit new dialog $name $file
+			set code "proc [list $name] args \{# ClassyTcl generated Dialog"
+			append code "\n\tif \[regexp \{^\\.\} \$args] \{"
+			append code "\n\t\tset window \[lshift args\]"
+			append code "\n\t\} else \{"
+			append code "\n\t\tset window .$name"
+			append code "\n\t\}"
+			append code "\n\tClassy::parseopt \$args opt {}"
+			append code "\n\t# Create windows"
+			append code "\n\tClassy::Dialog \$window \\"
+			append code "\n\t\t-destroycommand \[list destroy \$window\]"
+			append code "\n\t# End windows"
+			append code "\n\}"
+			$object infile set $file $name $code
 		}
 		toplevel {
-#			$object _creatededit $object.dedit
-			$object.dedit new toplevel $name $file
+			set code "proc [list $name] args \{# ClassyTcl generated Toplevel"
+			append code "\n\tif \[regexp \{^\\.\} \$args] \{"
+			append code "\n\t\tset window \[lshift args\]"
+			append code "\n\t\} else \{"
+			append code "\n\t\tset window .$name"
+			append code "\n\t\}"
+			append code "\n\tClassy::parseopt \$args opt {}"
+			append code "\n\t# Create windows"
+			append code "\n\tClassy::Toplevel \$window \\"
+			append code "\n\t\t-destroycommand \[list destroy \$window\]"
+			append code "\n\t# End windows"
+			append code "\n\}"
+			$object infile set $file $name $code
 		}
 		frame {
-#			$object _creatededit $object.dedit
-			$object.dedit new frame $name $file
+			set code "proc [list $name] args \{# ClassyTcl generated Frame"
+			append code "\n\tif \[regexp \{^\\.\} \$args] \{"
+			append code "\n\t\tset window \[lshift args\]"
+			append code "\n\t\} else \{"
+			append code "\n\t\tset window .$name"
+			append code "\n\t\}"
+			append code "\n\tClassy::parseopt \$args opt {}"
+			append code "\n\t# Create windows"
+			append code "\n\tframe \$window \\"
+			append code "\n\t\t-class Classy::Topframe"
+			append code "\n\t# End windows"
+			append code "\n\}"
+			$object infile set $file $name $code
 		}
 		color - font - misc - key - mouse - menu - tool {
 			set f [open $file a]
@@ -237,6 +274,10 @@ Classy::Builder method open {file function type} {
 	set browse(name) $function
 	set browse(type) $type
 	set open(type) $type
+	if {"$function" == ""} {
+		edit $file
+		return
+	}
 	switch $type {
 		toplevel -
 		frame -
@@ -303,6 +344,11 @@ Classy::Builder method infile {cmd file args} {
 			}
 			close $o
 			close $f
+			if [string match "proc *" $code] {
+				catch {auto_mkindex [file dirname $file] *.tcl}
+				catch {rename $name {}}
+				set ::auto_index($name) [list source $file]
+			}
 		}
 		ls {
 			set f [open $file]
@@ -334,6 +380,9 @@ Classy::Builder method infile {cmd file args} {
 			}
 			close $o
 			close $f
+			catch {auto_mkindex [file dirname $file] *.tcl}
+			catch {rename $name {}}
+			catch {unset ::auto_index($name)}
 		}
 		rename {
 			set name [lindex $args 0]
@@ -351,6 +400,10 @@ Classy::Builder method infile {cmd file args} {
 				if [string match "proc $name *" $line] {
 					regsub "^proc [list $name]" $line "proc [list $newname]" line
 					puts $o $line
+					catch {rename $name $newname}
+					catch {auto_mkindex [file dirname $file] *.tcl}
+					unset ::auto_index($name)
+					set ::auto_index($newname) [list source $file]
 				} elseif [regexp "^Classy::config\[a-z\]+ [list $name]" $line] {
 					regsub "^(Classy::config\[a-z\]+) [list $name]" $line "\\1 [list $newname]" line
 					puts $o $line
@@ -377,6 +430,10 @@ Classy::Builder method infile {cmd file args} {
 			set f [open $file a]
 			puts $f $code
 			close $f
+			if [string match "proc *" $code] {
+				catch {auto_mkindex [file dirname $file] *.tcl}
+				set ::auto_index($func#$num) [list source $file]
+			}
 			switch $browse(type) {
 				color - font - misc - key - mouse - menu - tool {
 					set pnode [list $file {} $browse(type)]
@@ -404,6 +461,7 @@ Classy::Builder method delete {} {
 		file {
 			file rename -force $file $file~
 			$object.browse deletenode $browse(base)
+			catch {auto_mkindex [file dirname $file] *.tcl}
 			return $file
 		}
 		dir - color - font - misc - key - mouse - menu - tool {
@@ -416,8 +474,8 @@ Classy::Builder method delete {} {
 		default {
 			set function $browse(name)
 			$object infile delete $file $function
-			catch {auto_mkindex [file dirname $file] *.tcl}
-			catch {unset auto_index($function)}
+#			catch {auto_mkindex [file dirname $file] *.tcl}
+#			catch {unset auto_index($function)}
 			$object.browse selection set {}
 			$object.browse deletenode $browse(base)
 			return $function
@@ -509,10 +567,7 @@ Classy::Builder method save {} {
 			set result [$object.dedit save]
 		}
 		function {	
-			file copy -force $file $file~
 			$object.fedit.edit save
-			uplevel #0 source {$browse(file)}
-			catch {auto_mkindex [file dirname $file] *.tcl}
 			set result $file
 		}
 	}
@@ -555,7 +610,6 @@ Classy::Builder method closenode {base} {
 }
 
 Classy::Builder method opennode {args} {
-putsvars args
 	private $object browse
 	if {[llength $args] == 1} {
 		set base [lindex $args 0]
@@ -658,7 +712,6 @@ Classy::Builder method _drawtree {} {
 }
 
 Classy::Builder method fedit {w file function type} {
-putsvars w file function type
 	if ![winfo exists $w] {
 		Classy::Toplevel $w -keepgeometry all -resize {2 2}
 		Classy::Editor $w.edit -closecommand "$w hide"
@@ -670,7 +723,11 @@ putsvars w file function type
 	$w configure -title $function
 	$w.edit textchanged 0
 	$w.edit configure -savecommand [list invoke code [varsubst {object file function w} {
+		uplevel #0 $code
 		$object infile set $file $function $code
+#		uplevel #0 source {$file}
+#		catch {auto_mkindex [file dirname $file] *.tcl}
+#		set ::auto_index($function) [list source $file]
 		$w.edit textchanged 0
 		$w configure -title $function
 	}]]

@@ -6,6 +6,10 @@
 # ----------------------------------------------------------------------
 #doc CmdWidget title {
 #CmdWidget
+#} index {
+# Common tools
+#} shortdescr {
+# Tcl command line widget
 #} descr {
 # subclass of <a href="../basic/Widget.html">Widget</a><br>
 # CmdWidget creates a window in which Tcl commands can be typed.
@@ -198,7 +202,7 @@ Classy::CmdWidget method complete {{what file}} {
 		set list [lregsub "^$start" $flist {}]
 		set completion ""
 		while {"[lindex $list 0]"!=""} {
-			set flet [lmanip remdup [lmanip extract $list {^(.)}]]
+			set flet [lremdup [lmanip extract $list {^(.)}]]
 			if {[llength $flet]!=1} {
 				break
 			}

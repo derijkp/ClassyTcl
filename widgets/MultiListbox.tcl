@@ -6,6 +6,10 @@
 # ----------------------------------------------------------------------
 #doc MultiListbox title {
 #MultiListbox
+#} index {
+# Tk improvements
+#} shortdescr {
+# listbox with more than one line long entries
 #} descr {
 # subclass of <a href="../basic/Widget.html">Widget</a><br>
 # creates a listbox in which an entries occupy more than one line

@@ -6,6 +6,10 @@
 # ----------------------------------------------------------------------
 #doc FontSelect title {
 #FontSelect
+#} index {
+# Selectors
+#} shortdescr {
+# to select a font
 #} descr {
 # subclass of <a href="../basic/Widget.html">Widget</a><br>
 # creates a font selection widget

@@ -1,12 +1,11 @@
 #Functions
 
-
-
-
 proc test2 {} {
+	puts test2
 }
 
 proc test3 {} {
+	puts test3
 }
 
 
@@ -48,6 +47,7 @@ proc ttt args {# ClassyTcl generated Dialog
 	button $window.options.button8 \
 		-text button
 	grid $window.options.button8 -row 3 -column 0 -sticky nesw
+	# End windows
 
 	return $window
 }
@@ -68,9 +68,27 @@ proc top args {# ClassyTcl generated Toplevel
 	}
 	Classy::parseopt $args opt {}
 	# Create windows
-	Classy::Toplevel $window \
-		-destroycommand [list destroy $window]
-	#Initialisation code
+	Classy::Toplevel $window 
+	button $window.button1 \
+		-text try
+	grid $window.button1 -row 1 -column 0 -sticky nesw
+	Classy::Entry $window.entry1 \
+		-label label \
+		-width 4
+	grid $window.entry1 -row 0 -column 0 -sticky nesw
+
+	# End windows
+# ClassyTcl Initialise
+puts ok
+	# Parse this
+	$window configure \
+		-destroycommand 
+	$window.button1 configure \
+		-command [varsubst window {$window.entry1 set try}]
+# ClassyTcl Finalise
+puts ok
+	return $window
+	return $window
 }
 
 
@@ -89,3 +107,15 @@ proc t args {# ClassyTcl generated Frame
 		-class Classy::Topframe
 	#Initialisation code
 }
+
+
+
+
+
+
+
+
+
+
+
+

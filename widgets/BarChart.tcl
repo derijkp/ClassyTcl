@@ -7,16 +7,20 @@
 # ----------------------------------------------------------------------
 #doc BarChart title {
 #BarChart
+#} index {
+# Charts
+#} shortdescr {
+# Barchart that can be drawn on a canvas
 #} descr {
 # subclass of <a href="../basic/Class.html">Class</a><br>
-# <b>BarChart is not a widget type</b>. It is a class whose objects can 
+# <b>A BarChart object is not a widget</b>. It is a class whose objects can 
 # be associated with a canvas widget. When a BarChart instance is 
 # associated with a canvas, it will draw a barchart on this canvas. 
 # Several BarChart (and LineChart and ChartGrid) objects can be associated
 # with the same canvas.
 #}
 #doc {BarChart options} h2 {
-#	BarChart options
+# BarChart options
 #} descr {
 # BarcHart objects support the following options in its configure method
 #<dl>
@@ -94,6 +98,7 @@ Classy::BarChart method destroy {} {
 #doc {BarChart command configure} cmd {
 #pathname configure ?option? ?value? ?option value ...?
 #} descr {
+# change the BarChart configuration options
 #}
 Classy::BarChart method configure {args} {
 	private $object options
@@ -178,6 +183,10 @@ Classy::BarChart method configure {args} {
 #doc {BarChart command dataset} cmd {
 #pathname dataset name values
 #} descr {
+# A barchart can have several ranges of data. Each range has a name.
+# This method is used to set (or change) the data in a range.
+# $values is a list of values that give the value for each data item. Optionally labels
+# can be set with the labelset method
 #}
 Classy::BarChart method dataset {name values} {
 	private $object data tag options order
@@ -196,7 +205,6 @@ Classy::BarChart method _create {name num} {
 	private $object data tag options
 	set canvas $options(-canvas)
 	if {"$canvas" == ""} return
-
 	set colors [option get . colorList ColorList]
 	regsub -all {{|}} $colors {} colors
 	set color [lindex $colors $num]
@@ -211,6 +219,7 @@ Classy::BarChart method _create {name num} {
 #doc {BarChart command dataget} cmd {
 #pathname dataget name
 #} descr {
+# returns the current data in range $name
 #}
 Classy::BarChart method dataget {name} {
 	private $object data tag
@@ -221,6 +230,7 @@ Classy::BarChart method dataget {name} {
 #doc {BarChart command labelset} cmd {
 #pathname labelset labels
 #} descr {
+# sets the labels associated with the barchart
 #}
 Classy::BarChart method labelset {values} {
 	private $object labels
@@ -235,6 +245,7 @@ Classy::BarChart method labelset {values} {
 #doc {BarChart command delete} cmd {
 #pathname delete name
 #} descr {
+# delete the range with name $name
 #}
 Classy::BarChart method delete {name} {
 	private $object data tag options order
@@ -279,6 +290,7 @@ Classy::BarChart method hidden {name {value {}}} {
 #doc {BarChart command ranges} cmd {
 #pathname ranges
 #} descr {
+# returns the names of all ranges in the chart
 #}
 Classy::BarChart method ranges {} {
 	private $object order
@@ -289,6 +301,8 @@ Classy::BarChart method ranges {} {
 #doc {BarChart command barconfigure} cmd {
 #pathname barconfigure name ?option? ?value? ?option value ...?
 #} descr {
+# change the display properties of a range. The same options as for the canvas polygon item are
+# available
 #}
 Classy::BarChart method barconfigure {name args} {
 	private $object tag options

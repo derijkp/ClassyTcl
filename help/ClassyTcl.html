@@ -1,115 +1,109 @@
 <HTML>
 <HEAD>
-   <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
-   <META NAME="GENERATOR" CONTENT="Mozilla/4.04 [en] (X11; I; Linux 2.0.32 i586) [Netscape]">
-   <TITLE>ClassyTcl</TITLE>
+	<TITLE>ClassyTcl</TITLE>
 </HEAD>
 <BODY>
+<H1>ClassyTcl</H1>
+<I>Object system, widget set and GUI builder for Tcl</I> <BR><I>by
+Peter De Rijk (Universiteit Antwerpen)</I> 
 
-<H1>
-ClassyTcl</H1>
-<I>Object system, widget set and GUI builder for Tcl</I>
-<BR><I>by Peter De Rijk (Universiteit Antwerpen)</I>
-<H2>
-What is ClassyTcl</H2>
-The first component of ClassyTcl is an object system 
-for <A HREF="tcltk.html">Tcl</A>, which has both a Tcl and a C version
-available. It doesn't require patches to the Tcl core,
-making keeping up with new releases easier. Performance is very adequate.
-The C version is gives extra speed, and makes it possible to implement some
-methods in C (usually also for performance reasons).
-Included in the distribution is a large set of <a href="widgets/index.html">
-new widgets</a>, written using
-the object system. While the object system itself only requires Tcl (>8.0),
-the widgets that come with it require Tk (of course), and another freely
-available extension called <A HREF="Extral.html">ExtraL</A>. ExtraL also
-does not require compiled code, but can be speeded up by having it available.
-<H2>
-Use</H2>
-You should be able to obtain the latest versions of ClassyTcl and ExtraL
-on our server <a href="http://rrna.uia.ac.be/">rrna.uia.ac.be</a> via WWW or 
-anonymous ftp (directory /pub/tcl).
-Both Extral and ClassyTcl are implemented as loadable packages. The ClassyTcl
-object systen can be used by putting the directories (after unpacking) 
-somewhere appropriate and using the command
-<BR>package require Class
+<H2>What is ClassyTcl</H2>
 
-<P>To use the widgets that come with the distribution, use the command
-<BR>package require ClassyTcl<br>
-after naming the application (tk appname ?name?). The application name
-will be used for managing defaults and configuration options.
-<H2>
-Implementation</H2>
-Loading the package will create on class named <a href="basic/Class.html">
-Class</a>. All other classes and objects are created by subclassing or
-instanciating Class (or its subclasses), so all documentation to use the 
-object system is in the description of <a href="basic/Class.html">Class</a>.
-<H2>
+<H4>Object system</H3>
+The first component of ClassyTcl is an <A HREF="basic/Class.html">object
+system</A> for <A HREF="tcltk.html">Tcl</A>, which has both a Tcl and
+a C version available. It doesn't require patches to the Tcl core,
+wich makes keeping up with new releases easier. Performance is very
+adequate. The C version is gives extra speed, and makes it possible
+to implement some methods in C (usually also for performance
+reasons).
 
-Widgets</H2>
-There are a lot of interesting <a href="widgets/index.html">widgets in 
-ClassyTcl</a>, that you can use in your programs. There are complex widgets,
-such as a <a href="widgets/Editor.html">full featured text editor</a>, 
-a <a href="widgets/Table.html">table widget</a>, 
-a <a href="widgets/HTML.html">HTML display widget</a>,
-a <a href="CmdWidget.html">console widget</a>,
-a <a href="widgets/help.html">help</a> and <a href="widgets/Configurator.html">
-configuration system</a> as well as component widgets, such as <a href="widgets/Dialog.html">
-intelligent dialogs</a>, a <a href="widgets/NoteBook.html">NoteBook</a> or a 
-<a href="widgets/Fold.html">Folding frame</a>.
-Classes such as <a href="widgets/DynaMenu.html">DynaMenu</a> 
-and <a href="widgets/DynaTool.html">DynaTool</a> help in easily making configurable
-menus.
-There are also several widgets that are improvments on the Tk widgets or systems, 
-such as the <a href="widgets/Text.html">text</a> and <a href="widgets/Canvas.html">canvas</a> with 
-undo capabilities and specialised entry widgets with label and contstraint options.
+<H3>Gui Builder</H3>
+The <a href="classy_builder.html">ClassyTcl Builder</a> can be used to graphically 
+create interfaces. It is invoked via the <b>cbuild</b> command in the bin
+directory.
+
+<H3>Widget Set</H3>
+ClassyTcl adds a lot of improvements to Tk, ranging from <a href="widgets/DragDrop.html">drag 
+and drop</a> support (between Tk apps) and a <a href="classy_configure.html">configuration 
+system</a> to a large set of <A HREF="widgets/index.html">new
+widgets and commands</A>, written using the object system.<br>
+While the object system itself only requires Tcl (&gt;8.0), the widgets that come with it
+require Tk (of course), and another freely available extension called
+<A HREF="Extral.html">ExtraL</A>. ExtraL also does not require
+compiled code, but can be speeded up by having it available.
+Documentation for the widgets is often somewhat limited, but besides
+the documentation, you can learn a lot from sources, the tests and the demos.
+
+<H3>Sample applications</H3>
+The ClassyTcl distribution contains some example applications:
+<ul>
+<li><b>cedit</b>: This editor is actually very useable: I use it for all my developement
+<li><b>ccalc</b>: calculator; demo for the builder
+<li><b>cdraw</b>: limited vector drawing program
+<li><b>ctester</b>: app to test widgets
+<li><b>cdemo</b>: show off
+</ul>
+
+<H2>Use</H2>
+You should be able to obtain the latest versions of ClassyTcl and
+ExtraL on our server <A HREF="http://rrna.uia.ac.be/">rrna.uia.ac.be</A>
+via WWW or anonymous ftp (directory /pub/tcl). Both Extral and
+ClassyTcl are implemented as loadable packages.
 <p>
-Unfortunately documentation is often somewhat limited, but
-besides the documentation, you can learn a lot from sources. Be sure to 
-check out the file '<a href="../widgets/Editor.tcl">widgets/Editor.tcl</a>' as an example. The Editor widget 
-uses a lot of the other widgets.
-<H2>
-How to contact me</H2>
-I will do my best to reply as fast as I can to any problems, etc. However,
-the development of ClassyTcl is not my only task, which is why my response
-might not be always as fast as you would like (although I get a good average).
+The ClassyTcl object systen can be used by putting the directories (after unpacking)
+somewhere appropriate and using the command<BR>
+<CODE>package require Class</CODE><br>
+To use the widgets that come with the distribution, use the code:<BR>
+<CODE>tk appname name<br>
+package require ClassyTcl</CODE><BR>
+The application name given by the "tk appname" will be
+used for managing defaults and configuration options.
+<p>
+To write a new application, you can try out the builder by starting the program
+cbuild in the bin directory.
+
+<H2>How to contact me</H2>
+My mailbox gets overwhelmed quite often, and the development of ClassyTcl 
+is definately not my only task, so responses might be slower than you 
+would like. However, I will respond as fast as I can.
+<P>
 <ADDRESS>
-Peter De Rijk</ADDRESS>
+Peter De Rijk<BR>University of Antwerp (UIA) <BR>
+Department of Biochemistry <BR>Universiteitsplein 1 <BR>
+B-2610 Antwerp 
+<p>
+tel.: 32-03-820.23.16 <BR>fax: 32-03-820.22.48 <BR>
+E-mail: derijkp@uia.ua.ac.be <BR>
+web: http://rrna.uia.ac.be/~peter/personal/peter.html 
+</ADDRESS>
 
-<BR>University of Antwerp (UIA)
-<BR>Department of Biochemistry
-<BR>Universiteitsplein 1
-<BR>B-2610 Antwerp
-
-<P>tel.: 32-03-820.23.16
-<BR>fax: 32-03-820.22.48
-<BR>E-mail: derijkp@uia.ua.ac.be
-<BR>web: http://rrna.uia.ac.be/~peter/personal/peter.html
-<H2>
-Legalities</H2>
-ClassyTcl is Copyright Peter De Rijk, University of Antwerp (UIA), 1995
-The following terms apply to all files associated with the software unless
-explicitly disclaimed in individual files.
-
-<P>The author hereby grant permission to use, copy, modify, distribute,
-and license this software and its documentation for any purpose, provided
-that existing copyright notices are retained in all copies and that this
-notice is included verbatim in any distributions. No written agreement,
-license, or royalty fee is required for any of the authorized uses. Modifications
-to this software may be copyrighted by their authors and need not follow
-the licensing terms described here, provided that the new terms are clearly
-indicated on the first page of each file where they apply.
-
-<P>IN NO EVENT SHALL THE AUTHORS OR DISTRIBUTORS BE LIABLE TO ANY PARTY
-FOR DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING
-OUT OF THE USE OF THIS SOFTWARE, ITS DOCUMENTATION, OR ANY DERIVATIVES
-THEREOF, EVEN IF THE AUTHORS HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH
-DAMAGE.
-
-<P>THE AUTHORS AND DISTRIBUTORS SPECIFICALLY DISCLAIM ANY WARRANTIES, INCLUDING,
-BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS
-FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT. THIS SOFTWARE IS PROVIDED
-ON AN "AS IS" BASIS, AND THE AUTHORS AND DISTRIBUTORS HAVE NO OBLIGATION
-TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
+<H2>Legalities</H2>
+ClassyTcl is Copyright Peter De Rijk, University of Antwerp (UIA),
+1995 The following terms apply to all files associated with the
+software unless explicitly disclaimed in individual files. 
+<P>
+The author hereby grant permission to use, copy, modify,
+distribute, and license this software and its documentation for any
+purpose, provided that existing copyright notices are retained in all
+copies and that this notice is included verbatim in any
+distributions. No written agreement, license, or royalty fee is
+required for any of the authorized uses. Modifications to this
+software may be copyrighted by their authors and need not follow the
+licensing terms described here, provided that the new terms are
+clearly indicated on the first page of each file where they apply. 
+<P>
+IN NO EVENT SHALL THE AUTHORS OR DISTRIBUTORS BE LIABLE TO ANY
+PARTY FOR DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL
+DAMAGES ARISING OUT OF THE USE OF THIS SOFTWARE, ITS DOCUMENTATION,
+OR ANY DERIVATIVES THEREOF, EVEN IF THE AUTHORS HAVE BEEN ADVISED OF
+THE POSSIBILITY OF SUCH DAMAGE. 
+<P>
+THE AUTHORS AND DISTRIBUTORS SPECIFICALLY DISCLAIM ANY WARRANTIES,
+INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND
+NON-INFRINGEMENT. THIS SOFTWARE IS PROVIDED ON AN &quot;AS IS&quot;
+BASIS, AND THE AUTHORS AND DISTRIBUTORS HAVE NO OBLIGATION TO PROVIDE
+MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS. 
 </BODY>
 </HTML>

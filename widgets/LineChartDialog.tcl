@@ -6,6 +6,10 @@
 # ----------------------------------------------------------------------
 #doc LineChartDialog title {
 #LineChartDialog
+#} index {
+# Charts
+#} shortdescr {
+# Dialog with a linechart and some controls to change its display
 #} descr {
 # subclass of <a href="Dialog.html">Dialog</a><br>
 # Creates a <a href="Dialog.html">Dialog</a> which displays a 
@@ -119,11 +123,7 @@ Classy::LineChartDialog addoption -yrange {yRange YRange {0 100}} {
 #  Methods
 # ------------------------------------------------------------------
 
-#doc {LineChartDialog command newvalues} cmd {
-#pathname newvalues 
-#} descr {
-#}
-Classy::LineChartDialog method newvalues {} {
+Classy::LineChartDialog method _newvalues {} {
 	private $object keepyrange keepchartheight
 	set w $object.options
 	if {[$w.chart configure -percentages] == 1} {
@@ -136,6 +136,8 @@ Classy::LineChartDialog method newvalues {} {
 #doc {LineChartDialog command dataset} cmd {
 #pathname dataset name data
 #} descr {
+# A linechart can have several ranges of data. Each range has a name.
+# This method is used to set (or change) the data in a range.
 #}
 Classy::LineChartDialog method dataset {name data} {
 	$object.options.chart dataset $name $data
@@ -144,6 +146,7 @@ Classy::LineChartDialog method dataset {name data} {
 #doc {LineChartDialog command dataget} cmd {
 #pathname dataget name
 #} descr {
+# returns the current data in range $name
 #}
 Classy::LineChartDialog method dataget {name} {
 	$object.options.chart dataget $name
@@ -152,6 +155,7 @@ Classy::LineChartDialog method dataget {name} {
 #doc {LineChartDialog command datadelete} cmd {
 #pathname datadelete name
 #} descr {
+# delete the range with name $name
 #}
 Classy::LineChartDialog method datadelete {name} {
 	$object.options.chart datadelete $name
@@ -180,13 +184,13 @@ Classy::LineChartDialog method switchdata {item} {
 #doc {LineChartDialog command dataconfigure} cmd {
 #pathname dataconfigure
 #} descr {
+# pop up a dialog to change the properties of the linechart data
 #}
 Classy::LineChartDialog method dataconfigure {} {
 	private $object width data
 	set chart $object.options.chart
 	Classy::Dialog $object.configure -title "Data configure" -keepgeometry no
 	set w $object.configure.options
-
 	set num 0
 #	set elements "[$chart ranges] [array names data]"
 	foreach element [$chart ranges] {
@@ -202,7 +206,6 @@ Classy::LineChartDialog method dataconfigure {} {
 			$b configure -bg $color
 		}]
 		$b configure -bg [lindex [$chart lineconfigure "$element" -fill] 4]
-
 		button $w.line$num -text "Line color" -command [varsubst {b chart element} {
 			set color [lindex [$chart lineconfigure "$element" -outline] 4]
 			set color [Classy::getcolor -initialcolor $color -title "$element fill color"]
@@ -210,11 +213,9 @@ Classy::LineChartDialog method dataconfigure {} {
 			$b configure -fg $color
 		}]
 		$b configure -fg [lindex [$chart lineconfigure "$element" -outline] 4]
-
 		Classy::NumEntry $w.width$num -label "Line width" -width 5 \
 			-command "$chart lineconfigure [list $element] -width"
 		$w.width$num	set [lindex [$chart lineconfigure $element -width] 4]
-
 		grid $w.label$num $w.fill$num $w.line$num $w.width$num -sticky we
 		incr num
 	}
@@ -223,6 +224,7 @@ Classy::LineChartDialog method dataconfigure {} {
 #doc {LineChartDialog command rangeconfigure} cmd {
 #pathname rangeconfigure 
 #} descr {
+# pop up a dialog to change the properties of the linechart ranges
 #}
 Classy::LineChartDialog method rangeconfigure {} {
 	private $object options
@@ -265,7 +267,7 @@ Classy::LineChartDialog method rangeconfigure {} {
 	grid $w.view.ymin $w.view.ymax -sticky se
 	grid columnconfigure $w.view 0 -weight 1
 	grid columnconfigure $w.view 0 -weight 1
-
+	#
 	Classy::NumEntry $w.full.xmin -label "Min X" -width 5 -constraint int -min 0
 	Classy::NumEntry $w.full.xmax -label "Max X" -width 5 -constraint int
 	Classy::NumEntry $w.full.ymin -label "Min Y" -width 5 -constraint int
@@ -280,7 +282,7 @@ Classy::LineChartDialog method rangeconfigure {} {
 	grid $w.full.ymin $w.full.ymax -sticky se
 	grid columnconfigure $w.full 0 -weight 1
 	grid columnconfigure $w.full 0 -weight 1
-
+	#
 	Classy::NumEntry $w.area.xmin -label "Min X" -width 5 -constraint int -min 0
 	Classy::NumEntry $w.area.xmax -label "Max X" -width 5 -constraint int
 	Classy::NumEntry $w.area.ymin -label "Min Y" -width 5 -constraint int
@@ -294,7 +296,7 @@ Classy::LineChartDialog method rangeconfigure {} {
 	grid $w.area.ymin $w.area.ymax -sticky se
 	grid columnconfigure $w.area 0 -weight 1
 	grid columnconfigure $w.area 0 -weight 1
-
+	#
 	checkbutton $w.vertical -text "Vertical labels" \
 		-onvalue vertical -offvalue horizontal \
 		-variable [privatevar $object.options.chart options(-labelorient)] \
@@ -305,7 +307,7 @@ Classy::LineChartDialog method rangeconfigure {} {
 		$object chartconfigure -area [list [$w.area.xmin get] [$w.area.ymin get] [$w.area.xmax get] [$w.area.ymax get]]
 		$object _setscroll
 	}]
-
+	#
 	grid $w.viewl - -sticky we
 	grid $w.view - -sticky we
 	grid $w.fulll - -sticky we

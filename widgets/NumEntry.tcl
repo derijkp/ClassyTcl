@@ -9,6 +9,10 @@
 # ----------------------------------------------------------------------
 #doc NumEntry title {
 #NumEntry
+#} index {
+# Tk improvements
+#} shortdescr {
+# <a gref="Entry.html">Classy::Entry</a> limited to numbers, and with up and down buttons
 #} descr {
 # subclass of <a href="../basic/Widget.html">Widget</a><br>
 # provides nearly the same options and methods as Entry,

@@ -6,6 +6,10 @@
 # ----------------------------------------------------------------------
 #doc Message title {
 #Message
+#} index {
+# Tk improvements
+#} shortdescr {
+# slightly improved message widget
 #} descr {
 # subclass of <a href="../basic/Widget.html">Widget</a><br>
 # The ClassyTcl Message has all the options and commands of the Tk Message, but

@@ -184,8 +184,8 @@ void Classy_ClassDestroy(ClientData clientdata) {
 		entry = Tcl_FindHashEntry(&(parent->subclasses),string);
 		if (entry != NULL) {Tcl_DeleteHashEntry(entry);}
 	}
-	Tcl_VarEval(interp,"foreach var [info vars ::class::", string,",,*] {unset $var}", (char *)NULL);
-	Tcl_VarEval(interp,"foreach cmd [info commands ::class::", string,",,*] {rename $cmd {}}", (char *)NULL);
+	Tcl_VarEval(interp,"foreach ::class::var [info vars ::class::", string,",,*] {unset $::class::var}", (char *)NULL);
+	Tcl_VarEval(interp,"foreach ::class::cmd [info commands ::class::", string,",,*] {rename $::class::cmd {}}", (char *)NULL);
 	Tcl_EventuallyFree(clientdata,Classy_FreeClass);
 	Tcl_Release(clientdata);
 }
@@ -266,13 +266,13 @@ int Classy_SubclassClassMethod(
 	Classy_CopyMethods(&(class->methods),&(subclass->methods));
 	Classy_CopyMethods(&(class->classmethods),&(subclass->classmethods));
 	classname = Tcl_GetStringFromObj(class->class,NULL);
-	error = Tcl_VarEval(interp,"foreach var [info vars ::class::", classname, ",,v,*] {",
+	error = Tcl_VarEval(interp,"namespace eval class {foreach var [info vars ::class::", classname, ",,v,*] {",
 		"regexp {^::class::", classname, ",,v,(.*)$} $var temp name \n",
 		"if [array exists $var] {",
 			"array set ::class::", subclassname , ",,v,${name} [array get $var]",
 		"} else {",
 			"set ::class::", subclassname , ",,v,${name} [set $var]",
-		"}}",(char *)NULL);
+		"}}}",(char *)NULL);
 	if (error != TCL_OK) {return error;}
 	Tcl_SetObjResult(interp,name);
 	return TCL_OK;

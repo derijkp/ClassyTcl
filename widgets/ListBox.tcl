@@ -6,6 +6,10 @@
 # ----------------------------------------------------------------------
 #doc ListBox title {
 #ListBox
+#} index {
+# Tk improvements
+#} shortdescr {
+# listbox with auto scroll bars, and other extras
 #} descr {
 # subclass of <a href="../basic/Widget.html">Widget</a><br>
 # creates a listbox with automatic scrollbars, and some handy extra options.

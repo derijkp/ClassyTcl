@@ -7,6 +7,10 @@
 # ----------------------------------------------------------------------
 #doc ChartGrid title {
 #ChartGrid
+#} index {
+# Charts
+#} shortdescr {
+# grid that can be displayed on canvas
 #} descr {
 # subclass of <a href="../basic/Widget.html">Widget</a><br>
 # <b>ChartGrid is not a widget type</b>. It is a class whose objects can 

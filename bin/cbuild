@@ -1,0 +1,39 @@
+#!/bin/sh
+# the next line restarts using wish \
+exec wish8.0 "$0" "$@"
+#
+# ClassyTcl
+# --------- Peter De Rijk
+#
+
+wm withdraw .
+tk appname cbuild
+package require ClassyTcl
+
+if {"$argv" != ""} {
+	set file [lindex $argv 0]
+	set argv [lrange $argv 1 end]
+	if {"[file pathtype $file]" == "relative"} {
+		set file [file join [pwd] $file]
+	}
+} else {
+	set file ""
+	set file [Classy::savefile -title "Build Application" -help cbuild]
+	if {"$file" == ""} exit
+}
+
+set name [file tail $file]
+if ![file exists $file] {
+	if {[lsearch {conf help lib} $name] != -1} {
+		error "Cannot create application named \"$name\": reserved"
+	}
+	if ![Classy::yorn "Create application	\"$name\""] {exit}
+	file copy [file join $class::dir template] $file
+	file rename [file join $file template] [file join $file $name]
+	set file [file join $file $name]
+} elseif [file isdir $file] {
+	set file [file join $file $name]
+}
+puts "Starting application \"$name\""
+eval exec {$file} -builder $argv &
+exit

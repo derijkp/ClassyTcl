@@ -6,6 +6,10 @@
 # ----------------------------------------------------------------------
 #doc Progress title {
 #Progress
+#} index {
+# New widgets
+#} shortdescr {
+# show progress of some process
 #} descr {
 # subclass of <a href="Widget.html">Widget</a><br>
 # creates a widget in which the progress of some action will be displayed.

@@ -7,6 +7,10 @@
 # ----------------------------------------------------------------------
 #doc Tree title {
 #Tree
+#} index {
+# New widgets
+#} shortdescr {
+# a tree that can be drawn on a canvas
 #} descr {
 # subclass of <a href="../basic/Class.html">Class</a><br>
 # <b>Tree is not a widget type</b>. It is a class whose objects can 
@@ -23,6 +27,11 @@
 #<dt>-padx<dd>size of indentation
 #<dt>-pady<dd>size left open between different lines
 #<dt>-font<dd>default font for the text lines
+#<dt>-padtext<dd>size between text parts
+#<dt>-startx<dd>x location of root
+#<dt>-starty<dd>y location of root
+#<dt>-rootimage<dd>optional image displayed on root
+#<dt>-roottext<dd>optional text displayed on root
 #</dl>
 #}
 #doc {Tree command} h2 {
@@ -84,6 +93,7 @@ Classy::Tree method destroy {} {
 #doc {Tree command configure} cmd {
 #pathname configure ?option? ?value? ?option value ...?
 #} descr {
+# changes the way the tree is displayed. Supported options are given above.
 #}
 Classy::Tree method configure {args} {
 	private $object options
@@ -261,6 +271,14 @@ Classy::Tree method _redraw {} {
 #doc {Tree command addnode} cmd {
 # pathname addnode parent node args
 #} descr {
+# add a node to node $parent. The following arguments can be given:
+# <ul>
+# <li>-text
+# <li>-image
+# <li>-window
+# <li>-length
+# <li>-type
+# </ul>
 #}
 Classy::Tree method addnode {parent node args} {
 	private $object data options
@@ -416,9 +434,12 @@ Classy::Tree method type {node} {
 }
 
 #doc {Tree command node} cmd {
-# pathname node index
-# pathname node x y
+# pathname node ...
 #} descr {
+# <ul>
+# <li>pathname node index
+# <li>pathname node x y
+# </ul>
 #}
 Classy::Tree method node {index {y {}}} {
 	private $object data options
@@ -432,9 +453,12 @@ Classy::Tree method node {index {y {}}} {
 }
 
 #doc {Tree command what} cmd {
-# pathname what index
-# pathname what x y
+# pathname what ...
 #} descr {
+# <ul>
+# <li>pathname what index
+# <li>pathname what x y
+# </ul>
 #}
 Classy::Tree method what {index {y {}}} {
 	private $object data options
@@ -466,12 +490,15 @@ Classy::Tree method children {node} {
 }
 
 #doc {Tree command selection} cmd {
-# pathname selection
-# pathname selection clear
-# pathname selection add node ?node ...?
-# pathname selection set node ?node ...?
-# pathname selection remove node ?node ...?
+# pathname selection ?option? ...
 #} descr {
+# <ul>
+# <li>pathname selection
+# <li>pathname selection clear
+# <li>pathname selection add node ?node ...?
+# <li>pathname selection set node ?node ...?
+# <li>pathname selection remove node ?node ...?
+# </ul>
 #}
 Classy::Tree method selection {{cmd {}} args} {
 	private $object selection
@@ -485,10 +512,10 @@ Classy::Tree method selection {{cmd {}} args} {
 	Classy::todo $object _redraw
 }
 
-#doc {Tree command addnode} cmd {
+#doc {Tree command nodes} cmd {
 # pathname nodes parent
 #} descr {
-# resturns the child nodes from $parent
+# returns the child nodes from $parent
 #}
 Classy::Tree method nodes {parent} {
 	private $object data options

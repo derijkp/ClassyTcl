@@ -6,6 +6,10 @@
 # ----------------------------------------------------------------------
 #doc Selector title {
 #Selector
+#} index {
+# Selectors
+#} shortdescr {
+# select relief, justify, ...
 #} descr {
 # subclass of <a href="../basic/Widget.html">Widget</a><br>
 # creates an selector, a widget to select relief, justify, etc.

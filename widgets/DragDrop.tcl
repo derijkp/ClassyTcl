@@ -6,21 +6,30 @@
 # ----------------------------------------------------------------------
 #doc DragDrop title {
 #DragDrop
+#} index {
+# Common tools
+#} shortdescr {
+# class for handling drag and drop to and from widgets
 #} descr {
 # subclass of <a href="../basic/Class.html">Class</a><br>
 # DragDrop is not a widget and is not intended to produce instances. 
 # It is a class that manages drag and drop.
 # A drop can be started using the command <br>
-# Classy::DragDrop start window value ...<br>
-# This should be bound to the <<Action-Motion>> event od source window.<p>
+# <code>Classy::DragDrop start x y value ...<br></code>
+# This should be bound to the  &lt;&lt;Drag&gt;&gt; event of the source window.
+# <p>
 # A window will be notified of a drop by the virtual event &lt;&lt;Drop&gt;&gt;, so<br>
 # bind window &lt;&lt;Drop&gt;&gt; command<br>
-# will execute command when somethind is dropped on the window<p>
+# will execute the command when somethind is dropped on the window
+# <p>
 # The window is also notified of the current drag entering, moving in, or leaving the
 # window by the &lt;&lt;Drag-Enter&gt;&gt; &lt;&lt;Drag-Motion&gt;&gt; and\
 # &lt;&lt;Drag-Leave&gt;&gt; events, and can take apropriate actions.
 # The program can get the data associated with the drag using the command <br>
-# Classy::DragDrop get ?type?
+# <code>Classy::DragDrop get ?type?</code>
+#}
+#doc {DragDrop command} h2 {
+#	Config methods
 #}
 # Next is to get the attention of auto_mkindex
 if 0 {
@@ -55,11 +64,12 @@ Classy::DragDrop classmethod destroy {} {
 #bind Classy::DragDrop <<Drag-Link>> {Classy::DragDrop configure -transfer link}
 
 #doc {DragDrop command start} cmd {
-# Classy::DragDrop start window value ?option value ...?<br>
+# Classy::DragDrop start x y value ?option value ...?<br>
 #} descr {
 # starts a drag. It clears all previously changed drag and drop settings to their
 # default values or the ones supplied as options to the start method.
-# $window must the window from wich the drag is started.
+# x and y must be the x and y position of the pointer on the screen: you can
+# use %X and %Y in the event command to get these.
 # $value is the default value given for the drop if no type is specified.
 # the options are the same as for the Classy::DragDrop configure method.
 #}
@@ -244,83 +254,6 @@ Classy::DragDrop method configure {args} {
 	}
 }
 
-#doc {DragDrop command bind} cmd {
-# Classy::DragDrop start window value ?option value ...?<br>
-#} descr {
-# with this method, bindings can be added to the current drag, eg. to change the transfer type
-# in response to a keypress. Note that the command must come after the drag was
-# started with the start method.
-#}
-Classy::DragDrop method bind {args} {
-	eval ::Tk::bind Classy::DragDrop_extra $args
-}
-
-Classy::DragDrop method _events {app x y} {
-	private $object data
-	set dropw [winfo containing $x $y]
-	if {"$data(prev)" != ""} {
-		if {"$data(prev)" != "$dropw"} {
-			set rx [expr {$x-[winfo rootx $data(prev)]}]
-			set ry [expr {$y-[winfo rooty $data(prev)]}]
-			event generate $data(prev) <<Drag-Leave>> -x $rx -y $ry
-		}
-	}
-	if {"$dropw" == ""} {
-		set data(prev) ""
-		return ""
-	}
-	set rx [expr {$x-[winfo rootx $dropw]}]
-	set ry [expr {$y-[winfo rooty $dropw]}]
-	if {"$data(prev)" != "$dropw"} {
-		event generate $dropw <<Drag-Enter>> -x $rx -y $ry
-	}
-	event generate $dropw <<Drag-Motion>> -x $rx -y $ry
-	set data(prev) $dropw
-}
-
-#doc {DragDrop command move} cmd {
-# Classy::DragDrop move<br>
-#} descr {
-# This method is called while dragging. It updates the dragged window, and generates
-# the Drag events.
-#}
-Classy::DragDrop method move {} {
-	private $object data
-	if ![info exists data(prev)] {
-		$object abort
-	}
-	set w .classy__.dragdrop
-	set x [winfo pointerx $w]
-	set y [winfo pointery $w]
-	if ![info exists data(withdrawn)] {
-		wm geometry  $w +[expr {$x+1}]+[expr {$y+1}]
-	}
-	set data(app) {}
-	set dropw [winfo containing $x $y]
-	set curapp [tk appname]
-	if {"$data(prev)" != ""} {
-		if {"$data(prev)" != "$dropw"} {
-			set rx [expr {$x-[winfo rootx $data(prev)]}]
-			set ry [expr {$y-[winfo rooty $data(prev)]}]
-			event generate $data(prev) <<Drag-Leave>> -x $rx -y $ry
-		}
-	}
-	if {"$dropw" != ""} {
-		set rx [expr {$x-[winfo rootx $dropw]}]
-		set ry [expr {$y-[winfo rooty $dropw]}]
-		set data(app) $curapp
-		if {"$data(prev)" != "$dropw"} {
-			event generate $dropw <<Drag-Enter>> -x $rx -y $ry
-		}
-		event generate $dropw <<Drag-Motion>> -x $rx -y $ry
-	} else {
-	    foreach app [lremove [winfo interps] $curapp] {
-			send -async -- $app Classy::DragDrop _events [list $curapp] $x $y
-		}
-	}
-	set data(prev) $dropw
-}
-
 #doc {DragDrop command types} cmd {
 # Classy::DragDrop types ?pattern?<br>
 #} descr {
@@ -367,6 +300,40 @@ Classy::DragDrop method get {{type {}}} {
 			}
 		}
 	}
+}
+
+#doc {DragDrop command bind} cmd {
+# Classy::DragDrop bind event ?command?
+#} descr {
+# with this method, bindings can be added to the current drag, eg. to change the transfer type
+# in response to a keypress. Note that the command must come after the drag was
+# started with the start method.
+#}
+Classy::DragDrop method bind {args} {
+	eval ::Tk::bind Classy::DragDrop_extra $args
+}
+
+Classy::DragDrop method _events {app x y} {
+	private $object data
+	set dropw [winfo containing $x $y]
+	if {"$data(prev)" != ""} {
+		if {"$data(prev)" != "$dropw"} {
+			set rx [expr {$x-[winfo rootx $data(prev)]}]
+			set ry [expr {$y-[winfo rooty $data(prev)]}]
+			event generate $data(prev) <<Drag-Leave>> -x $rx -y $ry
+		}
+	}
+	if {"$dropw" == ""} {
+		set data(prev) ""
+		return ""
+	}
+	set rx [expr {$x-[winfo rootx $dropw]}]
+	set ry [expr {$y-[winfo rooty $dropw]}]
+	if {"$data(prev)" != "$dropw"} {
+		event generate $dropw <<Drag-Enter>> -x $rx -y $ry
+	}
+	event generate $dropw <<Drag-Motion>> -x $rx -y $ry
+	set data(prev) $dropw
 }
 
 #doc {DragDrop command abort} cmd {
@@ -417,6 +384,50 @@ Classy::DragDrop method drop {} {
 			send -async -- $appl [list catch [list event generate $dropw <<Drop>>]]
 		}
 	}
+}
+
+#doc {DragDrop command move} cmd {
+# Classy::DragDrop move<br>
+#} descr {
+# This method is called while dragging. It updates the dragged window, and generates
+# the Drag events. The user normally does not have to call this method, as it is
+# usually called by the bindings of DragDrop.
+#}
+Classy::DragDrop method move {} {
+	private $object data
+	if ![info exists data(prev)] {
+		$object abort
+	}
+	set w .classy__.dragdrop
+	set x [winfo pointerx $w]
+	set y [winfo pointery $w]
+	if ![info exists data(withdrawn)] {
+		wm geometry  $w +[expr {$x+1}]+[expr {$y+1}]
+	}
+	set data(app) {}
+	set dropw [winfo containing $x $y]
+	set curapp [tk appname]
+	if {"$data(prev)" != ""} {
+		if {"$data(prev)" != "$dropw"} {
+			set rx [expr {$x-[winfo rootx $data(prev)]}]
+			set ry [expr {$y-[winfo rooty $data(prev)]}]
+			event generate $data(prev) <<Drag-Leave>> -x $rx -y $ry
+		}
+	}
+	if {"$dropw" != ""} {
+		set rx [expr {$x-[winfo rootx $dropw]}]
+		set ry [expr {$y-[winfo rooty $dropw]}]
+		set data(app) $curapp
+		if {"$data(prev)" != "$dropw"} {
+			event generate $dropw <<Drag-Enter>> -x $rx -y $ry
+		}
+		event generate $dropw <<Drag-Motion>> -x $rx -y $ry
+	} else {
+	    foreach app [lremove [winfo interps] $curapp] {
+			send -async -- $app Classy::DragDrop _events [list $curapp] $x $y
+		}
+	}
+	set data(prev) $dropw
 }
 
 # event generate .e <<Drop>>

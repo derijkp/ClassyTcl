@@ -6,6 +6,10 @@
 # ----------------------------------------------------------------------
 #doc DynaTool title {
 #DynaTool
+#} index {
+# Common tools
+#} shortdescr {
+# Toolbar widget: nice little buttons in a row
 #} descr {
 # subclass of <a href="../basic/Widget.html">Widget</a><br>
 # The DynaTool widgets are toolbars, for which the contents are managed by

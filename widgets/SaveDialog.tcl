@@ -6,6 +6,10 @@
 # ----------------------------------------------------------------------
 #doc SaveDialog title {
 #SaveDialog
+#} index {
+# Dialogs
+#} shortdescr {
+# widget used by <a href="savefile.html">savefile</a>
 #} descr {
 # subclass of <a href="Dialog.html">Dialog</a><br>
 #<b>experimental work</b>

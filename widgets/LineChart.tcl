@@ -7,6 +7,10 @@
 # ----------------------------------------------------------------------
 #doc LineChart title {
 #LineChart
+#} index {
+# Charts
+#} shortdescr {
+# linechart class that can be drawn on a canvas
 #} descr {
 # subclass of <a href="../basic/Class.html">Class</a><br>
 # <b>LineChart is not a widget type</b>. It is a class whose objects can 
@@ -87,6 +91,7 @@ Classy::LineChart method destroy {} {
 #doc {LineChart command configure} cmd {
 #pathname configure ?option? ?value? ?option value ...?
 #} descr {
+# change the LineChart configuration options
 #}
 Classy::LineChart method configure {args} {
 	private $object options
@@ -160,6 +165,9 @@ Classy::LineChart method configure {args} {
 #doc {LineChart command dataset} cmd {
 #pathname dataset name values
 #} descr {
+# A linechart can have several ranges of data. Each range has a name.
+# This method is used to set (or change) the data in a range.
+# $values is a list of x and y values consituting the positions of points on the line.
 #}
 Classy::LineChart method dataset {name values} {
 	private $object data tag options order
@@ -175,7 +183,6 @@ Classy::LineChart method _create {name num} {
 	private $object data tag options
 	set canvas $options(-canvas)
 	if {"$canvas" == ""} return
-
 	set colors [option get . colorList ColorList]
 	regsub -all {{|}} $colors {} colors
 	set color [lindex $colors $num]
@@ -190,6 +197,7 @@ Classy::LineChart method _create {name num} {
 #doc {LineChart command dataget} cmd {
 #pathname dataget name
 #} descr {
+# returns the current data in range $name
 #}
 Classy::LineChart method dataget {name} {
 	private $object data tag
@@ -200,6 +208,7 @@ Classy::LineChart method dataget {name} {
 #doc {LineChart command labelset} cmd {
 #pathname labelset labels
 #} descr {
+# sets the labels associated with the linechart
 #}
 Classy::LineChart method labelset {values} {
 	private $object labels
@@ -214,6 +223,7 @@ Classy::LineChart method labelset {values} {
 #doc {LineChart command delete} cmd {
 #pathname delete name
 #} descr {
+# delete the range with name $name
 #}
 Classy::LineChart method delete {name} {
 	private $object data tag options order
@@ -258,6 +268,7 @@ Classy::LineChart method hidden {name {value {}}} {
 #doc {LineChart command ranges} cmd {
 #pathname ranges 
 #} descr {
+# returns the names of all ranges in the chart
 #}
 Classy::LineChart method ranges {} {
 	private $object order
@@ -268,6 +279,8 @@ Classy::LineChart method ranges {} {
 #doc {LineChart command lineconfigure} cmd {
 #pathname lineconfigure name ?option? ?value? ?option value ...?
 #} descr {
+# change the display properties of a range. The same options as for the canvas line item are
+# available
 #}
 Classy::LineChart method lineconfigure {name args} {
 	private $object tag options

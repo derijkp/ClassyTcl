@@ -6,6 +6,10 @@
 # ----------------------------------------------------------------------
 #doc HTML title {
 #HTML
+#} index {
+# New widgets
+#} shortdescr {
+# displays HTML
 #} descr {
 # subclass of <a href="../basic/Widget.html">Widget</a><br>
 # creates a HTML display widget. The widget is based on the

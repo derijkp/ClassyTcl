@@ -6,6 +6,10 @@
 # ----------------------------------------------------------------------
 #doc ColorEntry title {
 #ColorEntry
+#} index {
+# Selectors
+#} shortdescr {
+# entry which shows color
 #} descr {
 # subclass of <a href="Entry.html">Entry</a><br>
 # has the same options and methods as <a href="Entry.html">Entry</a>,

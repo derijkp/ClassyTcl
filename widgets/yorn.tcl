@@ -6,6 +6,10 @@
 # ----------------------------------------------------------------------
 #doc yorn title {
 #yorn
+#} index {
+# Dialogs
+#} shortdescr {
+# select yes or no
 #}
 # Next is to get the attention of auto_mkindex
 if 0 {

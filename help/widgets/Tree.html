@@ -23,6 +23,11 @@ Tree
 <dt>-padx<dd>size of indentation
 <dt>-pady<dd>size left open between different lines
 <dt>-font<dd>default font for the text lines
+<dt>-padtext<dd>size between text parts
+<dt>-startx<dd>x location of root
+<dt>-starty<dd>y location of root
+<dt>-rootimage<dd>optional image displayed on root
+<dt>-roottext<dd>optional text displayed on root
 </dl>
 
 <h2>
@@ -34,9 +39,18 @@ pathname destroy
 <b><dt>
 pathname configure ?option? ?value? ?option value ...?
 </b><dd>
+ changes the way the tree is displayed. Supported options are given above.
 <b><dt>
  pathname addnode parent node args
 </b><dd>
+ add a node to node $parent. The following arguments can be given:
+ <ul>
+ <li>-text
+ <li>-image
+ <li>-window
+ <li>-length
+ <li>-type
+ </ul>
 <b><dt>
  pathname closenode node
 </b><dd>
@@ -56,9 +70,19 @@ pathname configure ?option? ?value? ?option value ...?
  pathname type node
 </b><dd>
 <b><dt>
- pathname node index
- pathname node x y
+ pathname node ...
 </b><dd>
+ <ul>
+ <li>pathname node index
+ <li>pathname node x y
+ </ul>
+<b><dt>
+ pathname what ...
+</b><dd>
+ <ul>
+ <li>pathname what index
+ <li>pathname what x y
+ </ul>
 <b><dt>
  pathname parentnode node
 </b><dd>
@@ -66,11 +90,18 @@ pathname configure ?option? ?value? ?option value ...?
  pathname children node
 </b><dd>
 <b><dt>
- pathname selection
- pathname selection clear
- pathname selection add node ?node ...?
- pathname selection set node ?node ...?
- pathname selection remove node ?node ...?
+ pathname selection ?option? ...
 </b><dd>
+ <ul>
+ <li>pathname selection
+ <li>pathname selection clear
+ <li>pathname selection add node ?node ...?
+ <li>pathname selection set node ?node ...?
+ <li>pathname selection remove node ?node ...?
+ </ul>
+<b><dt>
+ pathname nodes parent
+</b><dd>
+ returns the child nodes from $parent
 
 </body>

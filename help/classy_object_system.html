@@ -1,0 +1,106 @@
+<HTML>
+<HEAD>
+	<TITLE>ClassyTcl object system</TITLE>
+</HEAD>
+<BODY>
+<H1>ClassyTcl object system</H1>
+<H2>Introduction</H2>
+The ClassyTcl object system was created as an object system that
+fits the Tcl phylosophy (as I see it), rather than being modelled
+after the object system of another language. Some criteria were:
+<UL>
+	<LI>Tcl is a dynamic language: so classes, methods, etc should also
+	be changeable at runtime 
+	<LI>no Tcl core changes 
+	<LI>fast, little overhead 
+	<LI>Tcl only possible, C code also possible for better performance 
+	<LI>Class methods can be defined in Tcl as wel as in C, and also in
+	a mix of the two 
+	<LI>Tk like working model 
+</UL>
+
+<H2>Classes and objects</H2>
+In ClassyTcl classes and objects are very similar: they are both
+entities that combine data and methods (actions that can be
+performed). However, classes are usually used as a template to
+produce a number of objects or instances. The class of an object
+determines wich data it stores, and which methods it has available.
+<P>
+New classes can be created by subclassing existing classes. The
+subclass inherits the data and methods of its parent class. Extra
+data and methods can be added after the new class is created.
+Inherited methods can be replaced or removed.
+
+<H2>Classmethods and methods</H2>
+Class provides two types of methods: 
+<DL>
+	<DT>classmethods 
+	<DD>A classmethod is a command associated with a class. A new
+	classmethod can be defined using the classmethod <I>classmethod</I>
+	(which is defined in the basic class named <A HREF="basic/Class.html"><I>Class</I></A>
+	and always inherited). A classmethod can be invoked using the
+	command:<br>
+	<LISTING>SomeClass classmethod ?...?</LISTING><br>
+	Classmethods are only available to their class, and cannot be
+	invoked from instances (objects) of that class. 
+	<DT>methods 
+	<DD>A method can be defined using the classmethod <I>method</I>.
+	A method of a class is available to all instances (objects) of the
+	class (and to the the class itself). A method can be invoked using a
+	command of the form:<br>
+	<LISTING>pathName method ?...?</LISTING>
+</DL>
+<P>
+Methods and classmethods starting with an underscore are hidden: they
+can be invoked, but are not shown when methods are queried. A class
+can have both a method and a classmethod with the same name. If this
+is the case, the method is invoked when doing:<BR>
+<CODE>pathName name ?...?</CODE><BR>
+and the classmethod is used when doing:<BR>
+<CODE>ClassName name ?...?</CODE><BR>
+A new object can be created using the command (classmethod <I>new</I>):<BR>
+<CODE>SomeClass new object</CODE><BR>
+A new class can be created using the command (classmethod <I>subclass</I>):<BR>
+<CODE>SomeClass subclass SubClass</CODE>
+
+<H2>private variables</H2>
+Each object (or class) can store its data in private variables. A
+private variable should only be used by the object owning it. In
+ClassyTcl, an object or a function can access the private variables
+of another object, which is great for debugging. However, it is not
+usually good object oriented programming practice to rely on this
+feature for your programs (data encapsulation). Private variables can
+be accessed using the following commands: 
+<DL>
+	<DT>private object var ?var? ... 
+	<DD>make the local variables in the list refer to the private
+	variables of $object 
+	<DT>setprivate object var value 
+	<DD>set the private variable $var of object $object to $value 
+	<DT>getprivate object var 
+	<DD>returns the current value of the private variable $var of object
+	$object 
+	<DT>privatevar object var 
+	<DD>returns the fully specified name of the private variable $var
+	of object $object. This can eg. be used to link a private variable
+	to an entry:<br>
+	<CODE>entry .e -textvariable [privatevar someobject somevar] </CODE>
+</DL>
+
+<H2>Class</H2>
+When the package Class is loaded, it will create one base class
+named <A HREF="basic/Class.html">Class</A>. All other classes and
+object will be derived from this base class. <A HREF="basic/Class.html">The
+classmethods and methods defined by Class</A> can normally be invoked
+from all classes. The most important classmethods are</P>
+<UL>
+	<LI>new: create a new object 
+	<LI>subclass: create a new class 
+	<LI>classmethod: ad a new classmethod to the class 
+	<LI>method: ad a new method to the class
+</UL>
+Classes are destroyed using the destroy classmethod. Objects are
+destroyed using the destroy method of their class.
+</BODY>
+</HTML>
+

@@ -6,9 +6,13 @@
 # ----------------------------------------------------------------------
 #doc FileSelect title {
 #FileSelect
+#} index {
+# Dialogs
+#} shortdescr {
+# Motif type File Selector Dialog: used by <a href="savefile.html">selectfile</a> depending on configuration
 #} descr {
 # subclass of <a href="Dialog.html">Dialog</a><br>
-# Offers a Motif type of file selection box
+# Offers a Motif type of file selection dialog
 #}
 #doc {FileSelect options} h2 {
 #	FileSelect specific options

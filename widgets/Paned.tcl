@@ -6,6 +6,10 @@
 # ----------------------------------------------------------------------
 #doc Paned title {
 #Paned
+#} index {
+# New widgets
+#} shortdescr {
+# control the size of another widget
 #} descr {
 # subclass of <a href="../basic/Widget.html">Widget</a><br>
 # creates a paned widget, which can be used to control the size

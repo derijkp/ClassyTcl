@@ -6,6 +6,10 @@
 # ----------------------------------------------------------------------
 #doc ColorHSV title {
 #ColorHSV
+#} index {
+# Selectors
+#} shortdescr {
+# HSV color selection widget
 #} descr {
 # subclass of <a href="../basic/Widget.html">Widget</a><br>
 # An HSV color selector for composing color values.

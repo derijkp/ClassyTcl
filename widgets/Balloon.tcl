@@ -5,7 +5,11 @@
 # Balloon
 # ----------------------------------------------------------------------
 #doc Balloon title {
-#Balloon
+# Balloon
+#} index {
+# Common tools
+#} shortdescr {
+# help pops up when staying over a widget
 #} descr {
 # subclass of <a href="../basic/Class.html">Class</a><br>
 # associate help with a widget such as a button. A box with the help text in it

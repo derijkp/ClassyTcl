@@ -6,6 +6,10 @@
 # ----------------------------------------------------------------------
 #doc Browser title {
 #Browser
+#} index {
+# New widgets
+#} shortdescr {
+# generic browser widget
 #} descr {
 #}
 #doc {Browser options} h2 {

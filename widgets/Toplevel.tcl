@@ -6,6 +6,10 @@
 # ----------------------------------------------------------------------
 #doc Toplevel title {
 #Toplevel
+#} index {
+# Tk improvements
+#} shortdescr {
+# toplevel with geometry management and destroy command
 #} descr {
 # subclass of <a href="../basic/Widget.html">Widget</a><br>
 # Toplevel produces "intelligent" toplevels. They have a simple option to

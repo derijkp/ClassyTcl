@@ -6,6 +6,10 @@
 # ----------------------------------------------------------------------
 #doc Text title {
 #Text
+#} index {
+# Tk improvements
+#} shortdescr {
+# text widget with undo/redo and linking (~multiple views)
 #} descr {
 # subclass of <a href="../basic/Widget.html">Widget</a><br>
 # creates a widgets which acts nearly like a text widget but
