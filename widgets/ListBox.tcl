@@ -37,7 +37,7 @@ Classy::export ListBox {}
 Classy::ListBox classmethod init {args} {
 	# REM Create object
 	# -----------------
-	super
+	super init
 	listbox $object.list -xscrollcommand "$object.xscroll set" -yscrollcommand "$object.yscroll set" \
 		-highlightthickness 0
 	scrollbar $object.xscroll -command "$object.list xview" -orient horizontal

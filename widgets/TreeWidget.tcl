@@ -41,7 +41,7 @@ bind Classy::TreeWidget <<MExecute>> {%W _execute %x %y}
 Classy::TreeWidget classmethod init {args} {
 	# REM Create object
 	# -----------------
-	super
+	super init
 	canvas $object.c -xscrollcommand [list $object.hbar set] -yscrollcommand [list $object.vbar set]
 	::class::rebind $object.c $object
 	::class::refocus $object $object.c

@@ -31,7 +31,7 @@ Classy::Entry subclass Classy::FileEntry
 Classy::export FileEntry {}
 
 Classy::FileEntry classmethod init {args} {
-	super
+	super init
 	button $object.browse -text "Browse" -command [varsubst object {
 		set ::Classy::current [$object get]
 		set ::Classy::current [::Classy::selectfile -title "[$object cget -label]" \

@@ -43,7 +43,7 @@ Classy::export Toplevel {}
 Classy::Toplevel classmethod init {args} {
 	# REM Create object
 	# -----------------
-	super toplevel
+	super init toplevel
 #	wm geometry $object +1000000+1000000
 	wm positionfrom $object program
 	wm withdraw $object
@@ -142,14 +142,17 @@ Classy::Toplevel method hide {} {
 #}
 Classy::Toplevel method place {} {
 	private $object options
-	set resize [getprivate $object options(-resize)]
+	set resize $options(-resize)
 	update idletasks
 	set keeppos 0
-	set minw [winfo reqwidth $object]
-	set minh [winfo reqheight $object]
-	set minsize [wm minsize $object]
-	if {$minw < [lindex $minsize 0]} {set minw [lindex $minsize 0]}
-	if {$minh < [lindex $minsize 1]} {set minh [lindex $minsize 1]}
+	set grid [wm grid $object]
+	if {"$grid" == ""} {
+		set minw [winfo reqwidth $object]
+		set minh [winfo reqheight $object]
+	} else {
+		set minw [lindex $grid 0]
+		set minh [lindex $grid 1]
+	}
 	set w $minw
 	set h $minh
 	set rx [lindex $resize 0]
@@ -209,7 +212,11 @@ Classy::Toplevel method place {} {
 #}
 Classy::Toplevel method destroy {} {
 	private $object options
-	set geom [winfo geometry $object]
+	if {"[wm grid $object]" == ""} {
+		set geom [winfo geometry $object]
+	} else {
+		set geom [wm geometry $object]
+	}
 	Classy::Default set geometry $object $geom
 	uplevel #0 $options(-destroycommand)
 }

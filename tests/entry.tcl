@@ -54,7 +54,7 @@ test Classy::Entry {command} {
 
 test Classy::Entry {constraint} {
 	classyclean
-	Classy::Entry .try -label try -constraint {^[a-z]*$}
+	Classy::Entry .try -label try -constraint {^[a-z]*$} -warn 0
 	pack .try
 	.try set try
 	.try set try2

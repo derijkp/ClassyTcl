@@ -51,7 +51,7 @@ Classy::export MultiListbox {}
 Classy::MultiListbox classmethod init {args} {
 	# REM Create object
 	# -----------------
-	super
+	super init
 	listbox $object.list -yscroll "$object.vbar set" -exportselection no -selectmode browse
 	::class::rebind $object.list $object
 	::class::refocus $object $object.list

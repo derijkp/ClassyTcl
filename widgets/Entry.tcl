@@ -71,7 +71,7 @@ Classy::export Entry {}
 Classy::Entry classmethod init {args} {
 	# REM Create object
 	# -----------------
-	super
+	super init
 	frame $object.frame
 	frame $object.frame.entry
 	pack $object.frame -expand yes -fill x -side left

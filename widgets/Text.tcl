@@ -43,7 +43,7 @@ Widget subclass Classy::Text
 Classy::export Text {}
 
 Classy::Text classmethod init {args} {
-	super text
+	super init text
 	# REM Initialise options and variables
 	# ------------------------------------
 	private $object undobuffer redobuffer linked textchanged

@@ -62,7 +62,7 @@ test Widget {init entry} {
 	destroy .try
 	Widget subclass Test
 	Test classmethod init {} {
-		super entry
+		super init entry
 	}
 	Test .try
 } {::class::Tk_.try}
@@ -72,7 +72,7 @@ test Widget {init entry with args} {
 	destroy .try
 	Widget subclass Test
 	Test classmethod init {} {
-		super entry $object -textvariable try
+		super init entry $object -textvariable try
 	}
 	[Test .try] cget -textvariable
 } {try}
@@ -82,7 +82,7 @@ test Widget {pass args in init} {
 	destroy .try
 	Widget subclass Test
 	Test classmethod init {args} {
-		super
+		super init
 		set ::c $args
 	}
 	set ::c {}

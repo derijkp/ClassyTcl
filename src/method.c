@@ -923,7 +923,7 @@ int Classy_InfoMethodinfo(
 	method = (Method *)Tcl_GetHashValue(entry);
 	Tcl_ResetResult(interp);
 	if (method->proc == NULL) {
-		Tcl_AppendResult(interp,"classmethod \"",name,
+		Tcl_AppendResult(interp,"method \"",name,
 			"\" of ",cmd , "\" is defined in C", (char *)NULL);
 		return TCL_ERROR;
 	}
@@ -937,7 +937,7 @@ int Classy_InfoMethodinfo(
 		if (argc != 4) {
 			Tcl_AppendResult(interp,"wrong # args: should be \"",
 				cmd,
-				" info classmethod default arg varname\"", (char *)NULL);
+				" info method default arg varname\"", (char *)NULL);
 			return TCL_ERROR;
 		}
 		Tcl_VarEval(interp,"info default ::class::",Tcl_GetStringFromObj(class->class,NULL),",,m,",name,

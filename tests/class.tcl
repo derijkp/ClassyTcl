@@ -305,11 +305,25 @@ test class {redefining init} {
 	clean
 	Base subclass Test
 	Test classmethod init {} {
-		return [list [super] 1]
+		return [list [super init] 1]
 	}
 	Test subclass Test2
 	Test2 classmethod init {} {
-		return [list [super] 2]
+		return [list [super init] 2]
+	}
+	Test2 new try
+} {{try 1} 2}
+
+test class {create other object in init with super} {
+	clean
+	Base subclass Test
+	Test classmethod init {} {
+		Base new $object.try
+		return [list [super init] 1]
+	}
+	Test subclass Test2
+	Test2 classmethod init {} {
+		return [list [super init] 2]
 	}
 	Test2 new try
 } {{try 1} 2}
@@ -327,11 +341,11 @@ test class {redefining init: test class} {
 	clean
 	Base subclass Test
 	Test method init {} {
-		return [list [super] 1]
+		return [list [super init] 1]
 	}
 	Test subclass Test2
 	Test2 method init {} {
-		return [list [super] 2]
+		return [list [super init] 2]
 	}
 	Test2 new try
 	try info class
@@ -341,7 +355,7 @@ test class {redefining init: 1 of 2} {
 	clean
 	Base subclass Test
 	Test classmethod init {} {
-		return [list [super] 1]
+		return [list [super init] 1]
 	}
 	Test subclass Test2
 	Test2 new try
@@ -374,7 +388,7 @@ test class {redefining 2 inits: error in init} {
 	}
 	Test subclass Test2
 	Test2 classmethod init {} {
-		return [list [super] 2]
+		return [list [super init] 2]
 	}
 	Test2 new try
 } {test error} 1
@@ -871,14 +885,93 @@ test class {test super args} {
 	}
 	Test subclass Test2
 	Test2 classmethod init {args} {
-		return [super data]
+		return [super init data]
 	}
 	Test2 subclass Test3
 	Test3 classmethod init {args} {
-		return [super]
+		return [super init]
 	}
 	Test3 new try
 } {data}
+
+test class {super in method} {
+	clean
+	Base method try {a} {
+		return {t 1}
+	}
+	Base subclass Subclass
+	Subclass subclass SubSubclass
+	SubSubclass method try {a b} {
+		return [list [super try $a] $b]
+	}
+	SubSubclass new try
+	try try 1 2
+} {{t 1} 2}
+
+test class {super in method calling super} {
+	clean
+	Base method try {a} {
+		return [list t $a]
+	}
+	Base subclass Subclass
+	Subclass method try {a} {
+		return [list [super try $a] $a]
+	}
+	Subclass subclass SubSubclass
+	SubSubclass method try {a b} {
+		return [list [super try $a] $b]
+	}
+	SubSubclass new try
+	try try 1 2
+} {{{t 1} 1} 2}
+
+test class {test super calling non-existing method} {
+	clean
+	Base subclass SubClass
+	SubClass method try {a b} {
+		return [list [super try $a] $b]
+	}
+	SubClass new try
+	try try 1 2
+} {No method "try" defined for super of try (at class "Base")} 1
+
+test class {super in classmethod} {
+	clean
+	Base classmethod try {a} {
+		return {t 1}
+	}
+	Base subclass Subclass
+	Subclass subclass SubSubclass
+	SubSubclass classmethod try {a b} {
+		return [list [super try $a] $b]
+	}
+	SubSubclass try 1 2
+} {{t 1} 2}
+
+test class {super in classmethod calling super} {
+	clean
+	Base classmethod try {a} {
+		return [list t $a]
+	}
+	Base subclass Subclass
+	Subclass classmethod try {a} {
+		return [list [super try $a] $a]
+	}
+	Subclass subclass SubSubclass
+	SubSubclass classmethod try {a b} {
+		return [list [super try $a] $b]
+	}
+	SubSubclass try 1 2
+} {{{t 1} 1} 2}
+
+test class {test super calling non-existing classmethod} {
+	clean
+	Base subclass SubClass
+	SubClass classmethod try {a b} {
+		return [list [super try $a] $b]
+	}
+	SubClass try 1 2
+} {No method "try" defined for super of SubClass (at class "Base")} 1
 
 test class {class info error} {
 	clean

@@ -41,7 +41,7 @@ Classy::Toplevel subclass Classy::Help
 Classy::export Help {}
 
 Classy::Help classmethod init {args} {
-	super
+	super init
 	Classy::HTML $object.html -yscrollcommand "$object.vbar set" \
 		-state disabled -wrap word -cursor hand2 \
 		-width 70 -height 28 -relief sunken \

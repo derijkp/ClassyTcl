@@ -43,7 +43,7 @@ Classy::export Fold {}
 Classy::Fold classmethod init {args} {
 	# REM Create object
 	# -----------------
-	super
+	super init
 	button $object.knob -image [Classy::geticon foldclosed.xbm] -command [list $object open]
 	button $object.title -text "" -command {}
 	frame $object.spacer

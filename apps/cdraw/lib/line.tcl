@@ -1,9 +1,4 @@
 #Functions
-proc line_init {} {
-bind Line <<Action>> {line_action %W %x %y}
-bind Line <<Escape>> {line_abort %W %x %y}
-bind Line <<Adjust>> {line_adjust %W %x %y}
-}
 
 
 proc line_action {w x y} {
@@ -55,6 +50,9 @@ bindtags $w [list Line $w Classy::Menu_MainMenu Classy::Canvas Canvas .mainw all
 set status(type) line
 
 }
+
+
+
 
 
 

@@ -93,7 +93,7 @@ Classy::export Table {}
 Classy::Table classmethod init {args} {
 	# REM Create object
 	# -----------------
-	super
+	super init
 	$object configure -width 100 -height 100 -highlightthicknes 0 -bd 0
 	frame $object.base -borderwidth 0
 	grid $object.base -row 0 -column 0 -sticky nw

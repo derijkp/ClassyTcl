@@ -56,7 +56,7 @@ Class subclass Classy::LineChart
 Classy::export LineChart {}
 
 Classy::LineChart classmethod init {args} {
-	super
+	super init
 	private $object options
 	array set options {
 		-canvas {} -tag {} -area {}

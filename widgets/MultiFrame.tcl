@@ -33,7 +33,7 @@ Classy::export MultiFrame {}
 Classy::MultiFrame classmethod init {args} {
 	# REM Create object
 	# -----------------
-	super
+	super init
 	grid rowconfigure $object 0 -weight 1
 	grid columnconfigure $object 0 -weight 1
 	# REM Configure initial arguments

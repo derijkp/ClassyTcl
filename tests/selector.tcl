@@ -88,7 +88,7 @@ test Classy::Selector {sticky} {
 	classyclean
 	Classy::Selector .try -type sticky -label Try -variable try -command puts
 	pack .try -fill both -expand yes
-	.try set ns
+	.try set n
 	.try get
 } {n}
 

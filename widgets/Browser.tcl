@@ -35,7 +35,7 @@ bind Classy::Browser <Configure> {%W redraw}
 Classy::Browser classmethod init {args} {
 	# REM Create object
 	# -----------------
-	super
+	super init
 	canvas $object.c -xscrollcommand [list $object.hbar set]
 	::class::rebind $object.c $object
 	::class::refocus $object $object.c

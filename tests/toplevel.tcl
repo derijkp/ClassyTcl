@@ -61,6 +61,35 @@ test Classy::Toplevel {keepgeometry all} {
 	manualtest
 } {}
 
+test Classy::Toplevel {resize} {
+	classyclean
+	catch {Classy::Default unset geometry .try}
+	button .b -command {
+		Classy::Toplevel .try -title "Try it" -resize {1 1}
+		button .try.b1 -text "button 1"
+		button .try.b2 -text "close" -command "destroy .try"
+		grid .try.b1 -sticky nwse
+		grid .try.b2 -sticky nwse
+		grid columnconfigure . 0 -weight 1
+	} -text "Click for toplevel"
+	pack .b
+	manualtest
+} {}
+
+test Classy::Toplevel {gridded} {
+	classyclean
+	catch {Classy::Default unset geometry .try}
+	button .b -command {
+		Classy::Toplevel .tryg -title "Try it" -resize {1 1} -keepgeometry all
+		text .tryg.t -setgrid yes
+		grid .tryg.t -sticky nwse
+		grid columnconfigure .tryg 0 -weight 1
+		grid rowconfigure .tryg 0 -weight 1
+	} -text "Click for toplevel"
+	pack .b
+	manualtest
+} {}
+
 
 testsummarize
 

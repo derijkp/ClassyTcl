@@ -41,7 +41,7 @@ Classy::ColorHSV classmethod init {args} {
 
 	# REM Create object
 	# -----------------
-	super
+	super init
 	scale $object.valV -orient vertical -from 100 -to 0
 	pack $object.valV -fill y -side right
 	canvas $object.valHS -borderwidth 0

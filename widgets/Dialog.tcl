@@ -79,7 +79,7 @@ Classy::export Dialog {}
 Classy::Dialog classmethod init {args} {
 	# REM Create object
 	# -----------------
-	super
+	super init
 	Classy::Dialog private options(-title) {title Title "Dialog"}
 	frame $object.options
 	frame $object.actions

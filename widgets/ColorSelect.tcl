@@ -39,7 +39,7 @@ Classy::export ColorSelect {}
 Classy::ColorSelect classmethod init {args} {
 	# REM Create object
 	# -----------------
-	super
+	super init
 	Classy::ColorEntry $object.entry
 	Classy::NoteBook $object.chooser
 	Classy::ColorSample $object.sample

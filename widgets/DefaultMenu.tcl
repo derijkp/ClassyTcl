@@ -42,7 +42,7 @@ bind Classy::DefaultMenu <Any-ButtonRelease> "%W _action"
 bind Classy::DefaultMenu <Motion> "%W _motion %X %Y"
 
 Classy::DefaultMenu classmethod init {args} {
-	super button $object -relief raised -image [::Classy::geticon cbxarrow.xbm] -takefocus 0
+	super init button $object -relief raised -image [::Classy::geticon cbxarrow.xbm] -takefocus 0
 	bindtags $object [lreplace [bindtags $object] 1 0 Classy::DefaultMenu]
 
 	# REM Evaluate arguments

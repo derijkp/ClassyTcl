@@ -41,7 +41,7 @@ Classy::Dialog subclass Classy::SelectDialog
 Classy::export SelectDialog {}
 
 Classy::SelectDialog classmethod init {args} {
-	super
+	super init
 	$object configure -resize {1 1}
 	$object add go "Go" [list $object _command] default
 	frame $object.options.frame

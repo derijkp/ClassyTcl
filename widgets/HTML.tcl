@@ -70,7 +70,7 @@ Widget subclass Classy::HTML
 Classy::export HTML {}
 
 Classy::HTML classmethod init {args} {
-	super text
+	super init text
 	bindtags $object [list $object Classy::HTML . all]
 	set w [Classy::window $object]
 	$w tag bind link <<Action>> {%W geturl [%W linkat %x %y]}

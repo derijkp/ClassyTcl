@@ -46,7 +46,7 @@ Widget subclass Classy::CmdWidget
 Classy::export CmdWidget {}
 
 Classy::CmdWidget classmethod init {args} {
-	setprivate $object w [super text $object -setgrid true]
+	setprivate $object w [super init text $object -setgrid true]
 	$object tag configure prompt -foreground blue
 	bindtags $object [list $object Classy::CmdWidget . all]
 
@@ -142,7 +142,10 @@ Classy::CmdWidget method do {} {
 	if {([$object compare insert >= "end-1c"]==1)&&([info complete $cmd]==1)} {
 		$object mark set cmdstart$cmdnum cmdstart
 		$object mark set cmdend$cmdnum "end-2c"
+		catch [list send $connection {set Classy__result ""}] cresult
 		catch [list send $connection $cmd] result
+		catch [list send $connection {set Classy__result}] cresult
+		set result "$cresult$result"
 		if {"$result"!=""} {
 			$w insert end $result
 			$w insert end "\n"
@@ -995,7 +998,8 @@ proc Classy__puts {args} {
 
 	if {"$ch"=="stdout"} {
 		if ![info exists newl] {append string "\n"}
-		send $source [list $cmdwidget display $string]
+		Classy__keepputs $string
+		append ::Classy__result $string
 		return {}
 	} else {
 		return [eval Classy__keepputs $args]

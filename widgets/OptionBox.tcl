@@ -41,7 +41,7 @@ Widget subclass Classy::OptionBox
 Classy::export OptionBox {}
 
 Classy::OptionBox classmethod init {args} {
-	super frame $object -highlightthickness 0 -class Classy::OptionBox
+	super init frame $object -highlightthickness 0 -class Classy::OptionBox
 	label $object.label -text ""
 	frame $object.box
 	pack $object.label -side left

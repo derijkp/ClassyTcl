@@ -206,12 +206,3 @@ test Classy::savefile {basic} {
 } {try}
 
 testsummarize
-
-test Classy::yorn {basic} {
-	source tools.tcl
-	classyclean
-	set name try
-	Classy::Toplevel .try
-	set name
-} {1}
-

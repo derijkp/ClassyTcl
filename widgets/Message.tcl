@@ -39,7 +39,7 @@ Widget subclass Classy::Message
 Classy::export Message {}
 
 Classy::Message classmethod init {args} {
-	super message
+	super init message
 	if {"$args" != ""} {eval $object configure $args}
 }
 

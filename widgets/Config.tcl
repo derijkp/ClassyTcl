@@ -31,7 +31,7 @@ Widget subclass Classy::Config
 Classy::export Config {}
 
 Classy::Config classmethod init {args} {
-	super
+	super init
 	Classy::OptionMenu $object.select
 	message $object.help
 	grid columnconfigure $object 1 -weight 1

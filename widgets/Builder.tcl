@@ -31,7 +31,7 @@ Classy::Toplevel subclass Classy::Builder
 Classy::export Builder {}
 
 Classy::Builder classmethod init {args} {
-	super -keepgeometry all -resize {10 10}
+	super init -keepgeometry all -resize {10 10}
 	set w [Classy::window $object]
 	private $object browse
 	Classy::DynaTool $object.tool -type Classy::Builder -cmdw $object

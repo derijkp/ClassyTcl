@@ -36,7 +36,7 @@ Widget subclass Classy::Selector
 Classy::export Selector {}
 
 Classy::Selector classmethod init {args} {
-	super
+	super init
 	
 	# REM Initialise variables
 	# ------------------------
@@ -97,6 +97,7 @@ Classy::Selector method destroy {} {
 #}
 Classy::Selector method set {item} {
 	private $object options
+	catch {Classy::handletodo $object}
 	if {"$options(-variable)" == ""} {
 		set varname [privatevar $object var]
 	} else {
@@ -114,6 +115,7 @@ Classy::Selector method set {item} {
 #}
 Classy::Selector method get {} {
 	private $object options
+	catch {Classy::handletodo $object}
 	if {"$options(-variable)" == ""} {
 		set varname [privatevar $object var]
 	} else {

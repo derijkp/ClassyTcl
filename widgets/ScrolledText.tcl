@@ -36,7 +36,7 @@ Classy::export ScrolledText {}
 Classy::ScrolledText classmethod init {args} {
 	# REM Create object
 	# -----------------
-	super
+	super init
 	Classy::Text $object.text -wrap none \
 		-xscrollcommand "$object xset" \
 		-yscrollcommand "$object yset"

@@ -52,7 +52,7 @@ Class subclass Classy::Tree
 Classy::export Tree {}
 
 Classy::Tree classmethod init {args} {
-	super
+	super init
 	private $object options data
 	array set options {
 		-canvas {}

@@ -39,14 +39,14 @@ test NumEntry {create with configuration configure} {
 
 test NumEntry {create with configuration configure} {
 	classyclean
-	NumEntry .try -label int -constraint int
+	NumEntry .try -label int -constraint int -warn 0
 	pack .try
 	.try cget -constraint
 } {^(-?)[0-9]*$}
 
 test NumEntry {min} {
 	classyclean
-	NumEntry .try -label try -min 0 -max 10
+	NumEntry .try -label try -min 0 -max 10 -warn 0
 	pack .try
 	.try set 5
 	.try set -1
@@ -55,7 +55,7 @@ test NumEntry {min} {
 
 test NumEntry {max} {
 	classyclean
-	NumEntry .try -label try -min 0 -max 10
+	NumEntry .try -label try -min 0 -max 10 -warn 0
 	pack .try
 	.try set 5
 	.try set 20
@@ -64,7 +64,7 @@ test NumEntry {max} {
 
 test NumEntry {int} {
 	classyclean
-	NumEntry .try -label try -min 0 -max 10 -constraint int
+	NumEntry .try -label try -min 0 -max 10 -constraint int -warn 0
 	pack .try
 	.try set 5
 	.try set 5.5
@@ -73,7 +73,8 @@ test NumEntry {int} {
 
 test NumEntry {int} {
 	classyclean
-	NumEntry .try -label try -min 0 -max 10 -constraint int -command {set ::try}
+	NumEntry .try -label try -min 0 -max 10 -constraint int \
+		-command {set ::try} -warn 0
 	pack .try
 	update
 	set ::try 1

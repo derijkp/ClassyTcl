@@ -37,6 +37,7 @@ Classy_Init(interp)
 #endif
 	Tcl_CreateObjCommand(interp,"::class::reinit",(Tcl_ObjCmdProc *)Classy_ReinitObjCmd,
 		(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
+	Classy_InitSuper();
 	Tcl_CreateObjCommand(interp,"::class::super",(Tcl_ObjCmdProc *)Classy_SuperObjCmd,
 		(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
 	Tcl_CreateObjCommand(interp,"::class::private",(Tcl_ObjCmdProc *)Classy_PrivateObjCmd,

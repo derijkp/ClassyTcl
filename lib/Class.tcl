@@ -108,7 +108,7 @@ proc ::class::classerror {class object result cmd arg} {
 # Usually, the init method of the superclass
 # must be invoked somehere in the init method with appropriate parameters.
 # This can be done using the command 
-#<pre>super ?...?</pre>.
+#<pre>super init ?...?</pre>.
 #}
 proc ::class::new {class arg} {
 #puts [list new $class $arg]
@@ -132,7 +132,7 @@ proc ::class::new {class arg} {
 	regsub -all {@class@} $body [list $class] body
 	regsub -all {@object@} $body [list $object] body
 	proc ::$object {cmd args} $body
-	set ::class::current $class
+#	set ::class::current $class
 	if [info exists ::class::${class},,init] {
 		if [catch {uplevel ::class::${class},,init [list $class] $arg} result] {
 			set errorInfo [set ::errorInfo]
@@ -142,7 +142,7 @@ proc ::class::new {class arg} {
 			return $result
 		}
 	} elseif {"$class" != "Class"} {
-		if [catch {eval super [lrange $arg 1 end]} result] {
+		if [catch {eval super init [lrange $arg 1 end]} result] {
 			set errorInfo [set ::errorInfo]
 			::class::objectdestroy $class $object
 			return -code error -errorinfo $errorInfo $result
@@ -317,17 +317,66 @@ proc ::class::children {class} {
 	return [lsort [array names ::class::${class},,child]]
 }
 
-proc ::class::super {args} {
+proc ::class::super {method args} {
 	upvar class class object object
-	upvar ::class::current current
-	while 1 {
-		set current [set ::class::parent($current)]
-		if {"$current" == "Class"} {return $object}
-		if [info exists ::class::${current},,init] {
-			break
-		}
+	set level [info level]
+	set plevel [expr {$level-2}]
+	if [info exists ::class::current($plevel)] {
+		set current $::class::current($plevel)
+	} else {
+		set current $class
 	}
-	if [catch {eval ::class::${current},,init {$class $object} $args} result] {
+	if {"$method" == "init"} {
+		while 1 {
+			set current [set ::class::parent($current)]
+			if {"$current" == "Class"} {
+				return $object
+			}
+			if [info exists ::class::${current},,init] {
+				break
+			}
+		}
+		set ::class::current($level) $current
+		set error [catch {eval ::class::${current},,init {$class $object} $args} result]
+		unset ::class::current($level)
+	} elseif [info exists object] {
+		set proc ::class::${current},,m,${method}
+		if [catch {info body $proc} body] {
+			error "No method \"$method\" defined for super of $object (at class \"$current\")"
+		}
+		regexp "^#(\[^\n\]+)" $body temp cclass
+		while 1 {
+			set current [set ::class::parent($current)]
+			set proc ::class::${current},,m,${method}
+			if [catch {info body $proc} body] {
+				error "No method \"$method\" defined for super of $object (at class \"$current\")"
+			}
+			regexp "^#(\[^\n\]+)" $body temp bclass
+			if {"$bclass" != "$cclass"} break
+		}
+		set ::class::current($level) $current
+		set error [catch {eval $proc {$class $object} $args} result]
+		unset ::class::current($level)
+	} else {
+		set proc ::class::${current},,cm,${method}
+		if [catch {info body $proc} body] {
+			error "No classmethod \"$method\" defined for super of $class (at class \"$current\")"
+		}
+		regexp "^#(\[^\n\]+)" $body temp cclass
+		while 1 {
+			set current [set ::class::parent($current)]
+			set proc ::class::${current},,cm,${method}
+			if [catch {info body $proc} body] {
+				error "No classmethod \"$method\" defined for super of $class (at class \"$current\")"
+			}
+			regexp "^#(\[^\n\]+)" $body temp bclass
+			if {"$bclass" != "$cclass"} break
+		}
+		set ::class::current($level) $current
+		set error [catch {eval $proc {$class} $args} result]
+		unset ::class::current($level)
+	}
+	if $error {
 		error $result
 	} else {
 		return $result

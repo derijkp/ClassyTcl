@@ -52,7 +52,7 @@ Classy::export DynaTool {}
 Classy::DynaTool classmethod init {args} {
 	# REM Create object
 	# -----------------
-	super
+	super init
 	$object configure -bd 0
 	# REM Create bindings
 	# -------------------

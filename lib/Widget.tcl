@@ -152,7 +152,7 @@ Class subclass Widget
 #doc {Widget classmethod init} cmd {
 # init
 #} descr {
-# The Widget init classmethod will normally be called using the super 
+# The Widget init classmethod will normally be called using the "super init"
 # command in the init classmethod of one of its subclasses.
 # By default the Widget init classmethod will create an object
 # with a frame as Tk base widget.<br>
@@ -514,6 +514,7 @@ Widget classmethod _children {} {
 # objectName destroy
 #}
 Widget method destroy {} {
+puts "widget destroy $object"
 	if {"$object" == "."} {
 		exit
 	}

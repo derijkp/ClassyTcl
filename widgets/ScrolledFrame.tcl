@@ -37,7 +37,7 @@ Classy::export ScrolledFrame {}
 Classy::ScrolledFrame classmethod init {args} {
 	# REM Create object
 	# -----------------
-	super
+	super init
 	frame $object.view
 	frame $object.view.frame
 	::class::rebind $object.view.frame $object

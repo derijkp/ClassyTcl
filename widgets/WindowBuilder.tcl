@@ -55,7 +55,7 @@ Classy::Toplevel subclass Classy::WindowBuilder
 Classy::export WindowBuilder {}
 
 Classy::WindowBuilder classmethod init {args} {
-	super	-keepgeometry all -resize {2 2}
+	super init	-keepgeometry all -resize {2 2}
 	private $object current options
 	set current(w) ""
 	set w [Classy::window $object]
@@ -482,7 +482,12 @@ Classy::WindowBuilder method close {} {
 	}
 	Classy::Default set geometry $object [wm geometry $object]
 	if [winfo exists $object.work] {
-		Classy::Default set geometry $object.work.keep [wm geometry $object.work]
+		if {"[wm grid $object.work]" == ""} {
+			set geom [winfo geometry $object.work]
+		} else {
+			set geom [wm geometry $object.work]
+		}
+		Classy::Default set geometry $object.work.keep $geom
 		destroy $object.work
 		catch {Classy::Default unset geometry $object.work}
 	}
@@ -573,9 +578,14 @@ Classy::WindowBuilder method open {file function} {
 		set geom [split [winfo geometry $object.work] "x+"]
 		set w [lindex $geom 0]
 		set h [lindex $geom 1]
-		if {($w < 100) || ($h < 100)} {
-			if {$w < 100} {set w 100}
-			if {$h < 100} {set h 100}
+		if {"[wm grid $object.work]" == ""} {
+			set min 100
+		} else {
+			set min 10
+		}
+		if {($w < $min) || ($h < $min)} {
+			if {$w < $min} {set w $min}
+			if {$h < $min} {set h $min}
 			wm geometry $object.work ${w}x${h}
 		}
 	}
@@ -765,12 +775,12 @@ Classy::WindowBuilder method test {{param {}}} {
 	private $object current data
 	set data(code) [$object code]
 	set w $data(options,window)
-	catch {$w configure -destroycommand "destroy $w"}
+	catch {$w configure -destroycommand ""}
 	catch {destroy $w}
 	uplevel #0 $data(code)
 	if {"$data(type)" != "frame"} {
 		set w [eval $data(function) $param]
-		catch {$w configure -destroycommand "destroy $w"}
+		catch {$w configure -destroycommand ""}
 	} else {
 		Classy::Toplevel $object.test
 		eval $data(function) $object.test.frame $param

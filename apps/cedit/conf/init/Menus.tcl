@@ -7,10 +7,10 @@ menu file "File" {
 	action Save "Save" "%W save"
 	action SaveAs "Save as" "%W savedialog"
 	action Reopen "Reopen" "%W reopenlist"
-	action New "New editor" "edit newfile"
-	action Cmd "Command window" {Classy::cmd}
 	action SaveState "Save state" {savestate}
 	separator
+	action New "New editor" "edit newfile"
+	action Cmd "Command window" {Classy::cmd}
 	action Configure "Customise application" {Classy::Config dialog}
 	action ConfigureMenu "Customise menu" {Classy::Config config menu Classy::Editor}
 	action ConfigureTool "Customise toolbar" {Classy::Config config tool Classy::Editor}

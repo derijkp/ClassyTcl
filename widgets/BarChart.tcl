@@ -61,7 +61,7 @@ Class subclass Classy::BarChart
 Classy::export BarChart {}
 
 Classy::BarChart classmethod init {args} {
-	super
+	super init
 	private $object options
 	array set options {
 		-canvas {} -tag {} -area {}

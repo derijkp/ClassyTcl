@@ -41,7 +41,7 @@ Widget subclass Classy::Editor
 Classy::export Editor {}
 
 Classy::Editor classmethod init {args} {
-	super
+	super init
 	set w [::Classy::window $object]
 	$w configure -highlightthickness 0 -borderwidth 0
 	Classy::Text $object.edit -wrap none -tabs 24 -yscrollcommand [list $object.vbar set] \
@@ -154,7 +154,7 @@ Classy::Editor chainallmethods {$object.edit} Classy::Text
 #}
 Classy::Editor method cut {} {
 	private $object replace
-	clipboard clear -displayof $object			  
+	clipboard clear -displayof $object
 	catch {									
 		set replace [$object get sel.first sel.last]
 		clipboard append -displayof $object $replace
@@ -611,7 +611,7 @@ Classy::Editor method finddialog {} {
 	} else {
 		$w place
 		focus $w.options.find.entry
-		$w.options.find.entry select range 0 end
+#		$w.options.find.entry select range 0 end
 	}
 	focus $w.options.find.entry
 #	$w.options.find.entry select range 0 end

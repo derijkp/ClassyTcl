@@ -38,7 +38,7 @@ Classy::Dialog subclass Classy::FileSelect
 Classy::export FileSelect {}
 
 Classy::FileSelect classmethod init {args} {
-	super
+	super init
 	$object add go "Select" [list $object _command] default
 	set w $object.options
 	checkbutton $w.hidden -text "Show (Unix) hidden files" -variable [privatevar $object hidden] \

@@ -209,6 +209,7 @@ menu classytcl "ClassyTcl" {
 	action AddClassy::colorselect {Color select} {[Classy::WindowBuilder_win %W] add button -text "Select color" -command {set color [Classy::getcolor]}}
 	action AddClassy::treewidget {Tree widget} {[Classy::WindowBuilder_win %W] add Classy::TreeWidget}
 	action AddClassy::browser {Browser} {[Classy::WindowBuilder_win %W] add Classy::Browser}
+	action AddClassy::command {CmdWidget} {[Classy::WindowBuilder_win %W] add Classy::CmdWidget}
 }
 menu help "Help" {
 	action Help "Window Builder" {Classy::help classy_windowbuilder}

@@ -15,7 +15,7 @@ proc ::Classy::WindowBuilder::start_Classy::Toplevel {object base} {
 	if ![info exists data(opt-destroycommand,$base)] {
 		set data(opt-destroycommand,$base) ""
 	}
-	$base configure -destroycommand "destroy $base"
+	$base configure -destroycommand ""
 	$object select $base
 	wm protocol $base WM_DELETE_WINDOW [varsubst base {
 		catch {$base configure -destroycommand {}}
@@ -38,6 +38,7 @@ proc ::Classy::WindowBuilder::attr_Classy::Toplevel_-destroycommand {object w ar
 }
 
 proc ::Classy::WindowBuilder::edit_Classy::Toplevel {object w} {
+putsvars object w
 	set c [$object current]
 	eval destroy [winfo children $w]
 	frame $w.general

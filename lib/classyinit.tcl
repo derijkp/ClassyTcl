@@ -42,12 +42,13 @@ if {"[info commands ::Tk::destroy]" == ""} {
 				exit
 			}
 			if {"$w" == ".classy__"} continue
-			foreach c [info commands ::class::Tk_$w.*] {
-				regexp {^::class::Tk_(.*)$} $c temp tempw
-				catch {$tempw destroy}
-			}
 			if {"[info commands ::class::Tk_$w]" != ""} {
 				catch {$w destroy}
+			} else {
+				foreach c [info commands ::class::Tk_$w.*] {
+					regexp {^::class::Tk_(.*)$} $c temp child
+					catch {$child destroy}
+				}
 			}
 		}
 		eval ::Tk::destroy [lremove $args .classy__]

@@ -10,14 +10,14 @@ package require ClassyTcl
 proc browse {tree dir} {
 	if {"$dir" == ""} return
 	switch [try type $dir] {
-		e {
+		end {
 			try selection set $dir
 			puts $dir
 		}
-		f {
+		open {
 			try clearnode $dir
 		}
-		c {
+		closed {
 			try clearnode $dir
 			set dirs {}
 			set files {}
@@ -51,6 +51,7 @@ browse try ../help
 update idletasks
 .c configure -scrollregion [.c bbox all]
 bind .c <<Action>> {
+puts "%x %y"
 	set node [try node %x %y]
 	browse try $node
 }

@@ -1,4 +1,4 @@
-source cdraw
+source ctester
 set object .classy__.builder
 Classy::Builder .try
 set object .try

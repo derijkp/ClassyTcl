@@ -38,7 +38,7 @@ Classy::export FontSelect {}
 Classy::FontSelect classmethod init {args} {
 	# REM Create object
 	# -----------------
-	super
+	super init
 	message $object.example -relief flat -justify center -width 1000 -text \
 		"ABCDEFGHIJKLMNOPQRSTUVWXYZ\nabcdefghijklmnopqrstuvwxyz\n1234567890\n~!@#\$%^&*()_+-={}|:\"<>?[]\\;',./`"
 	listbox $object.family -yscrollcommand "$object.vbar set" -exportselection no

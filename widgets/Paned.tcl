@@ -43,7 +43,7 @@ Classy::export Paned {}
 Classy::Paned classmethod init {args} {
 	# REM Create object
 	# -----------------
-	super
+	super init
 
 	# REM Configure initial arguments
 	# -------------------------------

@@ -38,7 +38,7 @@ Classy::export ColorSample {}
 Classy::ColorSample classmethod init {args} {
 	# REM Create object
 	# -----------------
-	super
+	super init
 	set Classycolors [option get $object colorList ColorList]
 	set row 0
 	set len 0

@@ -36,7 +36,7 @@ Classy::export ColorRGB {}
 Classy::ColorRGB classmethod init {args} {
 	# REM Create object
 	# -----------------
-	super
+	super init
 	foreach color {red green blue} {
 		frame $object.$color 
 		pack $object.$color -fill y -side left

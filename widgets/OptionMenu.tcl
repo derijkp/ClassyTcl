@@ -35,7 +35,7 @@ Widget subclass Classy::OptionMenu
 Classy::export OptionMenu {}
 
 Classy::OptionMenu classmethod init {args} {
-	super menubutton $object -text "" -menu $object.menu -indicatoron 1 \
+	super init menubutton $object -text "" -menu $object.menu -indicatoron 1 \
 		 -textvariable [privatevar $object textvariable] -relief raised -anchor c
 	menu $object.menu -tearoff no
 	

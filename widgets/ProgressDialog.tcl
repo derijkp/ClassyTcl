@@ -38,7 +38,7 @@ Classy::Dialog subclass Classy::ProgressDialog
 Classy::export ProgressDialog {}
 
 Classy::ProgressDialog classmethod init {args} {
-	super -title "ProgressDialog"
+	super init -title "ProgressDialog"
 	message $object.options.message -text "Progress" -justify center
 	frame $object.options.frame -relief sunken -height 20
 	frame $object.options.frame.prog -relief raised -bg green -width 0 -height 20

@@ -45,7 +45,7 @@ Classy::export NoteBook {}
 Classy::NoteBook classmethod init {args} {
 	# REM Create object
 	# -----------------
-	set w [super]
+	set w [super init]
 	label $object.label -text "" -width 0 -relief flat -bg [$w cget -bg]
 	frame $object.cover_ -relief flat
 	frame $object.book -relief raised -bd [$object.label cget -bd]

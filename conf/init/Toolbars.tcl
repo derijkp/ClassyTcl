@@ -82,6 +82,7 @@ Classy::configtool Classy::WindowBuilder_icons {Tk widget toolbar used in the Cl
 	action Builder/classy__selector {Selector} {%W add Classy::Selector}
 	action Builder/classy__treewidget {Tree widget} {%W add Classy::TreeWidget}
 	action Builder/classy__browser {Browser} {%W add Classy::Browser}
+	action Builder/classy__cmdwidget {CmdWidget} {%W add Classy::CmdWidget}
 }
 
 Classy::configtool Classy::Dummy {toolbar used as a dummy in the ClassyTcl WindowBuilder} {

@@ -94,6 +94,9 @@ bind Text <<ButtonRelease-Adjust>> {
 		tkTextPaste %W %x %y
 	}
 }
+bind Classy::CmdWidget <<MXPaste>> {
+	catch {%W textinsert [selection get -displayof %W]}
+}
 bind Classy::CmdWidget <<Left>> {
 	%W move left
 }

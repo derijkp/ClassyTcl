@@ -46,7 +46,7 @@ Classy::export Canvas {}
 
 Classy::Canvas classmethod init {args} {
 	private $object data undo currentname w del
-	setprivate $object data(w) [super canvas]
+	setprivate $object data(w) [super init canvas]
 	set w $data(w)
 	set data(page) [$w create rectangle -10000 -10000 0 0 -fill white -outline white -tags _page]
 	set del($data(page)) _page
@@ -79,9 +79,9 @@ Classy::Canvas classmethod init {args} {
 Classy::Canvas chainoptions {$object}
 
 #doc {Entry options -undosteps} option {-undosteps undoSteps UndoSteps} descr {
-# gives the number of possible undo steps. Default is 40.
+# gives the number of possible undo steps. Default is 200.
 #}
-Classy::Canvas	addoption -undosteps {undoSteps UndoSteps 40} {
+Classy::Canvas	addoption -undosteps {undoSteps UndoSteps 200} {
 	private $object undo
 	set undo(redo) ""
 	if {$value<1} {set value 1}
@@ -218,7 +218,8 @@ Classy::Canvas method undo {{action {}} args} {
 						}
 					}
 					insert {
-						foreach {item pos len} [lindex $current 0] {
+						set len [lindex $current 0]
+						foreach {item pos} [lindex $current 1] {
 							$w dchars $item $pos [expr {$pos+$len-1}]
 						}
 					}
@@ -294,7 +295,6 @@ Classy::Canvas method undo {{action {}} args} {
 					a {
 						set undo(busy) 1
 						uplevel #0 [lindex $current 0]
-						lappend undo(redo) [concat a $current]
 						unset undo(busy)
 					}
 				}
@@ -322,6 +322,7 @@ Classy::Canvas method undo {{action {}} args} {
 		}
 		clear {
 			foreach name [array names del] {
+				if [inlist {_page _sel} $del($name)] continue
 				$w delete $del($name)
 				unset del($name)
 			}
@@ -456,7 +457,6 @@ Classy::Canvas method redo {} {
 			a {
 				set undo(busy) 1
 				uplevel #0 [lindex $current 1]
-				lappend undo(undo) [concat a $current]
 				unset undo(busy)
 			}
 		}
@@ -1122,14 +1122,15 @@ Classy::Canvas method insert {tagOrId beforeThis string} {
 		set citems [Classy::tag2items $object $w $tagOrId]
 		set list ""
 		set len [string length $string]
+		if {$len == 0} return
 		foreach citem $citems {
 			set pos [$w index $citem $beforeThis]
 			if {"$pos"==""} continue
-			lappend list $citem $pos $len
+			lappend list $citem $pos
 			$w insert $citem $pos $string
 		}
 		if {"$list" != ""} {
-			$object addundo [list insert $tagOrId $beforeThis $string] [list insert $list]
+			$object addundo [list insert $tagOrId $beforeThis $string] [list insert $len $list]
 		}
 	} else {
 		$w insert $tagOrId $beforeThis $string

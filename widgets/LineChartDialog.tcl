@@ -35,7 +35,7 @@ Classy::Dialog subclass ::Classy::LineChartDialog
 Classy::export LineChartDialog {}
 
 ::Classy::LineChartDialog classmethod init {args} {
-	super -resize {1 1}
+	super init -resize {1 1}
 	set w $object.options
 	$object add print "Postscript" "printcanvas $w.chart"
 	$object add rangeconfig "Configure Ranges" "$object rangeconfigure"
