@@ -117,27 +117,27 @@ foreach {tag def} {
 	option add *htmlinsert_$tag $def widgetDefault
 }
 
-array set ::html::insert_map {
-	blockquote "\n\n" /blockquote "\n"
-	br	"\n"
-	dd	"\n" /dd	"\n"
-	dl	"\n" /dl	"\n"
-	dt	"\n"
-	form "\n"	/form "\n"
-	h1	"\n\n"	/h1	"\n"
-	h2	"\n\n"	/h2	"\n"
-	h3	"\n\n"	/h3	"\n"
-	h4	"\n"	/h4	"\n"
-	h5	"\n"	/h5	"\n"
-	h6	"\n"	/h6	"\n"
-	li   "\n"
-	/dir "\n"
-	/ul "\n"
-	/ol "\n"
-	/menu "\n"
-	p	"\n\n"
-	pre "\n"	/pre "\n"
-}
+#array set ::html::insert_map {
+#	blockquote "\n\n" /blockquote "\n"
+#	br	"\n"
+#	dd	"\n" /dd	"\n"
+#	dl	"\n" /dl	"\n"
+#	dt	"\n"
+#	form "\n"	/form "\n"
+#	h1	"\n\n"	/h1	"\n"
+#	h2	"\n\n"	/h2	"\n"
+#	h3	"\n\n"	/h3	"\n"
+#	h4	"\n"	/h4	"\n"
+#	h5	"\n"	/h5	"\n"
+#	h6	"\n"	/h6	"\n"
+#	li   "\n"
+#	/dir "\n"
+#	/ul "\n"
+#	/ol "\n"
+#	/menu "\n"
+#	p	"\n\n"
+#	pre "\n"	/pre "\n"
+#}
 
 # tags that are list elements, that support "compact" rendering
 
@@ -200,6 +200,8 @@ proc ::html::set_indent {win cm} {
 
 proc ::html::reset_win {win} {
 	upvar #0 ::html::$win var
+	set keepstate [$win cget -state]
+	$win configure -state normal
 	set ::html::hrcount 0
 	regsub -all { +[^L ][^ ]*} " [$win tag names] " {} tags
 	catch "$win tag delete $tags"
@@ -216,6 +218,7 @@ proc ::html::reset_win {win} {
 	catch unset [info globals ::html::$win.form*]
 
 	::html::init_state $win
+	$win configure -state $keepstate
 	return ::html::$win
 }
 
@@ -284,7 +287,10 @@ proc ::html::set_state {win args} {
 
 proc ::html::render {win tag not param text} {
 	upvar #0 ::html::$win var
-	if {$var(stop)} return
+	if {$var(stop)} {
+		$win configure -state $::html::keepstate($win)
+		return
+	}
 	set tag [string tolower $tag]
 	set text [::html::map_esc $text]
 
@@ -338,7 +344,9 @@ proc ::html::render {win tag not param text} {
 	# This can cause us to re-enter the event loop, and cause recursive
 	# invocations of ::html::render, so we need to be careful.
 	if {!([incr var(tags)] % $var(S_update))} {
+		catch {$win configure -state $::html::keepstate($win)}
 		update
+		$win configure -state normal
 	}
 }
 
@@ -360,6 +368,8 @@ proc ::html::render {win tag not param text} {
 
 proc ::html::tag_hmstart {win param text} {
 	upvar #0 ::html::$win var
+	set ::html::keepstate($win) [$win cget -state]
+	$win configure -state normal
 	$win mark gravity $var(S_insert) left
 	$win insert end "\n " last
 	$win mark gravity $var(S_insert) right
@@ -367,6 +377,8 @@ proc ::html::tag_hmstart {win param text} {
 
 proc ::html::tag_/hmstart {win param text} {
 	$win delete last.first end
+	catch {$win configure -state $::html::keepstate($win)}
+	unset ::html::keepstate($win)
 }
 
 # put the document title in the window banner, and remove the title text

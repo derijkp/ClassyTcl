@@ -31,7 +31,7 @@ Widget
 </h2>
  The Widget methods are available to all instances of Widget or one
  of its subclasses.
-<dl><dt><b>
+<dl><b><dt>
  objectName configure ?<u>option</u>? ?<u>value</u>? ?<u>option</u> <u>value</u> ...?
 </b><dd>
  Query or modify the configuration options of an widget (object).
@@ -47,13 +47,11 @@ Widget
  the given value(s)
 <br>eg.:<pre>
  SomeWidgetClass configure -try yes
-</pre></ul>
-<dl><dt><b>
+</pre><b><dt>
  objectName cget <u>option</u>
 </b><dd>
  get the value of the option <u>option</u>
-</ul>
-<dl><dt><b>
+<b><dt>
  objectName component ?<u>componentname</u>? ?<u>widget</u>?
 </b><dd>
  If no <u>componentname</u> is given, the names of all accessible 
@@ -62,8 +60,7 @@ Widget
  <u>componentname</u> is returned.
  If <u>componentname</u> and <u>widget</u> are given, <u>widget</u> 
  will be associated as a component with <u>componentname</u>.
-</ul>
-<dl><dt><b>
+<b><dt>
  objectName destroy
 </b><dd>
  destroys an instance of Widget or one of its subclasses.
@@ -72,14 +69,13 @@ Widget
  <pre>destroy objectName</pre>
 <br>eg.:<pre>
  objectName destroy
-</pre></ul>
-
-<h2>
+</pre>
+</dl><h2>
 	Widget classmethods
 </h2>
  The Widget classmethods are only available to Widget or one
  of its subclasses, not to its instances.
-<dl><dt><b>
+<dl><b><dt>
  init
 </b><dd>
  The Widget init classmethod will normally be called using the super 
@@ -92,8 +88,7 @@ Widget
  If more than one argument is given, the args will be evaluated to
  create the base widget of the object. In this case getting the class
  and bindtags of the Tk widget right is the resonsability of the caller.
-</ul>
-<dl><dt><b>
+<b><dt>
  className addoption <u>option</u> <u>defaultlist</u> ?<u>body</u>?
 </b><dd>
  addoption is used to add an option to a class. The value of these options
@@ -114,8 +109,7 @@ Widget
  array options, and can be accessed by methods this way.
 <br>eg.:<pre>
  SomeWidgetClass addoption -try {try Try 1} {return [true $value]}
-</pre></ul>
-<dl><dt><b>
+</pre><b><dt>
  className configure ?<u>option</u>? ?<u>value</u>? ?<u>option</u> <u>value</u> ...?
 </b><dd>
  Query or modify the class specific configuration options.
@@ -131,8 +125,7 @@ Widget
  the given  value(s)
 <br>eg.:<pre>
  SomeWidgetClass configure -try yes
-</pre></ul>
-<dl><dt><b>
+</pre><b><dt>
  className chainmethods <u>list</u> <u>widget</u>
 </b><dd>
  chainmethods is a convenience to make commands of the Tk base widget
@@ -144,8 +137,7 @@ Widget
 <br>eg.:<pre>
  SomeWidgetClass chainmethods {set get} {$object}
  SomeWidgetClass chainmethods {action} {$object.subwidget}
-</pre></ul>
-<dl><dt><b>
+</pre><b><dt>
  className chainallmethods <u>widget</u> <u>widgettype</u>
 </b><dd>
  chain all commands of <u>widgettype</u> to a Tk widget <u>widget</u>.
@@ -154,8 +146,7 @@ Widget
  are ignored (configure, config, cget, destroy, class, private, component).
 <br>eg.:<pre>
  SomeWidgetClass chainallmethods {$object} text
-</pre></ul>
-<dl><dt><b>
+</pre><b><dt>
  className chainoptions <u>widget</u>
 </b><dd>
  chainoptions is a convenience to make all options of the base widget
@@ -166,8 +157,7 @@ Widget
  be chained this way!</b>
 <br>eg.:<pre>
  SomeWidgetClass chainoptions {$object}
-</pre></ul>
-<dl><dt><b>
+</pre><b><dt>
  className chainoption option <u>widget</u> <u>widgetoption</u> ?<u>widget</u> <u>widgetoption</u>? ...
 </b><dd>
  chainoption is a convenience to make options of component widgets
@@ -177,14 +167,12 @@ Widget
  of the first chained option.
 <br>eg.:<pre>
  SomeWidgetClass chainoption -bg {$object} -bg {$object.sub} -fg
-</pre></ul>
-<dl><dt><b>
+</pre><b><dt>
  Widget destroy
 </b><dd>
  When class Widget is destroyed, it tries to clean up after itself:
  It undoes the redefinition of the destroy and bgerror command
 <br>eg.:<pre>
  SomeWidgetClass addoption -try {try Try 1} {return [true $value]}
-</pre></ul>
-
+</pre>
 </body>

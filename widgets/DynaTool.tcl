@@ -68,9 +68,7 @@ Classy::DynaTool method maketool {tooltype tool cmdw} {
 	if ![info exists tooldata($tooltype)] {
 		$object define $tooltype
 	}
-	if [info exists slaves($tool)] {
-		unset slaves($tool)
-	}
+	catch {unset slaves($tool)}
 	set tooltypes($tool) $tooltype
 	set cmdws($tool) $cmdw
 	set checks($tool) ""
@@ -125,11 +123,14 @@ Classy::DynaTool method maketool {tooltype tool cmdw} {
 			append checks($tool) "$tool.$key configure $command\n"
 			lappend slaves($tool) $tool.$key
 		} elseif {"$type"=="widget"} {
-			lappend slaves($tool) [lshift current]
-		} elseif {"$type"=="createwidget"} {
 			$id $tool.$key
 			update idletasks
 			lappend slaves($tool) $tool.$key
+#			set command [lindex $current 0]
+#			regsub -all %W $command $tool.$key command
+#			eval $command
+#			update idletasks
+#			lappend slaves($tool) $tool.$key
 		} elseif {"$type"=="separator"} {
 			lappend slaves($tool) separator
 		} elseif [regexp ^# $type] {
@@ -266,10 +267,10 @@ Classy::DynaTool method deletetool {tool} {
 		error "Couldn't delete $tool; it is not a tool managed by $object."
 	}
 	if [winfo exists $tool] {destroy $tool}
-	unset slaves($tool)
-	unset tooltypes($tool)
-	unset cmdws($tool)
-	unset checks($tool)
+	catch {unset slaves($tool)}
+	catch {unset tooltypes($tool)}
+	catch {unset cmdws($tool)}
+	catch {unset checks($tool)}
 }
 
 #doc {DynaTool delete} cmd {

@@ -8,6 +8,9 @@
 #Help
 #} descr {
 # subclass of <a href="Dialog.html">Dialog</a><br>
+# The help widget is a toplevel with a menu that displays HTML
+# help files. It has all the options and methods of the 
+# <a href="HTML.html">HTML widget</a>.
 #}
 #doc {Help options} h2 {
 #	Help specific options
@@ -22,6 +25,8 @@ proc Help {} {}
 }
 catch {Classy::Help destroy}
 
+laddnew ::Classy::help_path [file join $class::dir help]
+
 # ------------------------------------------------------------------
 #  Widget creation
 # ------------------------------------------------------------------
@@ -30,15 +35,45 @@ Widget subclass Classy::Help
 Classy::export Help {}
 
 Classy::Help classmethod init {args} {
+	set geom [Classy::Default get geometry $object]
 	super toplevel
+	if [regexp {^([0-9]+)x([0-9]+)\+([0-9]+)\+([0-9]+)} $geom temp w h prevx prevy] {
+		set maxx [expr [winfo vrootwidth $object]-$w]
+		set maxy [expr [winfo vrootheight $object]-$h]
+		set x [expr [winfo pointerx .]-$w/2]
+		set y [expr [winfo pointery .]-$h/2]
+		if {$x>$maxx} {set x $maxx}
+		if {$y>$maxy} {set y $maxy}
+		if {$x<0} {set x 0}
+		if {$y<0} {set y 0}
+		set temp [expr [winfo pointerx .]-$prevx]
+		if {($temp>0)&&($temp<$w)} {
+			set temp [expr [winfo pointery .]-$prevy]
+			if {($temp>0)&&($temp<$h)} {
+				set keeppos 1
+				set x $prevx
+				set y $prevy
+			}
+		}
+		wm geometry $object ${w}x${h}+$x+$y
+	}
 	set w $object
+	wm protocol $w WM_DELETE_WINDOW "destroy $w"
 	Classy::HTML $w.html -yscrollcommand "$w.vbar set" \
 		-state disabled -wrap word -cursor hand2 \
 		-width 70 -height 28 -relief sunken
 	scrollbar $w.vbar -orient vertical -command "$w.html yview"
-	Classy::DynaMenu makemenu Classy::Help $w.menu $object.html Classy::Help
+	Classy::DynaMenu makemenu Classy::Help $w.menu $object Classy::Help
 	bindtags $object "Classy::Help [bindtags $object]"
-	pack $w.vbar -side right -fill y
+	if {[option get $w showTool ShowTool]} {
+		Classy::DynaTool maketool Classy::Help $w.tool $object
+		pack $w.tool -side top -fill x
+	}
+	if {"[option get $w scrollSide ScrollSide]" == "right"} {
+		pack $w.vbar -side right -fill y
+	} else {
+		pack $w.vbar -side left -fill y
+	}
 	pack $w.html -expand yes -fill both
 	private $object curfile history
 	set curfile ""
@@ -55,7 +90,9 @@ Classy::Help classmethod init {args} {
 #  Widget options
 # ------------------------------------------------------------------
 Classy::Help chainoptions {$object.html}
-Classy::Help chainoption -font {$object.html} -font
+#doc {Help options -general} option {-general general General} descr {
+#what is to be displayed in the General menu
+#}
 Classy::Help addoption -general {general General {}} {
 	-general {
 		$object.menu.general delete 1 end
@@ -68,8 +105,23 @@ Classy::Help addoption -general {general General {}} {
 # ------------------------------------------------------------------
 #  Methods
 # ------------------------------------------------------------------
-
 Classy::Help chainallmethods {$object.html} HTML
+
+#doc {Help command gethelp} cmd {
+#pathname gethelp name
+#} descr {
+# find a helpfile in the Classy::help_path and display it
+#}
+Classy::Help method gethelp {name} {
+	foreach dir $::Classy::help_path {
+		set file [file join $dir $name.html]
+		if [file exists $file] {
+			break
+		}
+	}
+	if ![file exists $file] return
+	$object.html geturl file:$file
+}
 
 Classy::Help method historymenu {} {
 	private $object history
@@ -102,124 +154,95 @@ Classy::Help method contents {tag} {
 	}
 }
 
-Classy::Help method load {file args} {
-	private $object curfile history
-
-	set w $object.html
-	# history
-	if {("$args"=="")&&("$curfile"!="")} {
-		set histfile $curfile#[lindex [$w yview] 0]
-		if {"[lindex $history end]"!="$histfile"} {
-			lappend history $histfile
-			if {[llength $history]>40} {
-				lpop history 0
-			}
-		}
-	}
-
-	if {[$object.menu.contents.menu index end]>1} {
-		$object.menu.contents.menu delete 2 end
-	}
-	$w configure -state normal
-	if [catch {set URL [ClassyHTMLload $w $file]}] {
-		$w configure -state disabled
-		if [regexp {^([^#]+)#(.+)$} $file temp file mark] {
-			set mark $mark
-		} else {
-			set mark 0
-		}
-		if {"[file extension $file]"==""} {
-			set file $file.html
-		}
-		if {"[file pathtype $file]"=="absolute"} {
-			set load $file
-		} else {
-			foreach dir $::Classy::help_path {
-				set load [file join $dir $file]
-				if [file exists $load] {
-					break
-				}
-			}
-		}
-		if ![file exists $load] {error "Sorry, but there is no help for this subject yet. ($file)"}
-	
-		$w configure -state normal
-		set URL [ClassyHTMLload $w $load#$mark]
-		wm title $object $load
-	}
-	regexp {^([a-z]+)://([^/]+)(/?.*)} $URL temp service host curfile
-	$w configure -state disabled
-
-	private $object contentstag
-	$object contents $contentstag
-}
-
-Classy::Help method search {what} {
-	set string [$object.menu.entry get]
+Classy::Help method search {what string} {
+#	set string [$object.menu.entry get]
 	if {"$string"==""} {return}
 	switch $what {
-		file {$object load $string}
+		file {$object gethelp $string}
 		word {
 			set w $object.html
 			$w tag configure found -background red
 			$w tag remove found 1.0 end
 			set current 1.0
 			while 1 {
-				set pos [$w search -exact -nocase -count len $string $current end]
+				set pos [$w search -exact -nocase -count ::Classy::temp $string $current end]
 				if {"$pos"==""} {break}
-				set current [$w index "$pos + $len c"]
+				set current [$w index "$pos + $::Classy::temp c"]
 				$w tag add found $pos $current
 			}
 		}
 		grep {
 			set w $object.html
-			set found ""
 			set files ""
 			foreach dir $::Classy::help_path {
-				if [info exists list] {unset list}
-				foreach temp [glob [file join $dir *]] {
-					if ![file isdir $temp] {lappend list $temp}
+				foreach file [glob [file join $dir *]] {
+					if ![file isdir $file] {
+						set c [readfile $file]
+						if [regexp -- $string $c] {
+							lappend files $file
+						}
+					}
 				}
-				set found [ffind -regexp -- $list $string]
-				eval lappend files $found
 			}
 			if {"$files"==""} {tkerror "None found";return}
 			set html "Help files containing \"$string\":<p>"
 			foreach file $files {
-				append html "<a href=\"[file tail $file]\">[file tail $file]</a><br>"
+				append html "<a href=\"file:$file\">[file root [file tail $file]]</a><br>"
 			}
-			$w configure -state normal
-			ClassyHTMLload $w "" $html
-			$w configure -state disabled
+			$object set $html
 		}
 	}
 }
 
 Classy::Help method edit {} {
-	private $object curfile
-	edit $curfile
+	set url [$object.html cget -url]
+	if [regexp {^file://localhost(.*)$} $url temp file] {
+		edit $file
+	}
 }
 
-proc newhelp {{subject {help}}} {
+Classy::Help method getcontents {} {
+	set data "action TopHelp Top {%W see 1.0}\n"
+	return $data
+}
+
+
+set ::Classy::helpfind word
+proc Classy::findhelp {w} {
+	Classy::Entry $w
+	set p [winfo parent $w]
+	$w configure -command [varsubst {w p} {
+		[DynaTool cmdw $p] search $::Classy::helpfind [$w get]
+	}]
+}
+
+proc Classy::newhelp {{subject {help}}} {
 	set w .peos__help
 	set num 1
 	while {[winfo exists $w$num] == 1} {incr num}
 	set w $w$num
-	ClassyHelp $w
-	$w load $subject
+	Classy::Help $w
+	$w gethelp $subject
 }
 
-proc help {{subject {help}}} {
+proc Classy::help {{subject {help}}} {
 	if ![winfo exists .peos__help] {
-		ClassyHelp .peos__help -cache 1
-	} else {
-		.peos__help place
+		Classy::Help .peos__help
 	}
 	if ![winfo ismapped .peos__help] {wm deiconify .peos__help}
 	raise .peos__help
-	.peos__help place
-	.peos__help load $subject
+	.peos__help gethelp $subject
 }
+Classy::export {help newhelp} {}
 
-laddnew ::Classy::help_path [file join $class::dir help]
+# ------------------------------------------------------------------
+#  destructor
+# ------------------------------------------------------------------
 
+#doc {Help command destroy} cmd {
+#pathname destroy 
+#} descr {
+#}
+Classy::Help method destroy {} {
+	Classy::Default set geometry $object [winfo geometry $object]
+}

@@ -9,6 +9,7 @@ set trydata {
 		action Load "Open file" {%W insert insert "Open: %W"}
 		action LoadNext "Open next" {%W insert insert "Open next: %W"}
 		action Try "Test" {%W insert insert "Test: %W"}
+		activemenu active "Active" {getmenu}
 		menu trying "Trying" {
 			action Try "Trying" {puts try}
 		}
@@ -28,6 +29,12 @@ set trydata {
 	check SearchReopen "Search Reopen" {-variable [testit %W] -onvalue yes -offvalue no} Control-Alt-t
 }
 proc testit w {return ok}
+proc getmenu {} {
+	return {
+		action Test1 "Test1" {puts "Test1 ok"} Alt-a
+		action Test2 "Test2" {%W insert end "Test2 ok"}
+	}
+}
 
 test Classy::DynaMenu {popopmenu} {
 	clean
@@ -40,8 +47,8 @@ test Classy::DynaMenu {popopmenu} {
 	Classy::DynaMenu define Test $::trydata
 #	set object Classy::DynaMenu;set menutype Test; set menu .top;set cmdw .t;set bindtag TestBind
 	Classy::DynaMenu makepopup Test .top .t TestBind
-	bindtags .t "TestBind [bindtags .t]"
-	bindtags .b "TestBind [bindtags .b]"
+	bindtags .t "TestBind TestBind::active [bindtags .t]"
+	bindtags .b "TestBind TestBind::active [bindtags .b]"
 	. configure -menu .top
 	manualtest
 	set try 1

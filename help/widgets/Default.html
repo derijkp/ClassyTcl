@@ -24,7 +24,7 @@ Default
  Dialogs</a>.
 </dl>
 
-<dl><dt><b>
+<dl><b><dt>
 Default get type ?key? ?notfound?
 </b><dd>
  query the default system.
@@ -34,62 +34,53 @@ Default get type ?key? ?notfound?
 <dt>?key? ?notfound?<dd>return the defaults list associated with the key of 
  type type. If the key does not exists, return notfound.
 </dl>
-</ul>
 
-<dl><dt><b>
+<b><dt>
 Default set type key value
 </b><dd>
  set the defaults list associated with key key of type type to value.
-</ul>
 
-<dl><dt><b>
+<b><dt>
 Default unset type key
 </b><dd>
  unset the value associated with key key of type type.
-</ul>
 
-<dl><dt><b>
+<b><dt>
 Default add type key value
 </b><dd>
  add value to the defaults list associated with key key of type type.
-</ul>
 
-<dl><dt><b>
+<b><dt>
 Default remove type key value
 </b><dd>
  remove value from the defaults list associated with key key of type type.
-</ul>
 
-<dl><dt><b>
-Default names ?type?
+<b><dt>
+Default names ?type? ?pattern?
 </b><dd>
- returns a list of all keys of type type. If type is not given,
- it returns a list of all types.
-</ul>
+ returns a list of all keys of type $type that match $pattern (if given).
+ If type is not given, it returns a list of all types.
 
-<dl><dt><b>
+<b><dt>
 Default load ?type? ?file?
 </b><dd>
  Without arguments, all default values are reloaded. If type
  is given, only the defaults of type type will be reloaded.
  If file is specified, the values will be loaded from file rather
  than the normal loacation.
-</ul>
 
-<dl><dt><b>
+<b><dt>
 Default save ?type? ?file?
 </b><dd>
  Without arguments, all default values are saved. If type
  is given, only the defaults of type type will be saved.
  If file is specified, the values will be saved to file rather
  than the normal loacation.
-</ul>
 
-<dl><dt><b>
+<b><dt>
 Default clear ?type?
 </b><dd>
  remove all defaults. If the type argument is given, remove only defaults
  of type type.
-</ul>
 
 </body>

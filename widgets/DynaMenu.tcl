@@ -70,12 +70,12 @@ Classy::export DynaMenu {}
 # on the <a href="../classy_configure.html">ClassyTcl configuration</a>.
 #}
 Classy::DynaMenu method makemenu {menutype menu cmdw bindtag} {
-	if ![winfo exists .classy__editormenu] {
+	if ![winfo exists $menu] {
 		$object makepopup $menutype $menu $cmdw $bindtag
 	}
 	if {"[option get $cmdw menuType MenuType]"=="top"} {
 		$menu configure -type menubar
-		[winfo toplevel $cmdw] configure -menu $menu
+		[Classy::widget [winfo toplevel $cmdw]] configure -menu $menu
 	}
 }
 #doc {DynaMenu makepopup} cmd {
@@ -87,10 +87,11 @@ Classy::DynaMenu method makemenu {menutype menu cmdw bindtag} {
 # will make all shortcuts available from that widget.
 #}
 Classy::DynaMenu method makepopup {menutype menu cmdw bindtag} {
-	private $object mtype cmdws menudata menutypes checks bindtags
+	private $object mtype cmdws menudata menutypes checks bindtags actives
 	if ![info exists menudata($menutype)] {
 		$object define $menutype
 	}
+	set actives($menu) ""
 	set bindtags($menu) $bindtag
 	set menutypes($menu) $menutype
 	set mtype($menu) popup
@@ -111,6 +112,25 @@ Classy::DynaMenu method makepopup {menutype menu cmdw bindtag} {
 				if {"$type"=="menu"} {
 					menu $curmenu.$key
 					set todo($curmenu.$key) [lindex $current 3]
+					set shortcut [lindex $current 4]
+					if {"$shortcut"!=""} {
+						catch {bind $bindtag <$shortcut> "tk_popup $curmenu.$key %X %Y 1;break"}
+					} else {
+						set shortcut [event info <<menu$key>>]
+						catch {bind $bindtag <<menu$key>> "tk_popup $curmenu.$key %X %Y 1;break"}
+					}
+					$curmenu add cascade -label $text -menu $curmenu.$key -accelerator $shortcut
+					incr num
+				} elseif {"$type"=="activemenu"} {
+					set command [lindex $current 3]
+					regsub -all {%W} $command "\[$object cmdw $menu\]" command
+					regsub -all {%%} $command % command
+					set newmenu $curmenu.$key
+					lappend actives($menu) $newmenu
+					set newmenutype ${menutype}::$key
+					$object define $newmenutype [uplevel #0 $command]
+					$object makepopup $newmenutype $newmenu $cmdw ${bindtag}::$key
+					$curmenu.$key configure -postcommand [list Classy::DynaMenu _activemenu ${menutype}::$menu $command]
 					set shortcut [lindex $current 4]
 					if {"$shortcut"!=""} {
 						catch {bind $bindtag <$shortcut> "tk_popup $curmenu.$key %X %Y 1;break"}
@@ -195,7 +215,7 @@ Classy::DynaMenu method maketop {menutype menu cmdw bindtag} {
 	set checks($menu) ""
 	if ![info exists notop] {
 		frame $menu -class Classy::TopMenu -highlightthickness 0 -bd 0
-#		bind $menu <Configure> [list $object placetop $menu]
+#		bind $menu <Configure> [list $object _placetop $menu]
 	}
 	bind $bindtag <<KeyMenu>> [list $object post $menu %X %Y]
 	bind $bindtag <<Menu>> [list $object post $menu %X %Y]
@@ -534,6 +554,7 @@ Classy::DynaMenu method cmdw {menu {cmdw {}}} {
 	if {"$cmdw"==""} {
 		return $cmdws($menu)
 	} else {
+		private $object actives
 		if {"$cmdws($menu)"=="$cmdw"} {return $cmdw}
 		set cmdws($menu) $cmdw
 		private $object checks
@@ -541,6 +562,9 @@ Classy::DynaMenu method cmdw {menu {cmdw {}}} {
 			regsub -all {%W} $checks($menu) $cmdw command
 			regsub -all {%%} $command % command
 			eval $command
+		}
+		foreach active $actives($menu) {
+			Classy::DynaMenu cmdw $active $cmdw
 		}
 		return $cmdw
 	}
@@ -631,10 +655,10 @@ Classy::DynaMenu method _placetopfirst {menu} {
 		incr x $w
 	}
 	$menu configure -height $mh -width $x
-	bind $menu <Configure> "$object placetop $menu"
+	bind $menu <Configure> "$object _placetop $menu"
 }
 
-Classy::DynaMenu method placetop {menu} {
+Classy::DynaMenu method _placetop {menu} {
 	set keep [bind $menu <Configure>]
 	bind $menu <Configure> {}
 	set width [winfo width $menu]
@@ -660,4 +684,9 @@ Classy::DynaMenu method placetop {menu} {
 	incr y $mh
 	$menu configure -height $y
 	after idle "bind $menu <Configure> [list $keep]"
+}
+
+Classy::DynaMenu method _activemenu {menutype command} {
+	set data [uplevel #0 $command]
+	$object define $menutype $data
 }

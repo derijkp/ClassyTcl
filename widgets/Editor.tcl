@@ -24,7 +24,7 @@ proc Editor {} {}
 }
 catch {Classy::Editor destroy}
 
-option add *Classy::Editor.KeySearchReopen Control-Alt-r widgetDefault
+option add *Classy:Editor.KeySearchReopen Control-Alt-r widgetDefault
 option add *Classy::Editor.KeyMatchingBrackets "Alt-bracketleft" widgetDefault
 option add *Classy::Editor.KeyIndentCr Control-j widgetDefault
 option add *Classy::Editor.KeyComment "Alt-numbersign" widgetDefault
@@ -52,11 +52,17 @@ Classy::Editor classmethod init {args} {
 	scrollbar $object.hbar -orient horizontal -command "$object.edit xview"
 
 	set menu .classy__editormenu
-	set bindtag Classy::EditorMenu
 	Classy::DynaMenu makemenu Classy::Editor .classy__editormenu $object Classy::EditorMenu
-	grid rowconfigure $object 0 -weight 1
-#	bind $object <FocusIn> "Classy::DynaMenu cmdw .classy__editormenu $object"
-#	bind $object <Enter> "Classy::DynaMenu cmdw .classy__editormenu $object"
+	# replace default cmdw commands to make Editor cmdw instead of Editor.edit
+	bind $object <FocusIn> "Classy::DynaMenu cmdw .classy__editormenu $object"
+	bind $object <Enter> "Classy::DynaMenu cmdw .classy__editormenu $object"
+	if {[option get $object showTool ShowTool]} {
+		Classy::DynaTool maketool Classy::Editor $object.tool $object
+		grid $object.tool - -sticky we
+		grid rowconfigure $object 1 -weight 1
+	} else {
+		grid rowconfigure $object 0 -weight 1
+	}
 	if {"[option get $object scrollSide ScrollSide]"=="left"} {
 		grid $object.vbar $object.edit -sticky nswe
 		grid $object.hbar -column 1 -sticky nswe
@@ -79,20 +85,7 @@ Classy::Editor classmethod init {args} {
 
 	# REM Create bindings
 	# --------------------
-	bindtags $object.edit "$bindtag [bindtags $object.edit]"
-	foreach {name sym}	[Classy::Default get Classy__EditorMacro] {
-		bind $object <$sym> "$object runmacro $name"
-	}
-#	d&d__addreceiver $object files [varsubst object {
-#		foreach file $files {
-#			set f [open $file r]
-#			$object insert current [read $f]
-#			close $f
-#		}
-#	}]
-#	d&d__addreceiver $object mem_indirect [varsubst object {
-#		* {$object insert current [eval $getdata]}
-#	}]
+	bindtags $object.edit "Classy::EditorMenu Classy::EditorMenu::macros [bindtags $object.edit]"
 
 	# REM Configure initial arguments
 	# -------------------------------
@@ -143,7 +136,6 @@ Classy::Editor private replace {}
 #  destroy
 # ------------------------------------------------------------------
 
-
 #doc {Editor command destroy} cmd {
 #pathname destroy 
 #} descr {
@@ -164,7 +156,6 @@ Classy::Editor method destroy {} {
 
 Classy::Editor chainallmethods {$object.edit} Classy::Text
 
-
 #doc {Editor command cut} cmd {
 #pathname cut 
 #} descr {
@@ -179,7 +170,6 @@ Classy::Editor method cut {} {
 	}
 }
 
-
 #doc {Editor command copy} cmd {
 #pathname copy 
 #} descr {
@@ -193,7 +183,6 @@ Classy::Editor method copy {} {
 	}										  
 }
 
-
 #doc {Editor command connectto} cmd {
 #pathname connectto 
 #} descr {
@@ -206,7 +195,6 @@ Classy::Editor method connectto {} {
 	$w set [getprivate $object options(-connection)]
 }
 
-
 #doc {Editor command execute} cmd {
 #pathname execute 
 #} descr {
@@ -217,7 +205,6 @@ Classy::Editor method execute {} {
 		send -- [getprivate $object options(-connection)] $command
 	}
 }
-
 
 #doc {Editor command findfunction} cmd {
 #pathname findfunction ?function?
@@ -240,7 +227,6 @@ Classy::Editor method findfunction {args} {
 	$object find "proc $function"
 }
 
-
 #doc {Editor command save} cmd {
 #pathname save 
 #} descr {
@@ -258,7 +244,6 @@ Classy::Editor method save {} {
 	}
 }
 
-
 #doc {Editor command saveas} cmd {
 #pathname saveas file
 #} descr {
@@ -274,7 +259,6 @@ Classy::Editor method saveas {file} {
 	catch {wm title [winfo toplevel $object] "$curfile"}
 }
 
-
 #doc {Editor command savebox} cmd {
 #pathname savebox 
 #} descr {
@@ -285,7 +269,6 @@ Classy::Editor method savebox {} {
 		-transfercommand "$object transfercommand" -initialfile $curfile]
 }
 
-
 #doc {Editor command transfercommand} cmd {
 #pathname transfercommand 
 #} descr {
@@ -294,7 +277,6 @@ Classy::Editor method transfercommand {} {
 	set type [string trimleft [file extension [$object.savebox get]] "."]
 	return [varsubst {type object} {$type {$object get 1.0 end}}]
 }
-
 
 #doc {Editor command loadnext} cmd {
 #pathname loadnext 
@@ -309,7 +291,6 @@ Classy::Editor method loadnext {} {
 	$object load $file
 }
 
-
 #doc {Editor command loadprev} cmd {
 #pathname loadprev 
 #} descr {
@@ -323,7 +304,6 @@ Classy::Editor method loadprev {} {
 	$object load $file
 }
 
-
 #doc {Editor command close} cmd {
 #pathname close 
 #} descr {
@@ -333,7 +313,6 @@ Classy::Editor method close {} {
 		eval [getprivate $object options(-closecommand)]
 	}
 }
-
 
 #doc {Editor command closefile} cmd {
 #pathname closefile 
@@ -363,7 +342,6 @@ Classy::Editor method closefile {} {
 	}
 	return true
 }
-
 
 #doc {Editor command load} cmd {
 #pathname load ?filename? ?filename ...?
@@ -421,7 +399,6 @@ Classy::Editor method load {{file {}} args} {
 	return $file
 }
 
-
 #doc {Editor command set} cmd {
 #pathname set data
 #} descr {
@@ -437,7 +414,6 @@ Classy::Editor method set {data} {
 	$object textchanged 0
 }
 
-
 #doc {Editor command forget} cmd {
 #pathname forget filename ?filename ...?
 #} descr {
@@ -446,7 +422,6 @@ Classy::Editor method forget {args} {
 	private $object reopenlist
 	set reopenlist [llremove $reopenlist $args]
 }
-
 
 #doc {Editor command reopenlist} cmd {
 #pathname reopenlist 
@@ -463,7 +438,6 @@ Classy::Editor method reopenlist {} {
 	$w fill $reopenlist
 	$w set $curfile
 }
-
 
 #doc {Editor command findsel} cmd {
 #pathname findsel direction
@@ -490,7 +464,6 @@ Classy::Editor method replace-find {dir} {
 	$object insert insert $replace
 	$object find $findwhat $dir -exact
 }
-
 
 #doc {Editor command find} cmd {
 #pathname find what ?option? ?value? ?option value?
@@ -539,15 +512,14 @@ Classy::Editor method find {what args} {
 		catch {unset startfile}
 		catch {unset startpos}
 	} else {
-		set pos [eval {$object search -count number} $args -- {$what} $index]
+		set pos [eval {$object search -count ::Classy::number} $args -- {$what} $index]
 	}
 	if {"$pos" == ""} {error "Not found"}
 	$object mark set insert $pos
 	catch {$object tag remove sel sel.first sel.last}
-	$object tag add sel insert "insert + $number c"
+	$object tag add sel insert "insert + $::Classy::number c"
 	$object see insert
 }
-
 
 #doc {Editor command gotoline} cmd {
 #pathname gotoline line
@@ -559,7 +531,6 @@ Classy::Editor method gotoline {line} {
 	$object see insert
 }
 
-
 #doc {Editor command command} cmd {
 #pathname command command
 #} descr {
@@ -567,7 +538,6 @@ Classy::Editor method gotoline {line} {
 Classy::Editor method command {command} {
 	eval $command
 }
-
 
 #doc {Editor command replace} cmd {
 #pathname replace ?all?
@@ -599,7 +569,6 @@ Classy::Editor method replace {args} {
 		$object find $findwhat -$searchdir
 	}
 }
-
 
 #doc {Editor command finddialog} cmd {
 #pathname finddialog 
@@ -646,7 +615,6 @@ Classy::Editor method finddialog {} {
 	$w.options.find.entry select range 0 end
 }
 
-
 #doc {Editor command indentedcr} cmd {
 #pathname indentedcr 
 #} descr {
@@ -658,7 +626,6 @@ Classy::Editor method indentedcr {} {
 		$object insert insert $prefix
 	}
 }
-
 
 #doc {Editor command indent} cmd {
 #pathname indent number
@@ -686,7 +653,6 @@ Classy::Editor method indent {number} {
 		}
 	}
 }
-
 
 #doc {Editor command macro} cmd {
 #pathname macro 
@@ -720,42 +686,25 @@ Classy::Editor method macro {} {
 		catch {unset [privatevar $object macro]}
 	}]
 	$stop configure -state disabled
-	$object.macro add bind Bind [varsubst {} {
-		private $object macrocache
-		set name [$object.macro.options.name get]
-		if {"$name"==""} {
-			tkerror "No name selected"
-			return
-		}
-		set key [$object.macro.options.key get]
-		set sym [Classy::expand_accelerator $key]
-		set macrocache($name) [$object.macro.options.text get 1.0 end]
-		bind $object <$sym> "$object runmacro $name"
-	}]
+	$object.macro add set Set [concat $object setmacro "\[$object.macro.options.name get\]" \
+		"\[$object.macro.options.text get 1.0 end\]" \
+		"\[$object.macro.options.key get\]"]
+	$object.macro add delete Delete [concat $object deletemacro "\[$object.macro.options.name get\]"]
 	$object.macro add exec Execute [varsubst {} {
 		set object $object
 		eval [$object.macro.options.text get 1.0 end]
 	}]
 	$object.macro add get Get "$object getmacro"
 	set key [privatevar $object macrokey]
-	$object.macro add save "Save (remove)" "$object savemacro"
-	$object.macro add configure "Configure" [varsubst object {
-		set Classytemp [$object.macro.options.name get]
-		if {"$Classytemp"==""} {
-			tkerror "No name selected"
-			return
-		}
-		Classycustomise__item "Configure macro $Classytemp" Classy::Editor_$Classytemp.mcr {} *
-	}]
+	$object.macro add save "Save now" {Classy::Default save}
 	# Options
 	#--------
-	private $object macrokey macroname macrocache
-	Classy::Default set app Classy::Editor_macro [lunion [array names macrocache] [lunmerge [Classy::Default get Classy__EditorMacro]]]
-	Classy::Entry $object.macro.options.name -label "Name" -default Classy::Editor_macro\
+	private $object macrokey macroname
+	Classy::Entry $object.macro.options.name -label "Name" -default Classy::Editor_macros \
 		-textvariable [privatevar $object macroname] -command [varsubst object {
 			$object.macro invoke get
-			set key [Classy::Default get Classy__EditorMacro [$object.macro.options.name get]]
-			if {"$key"!=""} {$object.macro.options.key set $key}
+#			set key [Classy::Default get Classy__EditorMacro [$object.macro.options.name get]]
+#			if {"$key"!=""} {$object.macro.options.key set $key}
 		}]
 	Classy::Entry $object.macro.options.key -textvariable [privatevar $object macrokey] -label "Key-code"
 	scrollbar $object.macro.options.scroll -command "$object.macro.options.text yview"
@@ -767,77 +716,82 @@ Classy::Editor method macro {} {
 	pack $object.macro.options.name -side bottom -fill x
 	pack $object.macro.options.scroll -fill y -side right
 	pack $object.macro.options.text -fill both -expand yes
+	$object getmacro
 }
 
+#doc {Editor command setmacro} cmd {
+#pathname setmacro
+#} descr {
+#}
+Classy::Editor method setmacro {name command {key {}}} {
+	if {"$name"==""} {
+		tkerror "No name selected"
+		return
+	}
+	set macros [Classy::Default get app Classy::Editor_macros]
+	laddnew macros $name
+	Classy::Default set app Classy::Editor_macros $macros
+	Classy::Default set app Classy::Editor_macro_$name [list $command $key]
+	Classy::DynaMenu define Classy::Editor::macros [$object getmacromenu]
+}
+
+#doc {Editor command deletemacro} cmd {
+#pathname deletemacro
+#} descr {
+#}
+Classy::Editor method deletemacro {name} {
+	if {"$name"==""} {
+		tkerror "No name selected"
+		return
+	}
+	Classy::Default unset app Classy::Editor_macro_$name
+	Classy::DynaMenu define Classy::Editor::macros [$object getmacromenu]
+}
+
+#doc {Editor command getmacromenu} cmd {
+#pathname macromenu 
+#} descr {
+#}
+Classy::Editor method getmacromenu {} {
+	set data {action Macro "Manage Macros" "%W macro"}
+	append data "\n"
+	set names ""
+	foreach m [Classy::Default names app Classy::Editor_macro_*] {
+		regexp {^Classy::Editor_macro_(.*)$} $m temp name
+		set temp [Classy::Default get app Classy::Editor_macro_$name]
+		set key [lindex $temp 1]
+		append data "action [list Macro$name] \"$name\" \{[list %W runmacro $name]\}"
+		if {"$key" == ""} {
+			append data "\n"
+		} else {
+			append data " $key\n"
+		}
+		lappend names $name
+	}
+	Classy::Default set app Classy::Editor_macros $names
+	return $data
+}
 
 #doc {Editor command getmacro} cmd {
 #pathname getmacro 
 #} descr {
 #}
 Classy::Editor method getmacro {} {
-	private $object macrocache
 	set name [$object.macro.options.name get]
+	set temp [Classy::Default get app Classy::Editor_macro_$name]
 	$object.macro.options.text delete 1.0 end
-	if [info exists macrocache($name)] {
-		$object.macro.options.text insert end $macrocache($name)
-	} else {
-		set file [Classygetconffile Classy::Editor_$name.mcr]
-		if ![file exists $file] {
-			Classy::Default unset Classy__EditorMacro $name
-			error "Macro $name not found"
-		}
-		set f [open $file]
-		$object.macro.options.text insert end [read $f]
-		close $f
-	}
+	$object.macro.options.text insert end [lindex $temp 0]
+	$object.macro.options.key set [lindex $temp 1]
 }
-
-
-#doc {Editor command savemacro} cmd {
-#pathname savemacro 
-#} descr {
-#}
-Classy::Editor method savemacro {} {
-	set name [$object.macro.options.name get]
-	if {"$name"==""} {
-		tkerror "No name selected"
-		return
-	}
-	set key [$object.macro.options.key get]
-	set sym [Classy::expand_accelerator $key]
-	set macro [$object.macro.options.text get 1.0 end]
-	set dst [Classygetconffile Classy::Editor_$name.mcr *]
-	if ![Classyoverwriteyn $dst] return
-	set f [open $dst w]
-	puts $f $macro
-	close $f
-#	Classycustomise__item "Configure macro $name" Classy::Editor_$name.mcr {} *
-	Classy::Default add Classy__EditorMacro $name $sym
-	bind $object <$sym> "$object runmacro $name"
-	private $object macrocache
-	catch {unset macrocache($name)}
-}
-
 
 #doc {Editor command runmacro} cmd {
 #pathname runmacro name
 #} descr {
 #}
 Classy::Editor method runmacro {name} {
-	private $object macrocache
-	if ![info exists macrocache($name)] {
-		set file [Classygetconffile Classy::Editor_$name.mcr]
-		if ![file exists $file] {
-			Classy::Default unset Classy__EditorMacro $name
-			error "Macro $name not found"
-		}
-		set f [open $file]
-		set macrocache($name) [read $f]
-		close $f
-	}
-	eval $macrocache($name)
+	set temp	[Classy::Default get app Classy::Editor_macro_$name]
+	eval [lindex $temp 0]
 }
-
 
 #doc {Editor command comment} cmd {
 #pathname comment add/remove
@@ -877,7 +831,6 @@ Classy::Editor method comment {command} {
 	}
 }
 
-
 #doc {Editor command format} cmd {
 #pathname format length
 #} descr {
@@ -906,7 +859,6 @@ Classy::Editor method format {length} {
 	$w insert insert $result
 }
 
-
 #doc {Editor command transpose} cmd {
 #pathname transpose pos
 #} descr {
@@ -923,7 +875,6 @@ Classy::Editor method transpose {pos} {
 	$object insert insert $new
 	$object see insert
 }
-
 
 #doc {Editor command matchingbrackets} cmd {
 #pathname matchingbrackets 
@@ -974,7 +925,6 @@ Classy::Editor method matchingbrackets {} {
 	}
 	$w tag add sel $start "$end +1 c"
 }
-
 
 #doc {Editor command marker} cmd {
 #pathname marker command ?args?

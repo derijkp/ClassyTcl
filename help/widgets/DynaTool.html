@@ -36,14 +36,13 @@ option add *Sometool.Toolbar definition widgetDefault
  changed to the current cmdw (command widget). The cmdw of a toolbar can be
  changed at any time.
 
-<dl><dt><b>
+<dl><b><dt>
 pathname maketool tooltype tool cmdw
 </b><dd>
  create a toolbar of type $tooltype. $cmdw
  determines the initial commmand widget.
-</ul>
 
-<dl><dt><b>
+<b><dt>
 pathname define tooltype ?data?
 </b><dd>
  set the definition describing the tools that will be generated 
@@ -55,70 +54,58 @@ pathname define tooltype ?data?
  <a href="../classy_configure.html">configuration system</a>.
  You will usually not invoke this method, as the maketool
  method will automatically define a tooltype that isn't managed yet.
-</ul>
 
-<dl><dt><b>
+<b><dt>
 pathname names 
 </b><dd>
-</ul>
 
-<dl><dt><b>
+<b><dt>
 pathname redraw tooltype
 </b><dd>
  redraw toolbars of type $tooltype
-</ul>
 
-<dl><dt><b>
+<b><dt>
 pathname get tooltype
 </b><dd>
  returns the definition of $tooltype
-</ul>
 
-<dl><dt><b>
+<b><dt>
 pathname deletetool tool
 </b><dd>
  delete $tool managed by DynaTool
-</ul>
 
-<dl><dt><b>
+<b><dt>
 pathname delete tooltype
 </b><dd>
  delete the definition and all toolbars of $tooltype
-</ul>
 
-<dl><dt><b>
+<b><dt>
 pathname cmdw tool {cmdw {}}
 </b><dd>
  change the current cmdw for $tool to $cmdw. If the cmdw argument is
  not given, the method returns the current cmdw for $tool.
  This method is automatically called when a widget which has bindtags
  defined by DynaTool recieves the focus.
-</ul>
 
-<dl><dt><b>
+<b><dt>
 pathname invoke curtool index
 </b><dd>
  invoke the item given by $index in $curtool
-</ul>
 
-<dl><dt><b>
+<b><dt>
 pathname conftool tooltype
 </b><dd>
-</ul>
 
-<dl><dt><b>
+<b><dt>
 pathname reqwidth tool
 </b><dd>
-</ul>
 
-<dl><dt><b>
+<b><dt>
 pathname reqheight tool
 </b><dd>
-</ul>
 
-<dl><dt><b>
+<b><dt>
 pathname image tool image
 </b><dd>
-</ul>
 
 </body>

@@ -15,18 +15,17 @@ What is ClassyTcl</H2>
 ClassyTcl is an object system for <A HREF="tcltk.html">Tcl</A>, written
 enirely in Tcl. This means it doesn't require patches to the Tcl core,
 making keeping up with new releases easier. Performance is very adequate.
-Included in the distribution is a large set of new widgets, written using
+Included in the distribution is a large set of <a href="widgets/index.html">
+new widgets</a>, written using
 the object system. While the object system itself only requires Tcl (>8.0),
 the widgets that come with it require Tk (of course), and another freely
 available extension called <A HREF="Extral.html">ExtraL</A>. ExtraL also
 does not require compiled code, but can be speeded up by having it available.
-
-<P>Documentation is limited unfortunately. If I get the time, I will write
-more. Until then I can only say: "Use the source, Luke"
 <H2>
 Use</H2>
 You should be able to obtain the latest versions of ClassyTcl and ExtraL
-on our server rrna.uia.ac.be via WWW or anonymous ftp (directory /pub/tcl).
+on our server <a href="http://rrna.uia.ac.be/">rrna.uia.ac.be</a> via WWW or 
+anonymous ftp (directory /pub/tcl).
 Both Extral and ClassyTcl are implemented as loadable packages. ClassyTcl
 can be used by&nbsp; putting the directories (after unpacking) somewhere
 appropriate and using the command
@@ -36,15 +35,33 @@ appropriate and using the command
 <BR>classyinit &lt;program name>
 <H2>
 Implementation</H2>
-Loading the package will create on class named Class. This wil be the parent
-of all other classes and objects
+Loading the package will create on class named <a href="basic/Class.html">
+Class</a>. All other classes and objects are created by subclassing or
+instanciating Class (or its subclasses), so all documentation to use the 
+object system is in the description of <a href="basic/Class.html">Class</a>.
 <H2>
+
 Widgets</H2>
-There are a lot of interesting widgets in ClassyTcl, but unfortunately
-with no description of how to use them. If you take a look at the sources,
-things should be reasonably obvious though. Be sure to check out the file
-'widgets/Editor.tcl' as an example. The Editor widget uses a lot of the
-other widgets.
+There are a lot of interesting <a href="widgets/index.html">widgets in 
+ClassyTcl</a>, that you can use in your programs. There are complex widgets,
+such as a <a href="widgets/Editor.html">full featured text editor</a>, 
+a <a href="widgets/HTML.html">HTML display widget</a>,
+a <a href="CmdWidget.html">console widget</a>,
+a <a href="widgets/help.html">help</a> and <a href="widgets/Configurator.html">
+configuration system</a> as well as component widgets, such as <a href="widgets/Dialog.html">
+intelligent dialogs</a>, a <a href="widgets/NoteBook.html">NoteBook</a> or a 
+<a href="widgets/Fold.html">Folding frame</a>.
+Classes such as <a href="widgets/DynaMenu.html">DynaMenu</a> 
+and <a href="widgets/DynaTool.html">DynaTool</a> help in easily making configurable
+menus.
+There are also several widgets that are improvments on the Tk widgets or systems, 
+such as the <a href="widgets/Text.html">text</a> and <a href="widgets/Canvas.html">canvas</a> with 
+undo capabilities and specialised entry widgets with label and contstraint options.
+<p>
+Unfortunately documentation is often somewhat limited, but
+besides the documentation, you can learn a lot from sources. Be sure to 
+check out the file '<a href="../widgets/Editor.tcl">widgets/Editor.tcl</a>' as an example. The Editor widget 
+uses a lot of the other widgets.
 <H2>
 How to contact me</H2>
 I will do my best to reply as fast as I can to any problems, etc. However,

@@ -4,9 +4,7 @@ option add *Patchtk 1 widgetDefault
 ## Menutype {Menutype: can be popup or top} {select popup top}
 option add *MenuType top widgetDefault
 ## {Scrollbar position} {Scrollbar position (left/right)} {select left right}
-option add *ScrollSide right widgetDefault
-## Toolbars {Do you want toolbars} {select 0 1}
-option add *ToolBar 1 widgetDefault
+option add *ScrollSide left widgetDefault
 
 ## ---- Dialogs ----
 ## {Color select} {type of color selection dialog (Tk/Peos)} {select Peos Tk}

@@ -19,7 +19,7 @@ test Classy::HTML {create and configure} {
 
 test Classy::help {create and configure} {
 	clean
-	destroy .try
+	catch {destroy .try}
 	classyinit test
 	Classy::Help .try
 	.try gethelp ClassyTcl

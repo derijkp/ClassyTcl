@@ -25,8 +25,8 @@ option add *Balloon.text.background yellow widgetDefault
 option add *Balloon.background black widgetDefault
 option add *Balloon.borderWidth 0 widgetDefault
 
-bind all <Enter> {set Balloon__current %W;Balloon _schedule %W}
-bind all <Leave> {if [info exists Balloon__current] {unset Balloon__current};Balloon revoke}
+bind all <Enter> {Balloon _schedule %W}
+bind all <Leave> {Balloon revoke}
 
 # ------------------------------------------------------------------
 #  Widget creation
@@ -106,7 +106,7 @@ Classy::Balloon method revoke {} {
 		after cancel $id
 		unset id
 	}
-	wm withdraw .classy::balloon
+	catch {wm withdraw .classy::balloon}
 }
 
 Classy::Balloon method _schedule {widget} {

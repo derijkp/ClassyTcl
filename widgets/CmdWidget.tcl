@@ -845,37 +845,37 @@ if ![info exists Classy__unknowntempf] {
 }
 
 proc Classy__unknown args {
-    global auto_noexec auto_noload env unknown_pending tcl_interactive
-    global errorCode errorInfo
-    # Save the values of errorCode and errorInfo variables, since they
-    # may get modified if caught errors occur below.  The variables will
-    # be restored just before re-executing the missing command.
+	global auto_noexec auto_noload env unknown_pending tcl_interactive
+	global errorCode errorInfo
+	# Save the values of errorCode and errorInfo variables, since they
+	# may get modified if caught errors occur below.  The variables will
+	# be restored just before re-executing the missing command.
 
-    set savedErrorCode $errorCode
-    set savedErrorInfo $errorInfo
-    set name [lindex $args 0]
-    if ![info exists auto_noload] {
+	set savedErrorCode $errorCode
+	set savedErrorInfo $errorInfo
+	set name [lindex $args 0]
+	if ![info exists auto_noload] {
 	#
 	# Make sure we're not trying to load the same proc twice.
 	#
 	if [info exists unknown_pending($name)] {
-	    return -code error "self-referential recursion in \"unknown\" for command \"$name\"";
+		return -code error "self-referential recursion in \"unknown\" for command \"$name\"";
 	}
 	set unknown_pending($name) pending;
 	set ret [catch {auto_load $name} msg]
 	unset unknown_pending($name);
 	if {$ret != 0} {
-	    return -code $ret -errorcode $errorCode \
+		return -code $ret -errorcode $errorCode \
 		"error while autoloading \"$name\": $msg"
 	}
 	if ![array size unknown_pending] {
-	    unset unknown_pending
+		unset unknown_pending
 	}
 	if $msg {
-	    set errorCode $savedErrorCode
-	    set errorInfo $savedErrorInfo
-	    set code [catch {uplevel $args} msg]
-	    if {$code ==  1} {
+		set errorCode $savedErrorCode
+		set errorInfo $savedErrorInfo
+		set code [catch {uplevel $args} msg]
+		if {$code ==  1} {
 		#
 		# Strip the last five lines off the error stack (they're
 		# from the "uplevel" command).
@@ -885,16 +885,16 @@ proc Classy__unknown args {
 		set new [join [lrange $new 0 [expr [llength $new] - 6]] \n]
 		return -code error -errorcode $errorCode \
 			-errorinfo $new $msg
-	    } else {
+		} else {
 		return -code $code $msg
-	    }
+		}
 	}
-    }
-    if {([info level] == 1) && ([info script] == "") \
-	    && [info exists tcl_interactive] && $tcl_interactive} {
+	}
+	if {([info level] == 1) && ([info script] == "") \
+		&& [info exists tcl_interactive] && $tcl_interactive} {
 	if ![info exists auto_noexec] {
-	    set new [auto_execok $name]
-	    if {$new != ""} {
+		set new [auto_execok $name]
+		if {$new != ""} {
 		set errorCode $savedErrorCode
 		set errorInfo $savedErrorInfo
 # patched
@@ -906,34 +906,34 @@ proc Classy__unknown args {
 		close $f
 		return "$res$res1"
 # patch end
-	    }
+		}
 	}
 	set errorCode $savedErrorCode
 	set errorInfo $savedErrorInfo
 	if {$name == "!!"} {
-#	    return [uplevel {history redo}]
-	    return -code error "!! is disabled until history is fixed in Tcl8.0"
+#		return [uplevel {history redo}]
+		return -code error "!! is disabled until history is fixed in Tcl8.0"
 	}
 	if [regexp {^!(.+)$} $name dummy event] {
-	    return [uplevel [list history redo $event]]
+		return [uplevel [list history redo $event]]
 	}
 	if [regexp {^\^([^^]*)\^([^^]*)\^?$} $name dummy old new] {
-	    return [uplevel [list history substitute $old $new]]
+		return [uplevel [list history substitute $old $new]]
 	}
 	set cmds [info commands $name*]
 	if {[llength $cmds] == 1} {
-	    return [uplevel [lreplace $args 0 0 $cmds]]
+		return [uplevel [lreplace $args 0 0 $cmds]]
 	}
 	if {[llength $cmds] != 0} {
-	    if {$name == ""} {
+		if {$name == ""} {
 		return -code error "empty command name \"\""
-	    } else {
+		} else {
 		return -code error \
 			"ambiguous command name \"$name\": [lsort $cmds]"
-	    }
+		}
 	}
-    }
-    return -code error "invalid command name \"$name\""
+	}
+	return -code error "invalid command name \"$name\""
 }
 
 proc Classy__puts {args} {
@@ -975,16 +975,17 @@ proc Classy__puts {args} {
 }
 
 proc Classy::cmd {args} {
-    set w .peos__cmd
-    set num 1
-    while {[winfo exists $w$num] == 1} {incr num}
-    set w $w$num
-    catch {destroy $w}
-    toplevel $w -bd 0 -highlightthickness 0
-    frame $w.frame
-    eval {Classy::CmdWidget $w.edit \
+	set w .peos__cmd
+	set num 1
+	while {[winfo exists $w$num] == 1} {incr num}
+	set w $w$num
+	catch {destroy $w}
+	toplevel $w -bd 0 -highlightthickness 0
+	wm protocol $w WM_DELETE_WINDOW "destroy $w"
+	frame $w.frame
+	eval {Classy::CmdWidget $w.edit \
 		-yscrollcommand [list $w.vbar set]} $args
-    scrollbar $w.vbar -orient vertical -command "$w.edit yview"
+	scrollbar $w.vbar -orient vertical -command "$w.edit yview"
 
 	if {"[option get $w scrollSide ScrollSide]"=="left"} {
 		grid $w.vbar $w.edit -sticky nswe
@@ -997,6 +998,6 @@ proc Classy::cmd {args} {
 		grid columnconfigure $w 1 -weight 0
 		grid rowconfigure $w 0 -weight 1
 	}
-    wm geometry $w =80x25
-    return $w
+	wm geometry $w =80x25
+	return $w
 }

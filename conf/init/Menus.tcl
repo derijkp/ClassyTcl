@@ -6,13 +6,10 @@ menu file "File" {
 	action Save "Save" "%W save"
 	action SaveAs "Save as" "%W savebox"
 	action Reopen "Reopen" "%W reopenlist"
-	action Macro "Macro" "%W macro"
 	action Editor "New editor" "edit newfile"
 	action Cmd "Command window" {Classy::cmd}
 	separator
-	action ConfDefault "Customise defaults" {Classy::Default customise "Configure Defaults" app {} *}
-	action ConfMenu "Customise menu" "Classy::DynaMenu confmenu Classy::Editor"
-	action ConfPeos "Customise general" "Classy::customise"
+	action Configure "Customise application" {Classy::Configurator dialog}
 	action Quit "Quit" "%W close"
 }
 menu edit "Edit" {
@@ -55,22 +52,22 @@ menu tools "Tools" {
 	action Execute "Execute Tcl command" "%W execute"
 	action Format "format" "%W format 76"
 }
+activemenu macros "Macros" {%W getmacromenu}
 } widgetDefault
-
 ## Help {menu used in the ClassyTcl help system} menu
 option add *Classy::Help.Menu {
 menu file "File" {
-	action Edit "Edit" {%W edit}
-	action Close "Close" {%W close}
-}
-menu contents "Contents" {
-	action TopHelp "Top" {%W see 1.0}
-}
-menu go "Go" {
 	action Reload "Reload" {%W reload}
+	action Edit "Edit" {%W edit}
+	action Configure "Configure" {Configurator dialog}
+	separator
+	action Close "Close" {destroy %W}
+}
+activemenu contents "Contents" {%W getcontents}
+menu go "Go" {
 	action Back "Back" {%W back}
 	action Forward "Forward" {%W forward} C-r
-	action History "History" {%W histroymenu}
+	action History "History" {%W historymenu}
 	action HelpWord "search in helptext" "%W search word"
 	action HelpGrep "search through all helpfiles" "%W search grep"
 	action HelpFile "search a named Helpfile" "%W search file"
@@ -78,8 +75,10 @@ menu go "Go" {
 menu general "General" {
 	action HelpHelp "Help on Help" {%W load help}
 }
-} widgetDefault
 
+
+
+} widgetDefault
 ## Filer {menu used in the ClassyTcl Filer} menu
 option add *Classy::Filer.Menu {
 menu sel "Selection" {
@@ -102,3 +101,4 @@ menu option "Options" {
 	radio FullInfo "Full info" {-variable [privatevar %W view] -value full -command {%W redraw}}
 }
 } widgetDefault
+

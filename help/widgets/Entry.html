@@ -21,57 +21,47 @@ Entry
 
 <h2>
 	Entry specific options
-</h2><dl><dt>Command-Line Name: <b>-orient</b><dt>Database Name: <b>orient</b><dt>Database Class: <b>Orient</b><dd>
+</h2><dl><b><dt>Command-Line Name: -orient</b><b><dt>Database Name: orient</b><b><dt>Database Class: Orient</b><dd>
  determines the position of the label relative to the entry: horizontal or vertical
-</ul>
-<dl><dt>Command-Line Name: <b>-default</b><dt>Database Name: <b>default</b><dt>Database Class: <b>Default</b><dd>
+<b><dt>Command-Line Name: -default</b><b><dt>Database Name: default</b><b><dt>Database Class: Default</b><dd>
  If not empty, a <a href="DefaultMenu.html">DefaultMenu</a> will be 
  added to store and reselecte values of the entry easily. These 
  default values are stored by the <a href="Defaults.html">Defaults</a> system 
  as type app. The default option gives the key for getting and 
  setting values.
-</ul>
-<dl><dt>Command-Line Name: <b>-label</b><dt>Database Name: <b>label</b><dt>Database Class: <b>Label</b><dd>
+<b><dt>Command-Line Name: -label</b><b><dt>Database Name: label</b><b><dt>Database Class: Label</b><dd>
  text to be displayed in the entry label. If this is empty, no label will bne displayed.
-</ul>
-<dl><dt>Command-Line Name: <b>-command</b><dt>Database Name: <b>command</b><dt>Database Class: <b>Command</b><dd>
+<b><dt>Command-Line Name: -command</b><b><dt>Database Name: command</b><b><dt>Database Class: Command</b><dd>
  associate a command with the entry. This
  command will be executed when the Action key is pressed in the entry.
-</ul>
-<dl><dt>Command-Line Name: <b>-constraint</b><dt>Database Name: <b>constraint</b><dt>Database Class: <b>Constraint</b><dd>
+<b><dt>Command-Line Name: -constraint</b><b><dt>Database Name: constraint</b><b><dt>Database Class: Constraint</b><dd>
  the value in the entry must match the regular expression given here.
  No constraint is applied when it is set to the empty string.
-</ul>
 
-<h2>
+</dl><h2>
 	Entry specific methods
-</h2><dl><dt><b>
+</h2><dl><b><dt>
 pathname nocmdset value
 </b><dd>
  set the entry to value without invoking the command associated with the entry
-</ul>
-<dl><dt><b>
+<b><dt>
 pathname set value
 </b><dd>
  set the entry to value.
-</ul>
-<dl><dt><b>
+<b><dt>
 pathname get 
 </b><dd>
  get the current contents of the entry
-</ul>
-<dl><dt><b>
+<b><dt>
 pathname command 
 </b><dd>
  invoke the command associated with the entry
-</ul>
-<dl><dt><b>
+<b><dt>
 pathname constrain ?warn?
 </b><dd>
  check whether the value matches the regular expression given by the -constraint option
  The optional parameter warn can be either 1 or 0. If it is 0, the entry will
  never contain a value not matching the constraint. It warn is 1, it is possible
  to enter a value not matching the constraint, but there will be visual warning.
-</ul>
 
 </body>

@@ -15,30 +15,24 @@ NumEntry
 
 <h2>
 	NumEntry specific options
-</h2><dl><dt>Command-Line Name: <b>-increment</b><dt>Database Name: <b>increment</b><dt>Database Class: <b>Increment</b><dd>
-</ul>
-<dl><dt>Command-Line Name: <b>-min</b><dt>Database Name: <b>min</b><dt>Database Class: <b>Min</b><dd>
-</ul>
-<dl><dt>Command-Line Name: <b>-max</b><dt>Database Name: <b>max</b><dt>Database Class: <b>Max</b><dd>
-</ul>
-<dl><dt>Command-Line Name: <b>-constraint</b><dt>Database Name: <b>constraint</b><dt>Database Class: <b>Constraint</b><dd>
-</ul>
+</h2><dl><b><dt>Command-Line Name: -increment</b><b><dt>Database Name: increment</b><b><dt>Database Class: Increment</b><dd>
+<b><dt>Command-Line Name: -min</b><b><dt>Database Name: min</b><b><dt>Database Class: Min</b><dd>
+<b><dt>Command-Line Name: -max</b><b><dt>Database Name: max</b><b><dt>Database Class: Max</b><dd>
+<b><dt>Command-Line Name: -constraint</b><b><dt>Database Name: constraint</b><b><dt>Database Class: Constraint</b><dd>
 
-<h2>
+</dl><h2>
 	NumEntry specific methods
-</h2><dl><dt><b>
+</h2><dl><b><dt>
 pathname incr number
 </b><dd>
  increment the current value of the entry with $number. $number does not
  have to be an integer
-</ul>
-<dl><dt><b>
+<b><dt>
 pathname constrain ?warn?
 </b><dd>
  check whether the value matches the regular expression given by the -constraint option
  The optional parameter warn can be either 1 or 0. If it is 0, the entry will
  never contain a value not matching the constraint. It warn is 1, it is possible
  to enter a value not matching the constraint, but there will be visual warning.
-</ul>
 
 </body>

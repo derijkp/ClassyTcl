@@ -146,7 +146,11 @@ proc Classy::parseopt {real variable possible {remain {}}} {
 }
 
 proc ::Classy::widget {object} {
-	return ::class::Tk_$object
+	if {"[info commands ::class::Tk_$object]"!=""} {
+		return ::class::Tk_$object
+	} else {
+		return $object
+	}
 }
 
 # For debugging purposes only

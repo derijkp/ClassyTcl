@@ -15,6 +15,7 @@ Class
 <h2>
 	Introduction
 </h2>
+ <h3>Classes and objects</h3>
  In ClassyTcl classes and objects are very similar: they are both 
  entities that combine data and methods (actions that can be performed).
  However, classes are usually used as a template to produce a number
@@ -27,6 +28,8 @@ Class
  When the package ClassyTcl is loaded, it will create one base class 
  named Class. All other classes and object will be derived from this
  base class.<p>
+
+ <h3>Classmethods and methods</h3>
  Class provides two types of methods:
 <dl>
 <dt>classmethods
@@ -54,37 +57,54 @@ Class
  <pre>pathName name ?...?</pre>
  and the classmethod is used when doing:
  <pre>ClassName name ?...?</pre>
- <p>A new object can be created using the command (classmethod <i>new</i>/):
+ <p>A new object can be created using the command (classmethod <i>new</i>):
  <pre>SomeClass new object</pre>
- A new class can be created using the command (classmethod <i>subclass</i>/):
+ A new class can be created using the command (classmethod <i>subclass</i>):
  <pre>SomeClass subclass SubClass</pre>
- variables
- hidden methods
+ <h3>private variables</h3>
+ Each object (or class) can store its data in private variables. A private
+ variable should only be used by the object owning it. In ClassyTcl
+ private variables are only protected by convention; An object or 
+ function can access the private variables of another object, which is
+ great for debugging. However, it is not usually good object oriented 
+ programming practice to rely on this feature for your programs (data 
+ encapsulation). Private variables can be accessed using the following commands:
+<dl>
+<dt>private object var ?var? ...
+<dd>make the local variables in the list refer to the private variables of $object
+<dt>setprivate object var value
+<dd>set the private variable $var of object $object to $value
+<dt>getprivate object var
+<dd>returns the current value of the private variable $var of object $object
+<dt>privatevar object var
+<dd>returns the fully specified name of the private variable $var of object $object. This
+can eg. be used to link a private variable to an entry:
+<pre>entry .e -textvariable [privatevar someobject somevar]</pre>
+</dl>
+
 
 <h2>
-	Class classmethods
+ Classmethods
 </h2>
  The classmethods defined by Class can be invoked from all classes.
-<dl><dt><b>
+<dl><b><dt>
  ClassName new <u>object</u> ?...?
 </b><dd>
- create a new instance (or object) with the name <u>object</u> of class 
+ create a new instance (or object) with the name $<u>object</u> of class 
  ClassName. When the actual object is created,
  the init function of class ClassName will be invoked with the arguments
- given after <u>object</u>.<br>
+ given after $<u>object</u>.<br>
  Usually, the init method of the superclass
  must be invoked somehere in the init method with appropriate parameters.
  This can be done using the command 
 <pre>super ?...?</pre>.
-</ul>
-<dl><dt><b>
+<b><dt>
  ClassName subclass <u>SubClass</u>
 </b><dd>
- create a new class named <u>SubClass</u> that inherits data
+ create a new class named $<u>SubClass</u> that inherits data
  and methods from class ClassName. ClassName is the parent or
  superclass of SubClass.
-</ul>
-<dl><dt><b>
+<b><dt>
  Classname destroy
 </b><dd>
  destroys a class. All its instances and subclasses and their
@@ -92,24 +112,21 @@ Class
  if defined for the class, it will be invoked after the 
  desctruction of its children, but before destroying the class
  itself and and its instances.
-</ul>
-<dl><dt><b>
+<b><dt>
  ClassName parent
 </b><dd>
  returns the name of the superclass or parent of the class ClassName.
-</ul>
-<dl><dt><b>
+<b><dt>
  ClassName children
 </b><dd>
  returns the names of all children of the class ClassName.
  These include all instances and all direct subclasses of ClassName.
-</ul>
-<dl><dt><b>
+<b><dt>
  ClassName method <u>name</u> <u>args</u> <u>body</u>
 <br>
  ClassName method <u>pattern</u>
 </b><dd>
- define a new method named <u>name</u> for class ClassName.
+ define a new method named $<u>name</u> for class ClassName.
  Whenever the method is invoked, the contents of body will be executed.
  The arguments <u>args</u> and <u>body</u> follow the same conventions
  as in the Tcl command proc.
@@ -123,13 +140,12 @@ Class
  methods except the hidden methods (those starting with an underscore
  is returned. When it is invoked with one argument, a list
  of all methods matching the pattern is returned
-</ul>
-<dl><dt><b>
+<b><dt>
  ClassName classmethod <u>name</u> <u>args</u> <u>body</u>
 <br>
  ClassName classmethod <u>pattern</u>
 </b><dd>
- define a new classmethod named <u>name</u> for class ClassName.
+ define a new classmethod named $<u>name</u> for class ClassName.
  Whenever the classmethod is invoked, the contents of body will be executed.
  The arguments <u>args</u> and <u>body</u> follow the same conventions
  as in the Tcl command proc.
@@ -142,55 +158,48 @@ Class
  classmethods except the hidden methods (those starting with an underscore)
  is returned. When it is invoked with one argument, a list
  of all classmethods matching the pattern is returned
-</ul>
-<dl><dt><b>
+<b><dt>
  ClassName deletemethod <u>name</u>
 </b><dd>
- delete the method named <u>name</u> from class ClassName.
+ delete the method named $<u>name</u> from class ClassName.
  Some special methods cannot be deleted.
-</ul>
-<dl><dt><b>
+<b><dt>
  ClassName deleteclassmethod <u>name</u>
 </b><dd>
- delete the classmethod named <u>name</u> from class ClassName.
+ delete the classmethod named $<u>name</u> from class ClassName.
  Some special classmethods cannot be deleted.
-</ul>
-<dl><dt><b>
+<b><dt>
  ClassName private ?<u>name</u>? ?<u>value</u>?
 </b><dd>
  classmethod private is used to get or change private data 
  associated with a class.
  Without arguments a list of all private class variables is returned.
  If the name argument is given, but not the value argument, the 
- current value of private class variable <u>name</u> is returned. If both arguments
- are present, the private class variable <u>name</u> is set to <u>value</u>.
-</ul>
+ current value of private class variable $<u>name</u> is returned. If both arguments
+ are present, the private class variable $<u>name</u> is set to $<u>value</u>.
 
-<h2>
-	Class methods
+</dl><h2>
+ Methods
 </h2>
  The methods defined by Class can be invoked from all objects and classes.
-<dl><dt><b>
+<dl><b><dt>
  pathName destroy
 </b><dd>
  destroys an object.
  The destroy method of the objects class (if defined) and those
  of its superclasses (if defined) will be invoked before the 
  destruction of the actual object.
-</ul>
-<dl><dt><b>
+<b><dt>
  pathName class
 </b><dd>
  returns the class of the object given by pathName
-</ul>
-<dl><dt><b>
+<b><dt>
  ClassName private ?<u>name</u>? ?<u>value</u>?
 </b><dd>
  private is used to get or change data associated with an object.
  Without arguments a list of all private variables is returned.
  If the name argument is given, but not the value argument, the 
- current value of private variable <u>name</u> is returned. If both arguments
- are present, the private variable <u>name</u> is set to <u>value</u>.
-</ul>
+ current value of private variable $<u>name</u> is returned. If both arguments
+ are present, the private variable $<u>name</u> is set to $<u>value</u>.
 
 </body>

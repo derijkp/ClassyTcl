@@ -35,3 +35,4 @@ option add *Menubutton.font DefaultBoldItalicFont widgetDefault
 option add *Scale.font DefaultBoldItalicFont widgetDefault
 ## {Text font} {font used in text widgets} font
 option add *Text.font DefaultNonpropFont widgetDefault
+

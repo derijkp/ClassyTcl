@@ -52,7 +52,7 @@ Classy::HTML classmethod init {args} {
 	# REM Initialise options and variables
 	# ------------------------------------
 	private $object control options
-	setprivate $object currenturl "file:/"
+	setprivate $object options(-url) "file:/"
 	setprivate $object tempfile [tempfile]
 	set control(history) ""
 	set control(forward) ""
@@ -77,6 +77,12 @@ Classy::HTML classmethod init {args} {
 # ------------------------------------------------------------------
 
 Classy::HTML chainoptions {$object}
+
+#doc {HTML options -url} option {-url url Url} descr {
+#}
+Classy::HTML addoption -url {url Url {}} {
+	set value [$object geturl $value]
+}
 
 #doc {HTML options -indent} option {-indent indent Indent} descr {
 #}
@@ -125,18 +131,18 @@ Classy::HTML chainallmethods {$object} text
 #} descr {
 #}
 Classy::HTML method geturl {url} {
-	private $object currenturl control
+	private $object control options
 
 	set url [$object fullurl $url]
 
 	# if it is the same url as the current, don't reload
 	# --------------------------------------------------
 	set base $url
-	set currentbase $currenturl
+	set currentbase $options(-url)
 	set fragment ""
 	set currentfragment ""
 	regexp {([^#]*)#(.+)} $url dummy base fragment
-	regexp {([^#]*)#(.+)} $currenturl dummy currentbase currentfragment
+	regexp {([^#]*)#(.+)} $options(-url) dummy currentbase currentfragment
 	if ![info exists control(reload)] {
 		if {"$currentbase" == "$base"} {
 			if {"$currentfragment" != "$fragment"} {
@@ -144,12 +150,12 @@ Classy::HTML method geturl {url} {
 				if [info exists control(direction)] {
 					unset control(direction)
 				} else {
-					lappend control(back) $currenturl
+					lappend control(back) $options(-url)
 					set control(forward) ""
-					lunshift control(history) $currenturl
+					lunshift control(history) $options(-url)
 					set control(history) [lrange $control(history) 0 50]
 				}
-				set currenturl $url
+				set options(-url) $url
 			}
 			return $url
 		}
@@ -165,10 +171,24 @@ Classy::HTML method geturl {url} {
 			package require http
 			set id [http::geturl $base]
 			set html [http::data $id]
+			array set state [set [set id](meta)]
+			set type $state(Content-Type)
 			unset id
+			if {"$type" != "text/html"} {
+				set html "<pre>$html</pre>"
+			}
 		}
 		file {
 			set html [readfile $file]
+			if [regexp {html?$} $file] {
+				set type text/html
+			} else {
+				set html "<pre>$html</pre>"
+			}
+		}
+		data {
+			set html [string range $file 1 end]
+			set type text/html
 		}
 		ftp {
 			error "not yet"
@@ -180,38 +200,37 @@ Classy::HTML method geturl {url} {
 
 	# adjust controls
 	# ---------------
-	::html::reset_win $object
 	if [info exists control(reload)] {
 		unset control(reload)
 	} elseif [info exists control(direction)] {
 		unset control(direction)
 	} else {
-		lappend control(back) $currenturl
+		lappend control(back) $options(-url)
 		set control(forward) ""
-		lunshift control(history) $currenturl
+		lunshift control(history) $options(-url)
 		set control(history) [lrange $control(history) 0 50]
 	}
-	set currenturl $url
+	set options(-url) $url
 
 	# render
 	# ------
+	::html::set_state $object -stop 1	;# stop rendering previous page if busy
 	update idletasks
+	::html::reset_win $object
 	if {$fragment != ""} {
 		::html::goto $object $fragment
 	}
-	::html::set_state $object -stop 1	;# stop rendering previous page if busy
 	::html::parse_html $html [list ::html::render $object]
 }
-
 
 #doc {HTML command reload} cmd {
 #pathname reload 
 #} descr {
 #}
 Classy::HTML method reload {} {
-	private $object currenturl control
+	private $object options control
 	set control(reload) 1
-	$object geturl $currenturl
+	$object geturl $options(-url)
 }
 
 
@@ -220,10 +239,10 @@ Classy::HTML method reload {} {
 #} descr {
 #}
 Classy::HTML method back {} {
-	private $object currenturl control
+	private $object options control
 	if {"$control(back)" == ""} return
 	set url [lpop control(back)]
-	lappend control(forward) $currenturl
+	lappend control(forward) $options(-url)
 	set control(direction) 1
 	$object geturl $url
 }
@@ -234,16 +253,16 @@ Classy::HTML method back {} {
 #} descr {
 #}
 Classy::HTML method forward {} {
-	private $object currenturl control
+	private $object options control
 	if {"$control(forward)" == ""} return
 	set url [lpop control(forward)]
-	lappend control(back) $currenturl
+	lappend control(back) $options(-url)
 	set control(direction) 1
 	$object geturl $url
 }
 
 Classy::HTML method _setimage {handle url} {
-	private $object currenturl tempfile
+	private $object tempfile
 
 	set url [$object fullurl $url]
 
@@ -289,19 +308,19 @@ Classy::HTML method _setimage {handle url} {
 #} descr {
 #}
 Classy::HTML method fullurl {url} {
-	private $object currenturl
+	private $object options
 
 	# make url fully specified
 	# ------------------------
-	regsub {/[^/]*$} $currenturl {} dir
+	regsub {/[^/]*$} $options(-url) {} dir
 	switch -regexp $url {
 		^# {
-			set url $currenturl$url
+			set url $options(-url)$url
 		}
-		{^(http|ftp|file)://} {
+		{^(http|ftp|file|data)://} {
 		}
-		{^(http|ftp|file):/} {
-			regsub {^(http|ftp|file):/} $url {\0/localhost/} url
+		{^(http|ftp|file|data):/} {
+			regsub {^(http|ftp|file|data):/} $url {\0/localhost/} url
 		}
 		^/ {
 			set url $dir$url
@@ -322,4 +341,18 @@ Classy::HTML method load {file} {
 		set file [file join [pwd] $file]
 	}
 	$object geturl file:$file
+}
+
+#doc {HTML command set} cmd {
+#pathname set html
+#} descr {
+#}
+Classy::HTML method set {html} {
+	$object geturl "data://localhost/$html"
+#	private $object options
+#	set options(-url) ""
+#	::html::set_state $object -stop 1	;# stop rendering previous page if busy
+#	update idletasks
+#	::html::reset_win $object
+#	::html::parse_html $html [list ::html::render $object]
 }

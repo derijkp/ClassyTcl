@@ -18,6 +18,7 @@
 #doc {Class intro} h2 {
 #	Introduction
 #} descr {
+# <h3>Classes and objects</h3>
 # In ClassyTcl classes and objects are very similar: they are both 
 # entities that combine data and methods (actions that can be performed).
 # However, classes are usually used as a template to produce a number
@@ -30,6 +31,8 @@
 # When the package ClassyTcl is loaded, it will create one base class 
 # named Class. All other classes and object will be derived from this
 # base class.<p>
+#
+# <h3>Classmethods and methods</h3>
 # Class provides two types of methods:
 #<dl>
 #<dt>classmethods
@@ -57,21 +60,40 @@
 # <pre>pathName name ?...?</pre>
 # and the classmethod is used when doing:
 # <pre>ClassName name ?...?</pre>
-# <p>A new object can be created using the command (classmethod <i>new</i>/):
+# <p>A new object can be created using the command (classmethod <i>new</i>):
 # <pre>SomeClass new object</pre>
-# A new class can be created using the command (classmethod <i>subclass</i>/):
+# A new class can be created using the command (classmethod <i>subclass</i>):
 # <pre>SomeClass subclass SubClass</pre>
-# variables
-# hidden methods
+# <h3>private variables</h3>
+# Each object (or class) can store its data in private variables. A private
+# variable should only be used by the object owning it. In ClassyTcl
+# private variables are only protected by convention; An object or 
+# function can access the private variables of another object, which is
+# great for debugging. However, it is not usually good object oriented 
+# programming practice to rely on this feature for your programs (data 
+# encapsulation). Private variables can be accessed using the following commands:
+#<dl>
+#<dt>private object var ?var? ...
+#<dd>make the local variables in the list refer to the private variables of $object
+#<dt>setprivate object var value
+#<dd>set the private variable $var of object $object to $value
+#<dt>getprivate object var
+#<dd>returns the current value of the private variable $var of object $object
+#<dt>privatevar object var
+#<dd>returns the fully specified name of the private variable $var of object $object. This
+#can eg. be used to link a private variable to an entry:
+#<pre>entry .e -textvariable [privatevar someobject somevar]</pre>
+#</dl>
+#
 #}
 
 #doc {Class cm} h2 {
-#	Class classmethods
+# Classmethods
 #} descr {
 # The classmethods defined by Class can be invoked from all classes.
 #}
 #doc {Class m} h2 {
-#	Class methods
+# Methods
 #} descr {
 # The methods defined by Class can be invoked from all objects and classes.
 #}
@@ -142,10 +164,10 @@ proc ::class::classerror {class object result cmd arg} {
 #doc {Class cm new} cmd {
 # ClassName new <u>object</u> ?...?
 #} descr {
-# create a new instance (or object) with the name <u>object</u> of class 
+# create a new instance (or object) with the name $<u>object</u> of class 
 # ClassName. When the actual object is created,
 # the init function of class ClassName will be invoked with the arguments
-# given after <u>object</u>.<br>
+# given after $<u>object</u>.<br>
 # Usually, the init method of the superclass
 # must be invoked somehere in the init method with appropriate parameters.
 # This can be done using the command 
@@ -201,7 +223,7 @@ proc ::class::new {class arg} {
 #doc {Class cm subclass} cmd {
 # ClassName subclass <u>SubClass</u>
 #} descr {
-# create a new class named <u>SubClass</u> that inherits data
+# create a new class named $<u>SubClass</u> that inherits data
 # and methods from class ClassName. ClassName is the parent or
 # superclass of SubClass.
 #}
@@ -416,7 +438,7 @@ proc ::class::propagatedeletemethod {class type name} {
 #<br>
 # ClassName method <u>pattern</u>
 #} descr {
-# define a new method named <u>name</u> for class ClassName.
+# define a new method named $<u>name</u> for class ClassName.
 # Whenever the method is invoked, the contents of body will be executed.
 # The arguments <u>args</u> and <u>body</u> follow the same conventions
 # as in the Tcl command proc.
@@ -480,7 +502,7 @@ proc ::class::method {class arg} {
 #<br>
 # ClassName classmethod <u>pattern</u>
 #} descr {
-# define a new classmethod named <u>name</u> for class ClassName.
+# define a new classmethod named $<u>name</u> for class ClassName.
 # Whenever the classmethod is invoked, the contents of body will be executed.
 # The arguments <u>args</u> and <u>body</u> follow the same conventions
 # as in the Tcl command proc.
@@ -562,7 +584,7 @@ proc ::class::classmethod {class arg} {
 #doc {Class cm deletemethod} cmd {
 # ClassName deletemethod <u>name</u>
 #} descr {
-# delete the method named <u>name</u> from class ClassName.
+# delete the method named $<u>name</u> from class ClassName.
 # Some special methods cannot be deleted.
 #}
 proc ::class::deletemethod {class arg} {
@@ -603,7 +625,7 @@ proc ::class::deletemethod {class arg} {
 #doc {Class cm deleteclassmethod} cmd {
 # ClassName deleteclassmethod <u>name</u>
 #} descr {
-# delete the classmethod named <u>name</u> from class ClassName.
+# delete the classmethod named $<u>name</u> from class ClassName.
 # Some special classmethods cannot be deleted.
 #}
 proc ::class::deleteclassmethod {class arg} {
@@ -750,8 +772,8 @@ proc ::class::Class,,m,class {class object} {
 # private is used to get or change data associated with an object.
 # Without arguments a list of all private variables is returned.
 # If the name argument is given, but not the value argument, the 
-# current value of private variable <u>name</u> is returned. If both arguments
-# are present, the private variable <u>name</u> is set to <u>value</u>.
+# current value of private variable $<u>name</u> is returned. If both arguments
+# are present, the private variable $<u>name</u> is set to $<u>value</u>.
 #}
 proc ::class::privatecmd {class object arg} {
 	set len [llength $arg]
@@ -778,8 +800,8 @@ proc ::class::privatecmd {class object arg} {
 # associated with a class.
 # Without arguments a list of all private class variables is returned.
 # If the name argument is given, but not the value argument, the 
-# current value of private class variable <u>name</u> is returned. If both arguments
-# are present, the private class variable <u>name</u> is set to <u>value</u>.
+# current value of private class variable $<u>name</u> is returned. If both arguments
+# are present, the private class variable $<u>name</u> is set to $<u>value</u>.
 #}
 proc ::class::classprivatecmd {class arg} {
 	set len [llength $arg]

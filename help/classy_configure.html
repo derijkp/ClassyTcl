@@ -1,19 +1,53 @@
 <HEAD>
-<TITLE>Customise general dialog</TITLE>
+<TITLE>Configuration dialog</TITLE>
 </HEAD>
 <BODY>
-<h1>Customise general dialog</h1>
+<h1>Configuration dialog</h1>
 
 <h2>Description</h2>
-This dialog is used to edit, delete or create the general Peos configuration 
-files. From this dialog keys, fonts, colors and some general settings can be
-configured.
-<h2>Action buttons</h2>
-<dl>
-<dt><a href="peos_button.html">Action</a> Help
-<dd>What do you think?
-<dt><a href="peos_button.html">Action</a> Close
-<dd>Close the dialog box without.
-</dl>
+The Configuration dialog is used to change the ClassyTcl configuration 
+settings. From this dialog keys, mousebuttons, fonts, colors, menus, toolbars and some 
+general settings can be configured. The configure dialog can usually be 
+called from the File menu, by invoking an entry labeled "Configure".
+
+<h2>The configuration system</h2>
+Configuration can be changed at different levels, making it possible to eg. to change the 
+configuration for either all ClassyTcl applications or for one specific application, 
+for all users (global) or just one specific user (personal). 
+At startup, a ClassyTcl application will parse different levels in the following 
+order:
+
+<ol>
+<li><b>ClassyTcl default (def)</b>: Global configuration settings
+<dd>
+This level contains the most general configuration settings. They apply to any ClassyTcl 
+application, and should never be deleted. However, they can be overruled by any of the other 
+levels. (The configuration files for this level are stored in the conf/init subdirectory of 
+the ClassyTcl installation directory.)
+<li><b>ClassyTcl user (user)</b>: Personal configuration
+<dd>
+Settings at this level overrule the global, default settings for a particular user.
+The configuration id stored in the directory .classy/init (or equivalent depending on OS) 
+in the home directory of the user.
+<li><b>Application Default (appdef)</b>: Global application specific configuration
+<dd>
+Settings at this level overrule the global, default settings for a particular application.
+The configuration is stored in in files in the conf/init subdirectory of the 
+application directory.
+<li><b>Application user (appuser)</b>: Personal application specific configuration
+<dd>
+These configuration  settings are specific to the current user (Unix) and application.
+Settings at this level will overrule any other settings.
+The settings are stored in the subdirectory /.&lt;application name&gt;/init of the users home 
+directory (or equivalent depending on OS). 
+</ol>
+
+<h2>Named configurations</h2>
+Named configurations can be used to store several possible configurations (eg. blue or 
+gray color style, Unix or Windows keys), wich can be selected easily afterwards by using 
+the "Select configuration" button. Named configurations can also be saved at
+different levels.
+<p>
 </body>
+
 

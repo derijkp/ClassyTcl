@@ -14,166 +14,130 @@ Editor
 
 <h2>
 	Editor specific options
-</h2><dl><dt>Command-Line Name: <b>-loadcommand</b><dt>Database Name: <b>loadCommand</b><dt>Database Class: <b>LoadCommand</b><dd>
-</ul>
-<dl><dt>Command-Line Name: <b>-icon</b><dt>Database Name: <b>icon</b><dt>Database Class: <b>Icon</b><dd>
-</ul>
-<dl><dt>Command-Line Name: <b>-searchtype</b><dt>Database Name: <b>searchType</b><dt>Database Class: <b>SearchType</b><dd>
-</ul>
-<dl><dt>Command-Line Name: <b>-searchdir</b><dt>Database Name: <b>searchDir</b><dt>Database Class: <b>SearchDir</b><dd>
-</ul>
-<dl><dt>Command-Line Name: <b>-searchcase</b><dt>Database Name: <b>searchCase</b><dt>Database Class: <b>SearchCase</b><dd>
-</ul>
-<dl><dt>Command-Line Name: <b>-searchreopen</b><dt>Database Name: <b>SearchReopen</b><dt>Database Class: <b>searchReopen</b><dd>
-</ul>
-<dl><dt>Command-Line Name: <b>-menu</b><dt>Database Name: <b>menu</b><dt>Database Class: <b>Menu</b><dd>
-</ul>
-<dl><dt>Command-Line Name: <b>-closecommand</b><dt>Database Name: <b>closeCommand</b><dt>Database Class: <b>CloseCommand</b><dd>
-</ul>
+</h2><dl><b><dt>Command-Line Name: -loadcommand</b><b><dt>Database Name: loadCommand</b><b><dt>Database Class: LoadCommand</b><dd>
+<b><dt>Command-Line Name: -icon</b><b><dt>Database Name: icon</b><b><dt>Database Class: Icon</b><dd>
+<b><dt>Command-Line Name: -searchtype</b><b><dt>Database Name: searchType</b><b><dt>Database Class: SearchType</b><dd>
+<b><dt>Command-Line Name: -searchdir</b><b><dt>Database Name: searchDir</b><b><dt>Database Class: SearchDir</b><dd>
+<b><dt>Command-Line Name: -searchcase</b><b><dt>Database Name: searchCase</b><b><dt>Database Class: SearchCase</b><dd>
+<b><dt>Command-Line Name: -searchreopen</b><b><dt>Database Name: SearchReopen</b><b><dt>Database Class: searchReopen</b><dd>
+<b><dt>Command-Line Name: -menu</b><b><dt>Database Name: menu</b><b><dt>Database Class: Menu</b><dd>
+<b><dt>Command-Line Name: -closecommand</b><b><dt>Database Name: closeCommand</b><b><dt>Database Class: CloseCommand</b><dd>
 
-<h2>
+</dl><h2>
 	Editor specific methods
-</h2><dl><dt><b>
+</h2><dl><b><dt>
 pathname destroy 
 </b><dd>
-</ul>
-<dl><dt><b>
+<b><dt>
 pathname cut 
 </b><dd>
-</ul>
-<dl><dt><b>
+<b><dt>
 pathname copy 
 </b><dd>
-</ul>
-<dl><dt><b>
+<b><dt>
 pathname connectto 
 </b><dd>
-</ul>
-<dl><dt><b>
+<b><dt>
 pathname execute 
 </b><dd>
-</ul>
-<dl><dt><b>
+<b><dt>
 pathname findfunction ?function?
 </b><dd>
 load the file containing function $function (must be auto loadable),
 and find the function definition.
 if function is not given, the current selection will be searched.
-</ul>
-<dl><dt><b>
+<b><dt>
 pathname save 
 </b><dd>
-</ul>
-<dl><dt><b>
+<b><dt>
 pathname saveas file
 </b><dd>
-</ul>
-<dl><dt><b>
+<b><dt>
 pathname savebox 
 </b><dd>
-</ul>
-<dl><dt><b>
+<b><dt>
 pathname transfercommand 
 </b><dd>
-</ul>
-<dl><dt><b>
+<b><dt>
 pathname loadnext 
 </b><dd>
-</ul>
-<dl><dt><b>
+<b><dt>
 pathname loadprev 
 </b><dd>
-</ul>
-<dl><dt><b>
+<b><dt>
 pathname close 
 </b><dd>
-</ul>
-<dl><dt><b>
+<b><dt>
 pathname closefile 
 </b><dd>
-</ul>
-<dl><dt><b>
+<b><dt>
 pathname load ?filename? ?filename ...?
 </b><dd>
-</ul>
-<dl><dt><b>
+<b><dt>
 pathname set data
 </b><dd>
-</ul>
-<dl><dt><b>
+<b><dt>
 pathname forget filename ?filename ...?
 </b><dd>
-</ul>
-<dl><dt><b>
+<b><dt>
 pathname reopenlist 
 </b><dd>
-</ul>
-<dl><dt><b>
+<b><dt>
 pathname findsel direction
 </b><dd>
  direction can be -forwards or -backwards
-</ul>
-<dl><dt><b>
+<b><dt>
 pathname find what ?option? ?value? ?option value?
 </b><dd>
-</ul>
-<dl><dt><b>
+<b><dt>
 pathname gotoline line
 </b><dd>
-</ul>
-<dl><dt><b>
+<b><dt>
 pathname command command
 </b><dd>
-</ul>
-<dl><dt><b>
+<b><dt>
 pathname replace ?all?
 </b><dd>
-</ul>
-<dl><dt><b>
+<b><dt>
 pathname finddialog 
 </b><dd>
-</ul>
-<dl><dt><b>
+<b><dt>
 pathname indentedcr 
 </b><dd>
-</ul>
-<dl><dt><b>
+<b><dt>
 pathname indent number
 </b><dd>
-</ul>
-<dl><dt><b>
+<b><dt>
 pathname macro 
 </b><dd>
-</ul>
-<dl><dt><b>
+<b><dt>
+pathname setmacro
+</b><dd>
+<b><dt>
+pathname deletemacro
+</b><dd>
+<b><dt>
+pathname macromenu 
+</b><dd>
+<b><dt>
 pathname getmacro 
 </b><dd>
-</ul>
-<dl><dt><b>
-pathname savemacro 
-</b><dd>
-</ul>
-<dl><dt><b>
+<b><dt>
 pathname runmacro name
 </b><dd>
-</ul>
-<dl><dt><b>
+<b><dt>
 pathname comment add/remove
 </b><dd>
-</ul>
-<dl><dt><b>
+<b><dt>
 pathname format length
 </b><dd>
-</ul>
-<dl><dt><b>
+<b><dt>
 pathname transpose pos
 </b><dd>
-</ul>
-<dl><dt><b>
+<b><dt>
 pathname matchingbrackets 
 </b><dd>
-</ul>
-<dl><dt><b>
+<b><dt>
 pathname marker command ?args?
 </b><dd>
 command must be one of
@@ -188,6 +152,5 @@ command must be one of
 <dt>lset
 <dt>lget
 </dl>
-</ul>
 
 </body>

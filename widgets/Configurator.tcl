@@ -49,8 +49,13 @@ Classy::Configurator method dialog {} {
 	private $object w
 	# REM Create object
 	# -----------------
+	if [winfo exists .classy__config] {
+		raise .classy__config
+		return
+	}
 	Classy::Dialog .classy__config -title "Configuration Dialog" \
-		-closecommand "if \[$object _checksaved\] {destroy .classy__config}"
+		-closecommand "if \[$object _checksaved\] {destroy .classy__config}" \
+		-help classy_configure
 	.classy__config persistent add close
 	set w [.classy__config component options]
 
@@ -457,12 +462,22 @@ Classy::Configurator method _activateconfall {} {
 	foreach section $data(sections) {
 		foreach description $data(section__$section) {
 			set key $data(descr__$description)
-			if {"$conftype" == "key"} {setevent $key {}}
-			if {"$conftype" == "mouse"} {setevent $key {}}
+			if {"$conftype" == "key"} {
+				setevent $key {}
+			} elseif {"$conftype" == "mouse"} {
+				setevent $key {}
+			} 
 			foreach level {def user appdef appuser} {
 				if [info exists data(${level}__$key)] {
 					eval $data(${level}__$key)
 				}
+			}
+			if {"$conftype" == "tool"} {
+				regexp {([^.*]+)(\.|\*)(T|t)oolbar$} $key temp tooltype
+				Classy::DynaTool define $tooltype
+			} elseif {"$conftype" == "menu"} {
+				regexp {([^.*]+)(\.|\*)(M|m)enu$} $key temp menutype
+				Classy::DynaMenu define $menutype
 			}
 		}
 	}
@@ -484,7 +499,7 @@ Classy::Configurator method _activateconf {} {
 	set key $data(current)
 	set current ""
 	foreach level {def user appdef appuser} {
-		set value [$w.$level get]
+		set value [$object _getfield $level]
 		if $data($level) {
 			if {("$conftype" == "key")||("$conftype" == "mouse")} {
 				if $data(${level}__rem) {
@@ -530,12 +545,23 @@ Classy::Configurator method _activateconf {} {
 			catch {font delete $name}
 			eval {font create $name} [font actual [option get . $name $name]]
 		}
+	} elseif {"$conftype" == "tool"} {
+		option add $key $current widgetDefault
+		regexp {([^.*]+)(\.|\*)(T|t)oolbar$} $key temp tooltype
+		Classy::DynaTool define $tooltype
+	} elseif {"$conftype" == "menu"} {
+		option add $key $current widgetDefault
+		regexp {([^.*]+)(\.|\*)(M|m)enu$} $key temp menutype
+		Classy::DynaMenu define $menutype
 	} else {
 		option add $key [list $current] widgetDefault
 	}
-	$w.current configure -text $current
+	if {[string first "\n" $current] == -1} {
+		$w.current configure -text $current
+	} else {
+		$w.current configure -text "... too long to display; look above ..."
+	}
 }
-
 
 Classy::Configurator method _getnamedconfigs {{conf {}}} {
 	private $object data
@@ -605,17 +631,25 @@ Classy::Configurator method _saveconf {level file} {
 	set confname $data(confname)
 	set w [getprivate $object w].$conftype
 	set f [open $file w]
-	foreach section $data(sections) {
+	set list $data(sections)
+	lappend list {}
+	foreach section $list {
 		set result ""
 		foreach description $data(section__$section) {
 			set key $data(descr__$description)
 			if [info exists data(${level}__$key)] {
-				append result "[list ## $description $data(help__$key)]\n"
+				set list [list ## $description $data(help__$key)]
+				if {"$data(entry__$key)" != "line"} {
+					lappend list $data(entry__$key)
+				}
+				append result "$list\n"
 				append result "$data(${level}__$key)\n"
 			}
 		}
 		if {"$result" != ""} {
-			puts $f "## ---- $section ----"
+			if {"$section" != ""} {
+				puts $f "## ---- $section ----"
+			}
 			puts $f $result
 		}
 	}
@@ -753,7 +787,7 @@ Classy::Configurator method _changedefault {} {
 	set w [getprivate $object w]
 	set type [$w.defaults.type get]
 	set name [$w.defaults.list get [$w.defaults.list curselection]]
-	set value [lremove [split [$w.defaults.edit get 1.0 end] "\n"] {}]
+	set value [$w.defaults.edit get 1.0 end]
 	if {"$value" == ""} {
 		catch {::Classy::Default unset $type $name}
 	} else {
@@ -781,7 +815,5 @@ Classy::Configurator method _configuredefault {{name {}}} {
 	set type [$w.defaults.type get]
 	set list [::Classy::Default get $type $name]
 	$w.defaults.edit delete 1.0 end
-	foreach item $list {
-		$w.defaults.edit insert end "$item\n"
-	}
+	$w.defaults.edit insert end $list
 }

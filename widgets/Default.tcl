@@ -122,15 +122,15 @@ Classy::Default method remove {type key value} {
 }
 
 #doc {Default names} cmd {
-#Default names ?type?
+#Default names ?type? ?pattern?
 #} descr {
-# returns a list of all keys of type type. If type is not given,
-# it returns a list of all types.
+# returns a list of all keys of type $type that match $pattern (if given).
+# If type is not given, it returns a list of all types.
 #}
-Classy::Default method names {{type {}}} {
+Classy::Default method names {{type {}} {pattern *}} {
 	if {"$type"!=""} {
 		private $object defaults_$type
-		array names defaults_$type
+		array names defaults_$type $pattern
 	} else {
 		set types ""
 		foreach var [$object private] {

@@ -5,8 +5,6 @@ option add *Patchtk 1 widgetDefault
 option add *MenuType top widgetDefault
 ## {Scrollbar position} {Scrollbar position (left/right)} {select left right}
 option add *ScrollSide right widgetDefault
-## Toolbars {Do you want toolbars} {select 0 1}
-option add *ToolBar 1 widgetDefault
 
 ## ---- Dialogs ----
 ## {Color select} {type of color selection dialog (Tk/Peos)} {select Peos Tk}
@@ -45,3 +43,4 @@ option add *Checkbutton.anchor w widgetDefault
 option add *Peos__OptionBox.BorderWidth 2 widgetDefault
 ## {Option box relief} {Default Option box relief color}
 option add *Peos__OptionBox.Relief groove widgetDefault
+
