@@ -7,10 +7,10 @@
 #
 # =============================================================
 package require Tcl 8.0
-# $Format: "set ::Class::version 1.$ProjectMajorVersion$"$
+# $Format: "set ::Class::version 1.0$ProjectMajorVersion$"$
 set ::Class::version 1.0
 # $Format: "set ::Class::patchlevel $ProjectMinorVersion$"$
-set ::Class::patchlevel 1
+set ::Class::patchlevel 0
 
 package provide Class $::Class::version
 
@@ -25,3 +25,7 @@ package::init $Class::dir class Class lib/Class-tcl.tcl
 lappend auto_path [file join ${::Class::dir} lib]
 
 source [file join $::Class::dir lib Class.tcl]
+
+
+
+

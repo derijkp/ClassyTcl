@@ -7,10 +7,18 @@
 # script is sourced, the variable $dir must contain the
 # full path name of this file's directory.
 
-# $Format: "package ifneeded Class 1.$ProjectMajorVersion$ \\"$
+# $Format: "package ifneeded Class 1.0$ProjectMajorVersion$ \\"$
 package ifneeded Class 1.0 \
 [subst -nocommands {
 	namespace eval ::Class {}
 	set ::Class::dir [list $dir]
 	source [file join [list $dir] lib init.tcl]
 }]
+
+
+
+
+
+
+
+

@@ -46,7 +46,7 @@ UNIX_SOURCES	=
 #========================================================================
 
 class_OBJECTS	= $(class_SOURCES:.c=.o)
-class_LIB_FILE	= libclass2.0.so
+class_LIB_FILE	= libclass1.0.0.so
 
 #========================================================================
 # RUNTIME_SOURCES identifies Tcl runtime files that are associated with
@@ -85,8 +85,8 @@ BINARIES	= $(lib_BINARIES)
 SHELL		= /bin/sh
 
 srcdir		= ..
-prefix		= /usr/local
-exec_prefix	= /usr/local
+prefix		= /usr
+exec_prefix	= /usr
 
 bindir		= ${exec_prefix}/bin
 libdir		= ${exec_prefix}/lib
@@ -103,13 +103,13 @@ pkgincludedir	= $(includedir)/$(PKG_DIR)
 
 top_builddir	= .
 
-INSTALL		= /usr//bin/install -c
+INSTALL		= /usr/bin/install -c
 INSTALL_PROGRAM	= ${INSTALL}
 INSTALL_DATA	= ${INSTALL} -m 644
 INSTALL_SCRIPT	= ${INSTALL_PROGRAM}
 
 PACKAGE		= class
-VERSION		= 2.0
+VERSION		= 1.0.0
 CC		= gcc -pipe
 CFLAGS_DEBUG	= -g
 CFLAGS_DEFAULT	= $(CFLAGS_OPTIMIZE)
@@ -127,11 +127,11 @@ RANLIB		= :
 SHLIB_CFLAGS	= -fPIC
 SHLIB_LD	= gcc -pipe -shared
 SHLIB_LDFLAGS	= $(LDFLAGS_DEFAULT)
-SHLIB_LD_LIBS	= ${LIBS} -L/home/peter/tcl/tcl8.4.3/unix -ltclstub8.4
+SHLIB_LD_LIBS	= ${LIBS} -L/usr/lib -ltclstub8.4
 STLIB_LD	= ${AR} cr
 TCL_DEFS	=  -DHAVE_UNISTD_H=1 -DHAVE_LIMITS_H=1 -D_LARGEFILE64_SOURCE=1 -DTCL_WIDE_INT_TYPE=long\ long -DHAVE_STRUCT_STAT64=1 -DHAVE_TYPE_OFF64_T=1 -DHAVE_GETCWD=1 -DHAVE_OPENDIR=1 -DHAVE_STRSTR=1 -DHAVE_STRTOL=1 -DHAVE_STRTOLL=1 -DHAVE_STRTOULL=1 -DHAVE_TMPNAM=1 -DHAVE_WAITPID=1 -DHAVE_UNISTD_H=1 -DHAVE_SYS_PARAM_H=1 -DUSE_TERMIOS=1 -DHAVE_SYS_TIME_H=1 -DTIME_WITH_SYS_TIME=1 -DHAVE_TM_ZONE=1 -DHAVE_GMTIME_R=1 -DHAVE_LOCALTIME_R=1 -DHAVE_TM_GMTOFF=1 -DHAVE_TIMEZONE_VAR=1 -DHAVE_ST_BLKSIZE=1 -DSTDC_HEADERS=1 -DHAVE_SIGNED_CHAR=1 -DHAVE_LANGINFO=1 -DPEEK_XCLOSEIM=1 -DHAVE_SYS_IOCTL_H=1 
-TCL_BIN_DIR	= /home/peter/dev/tcl8.4.3/unix
-TCL_SRC_DIR	= /home/peter/tcl/tcl8.4.3
+TCL_BIN_DIR	= /usr/lib
+TCL_SRC_DIR	= /usr/include/tcl8.4.5
 # This is necessary for packages that use private Tcl headers
 #TCL_TOP_DIR_NATIVE	= @TCL_TOP_DIR_NATIVE@
 # Not used, but retained for reference of what libs Tcl required
@@ -156,18 +156,18 @@ TCLSH_ENV	= TCL_LIBRARY=`echo $(TCL_SRC_DIR)/library` \
 		  SHLIB_PATH="$(EXTRA_PATH):${SHLIB_PATH}" \
 		  PATH="$(EXTRA_PATH):$(PATH)" \
 		  TCLLIBPATH="$(top_builddir)"
-TCLSH_PROG	= /home/peter/dev/tcl8.4.3/unix/tclsh
+TCLSH_PROG	= /usr/lib/../bin/tclsh8.4
 WISH_PROG	= @WISH_PROG@
 TCLSH		= $(TCLSH_ENV) $(TCLSH_PROG)
 SHARED_BUILD	= 1
 
-INCLUDES	= -I"/usr/local/include"
+INCLUDES	= -I"/usr/include"
 # when using tk
-#INCLUDES	= -I"/usr/local/include" @TK_INCLUDES@ @TK_XINCLUDES@
+#INCLUDES	= -I"/usr/include" @TK_INCLUDES@ @TK_XINCLUDES@
 
 EXTRA_CFLAGS	= $(MEM_DEBUG_FLAGS) 
 
-DEFS		= $(TCL_DEFS)  -DVERSION=\"2.0\" -D_LARGEFILE64_SOURCE=1 -DTCL_WIDE_INT_TYPE=long\ long -DHAVE_STRUCT_STAT64=1 -DHAVE_TYPE_OFF64_T=1 -DHAVE_UNISTD_H=1 -DHAVE_SYS_PARAM_H=1 -DUSE_TCL_STUBS=1  $(EXTRA_CFLAGS)
+DEFS		= $(TCL_DEFS)  -DVERSION=\"1.0.0\" -D_LARGEFILE64_SOURCE=1 -DTCL_WIDE_INT_TYPE=long\ long -DHAVE_STRUCT_STAT64=1 -DHAVE_TYPE_OFF64_T=1 -DHAVE_UNISTD_H=1 -DHAVE_SYS_PARAM_H=1 -DUSE_TCL_STUBS=1  $(EXTRA_CFLAGS)
 
 CONFIG_CLEAN_FILES = Makefile
 
@@ -203,14 +203,14 @@ binaries: $(BINARIES) pkgIndex.tcl
 libraries:
 
 doc:
-		$(TCLSH_PROG) $(srcdir)/build/makedoc.tcl srcdir \$(srcdir)
+	$(TCLSH_PROG) $(srcdir)/build/makedoc.tcl srcdir \$(srcdir)
 	
 
 uninstall:
-	$(TCLSH_PROG) $(srcdir)/build/uninstall.tcl srcdir $(srcdir) pkglibdir "$(DESTDIR)$(pkglibdir)" pkgtcllibdir "$(DESTDIR)$(pkgtcllibdir)" pkgdatadir "$(DESTDIR)$(pkgdatadir)" pkgincludedir "$(DESTDIR)$(pkgincludedir)" bindir "$(DESTDIR)$(bindir)" mandir "$(DESTDIR)$(mandir)" package class version 2.0
+	$(TCLSH_PROG) $(srcdir)/build/uninstall.tcl srcdir $(srcdir) pkglibdir "$(DESTDIR)$(pkglibdir)" pkgtcllibdir "$(DESTDIR)$(pkgtcllibdir)" pkgdatadir "$(DESTDIR)$(pkgdatadir)" pkgincludedir "$(DESTDIR)$(pkgincludedir)" bindir "$(DESTDIR)$(bindir)" mandir "$(DESTDIR)$(mandir)" package class version 1.0.0
 
 install: all
-	$(TCLSH_PROG) $(srcdir)/build/install.tcl srcdir $(srcdir) pkglibdir "$(DESTDIR)$(pkglibdir)" pkgtcllibdir "$(DESTDIR)$(pkgtcllibdir)" pkgdatadir "$(DESTDIR)$(pkgdatadir)" pkgincludedir "$(DESTDIR)$(pkgincludedir)" bindir "$(DESTDIR)$(bindir)" mandir "$(DESTDIR)$(mandir)" package class version 2.0
+	$(TCLSH_PROG) $(srcdir)/build/install.tcl srcdir $(srcdir) pkglibdir "$(DESTDIR)$(pkglibdir)" pkgtcllibdir "$(DESTDIR)$(pkgtcllibdir)" pkgdatadir "$(DESTDIR)$(pkgdatadir)" pkgincludedir "$(DESTDIR)$(pkgincludedir)" bindir "$(DESTDIR)$(bindir)" mandir "$(DESTDIR)$(mandir)" package class version 1.0.0
 
 install-binaries: binaries install-lib-binaries install-bin-binaries
 	if test "x$(SHARED_BUILD)" = "x1"; then \
