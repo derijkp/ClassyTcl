@@ -170,7 +170,7 @@ test class {object class} {
 	try info class
 } {Base}
 
-test class {object command} {
+test class {3} {
 	clean
 	Base new try
 	try
@@ -1333,7 +1333,7 @@ test class {check two auto named objects} {
 	lappend result [Test new #auto]
 	lappend result [Test new]
 	set result
-} {Class::o1 Class::o2 Class::o3}
+} {::Class::o1 ::Class::o2 ::Class::o3}
 
 test class {changeclass} {
 	clean

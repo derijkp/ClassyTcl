@@ -3,6 +3,15 @@
 exec tclsh "$0" "$@"
 
 source tools.tcl
+lappend auto_path autoload_test
+
+catch {Test destroy}
+set temp [Test new]
+
+
+
+
+
 # - 4240
 # 2416 4952
 Class subclass Test

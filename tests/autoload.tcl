@@ -9,6 +9,12 @@ test autoload {Class::auto_mkindex} {
 	Class::auto_mkindex autoload_test
 } {}
 
+test autoload {bugfix: autoload with auto name should not segfault} {
+	catch {Test destroy}
+	set temp [Test new]
+	set a 1
+} {1}
+
 test autoload {autoload method from object} {
 	catch {Test destroy}
 	Test new try 1

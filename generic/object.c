@@ -167,7 +167,9 @@ int Classy_NewClassMethod(
 			" new ?object? ?args?\"", (char *)NULL);
 		return TCL_ERROR;
 	}
-	string = Tcl_GetStringFromObj(argv[0],&len);
+	if (argc > 0) {
+		string = Tcl_GetStringFromObj(argv[0],&len);
+	}
 	if ((argc == 0) || ((len == 5) && (strncmp(string,"#auto",5) == 0))) {
 		sprintf(buffer,"::Class::o%d",objectnum++);
 		len = strlen(buffer);
