@@ -1,6 +1,9 @@
+class::reinit
+Class classmethod nop {} {}
+time {Class nop} 5000
+
 Class subclass Test
 Test destroy
-
 Class classmethod try {a} {
 	puts "$class:$a"
 }
@@ -17,8 +20,28 @@ Test method destroy {} {
 Test new t
 puts [t try 2]
 Test method try {} {}
-time {t try} 1000
+time {t try} 5000
 Test destroy
+
+set v aaaaaaaaaa
+set v $v$v$v$v$v$v$v$v$v$v$v
+class::private .try $v
+set $v 1
+
+class::private .try t
+set t 1
+info vars ::class::*
+
+class::setprivate .try t1 1
+set v aaaaaaaaaa
+set v $v$v$v$v$v$v$v$v$v$v$v
+class::setprivate .try $v 1
+info vars ::class::*
+
+class::privatevar .try $v
+class::getprivate .try t
+class::getprivate .try $v
+
 
 Tk appname test
 package require ClassyTcl

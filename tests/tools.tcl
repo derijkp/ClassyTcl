@@ -8,7 +8,7 @@ raise .
 }
 
 proc clean {} {
-#	catch {Class destroy}
+	catch {Class destroy}
 	catch {eval destroy [winfo children .]}
 	catch {. configure -menu {}}
 }
@@ -74,13 +74,16 @@ proc testsummarize {} {
 			wm geometry .error +[expr [winfo pointerx .] - 100]+[expr [winfo pointery .] - 100]
 		}
 	} else {
-		destroy .final
-		toplevel .final
-		message .final.m -text "All tests ok" -justify center
-		button .final.b -text Exit -command exit
-		pack .final.m
-		pack .final.b
-		wm geometry .final +[expr [winfo pointerx .] - 20]+[expr [winfo pointery .] - 20]
+		catch {destroy .final}
+		if ![catch {toplevel .final}] {
+			message .final.m -text "All tests ok" -justify center
+			button .final.b -text Exit -command exit
+			pack .final.m
+			pack .final.b
+			wm geometry .final +[expr [winfo pointerx .] - 20]+[expr [winfo pointery .] - 20]
+		} else {
+			puts "All tests ok"
+		}
 	}
 }
 

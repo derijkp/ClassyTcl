@@ -111,7 +111,6 @@ proc putsvars {args} {
 # ------------------------------------------------------
 #
 namespace eval ::class {
-	set noc 1
 	namespace export super
 	namespace export private setprivate getprivate privatevar
 }
@@ -120,6 +119,12 @@ if [catch {package require Extral 0.96}] {
 		eval [eval concat $args]
 	}
 }
+
+if {"[info commands ::class::reinit]" != ""} {
+	set noc 0
+	::class::reinit
+} else {
+set noc 1
 
 proc ::class::correctcmd {fcmd cmd} {
 	set result "$cmd"
@@ -181,9 +186,6 @@ proc ::class::new {class arg} {
 	if {"$namespace" != ""} {
 		namespace eval $namespace {}
 	}
-	if [info exists ::class::parent($object)] {
-		return -code error "object \"$object\" exists"
-	}
 	if {"[info commands ::$object]" != ""} {
 		return -code error "command \"$object\" exists"
 	}
@@ -239,9 +241,12 @@ proc ::class::subclass {class arg} {
 		return -code error "wrong # args: should be \"$class subclass class\""
 	}
 	set child [lindex $arg 0]
-	if {"$class" == "$child"} {
-		return -code error "class and subclass \"$class\" are identical"
+	if {"[info commands ::$child]" != ""} {
+		return -code error "command \"$child\" exists"
 	}
+#	if {"$class" == "$child"} {
+#		return -code error "class and subclass \"$class\" are identical"
+#	}
 	regsub {^::} $child {} child
 	set namespace [namespace qualifiers $child]
 	if {"$namespace" != ""} {
@@ -253,14 +258,7 @@ proc ::class::subclass {class arg} {
 			catch {namespace import ::class::getprivate}
 		}
 	}
-	if [info exists ::class::parent($child)] {
-		return -code error "object \"$child\" exists"
-	}
-	if {"[info commands ::$child]" != ""} {
-		return -code error "command \"$child\" exists"
-	}
 	set ::class::parent($child) $class
-	set ::class::${class},,child($child) 1
 	set ::class::${class},,subclass($child) 1
 	set body [info body ::$class]
 	regsub -all $class $body [list $child] body
@@ -321,6 +319,9 @@ proc ::class::subclass {class arg} {
 #}
 proc ::class::classdestroy {class} {
 #puts "destroying class $class"
+	foreach child [array names ::class::${class},,subclass] {
+		catch {$child destroy}
+	}
 	foreach child [array names ::class::${class},,child] {
 		catch {$child destroy}
 	}
@@ -328,8 +329,8 @@ proc ::class::classdestroy {class} {
 	if [info exists ::class::parent($class)] {
 		if {"$class" != "Class"} {
 			set parent [set ::class::parent($class)]
-			if [info exists ::class::${parent},,child($class)] {
-				unset ::class::${parent},,child($class)
+			if [info exists ::class::${parent},,subclass($class)] {
+				unset ::class::${parent},,subclass($class)
 			}
 		}
 		unset ::class::parent($class)
@@ -595,18 +596,6 @@ proc ::class::deletemethod {class arg} {
 	}
 	set name [lindex $arg 0]
 	switch $name {
-		new -
-		method {return -code error "\"$name\" method cannot be deleted"}
-		init {
-			if {"$class" == "Class"} {
-				return -code error "init method of base Class cannot be deleted"
-			}
-			if [info exists ::class::${class},,init] {
-				unset ::class::${class},,init
-				rename ::class::${class},,init {}
-				return $name
-			}
-		}
 		destroy {
 			if {"$class" == "Class"} {
 				return -code error "destroy method of base Class cannot be deleted"
@@ -615,10 +604,12 @@ proc ::class::deletemethod {class arg} {
 				rename ::class::${class},,destroy {}
 			}
 		}
-	}
-	if {"[info commands ::class::${class},,m,${name}]" != ""} {
-		rename ::class::${class},,m,${name} {}
-		::class::propagatedeletemethod $class m $name
+		default {
+			if {"[info commands ::class::${class},,m,${name}]" != ""} {
+				rename ::class::${class},,m,${name} {}
+				::class::propagatedeletemethod $class m $name
+			}
+		}
 	}
 	return {}
 }
@@ -636,7 +627,7 @@ proc ::class::deleteclassmethod {class arg} {
 	}
 	set name [lindex $arg 0]
 	switch $name {
-		classmethod - method - deletemethod - subclass - parent - children -
+		classmethod - method - deletemethod - deleteclassmethod - subclass - parent - children -
 		new {return -code error "\"$name\" classmethod cannot be deleted"}
 		init {
 			if {"$class" == "Class"} {
@@ -787,7 +778,12 @@ proc ::class::privatecmd {class object arg} {
 		}
 		return $list
 	} elseif {$len == 1} {
-		return [set ::class::${object},,v,[lindex $arg 0]]
+		set name ::class::${object},,v,[lindex $arg 0]
+		if [info exists $name] {
+			return [set $name]
+		} else {
+			return -code error "\"$object\" does not have a private variable \"[lindex $arg 0]\""
+		}
 	} elseif {$len == 2} {
 		return [set ::class::${object},,v,[lindex $arg 0] [lindex $arg 1]]
 	} else {
@@ -815,7 +811,12 @@ proc ::class::classprivatecmd {class arg} {
 		}
 		return $list
 	} elseif {$len == 1} {
-		return [set ::class::${class},,v,[lindex $arg 0]]
+		set name ::class::${class},,v,[lindex $arg 0]
+		if [info exists $name] {
+			return [set $name]
+		} else {
+			return -code error "\"$class\" does not have a private variable \"[lindex $arg 0]\""
+		}
 	} elseif {$len == 2} {
 		set name [lindex $arg 0]
 		set ::class::${class},,vd($name) 1
@@ -856,16 +857,11 @@ proc ::class::getprivate {object var} {
 	set ::class::${object},,v,$var
 }
 
-namespace import ::class::private ::class::privatevar ::class::setprivate ::class::getprivate
-
 proc ::class::traceobject {object command {level 1}} {
 	::class::untraceobject $object
 	set class [set ::class::parent($object)]
 	if ![info exists ::class::${class},,child($object)] {
 		error "Object $object doesn't exists"
-	}
-	if {[set ::class::${class},,child($object)]!=1} {
-		error "$object is a class"
 	}
 	set temp [varsubst {command level} {
 		if {("$level"=="all")||("[info level]"=="$level")} {uplevel #0 $command [list "\$object [list $cmd] $args\n"]}
@@ -880,10 +876,12 @@ proc ::class::untraceobject {object} {
 	if ![info exists ::class::${class},,child($object)] {
 		error "Object $object doesn't exists"
 	}
-	if {[set ::class::${class},,child($object)]!=1} {
-		error "$object is a class"
-	}
 	set temp [info body $object]
 	regsub "^.*# object trace done\n" $temp {} temp
 	proc ::$object [info args $object] $temp
 }
+
+}
+# this is for C and Tcl implementation again
+catch {namespace import ::class::private ::class::privatevar ::class::setprivate ::class::getprivate}
+

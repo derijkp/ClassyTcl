@@ -446,7 +446,11 @@ Widget classmethod chainallmethods {widget widgettype} {
 	foreach method [::class::getwidgetmethods .class,,temp] {
 #		if [regexp {^configure$|^config$|^cget$|^destroy$|^class$|^private$|^component$} $method] continue
 		if {"[::$class method $method]" == ""} {
-			::$class method $method {args} "uplevel 2 $widget $method \$args"
+			if {"$method" != "destroy"} {
+				::$class method $method {args} "uplevel 2 $widget $method \$args"
+			} else {
+				::$class method destroy {} "uplevel 2 $widget $method \$args"
+			}
 		}
 	}
 	destroy .class,,temp

@@ -8,12 +8,12 @@ test class {create object 2 times} {
 	clean
 	Class new try
 	Class new try
-} {object "try" exists} 1
+} {command "try" exists} 1
 
 test class {create object with short name} {
 	clean
 	Class new t
-} {t} 1
+} {t}
 
 test class {object destroy and recreate} {
 	clean
@@ -74,13 +74,13 @@ test class {don't overwrite objects} {
 	clean
 	Class new try
 	Class new try
-} {object "try" exists} 1
+} {command "try" exists} 1
 
 test class {don't overwrite classes} {
 	clean
 	Class subclass Test
 	Class subclass Test
-} {object "Test" exists} 1
+} {command "Test" exists} 1
 
 test class {delete child classes when destroyed ?} {
 	clean
@@ -164,7 +164,6 @@ test Class {subclass destroy: test method} {
 	Test destroy
 	Test method nop {} {}
 } {invalid command name "Test"} 1
-
 
 test class {Class destroy: destroyed subclass?} {
 	clean
@@ -259,7 +258,7 @@ test class {new} {
 	Class new try
 	Class new try2
 	Class children
-} {Subclass try try2}
+} {try try2}
 
 test class {redefining init} {
 	clean
@@ -273,6 +272,15 @@ test class {redefining init} {
 	}
 	Test2 new try
 } {{try 1} 2}
+
+test class {error in init} {
+	clean
+	Class subclass Test
+	Test classmethod init {} {
+		error error
+	}
+	Test new try
+} {init of class Test failed: error} 1
 
 test class {redefining init: test class} {
 	clean
@@ -502,6 +510,11 @@ test class {class private} {
 	Class private try 1
 	Class private try
 } {1}
+
+test class {class private non existing} {
+	clean
+	Class private try
+} {"Class" does not have a private variable "try"} 1
 
 test class {inherit class private} {
 	clean
