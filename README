@@ -22,8 +22,7 @@ changed and debugged at runtime.
 Installation
 ------------
 You should be able to obtain the latest version of ClassyTcl
-via www on url http://rrna.uia.ac.be/classytcl/ or via anonymous ftp
-on rrna.uia.ac.be. in the directory /pub/tcl
+via www on url http://classytcl.sourceforge.net/
 
 Binary packages
 
@@ -78,19 +77,18 @@ definately not my only task, so responses might be slower than you would
 like. However, I will respond as fast as I can.
 
 Peter De Rijk
-University of Antwerp (UIA)
+University of Antwerp (UA)
 Department of Biochemistry
 Universiteitsplein 1
 B-2610 Antwerp
 
-tel.: 32-03-820.23.16
+tel.: 32-03-820.23.27
 fax: 32-03-820.22.48
-E-mail: derijkp@uia.ua.ac.be
-web: http://rrna.uia.ac.be/~peter/personal/peter.html
+E-mail: Peter.DeRijk@ua.ac.be
 
 Legalities
 
-ClassyTcl is Copyright Peter De Rijk, University of Antwerp (UIA), 2000. The
+ClassyTcl is Copyright Peter De Rijk, University of Antwerp (UA), 2000. The
 following terms apply to all files associated with the software unless
 explicitly disclaimed in individual files.
 

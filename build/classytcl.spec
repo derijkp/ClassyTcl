@@ -5,8 +5,8 @@ Release:	1
 Copyright:	BSD
 Group:	Development/Languages/Tcl
 Source:	ClassyTcl-1.0.1.src.tar.gz
-URL: http://rrna.uia.ac.be/classytcl
-Packager: Peter De Rijk <derijkp@uia.ua.ac.be>
+URL: http://classytcl.sourceforge.net/
+Packager: Peter De Rijk <Peter.DeRijk@ua.ac.be>
 Requires: tcl >= 8.3.2 extral >= 2.0.0
 Prefix: /usr/lib /usr/bin
 %description
