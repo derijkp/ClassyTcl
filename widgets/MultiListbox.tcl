@@ -47,9 +47,8 @@ Classy::MultiListbox method init {args} {
 	# -----------------
 	super init
 	listbox $object.list -yscroll "$object.vbar set" -exportselection no -selectmode browse
-	$object _rebind $object.list
-	bind $object <FocusIn> [list focus $object.list]
-	scrollbar $object.vbar -orient vertical -command "::Classy::rebind::$object.list yview" -takefocus 0
+	Classy::rebind $object.list $object
+	scrollbar $object.vbar -orient vertical -command "$object.list yview" -takefocus 0
 	pack $object.vbar -side right -fill y
 	pack $object.list -side right -fill both -expand yes
 
@@ -87,7 +86,7 @@ Classy::MultiListbox addoption -command {command Command {}}
 #} descr {
 #}
 Classy::MultiListbox method nearest {y} {
-	return [expr [::Classy::rebind::$object.list nearest $y] / [getprivate $object options(-number)]]
+	return [expr [$object.list nearest $y] / [getprivate $object options(-number)]]
 }
 
 #doc {MultiListbox command select} cmd {
@@ -97,12 +96,12 @@ Classy::MultiListbox method nearest {y} {
 Classy::MultiListbox method select {item} {
 	set number [getprivate $object options(-number)]
 	if {$item<0} {set item 0}
-	set max [expr [::Classy::rebind::$object.list size] / $number]
+	set max [expr [$object.list size] / $number]
 	if {$item>=$max} {set item [expr $max -1]}
 
 	set pos [expr $item * $number]
-	::Classy::rebind::$object.list select clear 0 end
-	::Classy::rebind::$object.list selection set $pos [expr $pos+$number-1]
+	$object.list select clear 0 end
+	$object.list selection set $pos [expr $pos+$number-1]
 }
 
 #doc {MultiListbox command command} cmd {
@@ -121,10 +120,10 @@ Classy::MultiListbox method command {} {
 #} descr {
 #}
 Classy::MultiListbox method get {} {
-	set cursel [::Classy::rebind::$object.list curselection]
+	set cursel [$object.list curselection]
 	set result ""
 	foreach pos $cursel {
-		append result "[::Classy::rebind::$object.list get $pos]\n"
+		append result "[$object.list get $pos]\n"
 	}
 	return [string trimright $result "\n"]
 }
@@ -134,7 +133,7 @@ Classy::MultiListbox method get {} {
 #} descr {
 #}
 Classy::MultiListbox method curselection {} {
-	return [expr [lindex [::Classy::rebind::$object.list curselection] 0] / [getprivate $object options(-number)]]
+	return [expr [lindex [$object.list curselection] 0] / [getprivate $object options(-number)]]
 }
 
 #doc {MultiListbox command add} cmd {
@@ -142,7 +141,7 @@ Classy::MultiListbox method curselection {} {
 #} descr {
 #}
 Classy::MultiListbox method add {args} {
-	eval ::Classy::rebind::$object.list insert end $args
+	eval $object.list insert end $args
 }
 
 #doc {MultiListbox command clear} cmd {
@@ -150,7 +149,7 @@ Classy::MultiListbox method add {args} {
 #} descr {
 #}
 Classy::MultiListbox method clear {} {
-	eval ::Classy::rebind::$object.list delete 0 end
+	eval $object.list delete 0 end
 }
 
 

@@ -12,6 +12,9 @@ set auto_index(test2) [list source [file join $dir try.tcl]]
 set auto_index(t2) [list source [file join $dir try.tcl]]
 set auto_index(testframe) [list source [file join $dir try.tcl]]
 set auto_index(trfr) [list source [file join $dir try.tcl]]
-set auto_index(function) [list source [file join $dir functions.tcl]]
+set auto_index(f2) [list source [file join $dir functions.tcl]]
+set auto_index(f3) [list source [file join $dir functions.tcl]]
+set auto_index(t1) [list source [file join $dir functions.tcl]]
+set auto_index(t2) [list source [file join $dir functions.tcl]]
 
 # Addition of ClassyTcl classes defined in the directory

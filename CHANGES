@@ -12,3 +12,6 @@ ClassyTcl
 ---------
 - The configuration system has been entirely redone, mainly for 
   performance reasons
+- builder has changed considerably: The window builder now creates 
+  classes that can be used to create multiple windows. The general 
+  structure is also different.

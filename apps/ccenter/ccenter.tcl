@@ -32,7 +32,7 @@ tk appname $appname
 package require -exact ClassyTcl 0.3
 set pwd [pwd]
 lappend Classy::help_path [file join $Classy::appdir help]
-lappend auto_path [file join $Classy::appdir lib]
+lappend auto_path [file join $Classy::appdir lib interface] [file join $Classy::appdir lib code]
 set Classy::starterror [catch {eval main $argv} Classy::result]
 set Classy::starterrorinfo $errorInfo
 if $Classy::starterror {

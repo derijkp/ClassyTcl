@@ -74,7 +74,7 @@ Classy::WindowBuilder method init {args} {
 			regexp { add ([^ {}]+)} $command temp type
 			set name [string tolower $type]
 			regsub -all : $name _ name
-			bind $c <<Drag>> "DragDrop start %X %Y $type -types [list [list create $command]] -image [Classy::geticon Builder/$name]"			
+			bind $c <<Drag>> "Classy::DragDrop start %X %Y $type -types [list [list create $command]] -image [Classy::geticon Builder/$name]"			
 		}
 	}
 	Classy::Paned $object.pane -window $object.icons -orient horizontal
@@ -573,7 +573,6 @@ Classy::WindowBuilder method open {file} {
 			return 1
 		}
 	}
-putsvars file function
 	wm title $object $function
 	catch {destroy $object.work}
 	catch {unset current}
@@ -1023,7 +1022,7 @@ Classy::WindowBuilder method generatebindings {base outw} {
 		if [info exists data(ev$event,$base)] {
 			set binding $data(ev$event,$base)
 		} else {
-			set binding [list [bind $base $event]]
+			set binding [list [bind [Classy::rebind $base] $event]]
 		}
 		append data(parse) "\tbind $outw $event $binding\n"
 	}
@@ -1997,7 +1996,7 @@ Classy::WindowBuilder method drag {w x y} {
 	if [catch {set image [Classy::geticon Builder/$name]}] {
 		set image [Classy::geticon unknown]
 	}
-	DragDrop start $x $y [$object outw $rw] -image $image
+	Classy::DragDrop start $x $y [$object outw $rw] -image $image
 }
 
 Classy::WindowBuilder method drop {dst} {
@@ -2010,9 +2009,9 @@ Classy::WindowBuilder method drop {dst} {
 		}
 		set dst [structlget [grid info $dst] -in]
 	}
-	if {"[DragDrop types create]" != ""} {
-		set type [DragDrop get]
-		set cmd [DragDrop get create]
+	if {"[Classy::DragDrop types create]" != ""} {
+		set type [Classy::DragDrop get]
+		set cmd [Classy::DragDrop get create]
 		set ::Classy::targetwindow $dst
 		set data(drop) 1
 		set src [uplevel #0 $cmd]
@@ -2025,7 +2024,7 @@ Classy::WindowBuilder method drop {dst} {
 		if [info exists data(redir,$dst)] {
 			set dst $data(redir,$dst)
 		}
-		set outsrc [DragDrop get]
+		set outsrc [Classy::DragDrop get]
 		set keep $object
 		set object $data(base)
 		eval set src $outsrc

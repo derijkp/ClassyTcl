@@ -1,3 +1,5 @@
+source cfiles/cfiles.tcl
+
 time {package require ClassyTcl}
 time {auto_load Classy::Entry}
 time {Classy::Entry .try}

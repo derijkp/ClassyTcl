@@ -23,7 +23,7 @@ test Classy::BarChart {create and configure} {
 	update idletasks
 	Classy::ChartGrid new chartgrid -ystep 1 -xrange {0 20} -yrange {0 20} -font {helvetica 9}
 	chartgrid configure -canvas .try
-	BarChart new try -xrange {0 20} -yrange {0 20}
+	Classy::BarChart new try -xrange {0 20} -yrange {0 20}
 	try configure -canvas .try
 	try dataset Try {5 6 5 5 4 5 6 7}
 	try dataset "Try 2" {4 5 4 4 5 6 5 9}

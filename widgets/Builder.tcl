@@ -35,8 +35,7 @@ Classy::Builder method init {args} {
 		-closecommand "$object closenode" \
 		-endnodecommand "$object selectnode" \
 		-executecommand "$object openendnode"
-	$object _rebind $object.browse
-	bind $object <FocusIn> [list focus $object.browse]
+	Classy::rebind $object.browse $object
 	Classy::DynaMenu attachmainmenu Classy::Builder $object
 	grid $object.tool -row 0 -columnspan 3 -sticky ew
 	grid rowconfigure $object 0 -weight 0
@@ -96,7 +95,7 @@ Classy::Builder method destroy {} {
 		if ![Classy::yorn "Close application?"] return
 		exit
 	} else {
-		::Classy::rebind::$object.browse destroy
+		$object.browse destroy
 	}
 }
 
@@ -113,7 +112,7 @@ Classy::Builder method new {type {name {}}} {
 	if {"$name" == ""} {
 		catch {destroy $object.temp}
 		Classy::InputDialog $object.temp -title "New $type" -label "Name" \
-			-command "$object new $type"
+			-command [list $object new $type]
 		return
 	}
 	set browse(type) $type
@@ -132,14 +131,14 @@ Classy::Builder method new {type {name {}}} {
 		switch $type {
 			file {
 				set f [open $file w]
-				file {puts $f "#Functions"}
+				puts $f "#Functions"
 				close $f
 				set dir [file dir $file]
 				set base [list $file {} file]
 				if {"$dir" == "$defdir"} {
-					::Classy::rebind::$object.browse addnode {} $base -text [file tail $file] -image [Classy::geticon newfile]
+					$object.browse addnode {} $base -text [file tail $file] -image [Classy::geticon newfile]
 				} else {
-					::Classy::rebind::$object.browse addnode [list $dir {} dir] $base -text [file tail $file] -image [Classy::geticon newfile]
+					$object.browse addnode [list $dir {} dir] $base -text [file tail $file] -image [Classy::geticon newfile]
 				}
 			}
 			dialog {set cmd Dialog}
@@ -157,25 +156,19 @@ Classy::Builder method new {type {name {}}} {
 			append code "\n\treturn \$window"
 			append code \n\}
 			set f [open $file w]
-			puts $f \n$create
+			puts $f $create
 			puts $f $code
 			close $f
 			set dir [file dir $file]
 			set base [list $file $name [string tolower $cmd]]
-			::Classy::rebind::$object.browse addnode [list $dir {} dir] $base \
+			$object.browse addnode [list $dir {} dir] $base \
 				-type end -text $name -image [Classy::geticon new[string tolower $cmd]]
 		}
-		::Classy::rebind::$object.browse selection set $base
+		$object.browse selection set $base
 		return
 	} else {
-		set c [splitcomplete [readfile $file]]
-		if {[lsearch -glob $c [list proc $name *]] != -1} {
-		} elseif {[lsearch -glob $c [list Classy::Toplevel subclass $name]] != -1} {
-			error "Toplevel \"$name\" exists in file \"$file\"!"
-		} elseif {[lsearch -glob $c [list Classy::Dialog subclass $name]] != -1} {
-			error "Dialog \"$name\" exists in file \"$file\"!"
-		} elseif {[lsearch -glob $c [list Classy::Topframe subclass $name]] != -1} {
-			error "Frame \"$name\" exists in file \"$file\"!"
+		if [inlist [$object infile ls $file] $name] {
+			error "\"$name\" exists in file \"$file\"!"
 		}
 		if [info exists auto_index($name)] {
 			set file [lindex $auto_index($name) 1]
@@ -211,9 +204,9 @@ Classy::Builder method new {type {name {}}} {
 	}
 	set base [list $file $name $type]
 	set pnode [list $file {} file]
-	::Classy::rebind::$object.browse addnode $pnode $base -type end -text $name -image [Classy::geticon new$type]
+	$object.browse addnode $pnode $base -type end -text $name -image [Classy::geticon new$type]
 	update idletasks
-	::Classy::rebind::$object.browse selection set $base
+	$object.browse selection set $base
 }
 
 Classy::Builder method _creatededit {w} {
@@ -235,7 +228,7 @@ Classy::Builder method open {file function type} {
 	set browse(type) $type
 	set open(type) $type
 	if {"$function" == ""} {
-		edit $file
+		if ![file isdir $file] {Classy::edit $file}
 		return
 	}
 	switch $type {
@@ -247,7 +240,7 @@ Classy::Builder method open {file function type} {
 		}
 		dir {}
 		file {
-			edit $file
+			if ![file isdir $file] {Classy::edit $file}
 		}
 		function {
 			$object fedit $object.fedit $file $function $type
@@ -418,7 +411,7 @@ Classy::Builder method infile {cmd file args} {
 				while {[lsearch $funcs $function#$num] != -1} {incr num}
 				set newfunction $function#$num
 				if [string match "proc *" $code] {
-					regsub "^proc $function" $code "proc $newfunction"
+					regsub "^proc $function" $code "proc $newfunction" code
 				} else {
 					set newcode ""
 					foreach line $split {
@@ -451,22 +444,22 @@ Classy::Builder method delete {} {
 		file - dialog - toplevel - topframe {
 			file copy -force $file $file~
 			file delete $file
-			::Classy::rebind::$object.browse deletenode $browse(base)
+			$object.browse deletenode $browse(base)
 			catch {Classy::auto_mkindex [file dirname $file] *.tcl}
 			return $file
 		}
 		dir - color - font - misc - key - mouse - menu - tool {
 			set function $browse(name)
 			$object infile delete $file $function
-			::Classy::rebind::$object.browse selection set [list $browse(file) {} file]
-			::Classy::rebind::$object.browse deletenode $browse(base)
+			$object.browse selection set [list $browse(file) {} file]
+			$object.browse deletenode $browse(base)
 			return $function
 		}
 		default {
 			set function $browse(name)
 			$object infile delete $file $function
-			::Classy::rebind::$object.browse deletenode $browse(base)
-			::Classy::rebind::$object.browse selection set [list $browse(file) {} file]
+			$object.browse deletenode $browse(base)
+			$object.browse selection set [list $browse(file) {} file]
 			return $function
 		}
 	}
@@ -558,9 +551,9 @@ Classy::Builder method paste {{file {}}} {
 			writefile $file $browse(clipb)
 		}
 		if {"$browse(cliptype)" == "file"} {
-			::Classy::rebind::$object.browse addnode $root [list $file {} file] -text [file tail $file] -image [Classy::geticon newfile]
+			$object.browse addnode $root [list $file {} file] -text [file tail $file] -image [Classy::geticon newfile]
 		} else {
-			::Classy::rebind::$object.browse addnode $root [list $file $name $browse(cliptype)] \
+			$object.browse addnode $root [list $file $name $browse(cliptype)] \
 				-type end -text $name -image [Classy::geticon new$browse(cliptype)]
 		}
 	} elseif {"$browse(clipbf)" != ""} {
@@ -578,7 +571,7 @@ Classy::Builder method openendnode {base} {
 	set browse(name) [lindex $base 1]
 	set browse(type) [lindex $base 2]
 	$object open $browse(file) $browse(name) $browse(type)
-	::Classy::rebind::$object.browse selection set $base
+	$object.browse selection set $base
 }
 
 Classy::Builder method selectnode {base} {
@@ -594,7 +587,7 @@ Classy::Builder method selectnode {base} {
 		set browse(name) [lindex $base 1]
 		set browse(type) [lindex $base 2]
 	}
-	::Classy::rebind::$object.browse selection set $base
+	$object.browse selection set $base
 }
 
 Classy::Builder method closenode {base} {
@@ -604,11 +597,11 @@ Classy::Builder method closenode {base} {
 	set browse(file) [lindex $base 0]
 	set browse(name) [lindex $base 1]
 	set browse(type) [lindex $base 2]
-	::Classy::rebind::$object.browse clearnode $base
+	$object.browse clearnode $base
 #	if ![file isdir $browse(file)] {
 #		catch {$object open $browse(file) $browse(name) $browse(type)}
 #	}
-	::Classy::rebind::$object.browse selection set $base
+	$object.browse selection set $base
 }
 
 Classy::Builder method opennode {args} {
@@ -630,7 +623,7 @@ Classy::Builder method opennode {args} {
 		set olist ""
 		foreach file [glob -nocomplain [file join $browse(file) *]] {
 			if [file isdir $file] {
-				::Classy::rebind::$object.browse addnode $root [list $file {} dir] -text [file tail $file]
+				$object.browse addnode $root [list $file {} dir] -text [file tail $file]
 			} elseif [regexp {~$} $file]  {
 			} elseif {"[file tail $file]" == "tclIndex"}  {
 			} else {
@@ -639,13 +632,13 @@ Classy::Builder method opennode {args} {
 				while {![eof $f] && ![string length $line]} {set line [gets $f]}
 				close $f
 				if [regexp {^Classy::Toplevel subclass (.+)$} $line temp func] {
-					::Classy::rebind::$object.browse addnode $root [list $file $func toplevel] \
+					$object.browse addnode $root [list $file $func toplevel] \
 						-type end -text $func -image [Classy::geticon newtoplevel]
 				} elseif [regexp {^Classy::Dialog subclass (.+)$} $line temp func] {
-					::Classy::rebind::$object.browse addnode $root [list $file $func dialog] \
+					$object.browse addnode $root [list $file $func dialog] \
 						-type end -text $func -image [Classy::geticon newdialog]
 				} elseif [regexp {^Classy::Topframe subclass (.+)$} $line temp func] {
-					::Classy::rebind::$object.browse addnode $root [list $file $func frame] \
+					$object.browse addnode $root [list $file $func frame] \
 						-type end -text $func -image [Classy::geticon newframe]
 				} elseif {"[file extension $file]" == ".tcl"} {
 					lappend list $file
@@ -657,40 +650,29 @@ Classy::Builder method opennode {args} {
 		foreach file [lsort $list] {
 			set type file
 			set image [Classy::geticon newfile]
-			::Classy::rebind::$object.browse addnode $root [list $file {} $type] -text [file tail $file] -image $image
+			$object.browse addnode $root [list $file {} $type] -text [file tail $file] -image $image
 		}
 		foreach file [lsort $olist] {
-			::Classy::rebind::$object.browse addnode $root [list $file {} file] -text [file tail $file] -type end -image [Classy::geticon newfile]
+			$object.browse addnode $root [list $file {} file] -text [file tail $file] -type end -image [Classy::geticon newfile]
 		}
 	} else {
-		set f [open $browse(file)]
-		while {![eof $f]} {
-			set line [gets $f]
-			if [regexp ^proc $line] {
-				if [info complete $line] {
-					set func [lindex "$line" 1]
-				} else {
-					set func [lindex "$line\}" 1]
-				}
-				::Classy::rebind::$object.browse addnode $root [list $browse(file) $func function] -type end -text $func -image [Classy::geticon newfunction]
-			}
-			set line [gets $f]
+		foreach func [$object infile ls $browse(file)] {
+				$object.browse addnode $root [list $browse(file) $func function] -type end -text $func -image [Classy::geticon newfunction]
 		}
-		close $f
 	}
-	::Classy::rebind::$object.browse selection set $base
+	$object.browse selection set $base
 }
 
 Classy::Builder method _drawtree {} {
 	private $object options browse defdir
-	::Classy::rebind::$object.browse clearnode {}
-	::Classy::rebind::$object.browse configure -roottext [file tail $defdir]
+	$object.browse clearnode {}
+	$object.browse configure -roottext [file tail $defdir]
 	catch {Classy::auto_mkindex $defdir *.tcl}
 	catch {source [file join $defdir tclIndex]}
 	$object opennode {} [list $defdir {} dir]
-	::Classy::rebind::$object.browse redraw
+	$object.browse redraw
 	update idletasks
-	set select [lindex [::Classy::rebind::$object.browse children {}] 0]
+	set select [lindex [$object.browse children {}] 0]
 	$object opennode $select
 }
 
@@ -715,7 +697,6 @@ Classy::Builder method fedit {w file function type} {
 }
 
 Classy::Builder method savefunction {w file function code} {
-putsvars object w file function code
 	set def "proc $function [list [$w.args get]] \{\n$code\n\}"
 	uplevel #0 $def
 	$object infile set $file $function $def
@@ -725,8 +706,8 @@ putsvars object w file function code
 
 Classy::Builder method rename {args} {
 	if {"$args" == ""} {
-		Classy::InputDialog $object.input -label "Rename \"[lindex [lindex [::Classy::rebind::$object.browse selection] 0] 1]\" to" \
-			-command "$object rename [::Classy::rebind::$object.browse selection]"
+		Classy::InputDialog $object.input -label "Rename \"[lindex [lindex [$object.browse selection] 0] 1]\" to" \
+			-command "$object rename [$object.browse selection]"
 		return
 	}
 	set src [lindex $args 0]
@@ -736,9 +717,9 @@ Classy::Builder method rename {args} {
 			set dst [file join [file dir $src] $dst]
 			file copy [lindex $src 0] $dst
 			file delete [lindex $src 0]
-			set parent [::Classy::rebind::$object.browse parentnode $src]
-			::Classy::rebind::$object.browse deletenode $src
-			::Classy::rebind::$object.browse addnode $parent [lreplace $src 0 0 $dst] -text [file tail $dst] -image [Classy::geticon newfile]
+			set parent [$object.browse parentnode $src]
+			$object.browse deletenode $src
+			$object.browse addnode $parent [lreplace $src 0 0 $dst] -text [file tail $dst] -image [Classy::geticon newfile]
 		}
 		toplevel - dialog - topframe {
 			set dstfile [file join [file dir $src] $dst.tcl]
@@ -752,19 +733,19 @@ Classy::Builder method rename {args} {
 			}
 			close $f
 			file delete [lindex $src 0]
-			set parent [::Classy::rebind::$object.browse parentnode $src]
-			::Classy::rebind::$object.browse deletenode $src
-			::Classy::rebind::$object.browse addnode $parent [list $dstfile $dst [lindex $src 2]] \
+			set parent [$object.browse parentnode $src]
+			$object.browse deletenode $src
+			$object.browse addnode $parent [list $dstfile $dst [lindex $src 2]] \
 				-type end -text $dst -image [Classy::geticon new[lindex $src 2]]
 		}
 		dir {
 		}
 		default {
 			set type [lindex $src 2]
-			set parent [::Classy::rebind::$object.browse parentnode $src]
+			set parent [$object.browse parentnode $src]
 			$object infile rename [lindex $src 0] [lindex $src 1] $dst
-			::Classy::rebind::$object.browse deletenode $src
-			::Classy::rebind::$object.browse addnode $parent [lreplace $src 1 1 $dst] -type end -text [file tail $dst] -image [Classy::geticon new$type]
+			$object.browse deletenode $src
+			$object.browse addnode $parent [lreplace $src 1 1 $dst] -type end -text [file tail $dst] -image [Classy::geticon new$type]
 		}
 	}
 }

@@ -70,6 +70,7 @@ set auto_index(::Classy::selectfile) [list source [file join $dir selectfile.tcl
 set auto_index(::html::submit_form) [list source [file join $dir HTML.tcl]]
 set auto_index(::html::set_image) [list source [file join $dir HTML.tcl]]
 set auto_index(::Classy::Tableobject) [list source [file join $dir Table.tcl]]
+set auto_index(::Classy::renameobj) [list source [file join $dir Builder.tcl]]
 set auto_index(::Classy::WindowBuilder_win) [list source [file join $dir WindowBuilder.tcl]]
 set auto_index(::Classy::WindowBuilder::attredit_line) [list source [file join $dir WindowBuilderTypes.tcl]]
 set auto_index(::Classy::WindowBuilder::attredit_int) [list source [file join $dir WindowBuilderTypes.tcl]]

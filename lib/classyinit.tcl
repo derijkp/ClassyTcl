@@ -41,22 +41,24 @@ if {"$tcl_platform(platform)"=="windows"} {
 namespace eval ::Tk {}
 if {"[info commands ::Tk::destroy]" == ""} {
 	rename destroy ::Tk::destroy
-	proc destroy {args} {
-		foreach w $args {
-			if {"$w" == "."} {
-				exit
-			}
-			if {"$w" == ".classy__"} continue
-			if {"[info commands ::class::Tk_$w]" != ""} {
-				catch {$w destroy}
-			}
-			foreach c [info commands ::class::Tk_$w.*] {
-				regexp {^::class::Tk_(.*)$} $c temp child
-				catch {$child destroy}
-			}
+}
+
+proc destroy {args} {
+	foreach w $args {
+		if {"$w" == "."} {
+			exit
 		}
-		eval ::Tk::destroy [lremove $args .classy__]
+		if {"$w" == ".classy__"} continue
+		if {"[info commands ::class::Tk_$w]" != ""} {
+			catch {$w destroy}
+		}
+		foreach c [info commands ::class::Tk_$w.*] {
+			regexp {^::class::Tk_(.*)$} $c temp child
+			catch {$child destroy}
+		}
+		Classy::destroyrebind $w
 	}
+	eval ::Tk::destroy [lremove $args .classy__]
 }
 
 if {"[info commands send]" == ""} {
@@ -110,6 +112,8 @@ if {[option get . patchTk PatchTk]==1} {
 	source [file join [set ::class::dir] patches patchtk.tcl]
 	source [file join [set ::class::dir] patches miscpatches.tcl]
 }
+
+source [file join [set ::class::dir] lib rebind.tcl]
 
 # ----------------------------------------------------------------------
 # Change the bgerror command

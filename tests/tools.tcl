@@ -1,5 +1,6 @@
 if ![info exists classy_tools] {
 set classy_tools 1
+set auto_path [concat [file dir [pwd]] $auto_path]
 if [catch {package require Class}] {
 	lappend auto_path [file dir [file dir [pwd]]]
 	package require Class
@@ -41,6 +42,9 @@ proc clean {} {
 	catch {Base destroy}
 	catch {eval destroy [winfo children .]}
 	catch {. configure -menu {}}
+	catch {::Test destroy}
+	catch {::try destroy}
+	catch {::.try destroy}
 	catch {rename ::Test {}}
 	catch {rename ::try {}}
 	catch {rename ::.try {}}
@@ -51,6 +55,10 @@ proc classyclean {} {
 	catch {Widget destroy}
 	catch {eval destroy [winfo children .]}
 	catch {. configure -menu {}}
+	catch {::Test destroy}
+	catch {::try destroy}
+	catch {::.try destroy}
+	catch {rename ::Test {}}
 	catch {rename ::try {}}
 	catch {rename ::.try {}}
 	Classy::initconf

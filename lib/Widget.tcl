@@ -534,37 +534,10 @@ Widget method destroy {} {
 		exit
 	}
 	Classy::cleartodo $object
-	private $object rebind
-	foreach name $rebind {
-		$object _unrebind $name
-	}
+	Classy::destroyrebind $object
 	foreach c [info commands ::class::Tk_$object.*] {
 		regexp {^::class::Tk_(.*)$} $c temp child
 		catch {$child destroy}
 	}
 	catch {::Tk::destroy $object}
-}
-
-namespace eval Classy::rebind {}
-
-Widget method _rebind {name} {
-	private $object rebind
-	bindtags $name [bindtags $object]
-	rename $name ::Classy::rebind::$name
-	set body [string::change {
-		if {[info level] == 1} {
-			eval @object@ [string::change $args {@name@ @object@}]
-		} else {
-			eval ::Classy::rebind::@name@ $args
-		}
-	} [list @name@ $name @object@ $object]]
-	uplevel #0 [list proc $name args $body]
-	lappend rebind $name
-}
-
-Widget method _unrebind {name} {
-	private $object rebind
-	uplevel #0 [list rename $name {}]
-	catch {rename ::Classy::rebind::$name {}}
-	set rebind [lremove $rebind $name]
 }

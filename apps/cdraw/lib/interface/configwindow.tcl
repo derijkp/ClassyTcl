@@ -1,66 +1,3 @@
-proc main args {
-set w [mainw .mainw]
-zoom_init
-select_init
-line_init
-polygon_init
-text_init
-rectangle_init
-oval_init
-arc_init
-set w $w.canvas
-select_start $w
-focus $w
-}
-
-Classy::Toplevel subclass mainw
-mainw method init args {
-	super init
-	# Create windows
-	Classy::DynaTool $object.maintool  \
-		-width 179 \
-		-type MainTool \
-		-height 42
-	grid $object.maintool -row 0 -column 0 -columnspan 2 -sticky new
-	Classy::Canvas $object.canvas \
-		-papersize A4 \
-		-height 50 \
-		-relief sunken \
-		-scrollregion {0 0 595p 842p} \
-		-width 50
-	grid $object.canvas -row 1 -column 0 -sticky nesw
-	scrollbar $object.scrollbar1
-	
-	scrollbar $object.scrollv
-	grid $object.scrollv -row 1 -column 1 -sticky nesw
-	scrollbar $object.scrollh \
-		-orient horizontal
-	grid $object.scrollh -row 2 -column 0 -sticky nesw
-	grid columnconfigure $object 0 -weight 1
-	grid rowconfigure $object 1 -weight 1
-
-	# End windows
-	if {"$args" == "___Classy::Builder__create"} {return $object}
-	# Parse this
-	$object configure \
-		-destroycommand [varsubst object {destroy $object
-exit}] \
-		-title [tk appname]
-	$object.maintool configure \
-		-cmdw [varsubst object {$object.canvas}]
-	$object.canvas configure \
-		-xscrollcommand "$object.scrollh set" \
-		-yscrollcommand "$object.scrollv set"
-	$object.scrollv configure \
-		-command "$object.canvas yview"
-	$object.scrollh configure \
-		-command "$object.canvas xview"
-	Classy::DynaMenu attachmainmenu MainMenu $object.canvas
-	return $object
-
-	# Configure initial arguments
-	if {"$args" != ""} {eval $object configure $args}}
-
 Classy::Toplevel subclass configwindow
 configwindow method init args {
 	super init
@@ -192,8 +129,11 @@ configwindow method init args {
 	grid columnconfigure $object 0 -weight 1
 	grid rowconfigure $object 9 -weight 1
 
+	# End windows
 	if {"$args" == "___Classy::Builder__create"} {return $object}
 	# Parse this
+	$object configure \
+		-destroycommand 
 	$object.x configure \
 		-command [varsubst object {update_x $object}]
 	$object.y configure \
@@ -227,65 +167,9 @@ configwindow method init args {
 		-image [Classy::geticon arrow_none]
 	# Configure initial arguments
 	if {"$args" != ""} {eval $object configure $args}
+# ClassyTcl Finalise
+set ::current(w) $opt(-startw)
+	return $object
 	return $object
 }
-
-configwindow addoption -startw {startw Startw {}} {set ::current(w) $value}
-
-Classy::Dialog subclass zoomdialog
-zoomdialog method init args {
-	super init
-	# Create windows
-	Classy::NumEntry $object.options.numentry1 \
-		-command {zoom $current(w)} \
-		-label Zoom \
-		-textvariable current(zoom) \
-		-width 4
-	grid $object.options.numentry1 -row 0 -column 0 -columnspan 3 -sticky nesw
-	radiobutton $object.options.radiobutton1 \
-		-command {zoom $current(w) 100} \
-		-text {100 %} \
-		-value 100 \
-		-variable current(zoom)
-	grid $object.options.radiobutton1 -row 1 -column 0 -sticky nesw
-	radiobutton $object.options.radiobutton2 \
-		-command {zoom $current(w) 200} \
-		-text {200 %} \
-		-value 200 \
-		-variable current(zoom)
-	grid $object.options.radiobutton2 -row 2 -column 0 -sticky nesw
-	radiobutton $object.options.radiobutton3 \
-		-command {zoom $current(w) 400} \
-		-text {400 %} \
-		-value 400 \
-		-variable current(zoom)
-	grid $object.options.radiobutton3 -row 3 -column 0 -sticky nesw
-	radiobutton $object.options.radiobutton5 \
-		-command {zoom $current(w) 75} \
-		-text {75 %} \
-		-value 75 \
-		-variable current(zoom)
-	grid $object.options.radiobutton5 -row 1 -column 1 -sticky nesw
-	radiobutton $object.options.radiobutton6 \
-		-command {zoom $current(w) 50} \
-		-text {50 %} \
-		-value 50 \
-		-variable current(zoom)
-	grid $object.options.radiobutton6 -row 2 -column 1 -sticky nesw
-	radiobutton $object.options.radiobutton7 \
-		-command {zoom $current(w) 25} \
-		-text {25 %} \
-		-value 25 \
-		-variable current(zoom)
-	grid $object.options.radiobutton7 -row 3 -column 1 -sticky nesw
-	grid columnconfigure $object.options 2 -weight 1
-
-	# End windows
-	if {"$args" == "___Classy::Builder__create"} {return $object}
-	# Parse this
-	$object persistent set 
-	return $object
-
-	# Configure initial arguments
-	if {"$args" != ""} {eval $object configure $args}}
-
+configwindow addoption -startw {startw Startw {}} {}

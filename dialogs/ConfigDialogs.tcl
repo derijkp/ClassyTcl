@@ -335,7 +335,6 @@ proc Classy::config_load window {
 }
 
 proc Classy::config_save window {
-putsvars window
 	upvar #0 ::Classy::config conf
 	foreach level {def user appdef appuser} {
 		set conf(forsave) ""

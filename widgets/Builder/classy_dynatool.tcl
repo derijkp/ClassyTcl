@@ -49,7 +49,7 @@ proc ::Classy::WindowBuilder::edit_Classy::DynaTool {object w} {
 	eval destroy [winfo children $w]
 	frame $w.general
 	::Classy::WindowBuilder::defattredit $object $w.general {
-		-type Type 0 -cmdw cmdw 0 
+		-type Type 0 -orient Orientation 0 -cmdw cmdw 0 -max Max 0
 	} 12 0
 	button $w.select -text "Select tool" -command [varsubst {object w} {
 		set ::Classy::temp [Classy::select tool [Classy::DynaTool types]]

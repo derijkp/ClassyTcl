@@ -913,14 +913,24 @@ int Classy_InfoMethodinfo(
 	}
 	option = Tcl_GetStringFromObj(argv[0],&optionlen);
 	name = Tcl_GetStringFromObj(argv[1],NULL);
-	entry = Tcl_FindHashEntry(&(class->methods), name);
-	if (entry == NULL) {
+	if (strcmp(name,"init") == 0) {
+		method = class->init;
+	} else if (strcmp(name,"destroy") == 0) {
+		method = class->destroy;
+	} else {
+		entry = Tcl_FindHashEntry(&(class->methods), name);
+		if (entry == NULL) {
+			method = NULL;
+		} else {
+			method = (Method *)Tcl_GetHashValue(entry);
+		}
+	}
+	if (method == NULL) {
 		Tcl_ResetResult(interp);
 		Tcl_AppendResult(interp,"class \"",cmd,
-			" does not have a method \"", name, "\"", (char *)NULL);
+			"\" does not have a method \"", name, "\"", (char *)NULL);
 		return TCL_ERROR;
 	}
-	method = (Method *)Tcl_GetHashValue(entry);
 	Tcl_ResetResult(interp);
 	if ((optionlen == 4) &&(strncmp(option,"body",4) == 0)) {
 		if (method->proc == NULL) {
@@ -974,7 +984,7 @@ int Classy_InfoClassMethodinfo(
 	if (entry == NULL) {
 		Tcl_ResetResult(interp);
 		Tcl_AppendResult(interp,"class \"",Tcl_GetStringFromObj(class->class,NULL),
-			" does not have a classmethod \"", name, "\"", (char *)NULL);
+			"\" does not have a classmethod \"", name, "\"", (char *)NULL);
 		return TCL_ERROR;
 	}
 	method = (Method *)Tcl_GetHashValue(entry);

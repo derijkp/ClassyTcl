@@ -65,17 +65,6 @@ proc ::Classy::WindowBuilder::generate_Classy::Dialog {object base} {
 		}
 	}
 	append data(parse) "\t$outw persistent set [$base persistent]\n"
-	if [info exists data(opt-mainmenu,$base)] {
-		if {"$data(opt-mainmenu,$base)" != ""} {
-			if {"$data(opt-menuwin,$base)" != ""} {
-				foreach win $data(opt-menuwin,$base) {
-					append data(parse) "\tClassy::DynaMenu attachmainmenu $data(opt-mainmenu,$base) $win\n"
-				}
-			} else {
-				append data(parse) "\tClassy::DynaMenu attachmainmenu $data(opt-mainmenu,$base)\n"
-			}
-		}
-	}
 	return $body
 }
 

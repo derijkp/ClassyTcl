@@ -103,7 +103,6 @@ void Classy_ObjectDestroy(ClientData clientdata) {
 	Object *object;
 	Tcl_HashEntry *entry;
 	char *string;
-
 	object = (Object *)clientdata;
 	Tcl_Preserve(clientdata);
 	class = object->parent;

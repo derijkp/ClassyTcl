@@ -7,6 +7,7 @@
 # a script that loads the command.
 
 set auto_index(main) [list source [file join $dir Main.tcl]]
+set auto_index(mainw) [list source [file join $dir Main.tcl]]
 set auto_index(gettext) [list source [file join $dir filing.tcl]]
 set auto_index(getimage) [list source [file join $dir filing.tcl]]
 set auto_index(getsmimage) [list source [file join $dir filing.tcl]]
@@ -27,5 +28,3 @@ set auto_index(browser_small) [list source [file join $dir bindings.tcl]]
 set auto_index(browser_data) [list source [file join $dir bindings.tcl]]
 set auto_index(filer_drag) [list source [file join $dir bindings.tcl]]
 
-# Addition of ClassyTcl classes defined in the directory
-set auto_index(mainw) [list source [file join $dir Main.tcl]]

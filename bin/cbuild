@@ -29,21 +29,28 @@ if ![file exists $file] {
 		error "Cannot create application named \"$name\": reserved"
 	}
 	if ![Classy::yorn "Create application	\"$name\""] {exit}
+	set cachefile [file join [file dir $::Classy::dir(appuser)] $name config.cache]
+	if [file exists $cachefile] {
+		file delete $cachefile
+	}
 	file copy [file join $class::dir template] $file
 	file rename [file join $file template.tcl] [file join $file $name.tcl]
 	set file [file join $file $name.tcl]
 } elseif [file isdir $file] {
 	set file [file join $file $name.tcl]
 }
-set f [open $file]
-gets $f;gets $f;gets $f
-set line [gets $f]
-set v 0.1
-regexp {[0-9.]+$} $line v
-close $f
-switch $v {
-	0.1 {
-		exec [file join $::class::dir bin convert0.1_to_0.2] $file
+
+if ![catch {open [file root $file]} f] {
+	gets $f;gets $f;gets $f
+	set line [gets $f]
+	set v 0.1
+	regexp {[0-9.]+$} $line v
+	close $f
+	switch $v {
+		0.1 {
+			puts "Converting to new builder format"
+			exec [file join $::class::dir bin convert0.1_to_0.2] $file
+		}
 	}
 }
 puts "Starting application \"$name\""

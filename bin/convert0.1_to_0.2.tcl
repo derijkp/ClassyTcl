@@ -138,9 +138,10 @@ proc convcode {dir} {
 		set newc ""
 		foreach line $c {
 			if [regexp "^proc \[^ \]+ args \{# ClassyTcl generated (\[^ \n\]+)" $line temp type] {
+				set newcode ""
 				set function [lindex $line 1]
 				set code [lindex $line 3]
-				set code [replace $code {$window $object {varsubst window} {varsubst object}}]
+				set code [string::change $code {$window $object {varsubst window} {varsubst object}}]
 				set code [splitcomplete $code]
 				set opt [lindex $code 2]
 				set code [lreplace $code 0 2 "\tsuper init"]
@@ -159,8 +160,8 @@ proc convcode {dir} {
 					lappend code $insert
 				}
 				set code [join $code \n]
-				lappend newc [list Classy::$type subclass $function]
-				lappend newc "[list $function] method init args \{\n$code\}"
+				lappend newcode [list Classy::$type subclass $function]
+				lappend newcode "[list $function] method init args \{\n$code\}"
 				foreach {option options default} [lindex $opt 3] {
 					if [string length $options] {
 						if {"$options" == "0 1"} {
@@ -173,8 +174,20 @@ proc convcode {dir} {
 					} else {
 						set code {}
 					}
-					lappend newc [list $function addoption $option [list [string range $option 1 end] "[string toupper [string index $option 1]][string range $option 2 end]" $default] $code]
+					lappend newcode [list $function addoption $option [list [string range $option 1 end] "[string toupper [string index $option 1]][string range $option 2 end]" $default] $code]
 				}
+				set f [open [file join [file dir $file] interface $function.tcl] w]
+				set space 0
+				foreach line $newcode {
+					if ![string length $line] {
+						if $space continue
+						set space 1
+					} else {
+						set space 0
+					}
+					puts $f $line
+				}
+				close $f
 			} elseif [regexp "^proc main \{?args\}?" $line] {
 				regsub "(\[\[\n\t \]mainw)(\[\]\t\n \]\[^.\])" $line "\\1 .mainw\\2" line
 				regsub "(\[\n\t \]mainw)(\n)" $line "\\1 .mainw\\2" line
@@ -183,8 +196,8 @@ proc convcode {dir} {
 				lappend newc $line
 			}
 		}
-		catch {file copy -force $file $file~}
-		set f [open $file w]
+		catch {file rename -force $file $file~}
+		set f [open [file join [file dir $file] code [file tail $file]] w]
 		set space 0
 		foreach line $newc {
 			if ![string length $line] {
@@ -197,7 +210,8 @@ proc convcode {dir} {
 		}
 		close $f
 	}
-	catch {Classy::auto_mkindex [file dirname $file] *.tcl}
+	catch {Classy::auto_mkindex [file join [file dirname $file] interface] *.tcl}	
+	catch {Classy::auto_mkindex [file join [file dirname $file] code] *.tcl}
 }
 
 invoke {file} {
@@ -220,7 +234,10 @@ invoke {file} {
 		catch {file rename $file [file join $dir conf themes [file tail $file]]}
 	}
 	catch {file delete [file join $dir conf opt]}
+	file mkdir [file join $dir lib interface]
+	file mkdir [file join $dir lib code]
 	convcode [file join $dir lib]
+	file delete [file join $dir [file tail $dir]]
 	puts "conversion done"
 	puts "WARNING: behaviour has changed a lot between these versions, and you might very well need to change some code"
 } $file

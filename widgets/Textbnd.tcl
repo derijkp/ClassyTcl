@@ -49,7 +49,7 @@ bind Classy::Text <<Empty>> {
 	catch {%W delete 1.0 end}
 }
 bind Classy::Text <<Drop>> {
-	catch {%W textinsert [DragDrop get]}
+	catch {%W textinsert [Classy::DragDrop get]}
 }
 bind Classy::Text <<Drag-Motion>> {
 	%W position [%W index @%x,%y]
@@ -197,7 +197,6 @@ bind Classy::Text <<SelectBottom>> {
 
 bind Classy::Text <Tab> {
 	%W textinsert \t
-	focus %W
 	break
 }
 bind Classy::Text <Shift-Tab> {

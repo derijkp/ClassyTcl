@@ -63,7 +63,7 @@ Classy::Canvas method init {args} {
 	set data(zoom) 1
 	set data(current) ""
 	set data(group) 0
-	$object width 1
+	$object _width 1
 	# REM Create bindings
 	# --------------------
 	# REM Configure initial arguments
@@ -188,9 +188,7 @@ Classy::Canvas method undo {{action {}} args} {
 			$object _undoone [lindex $undo(undo) $undo(pos)]
 		}
 		check {
-			if {"$args" == "start"} {
-				set undo(check) [llength $undo(undo)]
-			} elseif {"$args" == "stop"} {
+			if {"$args" == "stop"} {
 				if ![info exists undo(check)] {
 					error "\"$object undo check start\" must be called first"
 				}
@@ -203,7 +201,10 @@ Classy::Canvas method undo {{action {}} args} {
 				lappend undo(redo) [list check $list]
 				unset undo(check)
 			} else {
-				error "invalid option \"$args\": must be start or stop"
+				if [info exists undo(check)] {
+					$object undo check stop
+				}
+				set undo(check) [llength $undo(undo)]
 			}
 		}
 		clear {
@@ -632,7 +633,7 @@ Classy::Canvas method zoom {{factor {}}} {
 	}
 }
 
-Classy::Canvas method font {font} {
+Classy::Canvas method _font {font} {
 	private $object fonts rfonts data
 	if ![info exists fonts($font)] {
 		set fname [list $object font $font]
@@ -643,12 +644,22 @@ Classy::Canvas method font {font} {
 	return $fonts($font)
 }
 
-Classy::Canvas method width {width} {
+Classy::Canvas method font {id} {
+	private $object rfonts
+	return $rfonts([$object itemcget $id -font])
+}
+
+Classy::Canvas method _width {width} {
 	private $object widths rwidths data
 	if ![info exists widths($width)] {
 		set widths($width) [expr $width*$data(zoom)]
 		set rwidths($widths($width)) $width
 	}
+}
+
+Classy::Canvas method width {id} {
+	private $object itemw
+	return $itemw($id)
 }
 
 proc Classy::Canvas_create_text {object w arg extra} {
@@ -664,7 +675,7 @@ proc Classy::Canvas_create_text {object w arg extra} {
 		}
 	}
 	if ![info exists fonts($font)] {
-		$object font $font
+		$object _font $font
 	}
 	if {$pos == -1} {
 		lappend arg -font $fonts($font)
@@ -684,7 +695,7 @@ foreach type {line polygon rectangle oval arc} {
 			incr pos
 			set width [lindex $arg $pos]
 			if ![info exists widths($width)] {
-				$object width $width
+				$object _width $width
 			}
 			set arg [lreplace $arg $pos $pos $widths($width)]
 		} else {
@@ -768,7 +779,8 @@ Classy::Canvas method clear {} {
 	catch {unset del}
 	catch {unset data}
 	catch {unset widths}
-	$object width 1
+	set data(zoom) 1
+	$object _width 1
 	catch {unset itemw}
 	foreach name [array names fonts] {
 		font delete $fonts($name)
@@ -822,7 +834,7 @@ Classy::Canvas method itemconfigure {tagOrId args} {
 			incr fpos
 			set font [lindex $args $fpos]
 			if ![info exists fonts($font)] {
-				$object font $font
+				$object _font $font
 			}			
 			set args [lreplace $args $fpos $fpos $fonts($font)]
 		}
@@ -836,7 +848,7 @@ Classy::Canvas method itemconfigure {tagOrId args} {
 				incr wpos
 				set width [lindex $args $wpos]
 				if ![info exists widths($width)] {
-					$object width $width
+					$object _width $width
 				}			
 				set args [lreplace $args $wpos $wpos $widths($width)]
 				foreach item $citems {
@@ -868,7 +880,7 @@ Classy::Canvas method itemconfigure {tagOrId args} {
 				incr wpos
 				set width [lindex $args $wpos]
 				if ![info exists widths($width)] {
-					$object width $width
+					$object _width $width
 				}			
 				set args [lreplace $args $wpos $wpos $widths($width)]
 				set optionslist ""
@@ -889,7 +901,11 @@ Classy::Canvas method itemconfigure {tagOrId args} {
 
 Classy::Canvas method mitemcget {tagOrId option} {
 	private $object w data undo
-	set citems [Classy::tag2items $object $w $tagOrId]
+	if [regexp {^[0-9]+$} [lindex $tagOrId 0]] {
+		set citems $tagOrId
+	} else {
+		set citems [Classy::tag2items $object $w $tagOrId]
+	}
 	set result ""
 	foreach item $citems {
 		lappend result [$w itemcget $item $option]
@@ -981,7 +997,7 @@ Classy::Canvas method scale {tagOrId xOrigin yOrigin xScale yScale} {
 		if !$nf {
 			set font [lindex $font 2]
 			set newfont [Classy::zoomfont $font $yScale]
-			$w itemconfigure $citem -font [$object font $newfont]
+			$w itemconfigure $citem -font [$object _font $newfont]
 		}
 		if [info exists itemw($citem)] {
 			set itemw($citem) [expr {abs($itemw($citem)*$yScale)}]
@@ -1024,7 +1040,8 @@ Classy::Canvas method rotate {tagOrId xcenter ycenter angle} {
 	set a [expr {$angle*0.0174532925199}]
 	set cs [expr {cos($a)}]
 	set sn [expr {sin($a)}]
-	foreach citem [$w find withtag $tagOrId] {
+	set citems [$w find withtag $tagOrId]
+	foreach citem $citems {
 		set coords [$w coords $citem]
 		set newcoords ""
 		foreach {x y} $coords {
@@ -1095,7 +1112,7 @@ Classy::Canvas method addtag {tag searchcommand args} {
 	if $data(undo) {
 		switch $searchcommand {
 			items {
-				set citems $args
+				set citems [eval concat $args]
 			}
 			tags {
 				set citems [Classy::tag2items $object $w [lindex $args 0]]
@@ -1144,7 +1161,7 @@ Classy::Canvas method addtag {tag searchcommand args} {
 	} else {
 		switch $searchcommand {
 			items {
-				foreach item $args {
+				foreach item [eval concat $args] {
 					$w addtag $tag withtag $item
 				}
 			}
@@ -1239,7 +1256,7 @@ Classy::Canvas method find {searchcommand args} {
 				return $citems
 			}
 			default {
-				return [llremove leval $w find $searchcommand $args] [array names del]]
+				return [llremove [leval $w find $searchcommand $args] [array names del]]
 			}
 		}
 	}
@@ -1536,6 +1553,9 @@ Classy::Canvas method selection {action {list {}}} {
 		coords {
 			return [$w coords $data(sel)]
 		}
+		default {
+			error "wrong option \"$action\": should be one of: set, get, add, clear, remove, redraw, draw or coords"
+		}
 	}
 }
 
@@ -1606,7 +1626,7 @@ proc ::Classy::Canvas_load_text {object w idata tags} {
 	set coords [lindex $idata 1]
 	set font [lindex $idata 2]
 	if ![info exists fonts($font)] {
-		$object font $font
+		$object _font $font
 	}
 	set args [lmerge {-anchor -fill -justify -stipple -text -width} \
 		[lrange $idata 3 8]]
@@ -1642,7 +1662,7 @@ foreach {type opts} {
 		set coords [lindex $idata 1]
 		set width [lindex $idata 2]
 		if ![info exists widths($width)] {
-			$object width $width
+			$object _width $width
 		}
 		set args [lmerge {@opt@} \
 			[lrange $idata 3 @end@]]
@@ -1763,11 +1783,9 @@ proc ::Classy::Canvas_load_window {object w idata} {
 }
 
 proc ::Classy::Canvas_load_order {object w idata tags} {
-	set offset [lindex $idata 2]
 	set first [lindex [lsort -integer [$w find withtag _new]] 0]
-	set offset [expr {$first-$offset}]
 	foreach item [lindex $idata 1] {
-		$w raise [expr {$item+$offset}]
+		$w raise [expr {$item+$first}]
 	}
 }
 
@@ -1785,11 +1803,9 @@ Classy::Canvas method save {{tag all}} {
 	lappend result header "Classy::Canvas-0.1"
 	$w delete _np
 	set list [Classy::tag2items $object $w $tag]
-	lappend order {}
-	lappend order $list
-	set list [lsort -integer $list]
-	lappend order [lindex $list 0]
-	foreach item $list {
+	set slist [lsort -integer $list]
+	lappend order {} [lcor $slist $list] {}
+	foreach item $slist {
 		set type [$w type $item]
 		set idata [::Classy::Canvas_save_$type $object $w $item]
 		if {"$idata" != ""} {
@@ -1807,6 +1823,7 @@ Classy::Canvas method save {{tag all}} {
 # the save method.
 #}
 Classy::Canvas method load {c} {
+	if ![regexp {^header Classy::Canvas} $c] {error "wrong format"}
 	private $object w load data tag
 	catch {unset load}
 	$w dtag _new
@@ -1822,9 +1839,6 @@ Classy::Canvas method load {c} {
 		}
 		lappend tags _new
 		catch {::Classy::Canvas_load_$type $object $w $idata $tags}
-#		if {"[info commands ::Classy::Canvas_load_$type]" != ""} {
-#			::Classy::Canvas_load_$type $object $w $idata $tags
-#		}
 	}
 	return {}
 }
@@ -1835,7 +1849,7 @@ Classy::Canvas method load {c} {
 # creates a new group, consisting of items found by the searchcommand. searchcommand
 # has the same options as in the addtag method. The method returns the name of the
 # group. The group name can be used as a tag, in order to perform actions on group 
-# member. Adding the group name as a tag to an item will add the item to the group.
+# members. Adding the group name as a tag to an item will add the item to the group.
 #}
 Classy::Canvas method group {args} {
 	private $object w data

@@ -46,10 +46,9 @@ Classy::Editor method init {args} {
 		}]
 	bindtags $object [list $object Classy::Menu_macro Classy::Menu_pattern Classy::Editor Classy::Text all]
 	Classy::DynaMenu attachmainmenu Classy::Editor $object
-	$object _rebind $object.edit
-	bind $object <FocusIn> [list focus $object.edit]
-	scrollbar $object.vbar -orient vertical -command "::Classy::rebind::$object.edit yview"
-	scrollbar $object.hbar -orient horizontal -command "::Classy::rebind::$object.edit xview"
+	Classy::rebind $object.edit $object
+	scrollbar $object.vbar -orient vertical -command "$object.edit yview"
+	scrollbar $object.hbar -orient horizontal -command "$object.edit xview"
 	Classy::DynaTool $object.tool -type Classy::Editor -cmdw $object
 	grid $object.tool - -sticky we
 	grid rowconfigure $object 1 -weight 1
@@ -82,10 +81,10 @@ Classy::Editor method init {args} {
 # ------------------------------------------------------------------
 #  Widget options
 # ------------------------------------------------------------------
-Classy::Editor chainoptions {::Classy::rebind::$object.edit}
-Classy::Editor chainoption -background {$object} -background {::Classy::rebind::$object.edit} -background
-Classy::Editor chainoption -highlightbackground {$object} -highlightbackground {::Classy::rebind::$object.edit} -highlightbackground
-Classy::Editor chainoption -highlightcolor {$object} -highlightcolor {::Classy::rebind::$object.edit} -highlightcolor
+Classy::Editor chainoptions {$object.edit}
+Classy::Editor chainoption -background {$object} -background {$object.edit} -background
+Classy::Editor chainoption -highlightbackground {$object} -highlightbackground {$object.edit} -highlightbackground
+Classy::Editor chainoption -highlightcolor {$object} -highlightcolor {$object.edit} -highlightcolor
 
 #doc {Editor options -loadcommand} option {-loadcommand loadCommand LoadCommand} descr {
 #}
@@ -142,7 +141,7 @@ Classy::Editor method destroy {} {
 #  Methods
 # ------------------------------------------------------------------
 
-Classy::Editor chainallmethods {::Classy::rebind::$object.edit} Classy::Text
+Classy::Editor chainallmethods {$object.edit} Classy::Text
 #doc {Editor command cut} cmd {
 #pathname cut 
 #} descr {
@@ -229,7 +228,7 @@ Classy::Editor method save {} {
 		close $f
 		$object textchanged 0
 		catch {wm title [winfo toplevel $object] "$curfile"}
-		foreach w [::Classy::rebind::$object.edit link] {
+		foreach w [$object.edit link] {
 			catch {wm title [winfo toplevel $w] "$curfile"}
 		}
 	}
@@ -330,8 +329,8 @@ Classy::Editor method closefile {} {
 	set cur(prevmarker,$curfile) $prevmarker
 	set curmarkers($curfile) [$object marker lget]
 	if {"$curmarkers($curfile)" == ""} {unset curmarkers($curfile)}
-	::Classy::rebind::$object.edit delete 1.0 end
-	::Classy::rebind::$object.edit unlink
+	$object.edit unlink
+	$object.edit delete 1.0 end
 	set temp [::Classy::fullpath $curfile]
 	if [info exists editing($temp)] {
 		set editing($temp) [lremove $editing($temp) $object]
@@ -353,15 +352,18 @@ Classy::Editor method load {{file {}} args} {
 	set curfile [::Classy::fullpath $file]
 	::Classy::busy add $object
 	if [info exists editing($curfile)] {
+		$object textchanged 0
 		set w [lindex $editing($curfile) 0]
-		::Classy::rebind::$object.edit link $w.edit
-	} elseif [file exists $curfile] {
-		if [file isdir $curfile] {
-			error "Cannot open directory \"$curfile\""
+		$object.edit link $w.edit
+	} else {
+		if [file exists $curfile] {
+			if [file isdir $curfile] {
+				error "Cannot open directory \"$curfile\""
+			}
+			set f [open $curfile r]
+			$object.edit insert end [read $f]
+			close $f
 		}
-		set f [open $curfile r]
-		::Classy::rebind::$object.edit insert end [read $f]
-		close $f
 		$object clearundo
 		$object textchanged 0
 	}
@@ -658,7 +660,6 @@ proc Classy::trace {var command} {
 			lappend $var "\$object $command"
 		}
 	}
-	puts [set $var]
 }
 
 #doc {Editor command macro} cmd {
@@ -803,9 +804,9 @@ Classy::Editor method getpatternmenu {} {
 	set index 1.0
 	set num 1
 	while 1 {
-		set r [::Classy::rebind::$object.edit search -regexp -- $pattern $index end]
+		set r [$object.edit search -regexp -- $pattern $index end]
 		if {"$r" == ""} break
-		set line [::Classy::rebind::$object.edit get "$r linestart" "$r lineend"]
+		set line [$object.edit get "$r linestart" "$r lineend"]
 		append data [list action $line [list %W see $r] <<Pattern$num>>]\n
 		incr num
 		set index "$r +1c"
@@ -985,7 +986,7 @@ Classy::Editor method matchingbrackets {} {
 #}
 Classy::Editor method marker {command args} {
 	private $object marker
-	set we ::Classy::rebind::$object.edit
+	set we $object.edit
 	set arg [lindex $args 0]
 	switch $command {
 		set {
@@ -1094,7 +1095,7 @@ Classy::Editor method marker {command args} {
 }
 
 Classy::Editor method _reconfigure {} {
-	foreach w [list $object ::Classy::rebind::$object.edit $object.vbar $object.hbar] {
+	foreach w [list $object $object.edit $object.vbar $object.hbar] {
 		foreach {option name class} {
 			-font font Font
 			-foreground foreground Foreground
@@ -1139,19 +1140,19 @@ Classy::Editor method _reconfigure {} {
 }
 
 Classy::Editor method cut {} {
-	::Classy::rebind::$object.edit cut
+	$object.edit cut
 }
 
 Classy::Editor method paste {} {
-	::Classy::rebind::$object.edit paste
+	$object.edit paste
 }
 
 Classy::Editor method undo {} {
-	::Classy::rebind::$object.edit undo
+	$object.edit undo
 }
 
 Classy::Editor method redo {} {
-	::Classy::rebind::$object.edit redo
+	$object.edit redo
 }
 
 proc Classy::title {w title} {
@@ -1176,5 +1177,64 @@ proc Classy::edit {args} {
 	return $w
 }
 
-namespace eval Classy {namespace export edit}
-namespace import Classy::edit
+Classy::Editor method _grepgoto {args} {
+	private $object grep
+	set w $object.grep
+	set spec [$w.options.list get]
+	set spec [lindex $spec 0]
+	if ![regexp {^(.+):([0-9]+):} $spec temp file line] {return}
+	$object load $file
+	$object gotoline $line
+	set sline [$object get insert "insert lineend"]
+	regexp -indices $grep(pattern) $sline poss
+	catch {$object tag add sel $line.[lindex $poss 0] $line.[expr {[lindex $poss 1]+1}]}
+}
+
+Classy::Editor method _grep {args} {
+	private $object options grep
+	set w $object.grep
+	set files $grep(files)
+	if $grep(recursive) {
+		set result [eval exec grep -n -r [list $grep(pattern)] $files]
+	} else {
+		set result [eval exec grep -n -$grep(context) [list $grep(pattern)] $files]
+	}
+	$w.options.list delete 0 end
+	eval $w.options.list insert end [split $result \n]
+}
+
+Classy::Editor method grep {} {
+	private $object options grep
+	set w $object.grep
+	if ![info exists grep(files)] {
+		set grep(files) [pwd]
+		set grep(pattern) ^proc
+		set grep(recursive) 1
+		set grep(context) 0
+	}
+	if ![winfo exists $w] {
+		Classy::Dialog $w -cache 1
+		wm title $w Grep
+		set what "\[$w.options.find get\] "
+		$w add goto Goto [list $object _grepgoto] default
+		$w persistent add grep goto
+		Classy::FileEntry $w.options.files -label Files -selectmode persistent -orient stacked \
+			-textvariable [privatevar $object grep(files)] -command "$object _grep ; break"
+		Classy::Entry $w.options.pattern -label Pattern \
+			-textvariable [privatevar $object grep(pattern)] -command [list $object _grep]
+		Classy::ListBox $w.options.list -command [list $object _grepgoto]
+		checkbutton $w.options.recursive -variable [privatevar $object grep(recursive)] -text "Recursive"
+		Classy::NumEntry $w.options.context -label Context -textvariable [privatevar $object grep(context)]
+		grid $w.options.recursive $w.options.context -sticky we
+		grid $w.options.files -columns 2 -sticky we
+		grid $w.options.pattern -columns 2 -sticky we
+		grid $w.options.list -columns 2 -sticky nswe
+		grid rowconfigure $w.options 3 -weight 1
+		grid columnconfigure $w.options 0 -weight 1
+	} else {
+		$w place
+		focus $w.options.pattern
+	}
+	focus $w.options.pattern
+}
+

@@ -2,7 +2,6 @@
 # the next line restarts using wish \
 exec tclsh8.0 "$0" ${1+"$@"}
 #
-
 #if {[llength $argv] == 0} {
 #	set targetdir [file dir [pwd]]
 #} else {
@@ -16,9 +15,10 @@ if ![file exists [file join lib Class.tcl]] {
 # $Format: "\tset currentversion 0.$ProjectMajorVersion$"$
 	set currentversion 0.3
 # $Format: "\tset patchLevel $ProjectMinorVersion$"$
-	set patchLevel 4
+	set patchLevel 6
 
 lappend auto_path [pwd]
+package require Extral
 package require -exact Class $currentversion
 
 set targetdir ClassyTcl-$tcl_platform(os)-$currentversion.$patchLevel
@@ -81,9 +81,9 @@ proc clean {filemode dirmode dir} {
 			eval file copy -force [glob [file join $targetdir conf themes Linux.conf]] \
 				[list [file join $targetdir conf init.conf]]
 			foreach file [glob [file join $targetdir bin *]] {
-				file attributes $file -permissions 0755
+				catch {file attributes $file -permissions 0755}
 			}
-			file attributes [file join $targetdir template template.tcl] -permissions 0755
+			catch {file attributes [file join $targetdir template template.tcl] -permissions 0755}
 		}
 	}
 exit

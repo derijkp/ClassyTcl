@@ -38,13 +38,13 @@ Classy::SelectDialog method init {args} {
 	super init
 	$object configure -resize {1 1}
 	$object add go "Go" [list $object _command] default
-	frame $object.options.frame
+	frame $object.options.frame -highlightthickness 0
 	Classy::ListBox $object.options.list -selectmode browse -exportselection no -width 5 -height 5
 	pack $object.options.frame -fill both -expand yes
 	pack $object.options.list -in $object.options.frame -side left -fill both -expand yes
 	# REM Create bindings
 	# -------------------
-	bind $object.options.list <Enter> "focus $object.options.list"
+	focus $object.options.list
 	bind $object.options.list <<Invoke>> "$object invoke go"
 	bind $object.options.list <<MExecute>> "$object invoke go Action"
 	bind $object.options.list <<MExecuteAjust>> "$object.options.list activate @%x,%y;$object invoke go Adjust"

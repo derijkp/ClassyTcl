@@ -44,7 +44,7 @@
 #-------------------------------------------------------------------------
 
 bind Classy::Text <<Drop>> {
-	catch {%W textinsert [DragDrop get]}
+	catch {%W textinsert [Classy::DragDrop get]}
 }
 bind Classy::Text <<Drag-Motion>> {
 	%W position [::class::Tk_%W index @%x,%y]

@@ -31,8 +31,7 @@ Classy::Browser method init {args} {
 	# -----------------
 	super init
 	canvas $object.c -xscrollcommand [list $object.hbar set]
-	$object _rebind $object.c
-	bind $object <FocusIn> [list focus $object.c]
+	Classy::rebind $object.c $object
 	scrollbar $object.vbar -command [list $object _view] -orient vertical
 	scrollbar $object.hbar -command [list $object _view] -orient horizontal
 	grid $object.c -row 0 -sticky nwse
@@ -57,7 +56,7 @@ Classy::Browser method init {args} {
 	if {"$args" != ""} {eval $object configure $args}
 }
 
-Classy::Browser component canvas {::Classy::rebind::$object.c}
+Classy::Browser component canvas {$object.c}
 # ------------------------------------------------------------------
 #  Widget destroy
 # ------------------------------------------------------------------
@@ -66,10 +65,10 @@ Classy::Browser component canvas {::Classy::rebind::$object.c}
 #  Widget options
 # ------------------------------------------------------------------
 
-Classy::Browser chainoptions {::Classy::rebind::$object.c}
-Classy::Browser chainoption -background {$object} -background {::Classy::rebind::$object.c} -background
-Classy::Browser chainoption -highlightbackground {$object} -highlightbackground {::Classy::rebind::$object.c} -highlightbackground
-Classy::Browser chainoption -highlightcolor {$object} -highlightcolor {::Classy::rebind::$object.c} -highlightcolor
+Classy::Browser chainoptions {$object.c}
+Classy::Browser chainoption -background {$object} -background {$object.c} -background
+Classy::Browser chainoption -highlightbackground {$object} -highlightbackground {$object.c} -highlightbackground
+Classy::Browser chainoption -highlightcolor {$object} -highlightcolor {$object.c} -highlightcolor
 
 Classy::Browser addoption -minx {minX MinX 0} {
 	Classy::todo $object redraw
@@ -94,7 +93,7 @@ Classy::Browser addoption -padtext {padText PadText 4} {
 Classy::Browser addoption -font {font Font {}} {
 	private display
 	if {"$value" == ""} {
-		set display(font) [Classy::realfont [Classy::optionget ::Classy::rebind::$object.c font Font BoldFont]]
+		set display(font) [Classy::realfont [Classy::optionget $object.c font Font BoldFont]]
 	} else {
 		set display(font) [Classy::realfont $value]
 	}
@@ -104,7 +103,7 @@ Classy::Browser addoption -font {font Font {}} {
 Classy::Browser addoption -datafont {dataFont Font {}} {
 	private display
 	if {"$value" == ""} {
-		set display(datafont) [Classy::realfont [Classy::optionget ::Classy::rebind::$object.c dataFont Font BoldFont]]
+		set display(datafont) [Classy::realfont [Classy::optionget $object.c dataFont Font BoldFont]]
 	} else {
 		set display(datafont) [Classy::realfont $value]
 	}
@@ -170,7 +169,7 @@ Classy::Browser addoption -list {list List {}} {
 #  Methods
 # ------------------------------------------------------------------
 
-Classy::Browser chainallmethods {::Classy::rebind::$object.c} canvas
+Classy::Browser chainallmethods {$object.c} canvas
 
 Classy::Browser method redraw {} {
 	private $object options curpos endpos step
@@ -190,7 +189,7 @@ Classy::Browser method _redrawrow {} {
 	set padx $options(-padx)
 	set pady $options(-pady)
 	set padtext $options(-padtext)
-	set w ::Classy::rebind::$object.c
+	set w $object.c
 	$w delete all
 	if {"$options(-list)" == ""} return
 	set startx $padx
@@ -274,7 +273,7 @@ Classy::Browser method _redrawcolumn {} {
 	set padx $options(-padx)
 	set pady $options(-pady)
 	set padtext $options(-padtext)
-	set w ::Classy::rebind::$object.c
+	set w $object.c
 	$w delete all
 	if {"$options(-list)" == ""} return
 	set startx $padx
@@ -361,46 +360,46 @@ Classy::Browser method _redrawcolumn {} {
 
 Classy::Browser method _panestart {w x y} {
 	private $object pane
-	set current [::Classy::rebind::$object.c find withtag current]
+	set current [$object.c find withtag current]
 	set pane(item) $current
 	set pane(px) $x
-	set coords [::Classy::rebind::$object.c coords $current]
+	set coords [$object.c coords $current]
 	set pane(ph) [lindex $coords end]
-	eval ::Classy::rebind::$object.c coords $current [lreplace $coords end end 10000]
+	eval $object.c coords $current [lreplace $coords end end 10000]
 }
 
 Classy::Browser method _panemove {w x y} {
 	private $object pane
-	::Classy::rebind::$object.c move $pane(item) [expr $x-$pane(px)] 0
+	$object.c move $pane(item) [expr $x-$pane(px)] 0
 	set pane(px) $x
 }
 
 Classy::Browser method _panestop {w x y} {
 	private $object options pane psize
-	::Classy::rebind::$object.c move $pane(item) [expr $x-$pane(px)] 0
+	$object.c move $pane(item) [expr $x-$pane(px)] 0
 	set pane(px) $x
-	set id [lindex [::Classy::rebind::$object.c itemcget $pane(item) -tags] 1]
+	set id [lindex [$object.c itemcget $pane(item) -tags] 1]
 	regsub {^pane_} $id {} id
 	if {"$id" == "name"} {
 		set psize($id) $x
 	} else {
-		set bbox [::Classy::rebind::$object.c coords bg_$id]
+		set bbox [$object.c coords bg_$id]
 		set psize($id) [expr {$x-[lindex $bbox 0]-2*$options(-padtext)}]
 	}
 	if {$psize($id)<5} {
 		set psize($id) 5
 	}
-	::Classy::rebind::$object.c configure -cursor {}
+	$object.c configure -cursor {}
 	$object redraw
 }
 
 Classy::Browser method _paneremove {w x y} {
 	private $object pane psize
-	set current [::Classy::rebind::$object.c find withtag current]
-	set id [lindex [::Classy::rebind::$object.c itemcget $current -tags] 1]
+	set current [$object.c find withtag current]
+	set id [lindex [$object.c itemcget $current -tags] 1]
 	regsub {^pane_} $id {} id
 	catch {unset psize($id)}
-	::Classy::rebind::$object.c configure -cursor {}
+	$object.c configure -cursor {}
 	.try redraw
 }
 
@@ -411,7 +410,7 @@ Classy::Browser method _redrawlist {} {
 	set padx $options(-padx)
 	set pady $options(-pady)
 	set padtext $options(-padtext)
-	set w ::Classy::rebind::$object.c
+	set w $object.c
 	$w delete all
 	set startx $padx
 	set starty $pady
@@ -435,21 +434,21 @@ Classy::Browser method _redrawlist {} {
 		set hh [expr {$height/2}]
 		set id [$w create line 0 [expr $y-$hh] $padtext [expr $y-$hh] $padtext [expr $y+$hh] \
 			-tags [list {} pane_name pane] -width 2]
-		if [info exists psize(name)] {::Classy::rebind::$object.c itemconfigure $id -fill red}
+		if [info exists psize(name)] {$object.c itemconfigure $id -fill red}
 		foreach dt $options(-data) {
 			$w create text 0 $y -anchor e -text $dt -tags [list {} label_$dt d$dt] -font $display(font)
 			set id [$w create line 0 [expr $y-$hh] $padtext [expr $y-$hh] $padtext [expr $y+$hh] \
 				-tags [list {} pane_$dt pane] -width 2]
-			if [info exists psize($dt)] {::Classy::rebind::$object.c itemconfigure $id -fill red}
+			if [info exists psize($dt)] {$object.c itemconfigure $id -fill red}
 		}
 		set y [expr {$y + $height + $pady}]
-		::Classy::rebind::$object.c move all 0 [expr {$height/2}]
-		::Classy::rebind::$object.c bind pane <Enter> [list ::Classy::rebind::$object.c configure -cursor sb_h_double_arrow]
-		::Classy::rebind::$object.c bind pane <Leave> [list ::Classy::rebind::$object.c configure -cursor {}]
-		::Classy::rebind::$object.c bind pane <<Action>> [list $object _panestart %W %x %y]
-		::Classy::rebind::$object.c bind pane <<Action-Motion>> [list $object _panemove %W %x %y]
-		::Classy::rebind::$object.c bind pane <<Action-ButtonRelease>> [list $object _panestop %W %x %y]
-		::Classy::rebind::$object.c bind pane <<Adjust>> [list $object _paneremove %W %x %y]
+		$object.c move all 0 [expr {$height/2}]
+		$object.c bind pane <Enter> [list $object.c configure -cursor sb_h_double_arrow]
+		$object.c bind pane <Leave> [list $object.c configure -cursor {}]
+		$object.c bind pane <<Action>> [list $object _panestart %W %x %y]
+		$object.c bind pane <<Action-Motion>> [list $object _panemove %W %x %y]
+		$object.c bind pane <<Action-ButtonRelease>> [list $object _panestop %W %x %y]
+		$object.c bind pane <<Adjust>> [list $object _paneremove %W %x %y]
 	}
 	foreach name $list {
 		if {"$options(-gettext)" == ""} {
@@ -505,53 +504,53 @@ Classy::Browser method _redrawlist {} {
 		if {$y > $sh} break
 	}
 	set cy $y
-	set bgcol [::Classy::rebind::$object.c cget -bg]
+	set bgcol [$object.c cget -bg]
 	if !$options(-dataunder) {
 		if [info exists psize(name)] {
 			set pos [expr {$psize(name)+$padtext}]
 		} else {
-			set bbox [::Classy::rebind::$object.c bbox text]
+			set bbox [$object.c bbox text]
 			set pos [expr {[lindex $bbox 2]+$padtext}]
 		}
-		set id [::Classy::rebind::$object.c create rectangle 0 0 $pos $sh -fill $bgcol -outline $bgcol -tags {{} bg_name}]
-		::Classy::rebind::$object.c move pane_name [expr {$pos-2*$padtext}] 0
-		::Classy::rebind::$object.c lower $id
+		set id [$object.c create rectangle 0 0 $pos $sh -fill $bgcol -outline $bgcol -tags {{} bg_name}]
+		$object.c move pane_name [expr {$pos-2*$padtext}] 0
+		$object.c lower $id
 		foreach dt $options(-data) d $data {
 			if [info exists psize($dt)] {
 				set size $psize($dt)
 			} else {
-				set bbox [::Classy::rebind::$object.c bbox d$dt]
+				set bbox [$object.c bbox d$dt]
 				set size [expr {[lindex $bbox 2]-[lindex $bbox 0]}]
 			}
 			if {"$options(-dataalign)"=="l"} {
-				::Classy::rebind::$object.c create rectangle \
+				$object.c create rectangle \
 					[expr {$pos-$padtext}] 0 [expr {$pos+$size+$padtext}] $sh \
 					-tags [list {} bg_$dt] -fill $bgcol -outline $bgcol
-				::Classy::rebind::$object.c itemconfigure d$dt -anchor w
-				::Classy::rebind::$object.c move d$dt $pos 0
-				::Classy::rebind::$object.c move pane_$dt [expr {$pos+$size-$padtext}] 0
+				$object.c itemconfigure d$dt -anchor w
+				$object.c move d$dt $pos 0
+				$object.c move pane_$dt [expr {$pos+$size-$padtext}] 0
 				set pos [expr {$pos+$size+$padtext}]
-				::Classy::rebind::$object.c raise bg_$dt
-				::Classy::rebind::$object.c raise d$dt
+				$object.c raise bg_$dt
+				$object.c raise d$dt
 			} else {
 				set pos [expr {$pos+$size}]
-				::Classy::rebind::$object.c create rectangle \
+				$object.c create rectangle \
 					[expr {$pos-$size-$padtext}] 0 [expr {$pos+$padtext}] $sh \
 					-tags [list {} bg_$dt] -fill $bgcol -outline $bgcol
-				::Classy::rebind::$object.c move d$dt $pos 0
-				::Classy::rebind::$object.c move pane_$dt $pos 0
+				$object.c move d$dt $pos 0
+				$object.c move pane_$dt $pos 0
 				set pos [expr {$pos+$padtext}]
-				::Classy::rebind::$object.c lower d$dt
-				::Classy::rebind::$object.c lower bg_$dt
+				$object.c lower d$dt
+				$object.c lower bg_$dt
 			}
 		}
-		set id [::Classy::rebind::$object.c create rectangle $pos 0 \
+		set id [$object.c create rectangle $pos 0 \
 			$sw $sh -tags [list {} bg_end] -fill $bgcol -outline $bgcol]
-		::Classy::rebind::$object.c raise $id
-		::Classy::rebind::$object.c raise pane
+		$object.c raise $id
+		$object.c raise pane
 		if {"$options(-dataalign)"=="r"} {
-			::Classy::rebind::$object.c lower name
-			::Classy::rebind::$object.c lower bg_name
+			$object.c lower name
+			$object.c lower bg_name
 		}
 	}
 	$object _drawselection
@@ -564,7 +563,7 @@ Classy::Browser method _drawdataunder {nx ny name id} {
 	set padx $options(-padx)
 	set pady $options(-pady)
 	set padtext $options(-padtext)
-	set w ::Classy::rebind::$object.c
+	set w $object.c
 	set bbox [$w bbox $id]
 	set tempy [lindex $bbox 3]
 	set tempx [lindex $bbox 0]
@@ -588,31 +587,31 @@ Classy::Browser method _drawdataunder {nx ny name id} {
 
 Classy::Browser method _drawselection {} {
 	private $object options curpos endpos sel
-	::Classy::rebind::$object.c delete selection
+	$object.c delete selection
 	set sw [winfo width $object.c]
 	set selfg [Classy::optionget $object selectForeground Background gray]
 	set selbg [Classy::optionget $object selectBackground Foreground gray]
-	::Classy::rebind::$object.c itemconfigure t -fill black
+	$object.c itemconfigure t -fill black
 	foreach name [lrange $options(-list) $curpos $endpos] {
 		if [info exists sel($name)] {
 			if {("$options(-order)" == "list")&&!$options(-dataunder)} {
-				::Classy::rebind::$object.c itemconfigure text_$name -fill $selfg
-				set bbox [::Classy::rebind::$object.c bbox img_$name]
+				$object.c itemconfigure text_$name -fill $selfg
+				set bbox [$object.c bbox img_$name]
 				if {"$bbox" != ""} {
-					set id [::Classy::rebind::$object.c create rectangle \
+					set id [$object.c create rectangle \
 						[lindex $bbox 0] [lindex $bbox 1] $sw [lindex $bbox 3]\
 						-tags [list _$name name selection] -fill $selbg -outline $selbg]
-					::Classy::rebind::$object.c lower $id img_$name
+					$object.c lower $id img_$name
 				}
 			} else {
-				foreach item [::Classy::rebind::$object.c find withtag _$name] {
-					catch {::Classy::rebind::$object.c itemconfigure $item -fill $selfg}
+				foreach item [$object.c find withtag _$name] {
+					catch {$object.c itemconfigure $item -fill $selfg}
 				}
-				set bbox [::Classy::rebind::$object.c bbox _$name]
+				set bbox [$object.c bbox _$name]
 				if {"$bbox" != ""} {
-					set id [eval ::Classy::rebind::$object.c create rectangle $bbox \
+					set id [eval $object.c create rectangle $bbox \
 						{-tags [list _$name selection] -fill $selbg -outline $selbg}]
-					::Classy::rebind::$object.c lower $id _$name
+					$object.c lower $id _$name
 				}
 			}
 		}
@@ -624,7 +623,7 @@ Classy::Browser method _drawdata {nx names items} {
 	set padx $options(-padx)
 	set pady $options(-pady)
 	set padtext $options(-padtext)
-	set w ::Classy::rebind::$object.c
+	set w $object.c
 	set i 0
 	set names [lrange $names 0 [expr [llength $items]-1]]
 	foreach dt $options(-data) {
@@ -637,7 +636,7 @@ Classy::Browser method _drawdata {nx names items} {
 				set data [eval $options(-getdata) {$name}]
 			}
 			set d [lindex $data $i]
-			set y [lindex [::Classy::rebind::$object.c coords $item] 1]
+			set y [lindex [$object.c coords $item] 1]
 			set id [$w create text $cx $y \
 				-anchor w -text $d -tags [list _$name d$dt ${dt}_$name t] -font $display(datafont)]
 			set bbox [$w bbox $id]
@@ -646,7 +645,7 @@ Classy::Browser method _drawdata {nx names items} {
 			if {$temp > $nx} {set nx $temp}
 		}
 		foreach name $names item $nitems {
-			$w coords $item $nx [lindex [::Classy::rebind::$object.c coords $item] 1]
+			$w coords $item $nx [lindex [$object.c coords $item] 1]
 			$w itemconfigure $item -anchor e
 		}
 		incr i
@@ -657,7 +656,7 @@ Classy::Browser method _drawdata {nx names items} {
 
 Classy::Browser method name {index {y {}}} {
 	if {"$y" != ""} {
-		set index [lindex [::Classy::rebind::$object.c find overlapping $index $y $index $y] end]
+		set index [lindex [$object.c find overlapping $index $y $index $y] end]
 	}
 	set name [lindex [$object itemcget $index -tags] 0]
 	return [string range $name 1 end]
@@ -665,7 +664,7 @@ Classy::Browser method name {index {y {}}} {
 
 Classy::Browser method type {index {y {}}} {
 	if {"$y" != ""} {
-		set index [lindex [::Classy::rebind::$object.c find overlapping $index $y $index $y] end]
+		set index [lindex [$object.c find overlapping $index $y $index $y] end]
 	}
 	set tags [$object itemcget $index -tags]
 	return [lindex $tags 1]
@@ -821,8 +820,8 @@ Classy::Browser method edit {name type command} {
 	if ![winfo exists $object.e] {
 		entry $object.e -textvariable [privatevar $object edit] -relief sunken -bd 1
 	}
-	foreach el [::Classy::rebind::$object.c find withtag _$name] {
-		set t [lindex [::Classy::rebind::$object.c itemcget $el -tags] 1]
+	foreach el [$object.c find withtag _$name] {
+		set t [lindex [$object.c itemcget $el -tags] 1]
 		if {"$t" == "$type"} {
 			set item $el
 			break
@@ -831,7 +830,7 @@ Classy::Browser method edit {name type command} {
 	if ![info exists item] {
 		return -code error "item not found"
 	}
-	set bbox [::Classy::rebind::$object.c bbox $item]
+	set bbox [$object.c bbox $item]
 	set x [lindex $bbox 0]
 	set y [lindex $bbox 1]
 	set h [expr {[lindex $bbox 3]-[lindex $bbox 1]+2}]
@@ -844,10 +843,10 @@ Classy::Browser method edit {name type command} {
 		list {
 			if !$options(-dataunder) {
 				if {"$type" == "text"} {
-					set coords [::Classy::rebind::$object.c coords pane_name]
+					set coords [$object.c coords pane_name]
 					set w [expr {[lindex $coords 0]-[lindex $bbox 0]+2}]
 				} else {
-					set coords [::Classy::rebind::$object.c coords bg_$type]
+					set coords [$object.c coords bg_$type]
 					set w [expr {[lindex $coords 2]-[lindex $coords 0]}]
 					$object.e configure -font $display(datafont)
 				}
@@ -862,15 +861,15 @@ Classy::Browser method edit {name type command} {
 			set w [expr {[lindex $bbox 2]-[lindex $bbox 0]+2}]
 		}
 	}
-	set edit [::Classy::rebind::$object.c itemcget $item -text]
-	catch {::Classy::rebind::$object.c delete $id}
-	set id [::Classy::rebind::$object.c create window $x $y -anchor nw -window $object.e -width $w -height $h]
+	set edit [$object.c itemcget $item -text]
+	catch {$object.c delete $id}
+	set id [$object.c create window $x $y -anchor nw -window $object.e -width $w -height $h]
 	bind $object.e <Return> [list $object _stopedit $command]	
 }
 
 Classy::Browser method _stopedit {command} {
 	private $object edit id command
-	::Classy::rebind::$object.c delete $id
+	$object.c delete $id
 	uplevel #0 $command {$edit}
 }
 
@@ -878,14 +877,14 @@ Classy::Browser method active {{option get} args} {
 	private $object active
 	switch $option {
 		set {
-			::Classy::rebind::$object.c delete active
+			$object.c delete active
 			if {"$args" != ""} {
 				set active [lindex $args 0]
 			}
-			::Classy::rebind::$object.c delete active
-			set bbox [::Classy::rebind::$object.c bbox _$active]
+			$object.c delete active
+			set bbox [$object.c bbox _$active]
 			if {"$bbox" != ""} {
-				eval ::Classy::rebind::$object.c create rectangle $bbox {-tags {{} active} -outline darkgray}
+				eval $object.c create rectangle $bbox {-tags {{} active} -outline darkgray}
 			}
 			return $active
 		}

@@ -50,7 +50,7 @@ bind Classy::Entry <<Default>> {
 	if [winfo exists %W.defaults] {%W.defaults menu}
 }
 bind Classy::Entry <<Drop>> {
-	%W insert insert [DragDrop get]
+	%W insert insert [Classy::DragDrop get]
 }
 bind Classy::Entry <<Drag-Motion>> {
 	tkEntryButton1 %W %x
@@ -73,10 +73,8 @@ Classy::Entry method init {args} {
 	frame $object.frame.entry
 	pack $object.frame -expand yes -fill x -side left
 	pack $object.frame.entry -expand yes -fill x -side left
-	bindtags $object [lreplace [bindtags $object] 2 0 Entry]
 	entry $object.entry
-	$object _rebind $object.entry
-	bind $object <FocusIn> [list focus $object.entry]
+	Classy::rebind $object.entry $object
 	pack $object.entry -in $object.frame.entry -side left -expand yes -fill x
 	# REM Create bindings
 	# -------------------
@@ -92,10 +90,10 @@ Classy::Entry method init {args} {
 # ------------------------------------------------------------------
 #  Widget options
 # ------------------------------------------------------------------
-Classy::Entry chainoptions {::Classy::rebind::$object.entry}
-Classy::Entry chainoption -background {$object} -background {::Classy::rebind::$object.entry} -background
-Classy::Entry chainoption -highlightbackground {$object} -highlightbackground {::Classy::rebind::$object.entry} -highlightbackground
-Classy::Entry chainoption -highlightcolor {$object} -highlightcolor {::Classy::rebind::$object.entry} -highlightcolor
+Classy::Entry chainoptions {$object.entry}
+Classy::Entry chainoption -background {$object} -background {$object.entry} -background
+Classy::Entry chainoption -highlightbackground {$object} -highlightbackground {$object.entry} -highlightbackground
+Classy::Entry chainoption -highlightcolor {$object} -highlightcolor {$object.entry} -highlightcolor
 
 #doc {Entry options -orient} option {-orient orient Orient} descr {
 # determines the position of the label relative to the entry: horizontal or vertical
@@ -198,7 +196,7 @@ Classy::Entry addoption -warn {warn warn 1} {
 #  Methods
 # ------------------------------------------------------------------
 
-Classy::Entry chainallmethods {::Classy::rebind::$object.entry} entry
+Classy::Entry chainallmethods {$object.entry} entry
 
 #doc {Entry command nocmdset} cmd {
 #pathname nocmdset value
@@ -207,9 +205,9 @@ Classy::Entry chainallmethods {::Classy::rebind::$object.entry} entry
 #}
 Classy::Entry method nocmdset {val} {
 	private $object previous
-	::Classy::rebind::$object.entry delete 0 end
-	::Classy::rebind::$object.entry insert 0 $val
-	::Classy::rebind::$object.entry xview end
+	$object.entry delete 0 end
+	$object.entry insert 0 $val
+	$object.entry xview end
 }
 
 #doc {Entry command set} cmd {
@@ -229,7 +227,7 @@ Classy::Entry method set {val} {
 # get the current contents of the entry
 #}
 Classy::Entry method get {} {
-	return [::Classy::rebind::$object.entry get]
+	return [$object.entry get]
 }
 
 #doc {Entry command command} cmd {
@@ -240,7 +238,7 @@ Classy::Entry method get {} {
 Classy::Entry method command {} {
 	set command [getprivate $object options(-command)]
 	if {"$command" != ""} {
-		uplevel #0 $command [list [::Classy::rebind::$object.entry get]]
+		uplevel #0 $command [list [$object.entry get]]
 		return 1
 	} else {
 		return 0
@@ -278,15 +276,15 @@ Classy::Entry method constrain {} {
 	if $ok {
 		set previous $new
 		if [info exists previouscol] {
-			::Classy::rebind::$object.entry configure -fg $previouscol
+			$object.entry configure -fg $previouscol
 			unset previouscol
 		}
 	} else {
 		if {$warn==0} {
 			$object nocmdset $previous
 		} elseif ![info exists previouscol] {
-			set previouscol [::Classy::rebind::$object.entry cget -fg]
-			::Classy::rebind::$object.entry configure -fg red
+			set previouscol [$object.entry cget -fg]
+			$object.entry configure -fg red
 		}
 		if [info exists error] {error $error}
 	}
@@ -309,7 +307,7 @@ Classy::Entry method _redrawentry {} {
 }
 
 Classy::Entry method paste {} {
-	::Classy::rebind::$object.entry insert insert [selection get -displayof $object]
+	$object.entry insert insert [selection get -displayof $object]
 }
 
 Classy::Entry method previous {} {

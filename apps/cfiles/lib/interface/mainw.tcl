@@ -1,7 +1,3 @@
-proc main {args} {
-	mainw .mainw
-}
-
 Classy::Toplevel subclass mainw
 mainw method init args {
 	super init
@@ -73,12 +69,4 @@ mainw method init args {
 # ClassyTcl Finalise
 setdir $object.browser [pwd]
 	return $object
-	return $object
-	return $object
-	return $object
-	return $object
-	return $object
-	return $object
-	return $object
 }
-

@@ -30,6 +30,7 @@ Classy::FileEntry method init {args} {
 		set ::Classy::current [$object get]
 		set ::Classy::current [::Classy::selectfile -title "[$object cget -label]" \
 			-initialdir [file dirname $::Classy::current] -filter *[file extension $::Classy::current] \
+			-selectmode [getprivate $object options(-selectmode)] \
 			]
 		if {"$::Classy::current"!=""} {$object set $::Classy::current}
 	}]
@@ -40,4 +41,10 @@ Classy::FileEntry method init {args} {
 	if {"$args" != ""} {eval $object configure $args}
 }
 
-
+#doc {FileEntry options -selectmode} option {-selectmode selectMode SelectMode} descr {
+#}
+Classy::FileEntry addoption	-selectmode {selectMode SelectMode browse} {
+	if ![inlist {single browse multiple extended persistent} $value] {
+		error "bad selectmode \"$value\": must be single, browse, multiple, extended, or persistent"
+	}
+}

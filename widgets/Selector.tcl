@@ -187,7 +187,7 @@ Classy::Selector method redraw {} {
 				$object _command [set $var]
 			}]
 			button $object.edit -text "Edit" -command [varsubst {object title} {
-				set w [edit]
+				set w [Classy::edit]
 				wm title $w $title
 				$w.editor configure -savecommand [list invoke {object w} {
 					$object.change invoke
@@ -229,7 +229,7 @@ Classy::Selector method redraw {} {
 			grid rowconfigure $v 3 -weight 1
 			catch {$v.sample configure -bg [Classy::realcolor [set $var]]}
 			bind $v.sample <<Drag>> {
-				DragDrop start %X %Y [[winfo parent %W] get]
+				Classy::DragDrop start %X %Y [[winfo parent %W] get]
 			}
 		}
 		font {
@@ -245,7 +245,7 @@ Classy::Selector method redraw {} {
 			grid rowconfigure $v 3 -weight 1
 			catch {$v.sample configure -font [Classy::realfont [set $var]]}
 			bind $v.sample <<Drag>> {
-				DragDrop start %X %Y [[winfo parent %W] get]
+				Classy::DragDrop start %X %Y [[winfo parent %W] get]
 			}
 		}
 		key {

@@ -40,8 +40,7 @@ Classy::ListBox method init {args} {
 	$object.xscroll set 0.0 1.0
 	$object.yscroll set 0.0 1.0
 	bindtags $object [lreplace [bindtags $object] 2 0 Listbox]
-	$object _rebind $object.list
-	bind $object <FocusIn> [list focus $object.list]
+	Classy::rebind $object.list $object
 	grid $object.list -column 0 -row 0 -sticky nwse
 	grid columnconfigure $object 0 -weight 1
 	grid rowconfigure $object 0 -weight 1
@@ -59,17 +58,17 @@ Classy::ListBox method init {args} {
 # ------------------------------------------------------------------
 #  Widget options
 # ------------------------------------------------------------------
-Classy::ListBox chainoptions {::Classy::rebind::$object.list}
-Classy::ListBox chainoption -background {$object} -background {::Classy::rebind::$object.list} -background
-Classy::ListBox chainoption -highlightbackground {$object} -highlightbackground {::Classy::rebind::$object.list} -highlightbackground
-Classy::ListBox chainoption -highlightcolor {$object} -highlightcolor {::Classy::rebind::$object.list} -highlightcolor
+Classy::ListBox chainoptions {$object.list}
+Classy::ListBox chainoption -background {$object} -background {$object.list} -background
+Classy::ListBox chainoption -highlightbackground {$object} -highlightbackground {$object.list} -highlightbackground
+Classy::ListBox chainoption -highlightcolor {$object} -highlightcolor {$object.list} -highlightcolor
 
 #doc {Editor options -content} option {-content content Content} descr {
 #}
 Classy::ListBox addoption -content {content Content {}} {
-	::Classy::rebind::$object.list delete 0 end
+	$object.list delete 0 end
 	foreach el $value {
-		::Classy::rebind::$object.list insert end $el
+		$object.list insert end $el
 	}
 	Classy::todo $object redraw
 }
@@ -88,7 +87,7 @@ Classy::ListBox addoption -browsecommand {browseCommand BrowseCommand {}} {
 #  Methods
 # ------------------------------------------------------------------
 
-Classy::ListBox chainallmethods {::Classy::rebind::$object.list} listbox
+Classy::ListBox chainallmethods {$object.list} listbox
 
 #doc {ListBox command get} cmd {
 #pathname get ?first? ?last?
@@ -98,14 +97,14 @@ Classy::ListBox method get {args} {
 	set len [llength $args]
 	if {$len == 0} {
 		set list ""
-		foreach pos [::Classy::rebind::$object.list curselection] {
-			lappend list [::Classy::rebind::$object.list get $pos]
+		foreach pos [$object.list curselection] {
+			lappend list [$object.list get $pos]
 		}
 		return $list
 	} elseif {$len == 1} {
-		return [::Classy::rebind::$object.list get [lindex $args 0]]
+		return [$object.list get [lindex $args 0]]
 	} elseif {$len == 2} {
-		return [::Classy::rebind::$object.list get [lindex $args 0] [lindex $args 1]]
+		return [$object.list get [lindex $args 0] [lindex $args 1]]
 	} else {
 		return -code error "wrong # args: should be \"$object get ?first? ?last?\""
 	}
@@ -121,7 +120,7 @@ Classy::ListBox method set {args} {
 	foreach el $args {
 		set pos [lsearch $c $el]
 		if {$pos == -1} {error "element \"$el\" not in listbox"}
-		::Classy::rebind::$object.list selection set $pos
+		$object.list selection set $pos
 	}
 }
 
@@ -145,12 +144,13 @@ Classy::ListBox method redraw {} {
 
 Classy::ListBox method activate {args} {
 	private $object options
-	if [catch {eval ::Classy::rebind::$object.list activate $args}] {
+	focus $object
+	if [catch {eval $object.list activate $args}] {
 		set c [$object cget -content]
 		set pos [lsearch $c [lindex $args 0]]
-		::Classy::rebind::$object.list activate $pos
+		$object.list activate $pos
 	} else {
-		set args [::Classy::rebind::$object.list get $args]
+		set args [$object.list get $args]
 	}
 	if {"$options(-browsecommand)" != ""} {
 		uplevel #0 $options(-browsecommand) [list $args]
@@ -158,12 +158,12 @@ Classy::ListBox method activate {args} {
 }
 
 Classy::ListBox method insert {args} {
-	uplevel #0 ::Classy::rebind::$object.list insert $args
+	uplevel #0 $object.list insert $args
 	Classy::todo $object redraw
 }
 
 Classy::ListBox method delete {args} {
-	uplevel #0 ::Classy::rebind::$object.list delete $args
+	uplevel #0 $object.list delete $args
 	Classy::todo $object redraw
 }
 

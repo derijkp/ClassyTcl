@@ -63,7 +63,7 @@ Classy::DynaMenu classmethod attachmainmenu {menutype cmdw {menuroot {}}} {
 		$class makemenu $menutype $menu $cmdw Classy::Menu_$menutype
 	}
 	$class cmdw $menutype $cmdw
-	catch {bindtags $cmdw [lreplace [bindtags $cmdw] 1 0 Classy::Menu_$menutype]}
+	catch {bindtags [Classy::rebindw $cmdw] [lreplace [bindtags [Classy::rebindw $cmdw]] 1 0 Classy::Menu_$menutype]}
 	if {"[option get $root menuType MenuType]"!="top"} {
 		bind $cmdw <<MainMenu>> "$class popup $menutype %X %Y"
 	} else {
@@ -87,7 +87,7 @@ Classy::DynaMenu classmethod attachmenu {menutype cmdw} {
 	} else {
 		$class cmdw $menutype $cmdw
 	}
-	bindtags $cmdw [lreplace [bindtags $cmdw] 1 0 Classy::Menu_$menutype]
+	bindtags [Classy::rebindw $cmdw] [lreplace [bindtags [Classy::rebindw $cmdw]] 1 0 Classy::Menu_$menutype]
 	bind $cmdw <<Menu>> "$class popup $menutype %X %Y $cmdw"
 	return {}
 }

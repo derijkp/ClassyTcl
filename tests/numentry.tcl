@@ -4,7 +4,7 @@ exec wish8.0 "$0" "$@"
 
 source tools.tcl
 
-test NumEntry {create and configure} {
+test Classy::NumEntry {create and configure} {
 	classyclean
 	destroy .try
 	Classy::NumEntry .try
@@ -13,67 +13,67 @@ test NumEntry {create and configure} {
 	.try cget -label
 } {test}
 
-test NumEntry {create with configuration configure} {
+test Classy::NumEntry {create with configuration configure} {
 	classyclean
-	NumEntry .try -label try
+	Classy::NumEntry .try -label try
 	pack .try
 	.try cget -label
 } {try}
 
-test NumEntry {create, destroy, create} {
+test Classy::NumEntry {create, destroy, create} {
 	classyclean
-	NumEntry .try -label try
+	Classy::NumEntry .try -label try
 	pack .try
 	destroy .try
-	NumEntry .try
+	Classy::NumEntry .try
 	pack .try
 	.try cget -label
 } {}
 
-test NumEntry {create with configuration configure} {
+test Classy::NumEntry {create with configuration configure} {
 	classyclean
-	NumEntry .try -label try -orient vertical
+	Classy::NumEntry .try -label try -orient vertical
 	pack .try
 	.try cget -orient
 } {vertical}
 
-test NumEntry {create with configuration configure} {
+test Classy::NumEntry {create with configuration configure} {
 	classyclean
-	NumEntry .try -label int -constraint int -warn 0
+	Classy::NumEntry .try -label int -constraint int -warn 0
 	pack .try
 	.try cget -constraint
 } {^(-?)[0-9]*$}
 
-test NumEntry {min} {
+test Classy::NumEntry {min} {
 	classyclean
-	NumEntry .try -label try -min 0 -max 10 -warn 0
+	Classy::NumEntry .try -label try -min 0 -max 10 -warn 0
 	pack .try
 	.try set 5
 	.try set -1
 	.try get
 } {5}
 
-test NumEntry {max} {
+test Classy::NumEntry {max} {
 	classyclean
-	NumEntry .try -label try -min 0 -max 10 -warn 0
+	Classy::NumEntry .try -label try -min 0 -max 10 -warn 0
 	pack .try
 	.try set 5
 	.try set 20
 	.try get
 } {5}
 
-test NumEntry {int} {
+test Classy::NumEntry {int} {
 	classyclean
-	NumEntry .try -label try -min 0 -max 10 -constraint int -warn 0
+	Classy::NumEntry .try -label try -min 0 -max 10 -constraint int -warn 0
 	pack .try
 	.try set 5
 	.try set 5.5
 	.try get
 } {5}
 
-test NumEntry {int} {
+test Classy::NumEntry {int} {
 	classyclean
-	NumEntry .try -label try -min 0 -max 10 -constraint int \
+	Classy::NumEntry .try -label try -min 0 -max 10 -constraint int \
 		-command {set ::try} -warn 0
 	pack .try
 	update

@@ -1,5 +1,3 @@
-#Functions
-
 Classy::Dialog subclass printdialog
 printdialog method init args {
 	if {"$args" == "___Classy::Builder__create"} {return $object}
@@ -9,4 +7,3 @@ printdialog method init args {
 
 	# Configure initial arguments
 	if {"$args" != ""} {eval $object configure $args}}
-

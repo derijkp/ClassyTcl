@@ -67,5 +67,31 @@ test Classy::DynaMenu {activemenu} {
 	bind Test_active
 } {<Alt-Key-b>}
 
+test Classy::DynaMenu {topmenu} {
+	classyclean
+	set menudata {
+		menu "Edit" {
+			action "Select Tree" {selecttree $canvas} <<SelectTree>>
+			action "Select Drawing" {selectall} <<SelectAll>>
+			action "Deselect" {escape} <<Escape>>
+			action "Copy objects" {copyobjects} <<Copy>>
+			action "Copy selection to clipboard" {copyclipboard sel} <<CopySel>>
+			action "Copy drawing to clipboard" {copyclipboard $drawing} <<CopyDrawing>>
+			action "Copy page to clipboard" {copyclipboard all} <<CopyPage>>
+		}
+	}
+	text .b -width 10 -height 5
+	text .t -width 10 -height 5
+	pack .b .t -side left -fill both -expand yes
+	Classy::DynaMenu define Test $menudata
+	Classy::DynaMenu attachmainmenu Test .t
+	Classy::DynaMenu attachmainmenu Test .b
+	Classy::DynaMenu attachmenu Test .t
+	bindtags .t "Test_active [bindtags .t]"
+	bindtags .b "Test_active [bindtags .b]"
+	manualtest
+	set try 1
+} {1}
+
 testsummarize
 

@@ -34,11 +34,10 @@ Classy::ScrolledText method init {args} {
 	Classy::Text $object.text -wrap none \
 		-xscrollcommand "$object xset" \
 		-yscrollcommand "$object yset"
-	scrollbar $object.xscroll -command "::Classy::rebind::$object.text xview" -orient horizontal
-	scrollbar $object.yscroll -command "::Classy::rebind::$object.text yview" -orient vertical
+	scrollbar $object.xscroll -command "$object.text xview" -orient horizontal
+	scrollbar $object.yscroll -command "$object.text yview" -orient vertical
 	bindtags $object [lreplace [bindtags $object] 2 0 Classy::Text]
-	$object _rebind $object.text
-	bind $object <FocusIn> [list focus $object.text]
+	Classy::rebind $object.text $object
 	grid $object.text -column 0 -row 0 -sticky nwse
 	grid columnconfigure $object 0 -weight 1
 	grid rowconfigure $object 0 -weight 1
@@ -59,16 +58,16 @@ Classy::ScrolledText method init {args} {
 # ------------------------------------------------------------------
 #  Widget options
 # ------------------------------------------------------------------
-Classy::ScrolledText chainoptions {::Classy::rebind::$object.text}
-Classy::ScrolledText chainoption -background {$object} -background {::Classy::rebind::$object.text} -background
-Classy::ScrolledText chainoption -highlightbackground {$object} -highlightbackground {::Classy::rebind::$object.text} -highlightbackground
-Classy::ScrolledText chainoption -highlightcolor {$object} -highlightcolor {::Classy::rebind::$object.text} -highlightcolor
+Classy::ScrolledText chainoptions {$object.text}
+Classy::ScrolledText chainoption -background {$object} -background {$object.text} -background
+Classy::ScrolledText chainoption -highlightbackground {$object} -highlightbackground {$object.text} -highlightbackground
+Classy::ScrolledText chainoption -highlightcolor {$object} -highlightcolor {$object.text} -highlightcolor
 
 # ------------------------------------------------------------------
 #  Methods
 # ------------------------------------------------------------------
 
-Classy::ScrolledText chainallmethods {::Classy::rebind::$object.text} Classy::Text
+Classy::ScrolledText chainallmethods {$object.text} Classy::Text
 
 #doc {ScrolledText command redraw} cmd {
 #pathname redraw 

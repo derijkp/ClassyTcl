@@ -89,6 +89,15 @@ test class {Base destroy -> children destroyed?} {
 	info command try
 } {}
 
+test class {Base destroy -> destroy method executed ?} {
+	clean
+	set ::temp 0
+	Base method destroy {} {set ::temp 1}
+	Base new try
+	try destroy
+	set ::temp
+} {1}
+
 test class {object destroy in method} {
 	clean
 	Base method try {} {
@@ -109,6 +118,26 @@ test class {object destroy in destroy} {
 	try destroy
 	info command try
 } {}
+
+test class {destroy method info} {
+	clean
+	Base method destroy {} {puts destroyed}
+	Base info method body destroy
+} {puts destroyed}
+
+test class {init method info} {
+	clean
+	Base method init {} {puts init}
+	Base info method body init
+} {puts init}
+
+#test class {rename to {} destroys?} {
+#	clean
+#	Base new try
+#	try private try 1
+#	rename try {}
+#	getprivate try try
+#} {can't read "::class::try,,v,try": no such variable} 1
 
 test class {nop} {
 	clean

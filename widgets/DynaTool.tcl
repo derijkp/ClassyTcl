@@ -69,6 +69,9 @@ Classy::DynaTool method init {args} {
 
 Classy::DynaTool chainoptions {$object}
 
+#doc {DynaTool options -type} option {-type type Type} descr {
+# sets the type of the tool
+#}
 Classy::DynaTool addoption -type {type Type {}} {
 	private $object data options
 	private $class tooldata tools
@@ -90,7 +93,7 @@ Classy::DynaTool addoption -type {type Type {}} {
 	}
 	set list [splitcomplete $tooldata($value)]
 	if {[lsearch -regexp $list "^\[\t \]*nodisplay\[\t \]*\$"] != -1} {
-		[Classy::window $object] configure -height 0 -width $options(-width)
+		[Classy::window $object] configure -height 0 -width 0
 		return
 	}
 	foreach current $list {
@@ -175,6 +178,30 @@ Classy::DynaTool addoption -cmdw {cmdw Cmdw {}} {
 
 Classy::DynaTool addoption -width {width Width 0} {
 	[Classy::window $object] configure -width $value
+	Classy::todo $object redraw
+}
+
+Classy::DynaTool addoption -height {height Height 0} {
+	[Classy::window $object] configure -height $value
+	Classy::todo $object redraw
+}
+
+#doc {DynaTool options -orient} option {-orient orient Orient} descr {
+# sets the orientation of the tool; can be horizontal or vertical
+#}
+Classy::DynaTool addoption -orient {orient Orient horizontal} {
+	if ![inlist {horizontal vertical} $value] {error "wrong option \"$value\": must be horizontal or vertical"}
+	Classy::todo $object redraw
+}
+
+#doc {DynaTool options -max} option {-max max Max} descr {
+# sets the maximum number of lines (or columns) the buttonbar will take when wrapping
+#}
+Classy::DynaTool addoption -max {max Max {}} {
+	if [string length $value] {
+		if ![isint $value] {error "-max value should be an integer or empty"}
+	}
+	Classy::todo $object redraw
 }
 
 # ------------------------------------------------------------------
@@ -374,9 +401,94 @@ Classy::DynaTool method reqheight {tool} {
 
 Classy::DynaTool method _placetopfirst {} {
 	private $object data options
-	set mh 0
-	set x 0
-	if [info exists data(slaves)] {
+	if [string_equal $options(-orient) horizontal] {
+		set mh 0
+		set x [$object cget -bd]
+		if [info exists data(slaves)] {
+			foreach slave $data(slaves) {
+				if {"$slave"=="separator"} {
+					set w 5
+					set h 0
+				} elseif ![winfo exists $slave] {
+					continue
+				} else {
+					set w [winfo reqwidth $slave]
+					set h [winfo reqheight $slave]
+					if {$h>$mh} {set mh $h}
+				}
+				if {"$slave"!="separator"} {
+					place forget $slave
+					place $slave -x $x -y 1 -in $object
+					raise $slave
+				}
+				incr x $w
+			}
+		}
+		incr mh [expr {2*[$object cget -bd]}]
+		incr x [$object cget -bd]
+		incr x 1
+		if {$options(-height) > 0} {
+			[Classy::window $object] configure -height $options(-height)
+		} else {
+			[Classy::window $object] configure -height $mh
+		}
+		if {$options(-width) > 0} {
+			[Classy::window $object] configure -width $options(-width)
+		} else {
+			[Classy::window $object] configure -width $x
+		}
+	} else {
+		set mw 0
+		set y [$object cget -bd]
+		if [info exists data(slaves)] {
+			foreach slave $data(slaves) {
+				if {"$slave"=="separator"} {
+					set h 5
+					set w 0
+				} elseif ![winfo exists $slave] {
+					continue
+				} else {
+					set w [winfo reqwidth $slave]
+					set h [winfo reqheight $slave]
+					if {$w>$mw} {set mw $w}
+				}
+				if {"$slave"!="separator"} {
+					place forget $slave
+					place $slave -x 1 -y $y -in $object
+					raise $slave
+				}
+				incr y $h
+			}
+		}
+		incr mw [expr {2*[$object cget -bd]}]
+		incr y [$object cget -bd]
+		incr y 1
+		if {$options(-width) > 0} {
+			[Classy::window $object] configure -width $options(-width)
+		} else {
+			[Classy::window $object] configure -width $mw
+		}
+		if {$options(-height) > 0} {
+			[Classy::window $object] configure -height $options(-height)
+		} else {
+			[Classy::window $object] configure -height $y
+		}
+	}
+}
+
+Classy::DynaTool method redraw {} {
+	private $object data options
+	if ![info exists data(slaves)] {return 0}
+	set keep [bind $object <Configure>]
+	bind $object <Configure> {}
+	set line 1
+	if [string_equal $options(-orient) horizontal] {
+		set width [expr [winfo width $object]-[$object cget -bd]-1]
+		set y [$object cget -bd]
+		set mh 0
+		set x [$object cget -bd]
+		set xs ""
+		set curslaves ""
 		foreach slave $data(slaves) {
 			if {"$slave"=="separator"} {
 				set w 5
@@ -388,66 +500,83 @@ Classy::DynaTool method _placetopfirst {} {
 				set h [winfo reqheight $slave]
 				if {$h>$mh} {set mh $h}
 			}
+			set temp [expr $x+$w]
+			if {$temp>$width} {
+				foreach temp $curslaves {
+					place $temp -height $mh
+				}
+				set curslaves ""
+				incr line
+				if {[string length $options(-max)] && ($line > $options(-max))} break
+				set x 0
+				incr y $mh
+				set mh $h
+			}
 			if {"$slave"!="separator"} {
+				lappend curslaves $slave
 				place forget $slave
-				place $slave -x $x -y 1 -in $object
+				place $slave -x $x -y $y -in $object
 				raise $slave
 			}
 			incr x $w
 		}
-	}
-	incr mh [$object cget -bd]
-	[Classy::window $object] configure -height $mh
-	if {$options(-width) == 0} {
-		[Classy::window $object] configure -width [expr $x+2*[$object cget -bd]+1]
-	}
-}
-
-Classy::DynaTool method redraw {} {
-	private $object data
-	if ![info exists data(slaves)] {return 0}
-	set keep [bind $object <Configure>]
-	bind $object <Configure> {}
-	set width [expr [winfo width $object]-2*[$object cget -bd]-1]
-	set y 0
-	set mh 0
-	set x 0
-	set xs ""
-	set curslaves ""
-	foreach slave $data(slaves) {
-		if {"$slave"=="separator"} {
-			set w 5
-			set h 0
-		} elseif ![winfo exists $slave] {
-			continue
+		foreach temp $curslaves {
+			place $temp -height $mh
+		}
+		set y [expr $y+$mh+2*[$object cget -bd]+1]
+		if {$options(-height) > 0} {
+			[Classy::window $object] configure -height $options(-height)
 		} else {
-			set w [winfo reqwidth $slave]
-			set h [winfo reqheight $slave]
-			if {$h>$mh} {set mh $h}
+			[Classy::window $object] configure -height $y
 		}
-		set temp [expr $x+$w]
-		if {$temp>$width} {
-			foreach temp $curslaves {
-				place $temp -height $mh
+	} else {
+		set height [expr [winfo height $object]-[$object cget -bd]-1]
+		set x [$object cget -bd]
+		set mw 0
+		set y [$object cget -bd]
+		set ys ""
+		set curslaves ""
+		foreach slave $data(slaves) {
+			if {"$slave"=="separator"} {
+				set h 5
+				set w 0
+			} elseif ![winfo exists $slave] {
+				continue
+			} else {
+				set w [winfo reqwidth $slave]
+				set h [winfo reqheight $slave]
+				if {$w>$mw} {set mw $w}
 			}
-			set curslaves ""
-			set x 0
-			incr y $mh
-			set mh $h
+			set temp [expr $y+$h]
+			if {$temp>$height} {
+				foreach temp $curslaves {
+					place $temp -width $mw
+				}
+				incr line
+				if {[string length $options(-max)] && ($line > $options(-max))} break
+				set curslaves ""
+				set y 0
+				incr x $mw
+				set mw $w
+			}
+			if {"$slave"!="separator"} {
+				lappend curslaves $slave
+				place forget $slave
+				place $slave -x $x -y $y -in $object
+				raise $slave
+			}
+			incr y $h
 		}
-		if {"$slave"!="separator"} {
-			lappend curslaves $slave
-			place forget $slave
-			place $slave -x $x -y $y -in $object
-			raise $slave
+		foreach temp $curslaves {
+			place $temp -width $mw
 		}
-		incr x $w
+		set x [expr $x+$mw+2*[$object cget -bd]+1]
+		if {$options(-width) > 0} {
+			[Classy::window $object] configure -width $options(-width)
+		} else {
+			[Classy::window $object] configure -width $x
+		}
 	}
-	foreach temp $curslaves {
-		place $temp -height $mh
-	}
-	set y [expr $y+$mh+2*[$object cget -bd]+1]
-	$object configure -height $y
 	after idle "bind $object <Configure> [list $keep]"
 }
 

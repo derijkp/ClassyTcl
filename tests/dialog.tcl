@@ -193,13 +193,13 @@ test Classy::InputDialog {basic} {
 	set ::try
 } {try}
 
-test Classy::SaveDialog {basic} {
-	classyclean
-	Classy::SaveDialog .try -textvariable colfile
-	.try set try
-	file tail [.try get]
-} {try}
-
+#test Classy::SaveDialog {basic} {
+#	classyclean
+#	Classy::SaveDialog .try -textvariable colfile
+#	.try set try
+#	file tail [.try get]
+#} {try}
+#
 test Classy::savefile {basic} {
 	classyclean
 	file tail [Classy::savefile -initialfile try]

@@ -76,7 +76,7 @@ Classy::Help chainoption -highlightcolor {$object} -highlightcolor {$object.html
 # ------------------------------------------------------------------
 #  Methods
 # ------------------------------------------------------------------
-Classy::Help chainallmethods {$object.html} HTML
+Classy::Help chainallmethods {$object.html} Classy::HTML
 
 #doc {Help command gethelp} cmd {
 #pathname gethelp name

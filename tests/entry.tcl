@@ -90,6 +90,22 @@ test Classy::Entry {gridlabel} {
 	.try cget -label
 } {short}
 
+test Classy::Entry {textvariable} {
+	classyclean
+	Classy::Entry .try -textvariable try
+	pack .try
+	set ::try t
+	.try get
+} {t}
+
+test Classy::Entry {textvariable set before} {
+	classyclean
+	set ::try t
+	Classy::Entry .try -textvariable try
+	pack .try
+	.try get
+} {t}
+
 test Classy::FileEntry {create and configure} {
 	classyclean
 	Classy::FileEntry .try

@@ -441,27 +441,7 @@ proc ::class::info_ {class object arg} {
 			}
 		method {
 			set name [lindex $arg 2]
-			if {"$name" != "init"} {
-				switch [lindex $arg 1] {
-					body {
-						set body [info body ::class::${class},,m,$name]
-						regsub "^#.+\n" $body {} body
-						return $body
-					}
-					args {
-						return [lrange [info args ::class::${class},,m,$name] 2 end]
-					}
-					default {
-						if {$len != 5} {
-							return -code error "wrong # args: should be \"$object info method default arg varname\""
-						}
-						return [uplevel 2 info default ::class::${class},,m,$name [lindex $arg 3] [lindex $arg 4]]
-					}
-					default {
-						return -code error "wrong option \"[lindex $arg 1]\" must be body, args or default"
-					}
-				}
-			} else {
+			if {"$name" == "init"} {
 				set tmpclass $class
 				while 1 {
 					set proc ::class::${tmpclass},,$name
@@ -469,24 +449,28 @@ proc ::class::info_ {class object arg} {
 					if {"$tmpclass" == "Class"} {return {}}
 					set tmpclass [set ::class::parent($tmpclass)]
 				}
-				switch [lindex $arg 1] {
-					body {
-						set body [info body $proc]
-						regsub "^#.+\n" $body {} body
-						return $body
+			} elseif {"$name" == "destroy"} {
+				set proc ::class::${class},,destroy
+			} else {
+				set proc ::class::${class},,m,$name
+			}
+			switch [lindex $arg 1] {
+				body {
+					set body [info body $proc]
+					regsub "^#.+\n" $body {} body
+					return $body
+				}
+				args {
+					return [lrange [info args $proc] 2 end]
+				}
+				default {
+					if {$len != 5} {
+						return -code error "wrong # args: should be \"$object info method default arg varname\""
 					}
-					args {
-						return [lrange [info args $proc] 2 end]
-					}
-					default {
-						if {$len != 5} {
-							return -code error "wrong # args: should be \"$class info classmethod default arg varname\""
-						}
-						return [uplevel 2 info default $proc [lindex $arg 3] [lindex $arg 4]]
-					}
-					default {
-						return -code error "wrong option \"[lindex $arg 0]\" must be body, args or default"
-					}
+					return [uplevel 2 info default $proc [lindex $arg 3] [lindex $arg 4]]
+				}
+				default {
+					return -code error "wrong option \"[lindex $arg 1]\" must be body, args or default"
 				}
 			}
 		}
@@ -718,20 +702,6 @@ namespace eval ::class {
 	set parent(Class) ""
 }
 
-#proc ::Class {cmd args} {
-#	if [regexp {^\.} $cmd] {set args [concat $cmd $args];set cmd new}
-#	if {"[info commands ::class::Class,,cm,${cmd}]" != ""} {
-#		if [catch {uplevel ::class::Class,,cm,${cmd} Class $args} result] {
-#			set error [::class::classerror Class Class $result $cmd $args]
-#			return -code error -errorinfo [set ::errorInfo] $error
-#		}
-#	} elseif [catch {uplevel ::class::Class,,m,${cmd} Class Class $args} result] {
-#		set error [::class::classerror Class Class $result $cmd $args]
-#		return -code error -errorinfo [set ::errorInfo] $error
-#	}
-#	return $result
-#}
-
 proc ::Class {cmd args} {
 	if [regexp {^\.} $cmd] {set args [concat $cmd $args];set cmd new}
 	if [catch {uplevel ::class::Class,,cm,${cmd} Class $args} result] {
@@ -939,3 +909,18 @@ Class method trace {command} {
 	}
 	proc ::$object [info args $object] $temp
 }
+
+#if ![llength [info commands ::Tk::rename]] {
+#	rename rename ::Tk::rename
+#}
+#proc rename {oldName newName} {
+#	if ![regexp ^:: $oldName] {
+#		set oldName [uplevel 1 namespace current]::$oldName
+#	}
+#	regsub ^(::)+ $oldName {} temp
+#	if {![string length $newName] && [info exists ::class::parent($temp)]} {
+#		$oldName destroy
+#	} else {
+#		uplevel 1 [list ::Tk::rename $oldName $newName]
+#	}
+#}

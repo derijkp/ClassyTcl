@@ -90,6 +90,19 @@ test Classy::Toplevel {gridded} {
 	manualtest
 } {}
 
+test Classy::Toplevel {do not execute destroycommand when error in init} {
+	classyclean
+	Classy::Toplevel subclass Test
+	Test method init {args} {
+		super init
+		$object configure -destroycommand {set ::try 1}
+		error error
+	}
+	set ::try 0
+	catch {Test .try} res
+	set ::try
+} {0}
+
 
 testsummarize
 

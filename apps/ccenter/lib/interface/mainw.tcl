@@ -1,9 +1,3 @@
-proc main args {
-	set ::clock(format) [Classy::Default get app clock_format "%b %d %H:%M:%S"]
-	mainw .mainw
-	clock_update
-}
-
 Classy::Toplevel subclass mainw
 mainw method init args {
 	super init
@@ -65,4 +59,3 @@ $w.edit connect [$object.tools.connect get]}]
 $object.tools.cmd clearall
 	return $object
 }
-

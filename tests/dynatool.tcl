@@ -69,7 +69,7 @@ test Classy::DynaTool {misc} {
 		action "OK" "OK" {%W insert end OK}
 		label label "Just a label"
 		tool tproc "Proc"
-		widget Entry "Entry" {-command {invoke v {puts %W:$v}}}
+		widget Classy::Entry "Entry" {-command {invoke v {puts %W:$v}}}
 		check copy "Copy" {-variable copy -command {puts %W:$copy}}
 		radio opt1 "opt1" {-variable opt -value opt1 -command {puts %W:$opt}}
 		radio opt2 "opt2" {-variable opt -value opt2 -command {puts %W:$opt}}
@@ -96,7 +96,7 @@ test Classy::DynaTool {%W stress test} {
 		action "OK" "OK" {%W insert end OK}
 		label label "Just a label"
 		tool tproc "Proc"
-		widget Entry "Entry" {-command {invoke v {puts %W:$v}}}
+		widget Classy::Entry "Entry" {-command {invoke v {puts %W:$v}}}
 		check copy "Copy" {-variable copy(%W) -command {puts %W:$copy(%W)}}
 		radio opt1 "opt1" {-variable opt -value opt1 -command {puts %W:$opt}}
 		radio opt2 "opt2" {-variable opt -value opt2 -command {puts %W:$opt}}
@@ -110,5 +110,32 @@ test Classy::DynaTool {%W stress test} {
 	manualtest
 } {}
 
+test Classy::DynaTool {%W stress test -orient vertical} {
+	classyclean
+	catch {unset ::copy}
+	catch {unset ::opt}
+	proc tproc {w} {
+		Classy::Entry $w
+		return [list $w configure -command [list invoke {v} {puts %W:$v}]]
+	}
+	Classy::DynaTool define Test {
+		action "Test" "Test" {%W insert end test}
+		action "OK" "OK" {%W insert end OK}
+		label label "Just a label"
+		tool tproc "Proc"
+		widget Classy::Entry "Entry" {-command {invoke v {puts %W:$v}}}
+		check copy "Copy" {-variable copy(%W) -command {puts %W:$copy(%W)}}
+		radio opt1 "opt1" {-variable opt -value opt1 -command {puts %W:$opt}}
+		radio opt2 "opt2" {-variable opt -value opt2 -command {puts %W:$opt}}
+	}
+	entry .e
+	Classy::DynaTool .try -cmdw .text -orient vertical
+	.try configure -type Test
+	text .text
+	pack .try .text -side left -fill y
+	manualtest
+} {}
+
 testsummarize
 
+pack forget .try .text

@@ -142,3 +142,5 @@ set auto_index(::Classy::WindowBuilder::attr_Classy::Selector_-type) [list sourc
 set auto_index(::Classy::WindowBuilder::edit_Classy::Selector) [list source [file join $dir classy_selector.tcl]]
 set auto_index(::Classy::WindowBuilder::add_Classy::CmdWidget) [list source [file join $dir classy_cmdwidget.tcl]]
 set auto_index(::Classy::WindowBuilder::edit_Classy::CmdWidget) [list source [file join $dir classy_cmdwidget.tcl]]
+
+# Addition of ClassyTcl classes defined in the directory

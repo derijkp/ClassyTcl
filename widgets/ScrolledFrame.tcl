@@ -34,8 +34,7 @@ Classy::ScrolledFrame method init {args} {
 	super init
 	frame $object.view
 	frame $object.view.frame
-	$object _rebind $object.view.frame
-	bind $object <FocusIn> [list focus $object.view.frame]
+	Classy::rebind $object.view.frame $object
 	grid $object.view -column 0 -row 0 -sticky nwse
 	grid $object.view.frame -column 0 -row 0 -sticky nwse
 	# REM Configure initial arguments
@@ -44,7 +43,7 @@ Classy::ScrolledFrame method init {args} {
 	Classy::todo $object redraw
 	return $object.view.frame
 }
-Classy::ScrolledFrame component frame {::Classy::rebind::$object.view.frame}
+Classy::ScrolledFrame component frame {$object.view.frame}
 
 # ------------------------------------------------------------------
 #  Widget destroy

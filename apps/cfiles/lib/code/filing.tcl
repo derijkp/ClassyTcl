@@ -67,7 +67,8 @@ proc setfile {w file} {
 	global status
 	set status($w,file) $file
 	set status($w,keepfile) $file
-	$w active set $file
+	catch {$w active $file} result
+	catch {$w selection set $file} result
 }
 
 proc file_rename {w file} {
