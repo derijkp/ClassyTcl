@@ -220,6 +220,9 @@ Fonts {
 		Execute {_key <<ExecuteCmd>> {command} {Execute command key}}
 		HistoryUp {_key <<HistoryUp>> {HistoryUp key}}
 		HistoryDown {_key <<HistoryDown>> {HistoryDown key}}
+		Configure {_key <<Configure>> {Configure key}}
+		ConfigureMenu {_key <<ConfigureMenu>> {Configure Menu key}}
+		ConfigureTool {_key <<ConfigureTool>> {Configure Tool key}}
 	}
 	Table {
 		Singeline {

@@ -923,6 +923,13 @@ test class {propagate method to non existing} {
 	try try
 } {ok}
 
+test class {propagate classmethod to non existing} {
+	clean
+	Base subclass Test
+	Base classmethod try {} {return ok}
+	Base try
+} {ok}
+
 test class {propagate method to overwrite} {
 	clean
 	Base method try {} {return notok}
@@ -930,6 +937,14 @@ test class {propagate method to overwrite} {
 	Base method try {} {return ok}
 	Test new try
 	try try
+} {ok}
+
+test class {propagate classmethod to overwrite} {
+	clean
+	Base classmethod try {} {return notok}
+	Base subclass Test
+	Base classmethod try {} {return ok}
+	Base try
 } {ok}
 
 test class {propagate method: dont overwrite new methods} {
@@ -1221,12 +1236,31 @@ test class {method with argument with no name} {
 	Try method test {try {}} {}
 } {procedure "Try,,m,test" has argument with no name} 1
 
-test class {method with argument with no name} {
+test class {classmethod with argument with no name} {
 	clean
 	catch {Try destroy}
 	Class subclass Try
 	Try classmethod test {try {}} {}
 } {procedure "Try,,cm,test" has argument with no name} 1
+
+test class {method definition error -> old still exists?} {
+	clean
+	catch {Try destroy}
+	Class subclass Try
+	Try method test a {return $a}
+	catch {Try method test {try {}} {}}
+	Try new try
+	try test 1
+} {1}
+
+test class {classmethod definition error -> old still exists?} {
+	clean
+	catch {Try destroy}
+	Class subclass Try
+	Try classmethod test a {return $a}
+	catch {Try classmethod test {try {}} {}}
+	Try test 1
+} {1}
 
 #test class {info args init} {
 #	clean

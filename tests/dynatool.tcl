@@ -1,6 +1,6 @@
 #!/bin/sh
 # the next line restarts using wish \
-exec wish8.0 "$0" "$@"
+exec wish8.3 "$0" "$@"
 
 source tools.tcl 
 
@@ -36,7 +36,7 @@ test Classy::DynaTool {no display} {
 
 test Classy::DynaTool {pictures} {
 	classyclean
-	Classy::DynaTool .try -type Classy::Dummy -cmdw .text
+	Classy::DynaTool .try -type Classy_Dummy -cmdw .text
 	pack .try -fill x
 	text .text
 	pack .text -side bottom

@@ -19,21 +19,21 @@ int Classy_CreateTclClassMethod _ANSI_ARGS_((Tcl_Interp *interp,
 	Tcl_Obj *name,
 	Tcl_Obj *args,
 	Tcl_Obj *body,
-	char *rname));	
+	Tcl_Obj *rname));	
 
 int Classy_CreateTclMethod _ANSI_ARGS_((Tcl_Interp *interp,
 	Method *method,
 	Tcl_Obj *name,
 	Tcl_Obj *args,
 	Tcl_Obj *body,
-	char *rname));	
+	Tcl_Obj *rname));	
 
-void Classy_CopyMethods _ANSI_ARGS_((Tcl_HashTable *src,
-	Tcl_HashTable *dst));
+void Classy_CopyMethods _ANSI_ARGS_((Classy_HashTable *src,
+	Classy_HashTable *dst));
 
-int Classy_CopyMethod _ANSI_ARGS_((Tcl_HashTable *src,
-	Tcl_HashTable *dst,
-	char *name));
+int Classy_CopyMethod _ANSI_ARGS_((Classy_HashTable *src,
+	Classy_HashTable *dst,
+	Tcl_Obj *name));
 
 Classy_Method Classy_ClassMethodClassMethod;
 Classy_Method Classy_DeleteClassMethodClassMethod;

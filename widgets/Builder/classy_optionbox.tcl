@@ -64,7 +64,10 @@ proc ::Classy::WindowBuilder::generate_Classy::OptionBox {object base} {
 	foreach b [$base items] {
 		catch {append body "\t$outw add [list $b] [list [[$base button $b] cget -text]]\n"}
 	}
-	append body "\t$outw set [list [$base get]]\n"
+	set value [$base get]
+	if [string length $value] {
+		append body "\t$outw set [list $value]\n"
+	}
 	return $body
 }
 

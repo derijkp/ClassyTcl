@@ -27,14 +27,6 @@
 #  Widget creation
 # ------------------------------------------------------------------
 
-catch {destroy .classy__.temp}
-canvas .classy__.temp
-if ![catch {.classy__.temp create line 10 10 10 10 -activefill red}] {
-	set Classy::dashpatch 1
-} else {
-	set Classy::dashpatch 0
-}
-
 Widget subclass Classy::Canvas
 
 Classy::Canvas method init {args} {
@@ -284,8 +276,7 @@ Classy::Canvas method _undoone {current} {
 		create {
 			set item [lindex $current 0]
 			set del($item) [$w gettags $item]
-			$w itemconfigure $item -tags {_del}
-			$w move $item -10000 -10000
+			$w itemconfigure $item -tags {_del} -state hidden
 			$w lower $item
 		}
 		delete {
@@ -295,8 +286,7 @@ Classy::Canvas method _undoone {current} {
 			incr i -1
 			for {} {$i > -1} {incr i -1} {
 				set item [lindex $items $i]
-				$w itemconfigure $item -tags $del($item)
-				$w move $item 10000 10000
+				$w itemconfigure $item -tags $del($item) -state normal
 				set above [lindex $poss $i]
 				if [string length $above] {
 					$w lower $item $above
@@ -470,17 +460,15 @@ Classy::Canvas method _redoone {current} {
 		}
 		create {
 			set item [lindex $current 0]
-			$w itemconfigure $item -tags $del($item)
+			$w itemconfigure $item -tags $del($item) -state normal
 			unset del($item)
-			$w move $item 10000 10000
 			$w raise $item
 		}
 		delete {
 			set items [lindex $current 0]
 			foreach item $items {
 				set del($item) [$w gettags $item]
-				$w itemconfigure $item -tags {_del}
-				$w move $item -10000 -10000
+				$w itemconfigure $item -tags {_del} -state hidden
 			}
 		}
 		addtag {
@@ -762,20 +750,6 @@ proc Classy::Canvas_create_window {object w arg extra} {
 	return [eval $w create window $arg]
 }
 
-if $::Classy::dashpatch {
-
-Classy::Canvas method create {type args} {
-	private $object w data
-	if $data(changedcommand) {uplevel #0 [getprivate $object options(-changedcommand)]}
-	set item [Classy::Canvas_create_$type $object $w $args {-disabledfill red}]
-	if $data(undo) {
-		$object addundo [list create $item] [list create $item]
-	}
-	return $item
-}
-
-} else {
-
 Classy::Canvas method create {type args} {
 	private $object w data
 	if $data(changedcommand) {uplevel #0 [getprivate $object options(-changedcommand)]}
@@ -784,8 +758,6 @@ Classy::Canvas method create {type args} {
 		$object addundo [list create $item] [list create $item]
 	}
 	return $item
-}
-
 }
 
 Classy::Canvas method delete {args} {
@@ -809,8 +781,7 @@ Classy::Canvas method delete {args} {
 		foreach item $items {
 			lappend poss [$w find above $item]
 			set del($item) [$w gettags $item]
-			$w itemconfigure $item -tags {_del}
-			$w move $item -10000 -10000
+			$w itemconfigure $item -tags {_del} -state hidden
 		}
 		$object addundo [list delete $items] [list delete $items $poss]
 		return ""

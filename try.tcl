@@ -1,56 +1,61 @@
 source tools.tcl
-set object .try
-Classy_printdialog .try -command {invoke {} {puts $args}}
-
-$object.options.paper.select configure -value
-.try configure -printsize A4
-.try configure -portrait 0
-
-set d .classy__.printdialog
-test Classy::Canvas {print dialog} {
+#set ::class::tkhtmllib [file join $::class::dir tkhtml tkhtml-$tcl_platform(os)-$tcl_platform(machine)[info sharedlibextension]]
+#load $::class::tkhtmllib
 	classyclean
-	Classy::Canvas .try
-	.try configure -papersize A4
-	pack .try -fill both -expand yes
-	set id [.try create text 10 10 -text "A"]
-	.try create text 50 50 -text "B" -font {times 14 bold}
-	.try create line 20 10 60 50 -width 4
-	.try itemconfigure $id -text
-	.try configure -papersize A5-l
-	.try print
-	manualtest
+	Classy::HTML .try -yscrollcommand {.vbar set}
+	scrollbar .vbar -command {.try yview}
+	pack .try -side left -fill both -expand yes
+	pack .vbar -side left -fill y
+	.try geturl file:[file join $::class::dir html_library-0.3 html help.html]
+
+set object .try
+set query {}
+set url file:[file join $::class::dir html_library-0.3 html help.html]
+set url file:[file join $::class::dir html_library-0.3 html sample.html]
+bind .try <2> {%W linkat %x %y}
+bind Classy::HTML <2> {%W linkat %x %y}
+	.try geturl file:[file join $::class::dir html_library-0.3 html help.html]
+	.try geturl file:[file join $::class::dir html_library-0.3 html sample.html]
+	.try geturl file:[file join $::class::dir html_library-0.3 html forms.html]
+	.try geturl http://www.slashdot.org/
+
+test Classy::HTML {create and configure} {
+	classyclean
+	Classy::HTML .try -yscrollcommand {.vbar set}
+	scrollbar .vbar -command {.try yview}
+	pack .try -side left -fill both -expand yes
+	pack .vbar -side left -fill y
+	.try geturl file:[file join $::class::dir html_library-0.3 html help.html]
 } {}
 
-Classy::Builder .builder
-.builder configure -dir /home/peter/dev/ClassyTcl/dialogs
+test Classy::help {create and configure} {
+	classyclean
+	Classy::Help .try
+	.try gethelp ClassyTcl
+} {}
 
-set file /home/peter/dev/ClassyTcl/tests/testapp/lib/interface/mainw.tcl
-set function mainw
-set type toplevel
-set object .builder
-$object _creatededit $object.dedit
-$object.dedit open $file
+if [Classy::yorn "Do you have a network connection"] {
 
-set pos {Menus Application MainMenu}
-set key MainMenu
-set descr {description of menu}
+test Classy::HTML {create and configure} {
+	classyclean
+	Classy::HTML .try -yscrollcommand {.vbar set}
+	scrollbar .vbar -command {.try yview}
+	pack .try -side left -fill both -expand yes
+	pack .vbar -side left -fill y
+	.try geturl http://rrna.uia.ac.be/
+	.try cget -wrap
+} {word}
 
-source tools.tcl
+test Classy::HTML {create and configure} {
+	classyclean
+	Classy::HTML .try -yscrollcommand {.vbar set}
+	scrollbar .vbar -command {.try yview}
+	pack .try -side left -fill both -expand yes
+	pack .vbar -side left -fill y
+	.try geturl http://rrna.uia.ac.be/lsu/query/index.html
+	.try cget -wrap
+} {word}
 
-set file temp.descr
-set file ../conf/conf.descr
-Classy::config_edit $file
+.try bindlink <3> {puts [.try linkat %x %y]}
 
-Classy::config_edit_getdef {}
-
-Classy::config_edit_pos {Menus ClassyTcl}
-Classy::config_edit_pos {Menus ClassyTcl Help}
-Classy::config_edit_pos {Menus ClassyTcl {}}
-
-Classy::config_dialog
-Classy::config_gotokey menu,Classy_Editor
-set key menu,Classy_Editor
-
-Classy::config_dialog {Colors {Basic colors} Foreground}
-
-set pos {Menus ClassyTcl {}}
+}

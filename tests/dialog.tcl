@@ -1,6 +1,6 @@
 #!/bin/sh
 # the next line restarts using wish \
-exec wish8.0 "$0" "$@"
+exec wish8.3 "$0" "$@"
 
 source tools.tcl
 
@@ -172,7 +172,7 @@ test Classy::FileSelect {basic} {
 	classyclean
 	Classy::FileSelect .try
 	.try configure -textvariable try2 -selectmode persistent \
-	    -default try -command {invoke {} {set ::try $args}}
+		-command {invoke {} {set ::try $args}}
 	set w [.try component extra]
 	button $w.test -text "Please select dialog.tcl"
 	pack $w.test -fill x -expand yes

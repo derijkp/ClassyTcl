@@ -8,9 +8,9 @@ menu "File" {
 	separator
 	action "New editor" {edit newfile} <<New>>
 	action "Command window" {Classy::cmd} <<Cmd>>
-	action "Customise application" {Classy::Config dialog} <<Customise>>
-	action "Customise menu" {Classy::Config dialog -node {Menus Classy::Editor}} <<CustomiseMenu>>
-	action "Customise toolbar" {Classy::Config dialog -node {Menus Classy::Editor}} <<CustomiseTool>>
+	action "Configure menu" {Classy::Config dialog -node {Menus ClassyTcl Editor}} <<ConfigureMenu>>
+	action "Configure toolbar" {Classy::Config dialog -node {Menus ClassyTcl Editor}} <<ConfigureTool>>
+	action "Configure application" {Classy::Config dialog} <<Configure>>
 	action "Close" "%W close" <<Close>>
 }
 menu "Edit" {

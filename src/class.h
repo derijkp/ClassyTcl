@@ -7,6 +7,8 @@
  *	 of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  */
 
+#include "hash.h"
+
 typedef struct Method {
 	int copy;
 	void *func;
@@ -21,10 +23,10 @@ typedef struct Class {
 	struct Class *parent;
 	Tcl_Interp *interp;
 	Tcl_Obj *class;
-	Tcl_HashTable methods;
-	Tcl_HashTable classmethods;
-	Tcl_HashTable children;
-	Tcl_HashTable subclasses;
+	Classy_HashTable methods;
+	Classy_HashTable classmethods;
+	Classy_HashTable children;
+	Classy_HashTable subclasses;
 	Method *init;
 	Method *classdestroy;
 	Method *destroy;
@@ -48,12 +50,12 @@ typedef int Classy_Method _ANSI_ARGS_((Tcl_Interp *interp,
 
 EXTERN int Classy_CreateClassMethod _ANSI_ARGS_((Tcl_Interp *interp,
 	char *classname,
-	char *name,
+	Tcl_Obj *name,
 	Classy_Method *func));
 
 EXTERN int Classy_CreateMethod _ANSI_ARGS_((Tcl_Interp *interp,
 	char *classname,
-	char *name,
+	Tcl_Obj *name,
 	Classy_Method *func));
 
 EXTERN Tcl_Obj *Classy_ObjectPrivateVar(

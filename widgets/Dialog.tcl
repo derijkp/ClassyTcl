@@ -74,8 +74,8 @@ Classy::Dialog method init {args} {
 	# -----------------
 	super init
 	Classy::Dialog private options(-title) {title Title "Dialog"}
-	frame $object.options
-	frame $object.actions
+	frame $object.options -highlightthickness 0
+	frame $object.actions -highlightthickness 0
 	button $object.actions.close -text "Close"
 	bindtags $object.actions.close [list_regsub Button [bindtags $object.actions.close] Classy::DialogButton]
 	pack $object.actions.close -side right -expand yes -padx 5 -pady 10

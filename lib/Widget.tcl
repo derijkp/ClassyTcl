@@ -539,5 +539,9 @@ Widget method destroy {} {
 		regexp {^::class::Tk_(.*)$} $c temp child
 		catch {$child destroy}
 	}
+	catch {rename ::class::tempcmd {}}
+	rename $object ::class::tempcmd
+	rename ::class::Tk_$object $object
 	catch {::Tk::destroy $object}
+	rename ::class::tempcmd ::$object
 }

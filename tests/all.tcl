@@ -1,6 +1,6 @@
 #!/bin/sh
 # the next line restarts using wish \
-exec wish8.0 "$0" "$@"
+exec wish8.3 "$0" "$@"
 
 source tools.tcl
 
@@ -22,7 +22,6 @@ alltest canvas.tcl
 alltest chart.tcl
 alltest cmd.tcl
 alltest color.tcl
-alltest config.tcl
 alltest default.tcl
 alltest dialog.tcl
 alltest dragdrop.tcl
@@ -30,7 +29,6 @@ alltest dynamenu.tcl
 alltest dynatool.tcl
 alltest editor.tcl
 alltest entry.tcl
-alltest html.tcl
 alltest notebook.tcl
 alltest numentry.tcl
 alltest selector.tcl
@@ -40,3 +38,5 @@ alltest toplevel.tcl
 alltest tree.tcl
 alltest treewidget.tcl
 alltest varia.tcl
+alltest html.tcl
+alltest config.tcl

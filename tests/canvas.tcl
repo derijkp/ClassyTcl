@@ -1,6 +1,6 @@
 #!/bin/sh
 # the next line restarts using wish \
-exec wish8.0 "$0" "$@"
+exec wish8.3 "$0" "$@"
 
 source tools.tcl
 set object .try
@@ -107,6 +107,17 @@ test Classy::Canvas {not found} {
 	.try create line 20 10 60 50 -width 4
 	.try find withtag try
 } {}
+
+test Classy::Canvas {find &&} {
+	classyclean
+	Classy::Canvas .try
+	pack .try -fill both -expand yes
+	set id [.try create text 10 10 -text "A" -tags {txt try}]
+	.try create text 50 50 -text "B" -font {times 14 bold} -tags txt
+	.try create line 20 10 60 50 -width 4 -tags try
+	set fid [.try find withtag txt && try]
+	expr {$id == $fid}
+} 1
 
 test Classy::Canvas {zoom} {
 	classyclean
@@ -923,7 +934,7 @@ test Classy::Canvas {itemconfigure float width} {
 	set id [.try create line 20 10 60 50 -width 2.2]
 	.try zoom 2
 	.try itemconfigure $id -width
-} {-width {} {} 1 2.2}
+} {-width {} {} 1.0 2.2}
 
 test Classy::Canvas {itemconfigure font} {
 	classyclean

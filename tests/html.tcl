@@ -1,22 +1,19 @@
 #!/bin/sh
 # the next line restarts using wish \
-exec wish8.0 "$0" "$@"
+exec wish8.3 "$0" "$@"
 
 source tools.tcl
-if [Classy::yorn "Do you have a network connection"] {
+
 test Classy::HTML {create and configure} {
 	classyclean
 	Classy::HTML .try -yscrollcommand {.vbar set}
 	scrollbar .vbar -command {.try yview}
 	pack .try -side left -fill both -expand yes
 	pack .vbar -side left -fill y
-	.try geturl http://rrna.uia.ac.be/lsu/query/index.html
 	.try geturl file:[file join $::class::dir html_library-0.3 html help.html]
-	.try geturl http://rrna.uia.ac.be/
-	.try cget -wrap
-} {word}
-.try bindlink <3> {puts [.try linkat %x %y]}
-}
+	.try geturl file:[file join $::class::dir html_library-0.3 html sample.html]
+	.try geturl file:[file join $::class::dir html_library-0.3 html forms.html]
+} {}
 
 test Classy::help {create and configure} {
 	classyclean
@@ -24,6 +21,43 @@ test Classy::help {create and configure} {
 	.try gethelp ClassyTcl
 	.try cget -wrap
 } {word}
+
+test Classy::HTML {tkhtml tests} {
+	classyclean
+	Classy::HTML .try -yscrollcommand {.vbar set}
+	scrollbar .vbar -command {.try yview}
+	pack .try -side left -fill both -expand yes
+	pack .vbar -side left -fill y
+	.try geturl file:[file join $::class::dir tkhtml tests page1 index.html]
+	.try geturl file:[file join $::class::dir tkhtml tests page2 index.html]
+	.try geturl file:[file join $::class::dir tkhtml tests page3 index.html]
+	.try geturl file:[file join $::class::dir tkhtml tests page4 index.html]
+} {}
+
+if [Classy::yorn "Do you have a network connection"] {
+
+test Classy::HTML {create and configure} {
+	classyclean
+	Classy::HTML .try -yscrollcommand {.vbar set}
+	scrollbar .vbar -command {.try yview}
+	pack .try -side left -fill both -expand yes
+	pack .vbar -side left -fill y
+	.try geturl http://rrna.uia.ac.be/
+	.try cget -wrap
+} {word}
+
+test Classy::HTML {create and configure} {
+	classyclean
+	Classy::HTML .try -yscrollcommand {.vbar set}
+	scrollbar .vbar -command {.try yview}
+	pack .try -side left -fill both -expand yes
+	pack .vbar -side left -fill y
+	.try geturl http://rrna.uia.ac.be/lsu/query/index.html
+} {}
+
+.try bindlink <3> {puts [.try linkat %x %y]}
+
+}
 
 testsummarize
 

@@ -338,6 +338,8 @@ Classy::Builder method infile {cmd file args} {
 					} else {
 						set c [lreplace $c $pos $pos $code]
 					}
+					catch {Classy::auto_mkindex [file dirname $file] *.tcl}
+					set ::auto_index($function) [list source $file]
 					$object infile _save $file $function $c
 					catch {rename $function {}}
 				} \
@@ -394,8 +396,6 @@ Classy::Builder method infile {cmd file args} {
 				puts $f $line
 			}
 			close $f
-			catch {Classy::auto_mkindex [file dirname $file] *.tcl}
-			set ::auto_index($function) [list source $file]
 		}
 		ls {
 			if [llength $args] {
@@ -405,7 +405,9 @@ Classy::Builder method infile {cmd file args} {
 			set c [cmd_split [file_read $file]]
 			set result ""
 			foreach line $c {
-				if {"[lindex $line 0]" == "proc"} {
+				if {"[string index $line 0]" == "#"} {
+				} elseif {[llength $line] == 0} {
+				} elseif {"[lindex $line 0]" == "proc"} {
 					lappend types function
 					lappend result [lindex $line 1]
 				} elseif {"[lindex $line 1]" == "method"} {
@@ -477,6 +479,8 @@ Classy::Builder method infile {cmd file args} {
 				$object infile _save $file $function $c
 				catch {rename $function {}}
 				catch {unset ::auto_index($function)}
+				catch {Classy::auto_mkindex [file dirname $file] *.tcl}
+				set ::auto_index($newfunction) [list source $file]
 				return $newfunction
 			}
 			set pos [lsearch -glob $c [list * subclass $function]]

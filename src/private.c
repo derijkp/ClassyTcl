@@ -17,16 +17,16 @@ int Classy_PropagateVar(
 	Tcl_Obj *name,
 	Tcl_Obj *value)
 {
-	Tcl_HashEntry *entry;
-	Tcl_HashSearch search;
+	Classy_HashEntry *entry;
+	Classy_HashSearch search;
 	Class *subclass;
 	Tcl_Obj *val,*temp;
 	int error;
 
-	entry = Tcl_FirstHashEntry(&(class->subclasses), &search);
+	entry = Classy_FirstHashEntry(&(class->subclasses), &search);
 	while(1) {
 		if (entry == NULL) break;
-		subclass = (Class *)Tcl_GetHashValue(entry);
+		subclass = (Class *)Classy_GetHashValue(entry);
 		temp = Tcl_NewObj();
 		Tcl_AppendStringsToObj(temp, "::class::", Tcl_GetStringFromObj(subclass->class,NULL), ",,vd", (char *)NULL);
 		val = Tcl_ObjGetVar2(interp, temp, name, TCL_GLOBAL_ONLY);
@@ -40,7 +40,7 @@ int Classy_PropagateVar(
 			error = Classy_PropagateVar(interp,subclass,name,value);
 			if (error != TCL_OK) {return error;}
 		}
-		entry = Tcl_NextHashEntry(&search);
+		entry = Classy_NextHashEntry(&search);
 	}
 	return TCL_OK;
 }

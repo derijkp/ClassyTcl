@@ -1,6 +1,6 @@
 #!/bin/sh
 # the next line restarts using wish \
-exec wish8.0 "$0" "$@"
+exec wish8.3 "$0" "$@"
 
 source tools.tcl
 set object .try
@@ -148,7 +148,6 @@ test Classy::Selector {key} {
 	pack .try -fill both -expand yes
 	.try configure -state disabled
 	.try configure -state normal -orient vertical
-	.try nocmdset <a>
 	.try set <a>
 	set ::try
 } <a>

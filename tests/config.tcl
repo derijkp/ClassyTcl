@@ -1,6 +1,6 @@
 #!/bin/sh
 # the next line restarts using wish \
-exec wish8.0 "$0" "$@"
+exec wish8.3 "$0" "$@"
 
 source tools.tcl
 if 0 {
@@ -15,7 +15,17 @@ test Classy::Config {basic} {
 	manualtest
 } {}
 
+test Classy::Config {node, level appuser} {
+	Classy::Config dialog -node {Toolbars ClassyTcl Editor} -level appuser
+	update idletasks
+	manualtest
+} {}
+
+test Classy::Config {node, level appdef} {
+	Classy::Config dialog -node {Menus ClassyTcl Editor} -level appdef
+	update idletasks
+	manualtest
+} {}
+
 testsummarize
 
-Classy::Config dialog -node {Menus Classy::Editor} -level appdef
-Classy::Config dialog -node {Toolbars Classy::Editor} -level appuser

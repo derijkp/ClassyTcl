@@ -7,50 +7,66 @@
 # actual Makefile.
 #
 
-# To change the compiler switches, for example to change from -O
-# to -g, change the following line:
-CFLAGS = -g -Wall
+# set to yes to compile with debugging information
+DEBUG=yes
+# set to no to compile without stubs support
+USE_STUBS=no
 
-TCL_SRC=	/usr/src/bs/BUILD/tcltk-8.0.5/tcl8.0.5
-TK_SRC =	/usr/src/bs/BUILD/tcltk-8.0.5/tk8.0.5
-CC = gcc -pipe
-DEFS =  -DHAVE_UNISTD_H=1 -DHAVE_LIMITS_H=1 -DSTDC_HEADERS=1 -DHAVE_SYS_TIME_H=1 -DTIME_WITH_SYS_TIME=1 
+#----------------------------------------------------------------
+# The information below is modified by the configure script when
+# Makefile is generated from Makefile.in.  You shouldn't normally
+# modify any of this stuff by hand.
+#----------------------------------------------------------------
 
-SHLIB_LD = gcc -pipe -shared
-LIBS = -L/usr/X11R6/lib -lX11 -ldl  -lm
-SHLIB_CFLAGS = -fPIC
-SHLIB_LD_LIBS = ${LIBS}
-SHLIB_SUFFIX = .so
-LD_FLAGS = -fPIC
-X11_INCLUDES = -I/usr/X11R6/include
-X11_LIB_SWITCHES = -L/usr/X11R6/lib -lX11
-TCL_LIB_SPEC = -L/usr/lib -ltcl8.0${TCL_DBGX}
-TK_LIB_SPEC = -L/usr/lib -ltk8.0${TK_DBGX}
+PROJECT = classy
+TCLEXE = classytcl
+WISHEXE = classywish
 
-CC_SWITCHES = $(CFLAGS) $(SHLIB_CFLAGS) $(DEFS) -I$(TCL_SRC)/unix -I$(TCL_SRC)/generic \
-			 -I${TK_SRC}/generic -I${TK_SRC}/xlib/X11 ${X11_INCLUDES}
-CLASSYOBJS= class.o private.o object.o method.o classyInit.o
-SRCS= class.c private.c object.c method.c classyInit.c
+ifeq ($(DEBUG),yes)
+	CFLAGS = -g -Wall -Wno-implicit-int 
+else
+	CFLAGS = -O -D__NO_STRING_INLINES -D__NO_MATH_INLINES -Wall -Wno-implicit-int
+endif
+
+ifeq ($(USE_STUBS),yes)
+	LD_LIBS = -L/opt/tcltk/lib -ltclstub8.3${TCL_DBGX} ${LIBS}
+	DEFS =  -DHAVE_UNISTD_H=1 -DHAVE_LIMITS_H=1 -DHAVE_GETCWD=1 -DHAVE_OPENDIR=1 -DHAVE_STRSTR=1 -DHAVE_STRTOL=1 -DHAVE_TMPNAM=1 -DHAVE_WAITPID=1 -DHAVE_UNISTD_H=1 -DHAVE_SYS_PARAM_H=1 -DUSE_TERMIOS=1 -DHAVE_SYS_TIME_H=1 -DTIME_WITH_SYS_TIME=1 -DHAVE_TM_ZONE=1 -DHAVE_TM_GMTOFF=1 -DHAVE_TIMEZONE_VAR=1 -DHAVE_ST_BLKSIZE=1 -DSTDC_HEADERS=1 -DNEED_MATHERR=1 -DHAVE_SIGNED_CHAR=1 -DHAVE_SYS_IOCTL_H=1  -DUSE_TCL_STUBS
+else
+	LD_LIBS = -L/opt/tcltk/lib -ltcl8.3${TCL_DBGX} ${LIBS}
+	LD_LIBS = ${LIBS}
+	DEFS =  -DHAVE_UNISTD_H=1 -DHAVE_LIMITS_H=1 -DHAVE_GETCWD=1 -DHAVE_OPENDIR=1 -DHAVE_STRSTR=1 -DHAVE_STRTOL=1 -DHAVE_TMPNAM=1 -DHAVE_WAITPID=1 -DHAVE_UNISTD_H=1 -DHAVE_SYS_PARAM_H=1 -DUSE_TERMIOS=1 -DHAVE_SYS_TIME_H=1 -DTIME_WITH_SYS_TIME=1 -DHAVE_TM_ZONE=1 -DHAVE_TM_GMTOFF=1 -DHAVE_TIMEZONE_VAR=1 -DHAVE_ST_BLKSIZE=1 -DSTDC_HEADERS=1 -DNEED_MATHERR=1 -DHAVE_SIGNED_CHAR=1 -DHAVE_SYS_IOCTL_H=1 
+endif
+
+INCLUDES = -I/opt/tcltk/include
+CC = cc
+SHLIB_LD =		cc -shared
+SHLIB_SUFFIX =		.so
+
+CC_SWITCHES = $(INCLUDES) $(CFLAGS)	-fPIC $(DEFS)
+TCL_LD_LIBS = -L/opt/tcltk/lib -ltcl8.3${TCL_DBGX} ${LIBS} -ldl  -lieee -lm
+TK_LD_LIBS = -L/opt/tcltk/lib -ltcl8.3${TCL_DBGX} ${LIBS} -L/opt/tcltk/lib -ltk8.3 -L/usr/X11R6/lib -lX11 -ldl  -lieee -lm
+
+OBJECTS= class.o private.o object.o method.o hash.o classyInit.o
 
 # --------------------------- Rules -----------------------------
 
-all: classy$(SHLIB_SUFFIX)
+all: $(PROJECT)${SHLIB_SUFFIX}
 
-classy$(SHLIB_SUFFIX): $(CLASSYOBJS)
-	$(SHLIB_LD) $(CFLAGS) -o ../classy$(SHLIB_SUFFIX) $(CLASSYOBJS)
+$(PROJECT)${SHLIB_SUFFIX}: $(OBJECTS)
+	${SHLIB_LD} $(OBJECTS) -o ../$(PROJECT)$(SHLIB_SUFFIX) $(LD_LIBS)
 
-classytcl: tclAppInit.o $(CLASSYOBJS)
-	$(CC) $(CFLAGS) -o classytcl tclAppInit.o $(CLASSYOBJS) ${TCL_LIB_SPEC} ${LIBS}
+$(TCLEXE): tclAppInit.o $(OBJECTS)
+	${CC} $(CFLAGS) tclAppInit.o $(OBJECTS) -o $(TCLEXE) $(TCL_LD_LIBS)
 
-classywish: tkAppInit.o $(CLASSYOBJS)
-	$(CC) $(CFLAGS) -o classywish tkAppInit.o $(CLASSYOBJS) ${TCL_LIB_SPEC} ${TK_LIB_SPEC} ${LIBS}
+$(WISHEXE): tkAppInit.o $(OBJECTS)
+	${CC} $(CFLAGS) tkAppInit.o $(OBJECTS) -o $(WISHEXE) $(TK_LD_LIBS)
 
 install: 
 	../makedoc.tcl
-	../makedist.tcl /usr/lib /usr/bin
+	../makedist.tcl /opt/tcltk/lib /opt/tcltk/bin
 
 clean:
-	rm -f *.o ../classy$(SHLIB_SUFFIX) ../win/*.csm ../win/tmp/* ../*.dll classywish classytcl
+	rm -f *.o ../$(PROJECT)$(SHLIB_SUFFIX) ../win/*.csm ../win/tmp/* ../*.dll $(WISHEXE) $(TCLEXE)
 
 distclean:
 	rm -f config.cache config.log config.status Makefile

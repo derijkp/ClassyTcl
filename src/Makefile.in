@@ -6,50 +6,66 @@
 # actual Makefile.
 #
 
-# To change the compiler switches, for example to change from -O
-# to -g, change the following line:
-CFLAGS = -g -Wall
+# set to yes to compile with debugging information
+DEBUG=no
+# set to no to compile without stubs support
+USE_STUBS=@USE_STUBS@
 
-TCL_SRC=	@TCL_SRC_DIR@
-TK_SRC =	@TK_SRC_DIR@
-CC = @CC@
-DEFS = @TK_DEFS@
+#----------------------------------------------------------------
+# The information below is modified by the configure script when
+# Makefile is generated from Makefile.in.  You shouldn't normally
+# modify any of this stuff by hand.
+#----------------------------------------------------------------
 
-SHLIB_LD = @SHLIB_LD@
-LIBS = @TK_LIBS@
-SHLIB_CFLAGS = @SHLIB_CFLAGS@
-SHLIB_LD_LIBS = @SHLIB_LD_LIBS@
-SHLIB_SUFFIX = @SHLIB_SUFFIX@
-LD_FLAGS = @SHLIB_CFLAGS@
-X11_INCLUDES = @TK_XINCLUDES@
-X11_LIB_SWITCHES = @TK_XLIBSW@
-TCL_LIB_SPEC = @TCL_LIB_SPEC@
-TK_LIB_SPEC = @TK_LIB_SPEC@
+PROJECT = classy
+TCLEXE = classytcl
+WISHEXE = classywish
 
-CC_SWITCHES = $(CFLAGS) $(SHLIB_CFLAGS) $(DEFS) -I$(TCL_SRC)/unix -I$(TCL_SRC)/generic \
-			 -I${TK_SRC}/generic -I${TK_SRC}/xlib/X11 ${X11_INCLUDES}
-CLASSYOBJS= class.o private.o object.o method.o classyInit.o
-SRCS= class.c private.c object.c method.c classyInit.c
+ifeq ($(DEBUG),yes)
+	CFLAGS = @TCL_CFLAGS_DEBUG@ @TCL_CFLAGS_WARNING@ 
+else
+	CFLAGS = @TCL_CFLAGS_OPTIMIZE@ @TCL_CFLAGS_WARNING@
+endif
+
+ifeq ($(USE_STUBS),yes)
+	LD_LIBS = @TCL_STUB_LIB_SPEC@ @TCL_SHLIB_LD_LIBS@
+	DEFS = @TCL_DEFS@ -DUSE_TCL_STUBS
+else
+	LD_LIBS = @TCL_LIB_SPEC@ @TCL_SHLIB_LD_LIBS@
+	LD_LIBS = @TCL_SHLIB_LD_LIBS@
+	DEFS = @TCL_DEFS@
+endif
+
+INCLUDES = -I@TCL_EXEC_PREFIX@/include
+CC = @TCL_CC@
+SHLIB_LD =		@TCL_SHLIB_LD@
+SHLIB_SUFFIX =		@TCL_SHLIB_SUFFIX@
+
+CC_SWITCHES = $(INCLUDES) $(CFLAGS)	@TCL_SHLIB_CFLAGS@ $(DEFS)
+TCL_LD_LIBS = @TCL_LIB_SPEC@ @TCL_SHLIB_LD_LIBS@ @TCL_LIBS@
+TK_LD_LIBS = @TCL_LIB_SPEC@ @TCL_SHLIB_LD_LIBS@ @TK_LIB_SPEC@ @TK_LIBS@
+
+OBJECTS= class.o private.o object.o method.o hash.o classyInit.o
 
 # --------------------------- Rules -----------------------------
 
-all: classy$(SHLIB_SUFFIX)
+all: $(PROJECT)${SHLIB_SUFFIX}
 
-classy$(SHLIB_SUFFIX): $(CLASSYOBJS)
-	$(SHLIB_LD) $(CFLAGS) -o ../classy$(SHLIB_SUFFIX) $(CLASSYOBJS)
+$(PROJECT)${SHLIB_SUFFIX}: $(OBJECTS)
+	${SHLIB_LD} $(OBJECTS) -o ../$(PROJECT)$(SHLIB_SUFFIX) $(LD_LIBS)
 
-classytcl: tclAppInit.o $(CLASSYOBJS)
-	$(CC) $(CFLAGS) -o classytcl tclAppInit.o $(CLASSYOBJS) ${TCL_LIB_SPEC} ${LIBS}
+$(TCLEXE): tclAppInit.o $(OBJECTS)
+	${CC} tclAppInit.o $(OBJECTS) -o $(TCLEXE) $(TCL_LD_LIBS)
 
-classywish: tkAppInit.o $(CLASSYOBJS)
-	$(CC) $(CFLAGS) -o classywish tkAppInit.o $(CLASSYOBJS) ${TCL_LIB_SPEC} ${TK_LIB_SPEC} ${LIBS}
+$(WISHEXE): tkAppInit.o $(OBJECTS)
+	${CC} tkAppInit.o $(OBJECTS) -o $(WISHEXE) $(TK_LD_LIBS)
 
 install: 
 	../makedoc.tcl
 	../makedist.tcl @INSTALL_DIR@ @BIN_DIR@
 
 clean:
-	rm -f *.o ../classy$(SHLIB_SUFFIX) ../win/*.csm ../win/tmp/* ../*.dll classywish classytcl
+	rm -f *.o ../$(PROJECT)$(SHLIB_SUFFIX) ../win/*.csm ../win/tmp/* ../*.dll $(WISHEXE) $(TCLEXE)
 
 distclean:
 	rm -f config.cache config.log config.status Makefile

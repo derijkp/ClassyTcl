@@ -339,21 +339,6 @@ proc Classy::Config {option args} {
 				Classy::config_level $opt(-level)
 			}
 		}
-		config {
-			if ![winfo exists $window] {
-				eval Classy_config $window
-			}
-			set name [lindex $args 1]
-			switch [lindex $args 0] {
-				menu {set node [concat Menus $name]}
-				tool {set node [concat Toolbars $name]}
-			}
-			set level [lindex $args 2]
-			Classy::config_open $window.browse $node
-			if [string length $level] {
-				Classy::config_selectlevel $window $level
-			}
-		}
 		new {
 			return [eval Classy::newconfig $args]
 		}

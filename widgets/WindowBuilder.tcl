@@ -2023,6 +2023,7 @@ Classy::WindowBuilder method drag {w x y} {
 	} else {
 		set rw $w
 	}
+	if ![string_equal [winfo manager $rw] grid] {return}
 	set name [string tolower [$object itemclass $rw]]
 	regsub -all : $name _ name
 	if [catch {set image [Classy::geticon Builder/$name]}] {
@@ -2073,6 +2074,7 @@ Classy::WindowBuilder method drop {dst} {
 	} else {
 		set newp $dst
 	}
+	if [llength [pack slaves $newp]] {error "destination contains packed widgets"}
 	set x [expr {[winfo pointerx $newp]-[winfo rootx $newp]-1}]
 	set y [expr {[winfo pointery $newp]-[winfo rooty $newp]-1}]
 	foreach {col row} [grid location $newp $x $y] {}

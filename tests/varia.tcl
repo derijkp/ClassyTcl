@@ -1,6 +1,6 @@
 #!/bin/sh
 # the next line restarts using wish \
-exec wish8.0 "$0" "$@"
+exec wish8.3 "$0" "$@"
 source tools.tcl
 
 test Classy::parseopt {basic} {
@@ -165,7 +165,7 @@ test Classy::FontSelector {basic} {
 test Classy::getfont {basic} {
 	classyclean
 	Classy::getfont -font {times 16 {bold italic}}
-} {times 16 {bold roman}}
+} {times 16 {bold italic}}
 
 test Classy::getfont {command} {
 	classyclean
@@ -173,7 +173,7 @@ test Classy::getfont {command} {
 	Classy::getfont -font {times 16 bold italic} -command {set ::temp}
 	tkwait variable temp
 	set ::temp
-} {times 16 {bold roman}}
+} {times 16 {bold italic}}
 
 } else {
 test Classy::FontSelector {basic} {

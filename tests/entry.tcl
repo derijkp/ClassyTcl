@@ -1,6 +1,6 @@
 #!/bin/sh
 # the next line restarts using wish \
-exec wish8.0 "$0" "$@"
+exec wish8.3 "$0" "$@"
 
 source tools.tcl
 
@@ -185,7 +185,8 @@ test Classy::Entry {-default} {
 	Classy::Default set app try {test {test 2}}
 	Classy::Entry .try -label try -default try
 	pack .try -fill x -expand yes
-} {vertical}
+	.try cget -default
+} {try}
 
 test Classy::FileEntry {redefine combo} {
 	classyclean

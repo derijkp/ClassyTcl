@@ -17,15 +17,22 @@ int Classy_ParseArgs(
 	Tcl_Obj *args,
 	int *minptr,
 	int *maxptr,
-	Tcl_Obj *resultargs)
+	Tcl_Obj *rname,
+	Tcl_Obj **resultargs)
 {
-	Tcl_Obj **objv, *temp, *temp2;
+	Tcl_Obj **objv, *temp, *temp2,*rargs;
 	int objc,i,len,min,max,error;
 
 	min = 0;
 	max = 0;
 	error = Tcl_ListObjGetElements(interp, args, &objc, &objv);
 	if (error != TCL_OK) {return error;}
+	if Tcl_IsShared(rname) {
+		rargs = Tcl_DuplicateObj(rname);
+	} else {
+		rargs = rname;
+	}
+	Tcl_IncrRefCount(rargs);
 	if (objc == 0) {
 		min = 0;
 		max = 0;
@@ -36,7 +43,7 @@ int Classy_ParseArgs(
 			if (len == 1) {
 				min++;
 				max++;
-				error = Tcl_ListObjAppendElement(interp, resultargs, objv[i]);
+				error = Tcl_ListObjAppendElement(interp, rargs, objv[i]);
 				if (error == TCL_ERROR) {return error;}
 			} else {
 				max++;
@@ -44,22 +51,23 @@ int Classy_ParseArgs(
 				error = Tcl_ListObjIndex(interp, objv[i], 0, &temp2);
 				if (error == TCL_ERROR) {Tcl_DecrRefCount(temp);return error;}
 				Tcl_AppendStringsToObj(temp,Tcl_GetStringFromObj(temp2,NULL),"?",NULL);
-				error = Tcl_ListObjAppendElement(interp, resultargs, temp);
+				error = Tcl_ListObjAppendElement(interp, rargs, temp);
 				if (error == TCL_ERROR) {return error;}
 			}
 		}
 		if (strcmp(Tcl_GetStringFromObj(objv[objc-1],NULL),"args")==0) {
 			min--;
 			max = -1;
-			error = Tcl_ListObjLength(interp, resultargs, &len);
+			error = Tcl_ListObjLength(interp, rargs, &len);
 			if (error == TCL_ERROR) {return error;}
 			temp = Tcl_NewStringObj("...",3);
-			error = Tcl_ListObjReplace(interp, resultargs, len-1, 1, 1, &temp);
+			error = Tcl_ListObjReplace(interp, rargs, len-1, 1, 1, &temp);
 			if (error == TCL_ERROR) {return error;}
 		}
 	}
 	*minptr = min;
 	*maxptr = max;
+	*resultargs = rargs;
 	return TCL_OK;
 }
 
@@ -147,11 +155,15 @@ int Classy_ExecMethod(
 		objc = 3;
 		for(i=0;i<argc;i++) {
 			objv[objc++] = argv[i];
+			Tcl_IncrRefCount(argv[i]);
 		}
 		objv[objc] = NULL;
 		i = Tcl_GetCommandInfo(interp,Tcl_GetStringFromObj(method->proc,NULL),&cmdinfo);
 		if (i == 0) {return TCL_OK;}
 		error = cmdinfo.objProc(cmdinfo.objClientData,interp,objc,objv);
+		for(i=0;i<argc;i++) {
+			Tcl_DecrRefCount(argv[i]);
+		}
 		return error;
 	} else {
 		error = ((Classy_Method *)method->func)(interp,class,object,argc,argv);
@@ -177,31 +189,33 @@ int Classy_CreateTclClassMethod(
 	Tcl_Obj *name,
 	Tcl_Obj *args,
 	Tcl_Obj *body,
-	char *rname)	
+	Tcl_Obj *rname)	
 {
-	Tcl_Obj *createObj, *realargs;
+	Tcl_Obj *createObj = NULL, *realargs = NULL;
 	int error;
 	method->copy = 0;
 	method->func = NULL;
 	method->proc = name;
 	Tcl_IncrRefCount(method->proc);
-	method->args = Tcl_NewStringObj(rname,strlen(rname));
-	Tcl_IncrRefCount(method->args);
 	createObj = Tcl_NewStringObj("proc",4);
+	Tcl_IncrRefCount(createObj);
 	error = Tcl_ListObjAppendElement(interp,createObj,method->proc);
-	if (error != TCL_OK) {Tcl_DecrRefCount(createObj);return error;}
+	if (error != TCL_OK) {goto error;}
 	realargs = Tcl_NewStringObj("class",5);
+	Tcl_IncrRefCount(realargs);
 	error = Tcl_ListObjAppendList(interp,realargs,args);
-	if (error != TCL_OK) {Tcl_DecrRefCount(createObj);Tcl_DecrRefCount(realargs);return error;}
+	if (error != TCL_OK) {goto error;}
 	error = Tcl_ListObjAppendElement(interp,createObj,realargs);
-	if (error != TCL_OK) {Tcl_DecrRefCount(createObj);return error;}
+	if (error != TCL_OK) {goto error;}
 	error = Tcl_ListObjAppendElement(interp,createObj,body);
-	if (error != TCL_OK) {Tcl_DecrRefCount(createObj);return error;}
+	if (error != TCL_OK) {goto error;}
 	error = Tcl_EvalObj(interp,createObj);
-	Tcl_DecrRefCount(createObj);
-	if (error != TCL_OK) {return error;}
-	error = Classy_ParseArgs(interp,args,&(method->min),&(method->max),method->args);
-	return error;
+	if (error != TCL_OK) {goto error;}
+	error = Classy_ParseArgs(interp,args,&(method->min),&(method->max),rname,&(method->args));
+	error:
+		if (createObj != NULL) Tcl_DecrRefCount(createObj);
+		if (realargs != NULL) Tcl_DecrRefCount(realargs);
+		return error;
 }
 
 int Classy_CreateTclMethod(
@@ -210,55 +224,57 @@ int Classy_CreateTclMethod(
 	Tcl_Obj *name,
 	Tcl_Obj *args,
 	Tcl_Obj *body,
-	char *rname)	
+	Tcl_Obj *rname)	
 {
-	Tcl_Obj *createObj, *realargs;
+	Tcl_Obj *createObj = NULL, *realargs = NULL;
 	int error;
 
 	method->copy = 0;
 	method->proc = name;
 	method->func = NULL;
 	Tcl_IncrRefCount(method->proc);
-	method->args = Tcl_NewStringObj(rname,strlen(rname));
-	Tcl_IncrRefCount(method->args);
 	createObj = Tcl_NewStringObj("proc",4);
+	Tcl_IncrRefCount(createObj);
 	error = Tcl_ListObjAppendElement(interp,createObj,method->proc);
-	if (error != TCL_OK) {Tcl_DecrRefCount(createObj);return error;}
+	if (error != TCL_OK) {goto error;}
 	realargs = Tcl_NewStringObj("class object",12);
+	Tcl_IncrRefCount(realargs);
 	error = Tcl_ListObjAppendList(interp,realargs,args);
-	if (error != TCL_OK) {Tcl_DecrRefCount(createObj);Tcl_DecrRefCount(realargs);return error;}
+	if (error != TCL_OK) {goto error;}
 	error = Tcl_ListObjAppendElement(interp,createObj,realargs);
-	if (error != TCL_OK) {Tcl_DecrRefCount(createObj);return error;}
+	if (error != TCL_OK) {goto error;}
 	error = Tcl_ListObjAppendElement(interp,createObj,body);
-	if (error != TCL_OK) {Tcl_DecrRefCount(createObj);return error;}
+	if (error != TCL_OK) {goto error;}
 	error = Tcl_EvalObj(interp,createObj);
-	Tcl_DecrRefCount(createObj);
 	if (error != TCL_OK) {return error;}
-	error = Classy_ParseArgs(interp,args,&(method->min),&(method->max),method->args);
-	return error;
+	error = Classy_ParseArgs(interp,args,&(method->min),&(method->max),rname,&(method->args));
+	error:
+		if (createObj != NULL) Tcl_DecrRefCount(createObj);
+		if (realargs != NULL) Tcl_DecrRefCount(realargs);
+		return error;
 }
 
 void Classy_CopyMethods(
-	Tcl_HashTable *src,
-	Tcl_HashTable *dst)
+	Classy_HashTable *src,
+	Classy_HashTable *dst)
 {
-	Tcl_HashSearch search;
-	Tcl_HashEntry *entry;
+	Classy_HashSearch search;
+	Classy_HashEntry *entry;
 	Method *srcmethod,*method;
-	char *key;
+	Tcl_Obj *key;
 	int new;
 
-	entry = Tcl_FirstHashEntry(src, &search);
+	entry = Classy_FirstHashEntry(src, &search);
 	while(1) {
 		if (entry == NULL) break;
-		srcmethod = (Method *)Tcl_GetHashValue(entry);
-		key = Tcl_GetHashKey(src, entry);
-		entry = Tcl_CreateHashEntry(dst,key,&new);
+		srcmethod = (Method *)Classy_GetHashValue(entry);
+		key = Classy_GetHashKey(src, entry);
+		entry = Classy_CreateHashEntry(dst,key,&new);
 		if (new == 1) {
 			method = (Method *)Tcl_Alloc(sizeof(Method));
-			Tcl_SetHashValue(entry,(ClientData)method);
+			Classy_SetHashValue(entry,(ClientData)method);
 		} else {
-			method = (Method *)Tcl_GetHashValue(entry);
+			method = (Method *)Classy_GetHashValue(entry);
 			Classy_FreeMethod(method);
 		}
 		method->copy = 1;
@@ -269,28 +285,28 @@ void Classy_CopyMethods(
 		method->func = srcmethod->func;
 		method->min = srcmethod->min;
 		method->max = srcmethod->max;
-		entry = Tcl_NextHashEntry(&search);
+		entry = Classy_NextHashEntry(&search);
 	}
 }
 
 int Classy_CopyMethod(
-	Tcl_HashTable *src,
-	Tcl_HashTable *dst,
-	char *name)
+	Classy_HashTable *src,
+	Classy_HashTable *dst,
+	Tcl_Obj *name)
 {
-	Tcl_HashEntry *entry;
+	Classy_HashEntry *entry;
 	Method *srcmethod,*method;
 	int new;
 
-	entry = Tcl_FindHashEntry(src, name);
+	entry = Classy_FindHashEntry(src, name);
 	if (entry == NULL) {return 0;}
-	srcmethod = (Method *)Tcl_GetHashValue(entry);
-	entry = Tcl_CreateHashEntry(dst,name,&new);
+	srcmethod = (Method *)Classy_GetHashValue(entry);
+	entry = Classy_CreateHashEntry(dst,name,&new);
 	if (new == 1) {
 		method = (Method *)Tcl_Alloc(sizeof(Method));
-		Tcl_SetHashValue(entry,(ClientData)method);
+		Classy_SetHashValue(entry,(ClientData)method);
 	} else {
-		method = (Method *)Tcl_GetHashValue(entry);
+		method = (Method *)Classy_GetHashValue(entry);
 		if (method->copy == 0) {return 0;}
 		Classy_FreeMethod(method);
 	}
@@ -309,17 +325,17 @@ int Classy_PropagateMethod(
 	Tcl_Interp *interp,
 	Class *class,
 	int type,
-	char *name)
+	Tcl_Obj *name)
 {
-	Tcl_HashEntry *entry;
-	Tcl_HashSearch search;
+	Classy_HashEntry *entry;
+	Classy_HashSearch search;
 	Class *subclass;
 	int done,error;
 
-	entry = Tcl_FirstHashEntry(&(class->subclasses), &search);
+	entry = Classy_FirstHashEntry(&(class->subclasses), &search);
 	while(1) {
 		if (entry == NULL) break;
-		subclass = (Class *)Tcl_GetHashValue(entry);
+		subclass = (Class *)Classy_GetHashValue(entry);
 		if (type == 'm') {
 			done = Classy_CopyMethod(&(class->methods),&(subclass->methods),name);
 		} else {
@@ -329,7 +345,7 @@ int Classy_PropagateMethod(
 			error = Classy_PropagateMethod(interp,subclass,type,name);
 			if (error != TCL_OK) {return error;}
 		}
-		entry = Tcl_NextHashEntry(&search);
+		entry = Classy_NextHashEntry(&search);
 	}
 	return TCL_OK;
 }
@@ -338,33 +354,33 @@ int Classy_PropagateDeleteMethod(
 	Tcl_Interp *interp,
 	Class *class,
 	int type,
-	char *name)
+	Tcl_Obj *name)
 {
-	Tcl_HashEntry *entry,*mentry;
-	Tcl_HashSearch search;
+	Classy_HashEntry *entry,*mentry;
+	Classy_HashSearch search;
 	Class *subclass;
 	Method *method;
 	int error;
 
-	entry = Tcl_FirstHashEntry(&(class->subclasses), &search);
+	entry = Classy_FirstHashEntry(&(class->subclasses), &search);
 	while(1) {
 		if (entry == NULL) break;
-		subclass = (Class *)Tcl_GetHashValue(entry);
+		subclass = (Class *)Classy_GetHashValue(entry);
 		if (type == 'm') {
-			mentry = Tcl_FindHashEntry(&(subclass->methods),name);
+			mentry = Classy_FindHashEntry(&(subclass->methods),name);
 		} else {
-			mentry = Tcl_FindHashEntry(&(subclass->classmethods),name);
+			mentry = Classy_FindHashEntry(&(subclass->classmethods),name);
 		}
 		if (mentry != NULL) {
-			method = (Method *)Tcl_GetHashValue(mentry);
+			method = (Method *)Classy_GetHashValue(mentry);
 			if (method->copy != 0) {
 				error = Classy_PropagateDeleteMethod(interp,subclass,type,name);
 				if (error != TCL_OK) {return error;}
-				Tcl_DeleteHashEntry(mentry);
+				Classy_DeleteHashEntry(mentry);
 				Classy_FreeMethod(method);
 			}
 		}
-		entry = Tcl_NextHashEntry(&search);
+		entry = Classy_NextHashEntry(&search);
 	}
 	return TCL_OK;
 }
@@ -375,42 +391,47 @@ int Classy_InfoClassMethods(
 	Tcl_Obj *pattern)
 {
 	Tcl_Obj *temp;
-	char *name;
+	Tcl_Obj *name;
+	char *namestring;
 	int error;
 
 	if (pattern == NULL) {
-		Tcl_HashEntry *entry;
-		Tcl_HashSearch search;
-		entry = Tcl_FirstHashEntry(&(class->classmethods), &search);
+		Classy_HashEntry *entry;
+		Classy_HashSearch search;
+		entry = Classy_FirstHashEntry(&(class->classmethods), &search);
 		while(1) {
 			if (entry == NULL) break;
-			name = Tcl_GetHashKey(&(class->methods),entry);
-			if (name[0] != '_') {
-				Tcl_AppendElement(interp, name);
+			name = Classy_GetHashKey(&(class->methods),entry);
+			namestring = Tcl_GetStringFromObj(name,NULL);
+			if (namestring[0] != '_') {
+				Tcl_AppendElement(interp, namestring);
 			}
-			entry = Tcl_NextHashEntry(&search);
+			entry = Classy_NextHashEntry(&search);
 		}
 		temp = Tcl_NewStringObj("lsort",5);
+		Tcl_IncrRefCount(temp);
 		error = Tcl_ListObjAppendElement(interp,temp,Tcl_GetObjResult(interp));
 		if (error != TCL_OK) {Tcl_DecrRefCount(temp);return error;}
 		error = Tcl_EvalObj(interp,temp);
 		Tcl_DecrRefCount(temp);
 		return error;
 	} else {
-		Tcl_HashEntry *entry;
-		Tcl_HashSearch search;
+		Classy_HashEntry *entry;
+		Classy_HashSearch search;
 		char *p;
-		entry = Tcl_FirstHashEntry(&(class->classmethods), &search);
+		entry = Classy_FirstHashEntry(&(class->classmethods), &search);
 		while(1) {
 			if (entry == NULL) break;
-			name = Tcl_GetHashKey(&(class->methods),entry);
+			name = Classy_GetHashKey(&(class->methods),entry);
+			namestring = Tcl_GetStringFromObj(name,NULL);
 			p = Tcl_GetStringFromObj(pattern,NULL);
-			if (Tcl_StringMatch(name, p) == 1) {
-				Tcl_AppendElement(interp, name);
+			if (Tcl_StringMatch(namestring, p) == 1) {
+				Tcl_AppendElement(interp, namestring);
 			}
-			entry = Tcl_NextHashEntry(&search);
+			entry = Classy_NextHashEntry(&search);
 		}
 		temp = Tcl_NewStringObj("lsort",5);
+		Tcl_IncrRefCount(temp);
 		error = Tcl_ListObjAppendElement(interp,temp,Tcl_GetObjResult(interp));
 		if (error != TCL_OK) {Tcl_DecrRefCount(temp);return error;}
 		error = Tcl_EvalObj(interp,temp);
@@ -426,9 +447,10 @@ int Classy_ClassMethodClassMethod(
 	int argc,
 	Tcl_Obj *CONST argv[])
 {
-	Method *method;
-	Tcl_HashEntry *entry;
+	Method *method,*oldmethod;
+	Classy_HashEntry *entry;
 	Tcl_Obj *procname;
+	Tcl_Obj *nameObj;
 	char *name;
 	char *classname;
 	int namelen,error,i,new;
@@ -439,9 +461,9 @@ int Classy_ClassMethodClassMethod(
 			" classmethod name args body\"", (char *)NULL);
 		return TCL_ERROR;
 	}
-
 	classname = Tcl_GetStringFromObj(class->class,NULL);
-	name = Tcl_GetStringFromObj(argv[0],&namelen);
+	nameObj = argv[0];
+	name = Tcl_GetStringFromObj(nameObj,&namelen);
 	if ((namelen == 11)&&(strncmp(name,"classmethod",11)==0)) {
 	} else if ((namelen == 6)&&(strncmp(name,"method",6)==0)) {
 	} else if ((namelen == 12)&&(strncmp(name,"deletemethod",12)==0)) {
@@ -469,27 +491,31 @@ int Classy_ClassMethodClassMethod(
 		method = (Method *)Tcl_Alloc(sizeof(Method));
 		procname = Tcl_NewObj();
 		Tcl_AppendStringsToObj(procname,"::class::",classname,",,classdestroy",(char *)NULL);
-		error = Classy_CreateTclClassMethod(interp,method,procname,argv[1],argv[2],"classdestroy");
+		error = Classy_CreateTclClassMethod(interp,method,procname,argv[1],argv[2],Tcl_NewStringObj("classdestroy",12));
 		if (error != TCL_OK) {Tcl_Free((char *)method);return error;}
 		class->classdestroy=method;
-		Tcl_SetResult(interp,name,TCL_VOLATILE);
+		Tcl_SetObjResult(interp,nameObj);
 		return TCL_OK;
 	} else {
-		entry = Tcl_CreateHashEntry(&(class->classmethods),name,&new);
-		if (new == 1) {
-			method = (Method *)Tcl_Alloc(sizeof(Method));
-			Tcl_SetHashValue(entry,(ClientData)method);
-		} else {
-			method = (Method *)Tcl_GetHashValue(entry);
-			Classy_FreeMethod(method);
-		}
+		Tcl_IncrRefCount(nameObj);
+		method = (Method *)Tcl_Alloc(sizeof(Method));
 		procname = Tcl_NewObj();
+		Tcl_IncrRefCount(procname);
 		Tcl_AppendStringsToObj(procname,"::class::",classname,",,cm,",name,(char *)NULL);
-		error = Classy_CreateTclClassMethod(interp,method,procname,argv[1],argv[2],name);
-		if (error != TCL_OK) {return error;}
-		Tcl_SetResult(interp,name,TCL_VOLATILE);
-		error = Classy_PropagateMethod(interp,class,'c',name);
-		if (error != TCL_OK) {return error;}
+		error = Classy_CreateTclClassMethod(interp,method,procname,argv[1],argv[2],nameObj);
+		Tcl_DecrRefCount(procname);
+		if (error != TCL_OK) {Tcl_DecrRefCount(nameObj);	return error;}
+		entry = Classy_CreateHashEntry(&(class->classmethods),nameObj,&new);
+		if (new == 0) {
+			oldmethod = (Method *)Classy_GetHashValue(entry);
+			Classy_FreeMethod(oldmethod);
+			Tcl_Free((char *)oldmethod);
+		}
+		Classy_SetHashValue(entry,(ClientData)method);
+		error = Classy_PropagateMethod(interp,class,'c',nameObj);
+		if (error != TCL_OK) {Tcl_DecrRefCount(nameObj);return error;}
+		Tcl_SetObjResult(interp,nameObj);
+		Tcl_DecrRefCount(nameObj);
 		return TCL_OK;
 	}
 	Tcl_ResetResult(interp);
@@ -505,8 +531,8 @@ int Classy_DeleteClassMethodClassMethod(
 	Tcl_Obj *CONST argv[])
 {
 	Method *method;
-	Tcl_HashEntry *entry;
-	Tcl_Obj *string;
+	Classy_HashEntry *entry;
+	Tcl_Obj *string, *nameObj;
 	char *name;
 	char *classname;
 	int namelen,error;
@@ -519,7 +545,8 @@ int Classy_DeleteClassMethodClassMethod(
 	}
 
 	classname = Tcl_GetStringFromObj(class->class,NULL);
-	name = Tcl_GetStringFromObj(argv[0],&namelen);
+	nameObj = argv[0];
+	name = Tcl_GetStringFromObj(nameObj,&namelen);
 	if ((namelen == 11)&&(strncmp(name,"classmethod",11)==0)) {
 	} else if ((namelen == 6)&&(strncmp(name,"method",6)==0)) {
 	} else if ((namelen == 12)&&(strncmp(name,"deletemethod",12)==0)) {
@@ -539,6 +566,7 @@ int Classy_DeleteClassMethodClassMethod(
 			Tcl_Free((char *)class->init);
 			class->init = NULL;
 			string = Tcl_NewObj();
+			Tcl_IncrRefCount(string);
 			Tcl_AppendStringsToObj(string,"rename ::class::",classname,",,init {}",(char *)NULL);
 			Tcl_EvalObj(interp,string);
 			Tcl_DecrRefCount(string);
@@ -556,6 +584,7 @@ int Classy_DeleteClassMethodClassMethod(
 			Tcl_Free((char *)class->classdestroy);
 			class->classdestroy = NULL;
 			string = Tcl_NewObj();
+			Tcl_IncrRefCount(string);
 			Tcl_AppendStringsToObj(string,"rename ::class::",classname,",,classdestroy {}",(char *)NULL);
 			Tcl_EvalObj(interp,string);
 			Tcl_DecrRefCount(string);
@@ -563,16 +592,17 @@ int Classy_DeleteClassMethodClassMethod(
 		Tcl_ResetResult(interp);
 		return TCL_OK;
 	} else {
-		entry = Tcl_FindHashEntry(&(class->classmethods),name);
-		method = (Method *)Tcl_GetHashValue(entry);
+		entry = Classy_FindHashEntry(&(class->classmethods),nameObj);
+		method = (Method *)Classy_GetHashValue(entry);
 		Classy_FreeMethod(method);
-		Tcl_DeleteHashEntry(entry);
+		Classy_DeleteHashEntry(entry);
 		string = Tcl_NewObj();
+		Tcl_IncrRefCount(string);
 		Tcl_AppendStringsToObj(string,"rename ::class::",classname,",,cm,",name," {}",(char *)NULL);
 		Tcl_EvalObj(interp,string);
 		Tcl_DecrRefCount(string);
 		Tcl_SetResult(interp,name,TCL_VOLATILE);
-		error = Classy_PropagateDeleteMethod(interp,class,'c',name);
+		error = Classy_PropagateDeleteMethod(interp,class,'c',nameObj);
 		if (error != TCL_OK) {return error;}
 		Tcl_ResetResult(interp);
 		return TCL_OK;
@@ -587,43 +617,47 @@ int Classy_InfoMethods(
 	Class *class,
 	Tcl_Obj *pattern)
 {
-	Tcl_Obj *temp;
+	Tcl_Obj *temp, *nameObj;
 	char *name;
 	int error;
 
 	if (pattern == NULL) {
-		Tcl_HashEntry *entry;
-		Tcl_HashSearch search;
-		entry = Tcl_FirstHashEntry(&(class->methods), &search);
+		Classy_HashEntry *entry;
+		Classy_HashSearch search;
+		entry = Classy_FirstHashEntry(&(class->methods), &search);
 		while(1) {
 			if (entry == NULL) break;
-			name = Tcl_GetHashKey(&(class->methods),entry);
+			nameObj = Classy_GetHashKey(&(class->methods),entry);
+			name = Tcl_GetStringFromObj(nameObj,NULL);
 			if (name[0] != '_') {
 				Tcl_AppendElement(interp, name);
 			}
-			entry = Tcl_NextHashEntry(&search);
+			entry = Classy_NextHashEntry(&search);
 		}
 		temp = Tcl_NewStringObj("lsort",5);
+		Tcl_IncrRefCount(temp);
 		error = Tcl_ListObjAppendElement(interp,temp,Tcl_GetObjResult(interp));
 		if (error != TCL_OK) {Tcl_DecrRefCount(temp);return error;}
 		error = Tcl_EvalObj(interp,temp);
 		Tcl_DecrRefCount(temp);
 		return error;
 	} else {
-		Tcl_HashEntry *entry;
-		Tcl_HashSearch search;
+		Classy_HashEntry *entry;
+		Classy_HashSearch search;
 		char *p;
-		entry = Tcl_FirstHashEntry(&(class->methods), &search);
+		entry = Classy_FirstHashEntry(&(class->methods), &search);
 		while(1) {
 			if (entry == NULL) break;
-			name = Tcl_GetHashKey(&(class->methods),entry);
+			nameObj = Classy_GetHashKey(&(class->methods),entry);
+			name = Tcl_GetStringFromObj(nameObj,NULL);
 			p = Tcl_GetStringFromObj(pattern,NULL);
 			if (Tcl_StringMatch(name, p) == 1) {
 				Tcl_AppendElement(interp, name);
 			}
-			entry = Tcl_NextHashEntry(&search);
+			entry = Classy_NextHashEntry(&search);
 		}
 		temp = Tcl_NewStringObj("lsort",5);
+		Tcl_IncrRefCount(temp);
 		error = Tcl_ListObjAppendElement(interp,temp,Tcl_GetObjResult(interp));
 		if (error != TCL_OK) {Tcl_DecrRefCount(temp);return error;}
 		error = Tcl_EvalObj(interp,temp);
@@ -639,9 +673,9 @@ int Classy_MethodClassMethod(
 	int argc,
 	Tcl_Obj *CONST argv[])
 {
-	Method *method;
-	Tcl_HashEntry *entry;
-	Tcl_Obj *procname;
+	Method *method,*oldmethod;
+	Classy_HashEntry *entry;
+	Tcl_Obj *procname, *nameObj;
 	char *name;
 	char *classname;
 	int namelen, error,i, new;
@@ -654,7 +688,8 @@ int Classy_MethodClassMethod(
 	}
 
 	classname = Tcl_GetStringFromObj(class->class,NULL);
-	name = Tcl_GetStringFromObj(argv[0],&namelen);
+	nameObj = argv[0];
+	name = Tcl_GetStringFromObj(nameObj,&namelen);
 	if ((namelen == 4)&&(strncmp(name,"init",4)==0)) {
 		if (strcmp(classname,"Class")==0) {
 			Tcl_ResetResult(interp);
@@ -669,7 +704,7 @@ int Classy_MethodClassMethod(
 		method = (Method *)Tcl_Alloc(sizeof(Method));
 		procname = Tcl_NewObj();
 		Tcl_AppendStringsToObj(procname,"::class::",classname,",,init",(char *)NULL);
-		error = Classy_CreateTclMethod(interp,method,procname,argv[1],argv[2],"init");
+		error = Classy_CreateTclMethod(interp,method,procname,argv[1],argv[2],Tcl_NewStringObj("init",4));
 		if (error != TCL_OK) {Tcl_Free((char *)method);return error;}
 		class->init=method;
 		Tcl_SetResult(interp,name,TCL_VOLATILE);
@@ -693,27 +728,31 @@ int Classy_MethodClassMethod(
 		method = (Method *)Tcl_Alloc(sizeof(Method));
 		procname = Tcl_NewObj();
 		Tcl_AppendStringsToObj(procname,"::class::",classname,",,destroy",(char *)NULL);
-		error = Classy_CreateTclMethod(interp,method,procname,argv[1],argv[2],"destroy");
+		error = Classy_CreateTclMethod(interp,method,procname,argv[1],argv[2],Tcl_NewStringObj("destroy",7));
 		if (error != TCL_OK) {Tcl_Free((char *)method);return error;}
 		class->destroy = method;
 		Tcl_SetResult(interp,name,TCL_VOLATILE);
 		return TCL_OK;
 	} else {
-		entry = Tcl_CreateHashEntry(&(class->methods),name,&new);
-		if (new == 1) {
-			method = (Method *)Tcl_Alloc(sizeof(Method));
-			Tcl_SetHashValue(entry,(ClientData)method);
-		} else {
-			method = (Method *)Tcl_GetHashValue(entry);
-			Classy_FreeMethod(method);
-		}
+		Tcl_IncrRefCount(nameObj);
+		method = (Method *)Tcl_Alloc(sizeof(Method));
 		procname = Tcl_NewObj();
+		Tcl_IncrRefCount(procname);
 		Tcl_AppendStringsToObj(procname,"::class::",classname,",,m,",name,(char *)NULL);
-		error = Classy_CreateTclMethod(interp,method,procname,argv[1],argv[2],name);
-		if (error != TCL_OK) {return error;}
-		error = Classy_PropagateMethod(interp,class,'m',name);
-		if (error != TCL_OK) {return error;}
-		Tcl_SetResult(interp,name,TCL_VOLATILE);
+		error = Classy_CreateTclMethod(interp,method,procname,argv[1],argv[2],nameObj);
+		Tcl_DecrRefCount(procname);
+		if (error != TCL_OK) {Tcl_DecrRefCount(nameObj);return error;}
+		entry = Classy_CreateHashEntry(&(class->methods),nameObj,&new);
+		if (new == 0) {
+			oldmethod = (Method *)Classy_GetHashValue(entry);
+			Classy_FreeMethod(oldmethod);
+			Tcl_Free((char *)oldmethod);
+		}
+		Classy_SetHashValue(entry,(ClientData)method);
+		error = Classy_PropagateMethod(interp,class,'m',nameObj);
+		if (error != TCL_OK) {Tcl_DecrRefCount(nameObj);return error;}
+		Tcl_SetObjResult(interp,nameObj);
+		Tcl_DecrRefCount(nameObj);
 		return TCL_OK;
 	}
 }
@@ -726,8 +765,8 @@ int Classy_DeleteMethodClassMethod(
 	Tcl_Obj *CONST argv[])
 {
 	Method *method;
-	Tcl_HashEntry *entry;
-	Tcl_Obj *string;
+	Classy_HashEntry *entry;
+	Tcl_Obj *string, *nameObj;
 	char *name;
 	char *classname;
 	int namelen, error;
@@ -740,7 +779,8 @@ int Classy_DeleteMethodClassMethod(
 	}
 
 	classname = Tcl_GetStringFromObj(class->class,NULL);
-	name = Tcl_GetStringFromObj(argv[0],&namelen);
+	nameObj = argv[0];
+	name = Tcl_GetStringFromObj(nameObj,&namelen);
 	if ((namelen == 7)&&(strncmp(name,"destroy",7)==0)) {
 		if (strcmp(classname,"Class")==0) {
 			Tcl_ResetResult(interp);
@@ -752,6 +792,7 @@ int Classy_DeleteMethodClassMethod(
 			Tcl_Free((char *)class->destroy);
 			class->destroy = NULL;
 			string = Tcl_NewObj();
+			Tcl_IncrRefCount(string);
 			Tcl_AppendStringsToObj(string,"rename ::class::",classname,",,destroy {}",(char *)NULL);
 			Tcl_EvalObj(interp,string);
 			Tcl_DecrRefCount(string);
@@ -759,16 +800,17 @@ int Classy_DeleteMethodClassMethod(
 		Tcl_ResetResult(interp);
 		return TCL_OK;
 	} else {
-		entry = Tcl_FindHashEntry(&(class->methods),name);
-		method = (Method *)Tcl_GetHashValue(entry);
+		entry = Classy_FindHashEntry(&(class->methods),nameObj);
+		method = (Method *)Classy_GetHashValue(entry);
 		Classy_FreeMethod(method);
-		Tcl_DeleteHashEntry(entry);
+		Classy_DeleteHashEntry(entry);
 		string = Tcl_NewObj();
+		Tcl_IncrRefCount(string);
 		Tcl_AppendStringsToObj(string,"rename ::class::",classname,",,m,",name," {}",(char *)NULL);
 		Tcl_EvalObj(interp,string);
 		Tcl_DecrRefCount(string);
 		Tcl_SetResult(interp,name,TCL_VOLATILE);
-		error = Classy_PropagateDeleteMethod(interp,class,'m',name);
+		error = Classy_PropagateDeleteMethod(interp,class,'m',nameObj);
 		if (error != TCL_OK) {return error;}
 		Tcl_ResetResult(interp);
 		return TCL_OK;
@@ -778,13 +820,14 @@ int Classy_DeleteMethodClassMethod(
 extern int Classy_CreateClassMethod(
 	Tcl_Interp *interp,
 	char *classname,
-	char *name,
+	Tcl_Obj *nameObj,
 	Classy_Method *func) 
 {
 	Tcl_CmdInfo cmdinfo;
 	Class *class;
 	Method *method;
-	Tcl_HashEntry *entry;
+	Classy_HashEntry *entry;
+	char *name;
 	int namelen,new,found,error;
 
 	found = Tcl_GetCommandInfo(interp,classname,&cmdinfo);
@@ -794,7 +837,7 @@ extern int Classy_CreateClassMethod(
 		return TCL_ERROR;
 	}
 	class = (Class *)cmdinfo.objClientData;
-	namelen = strlen(name);
+	name = Tcl_GetStringFromObj(nameObj,&namelen);
 	if ((namelen == 4)&&(strncmp(name,"init",4)==0)) {
 		if (class->init != NULL) {
 			Classy_FreeMethod(class->init);
@@ -822,19 +865,19 @@ extern int Classy_CreateClassMethod(
 		Tcl_SetResult(interp,name,TCL_VOLATILE);
 		return TCL_OK;
 	} else {
-		entry = Tcl_CreateHashEntry(&(class->classmethods),name,&new);
+		entry = Classy_CreateHashEntry(&(class->classmethods),nameObj,&new);
 		if (new == 1) {
 			method = (Method *)Tcl_Alloc(sizeof(Method));
-			Tcl_SetHashValue(entry,(ClientData)method);
+			Classy_SetHashValue(entry,(ClientData)method);
 		} else {
-			method = (Method *)Tcl_GetHashValue(entry);
+			method = (Method *)Classy_GetHashValue(entry);
 			Classy_FreeMethod(method);
 		}
 		method->copy = 0;
 		method->proc = NULL;
 		method->args = NULL;
 		method->func = func;
-		error = Classy_PropagateMethod(interp,class,'c',name);
+		error = Classy_PropagateMethod(interp,class,'c',nameObj);
 		if (error != TCL_OK) {return error;}
 		Tcl_SetResult(interp,name,TCL_VOLATILE);
 		return TCL_OK;
@@ -844,13 +887,14 @@ extern int Classy_CreateClassMethod(
 extern int Classy_CreateMethod(
 	Tcl_Interp *interp,
 	char *classname,
-	char *name,
+	Tcl_Obj *nameObj,
 	Classy_Method *func) 
 {
 	Tcl_CmdInfo cmdinfo;
 	Class *class;
 	Method *method;
-	Tcl_HashEntry *entry;
+	Classy_HashEntry *entry;
+	char *name;
 	int namelen,new,found,error;
 
 	found = Tcl_GetCommandInfo(interp,classname,&cmdinfo);
@@ -860,7 +904,7 @@ extern int Classy_CreateMethod(
 		return TCL_ERROR;
 	}
 	class = (Class *)cmdinfo.objClientData;
-	namelen = strlen(name);
+	name = Tcl_GetStringFromObj(nameObj,&namelen);
 	if ((namelen == 7)&&(strncmp(name,"destroy",7)==0)) {
 		if (class->destroy != NULL) {
 			Classy_FreeMethod(class->destroy);
@@ -875,19 +919,20 @@ extern int Classy_CreateMethod(
 		Tcl_SetResult(interp,name,TCL_VOLATILE);
 		return TCL_OK;
 	} else {
-		entry = Tcl_CreateHashEntry(&(class->methods),name,&new);
+		nameObj = Tcl_NewStringObj(name,namelen);
+		entry = Classy_CreateHashEntry(&(class->methods),nameObj,&new);
 		if (new == 1) {
 			method = (Method *)Tcl_Alloc(sizeof(Method));
-			Tcl_SetHashValue(entry,(ClientData)method);
+			Classy_SetHashValue(entry,(ClientData)method);
 		} else {
-			method = (Method *)Tcl_GetHashValue(entry);
+			method = (Method *)Classy_GetHashValue(entry);
 			Classy_FreeMethod(method);
 		}
 		method->copy = 0;
 		method->proc = NULL;
 		method->args = NULL;
 		method->func = func;
-		error = Classy_PropagateMethod(interp,class,'m',name);
+		error = Classy_PropagateMethod(interp,class,'m',nameObj);
 		if (error != TCL_OK) {return error;}
 		Tcl_SetResult(interp,name,TCL_VOLATILE);
 		return TCL_OK;
@@ -901,8 +946,9 @@ int Classy_InfoMethodinfo(
 	int argc,
 	Tcl_Obj *CONST argv[])
 {
-	Tcl_HashEntry *entry;
+	Classy_HashEntry *entry;
 	Method *method;
+	Tcl_Obj *nameObj;
 	char *option,*name,*cmd;
 	int optionlen;
 
@@ -912,17 +958,18 @@ int Classy_InfoMethodinfo(
 		cmd = Tcl_GetStringFromObj(class->class,NULL);
 	}
 	option = Tcl_GetStringFromObj(argv[0],&optionlen);
-	name = Tcl_GetStringFromObj(argv[1],NULL);
+	nameObj = argv[1];
+	name = Tcl_GetStringFromObj(nameObj,NULL);
 	if (strcmp(name,"init") == 0) {
 		method = class->init;
 	} else if (strcmp(name,"destroy") == 0) {
 		method = class->destroy;
 	} else {
-		entry = Tcl_FindHashEntry(&(class->methods), name);
+		entry = Classy_FindHashEntry(&(class->methods), nameObj);
 		if (entry == NULL) {
 			method = NULL;
 		} else {
-			method = (Method *)Tcl_GetHashValue(entry);
+			method = (Method *)Classy_GetHashValue(entry);
 		}
 	}
 	if (method == NULL) {
@@ -973,21 +1020,23 @@ int Classy_InfoClassMethodinfo(
 	int argc,
 	Tcl_Obj *CONST argv[])
 {
-	Tcl_HashEntry *entry;
+	Classy_HashEntry *entry;
 	Method *method;
+	Tcl_Obj *nameObj;
 	char *option,*name;
 	int optionlen;
 
 	option = Tcl_GetStringFromObj(argv[0],&optionlen);
-	name = Tcl_GetStringFromObj(argv[1],NULL);
-	entry = Tcl_FindHashEntry(&(class->classmethods), name);
+	nameObj = argv[1];
+	name = Tcl_GetStringFromObj(nameObj,NULL);
+	entry = Classy_FindHashEntry(&(class->classmethods), nameObj);
 	if (entry == NULL) {
 		Tcl_ResetResult(interp);
 		Tcl_AppendResult(interp,"class \"",Tcl_GetStringFromObj(class->class,NULL),
 			"\" does not have a classmethod \"", name, "\"", (char *)NULL);
 		return TCL_ERROR;
 	}
-	method = (Method *)Tcl_GetHashValue(entry);
+	method = (Method *)Classy_GetHashValue(entry);
 	Tcl_ResetResult(interp);
 	if (method->proc == NULL) {
 		Tcl_AppendResult(interp,"classmethod \"",name,
