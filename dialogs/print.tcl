@@ -74,13 +74,13 @@ proc Classy::printdialog args {# ClassyTcl generated Dialog
 	grid $window.options.paper.radiobutton2 -row 1 -column 1 -sticky nesw
 	Classy::OptionBox $window.options.paper.cmode  \
 		-label Colormode \
-		-variable ::Classy::print(mode) \
+		-variable ::Classy::print(colormode) \
 		-relief flat
 	grid $window.options.paper.cmode -row 2 -column 0 -columnspan 3 -sticky nesw
 	$window.options.paper.cmode add color Color
 	$window.options.paper.cmode add gray Gray
 	$window.options.paper.cmode add mono Mono
-	$window.options.paper.cmode set mono
+	$window.options.paper.cmode set color
 	grid columnconfigure $window.options.paper 2 -weight 1
 	grid rowconfigure $window.options.paper 2 -weight 1
 	Classy::Entry $window.options.printcommand \
@@ -105,26 +105,36 @@ proc Classy::printdialog args {# ClassyTcl generated Dialog
 		-textvariable ::Classy::print(scale) \
 		-width 3
 	grid $window.options.offset.scale -row 1 -column 0 -sticky nesw
-	Classy::NumEntry $window.options.offset.x \
-		-label {X offset} \
-		-textvariable ::Classy::print(xoffset) \
-		-width 3
-	grid $window.options.offset.x -row 0 -column 1 -sticky nesw
-	Classy::NumEntry $window.options.offset.y \
-		-label {Y offset} \
-		-textvariable ::Classy::print(yoffset) \
-		-width 3
-	grid $window.options.offset.y -row 1 -column 1 -sticky nesw
 	checkbutton $window.options.offset.autoscale \
 		-text {Auto scale} \
 		-variable ::Classy::print(autoscale)
 	grid $window.options.offset.autoscale -row 0 -column 0 -sticky nesw
+	Classy::Entry $window.options.offset.entry1 \
+		-label {X offset} \
+		-textvariable ::Classy::print(xoffset) \
+		-width 4
+	grid $window.options.offset.entry1 -row 0 -column 1 -sticky nesw
+	Classy::Entry $window.options.offset.entry2 \
+		-label {Y offset} \
+		-textvariable ::Classy::print(yoffset) \
+		-width 4
+	grid $window.options.offset.entry2 -row 1 -column 1 -sticky nesw
 	grid columnconfigure $window.options.offset 0 -weight 1
 	grid columnconfigure $window.options.offset 1 -weight 1
 	grid columnconfigure $window.options 0 -weight 1
 
 	# End windows
 	# Parse this
+	$window configure \
+		-closecommand [list invoke {} {
+upvar #0 ::Classy::print print
+foreach {type} {
+	width height portrait size colormode
+	command file scale xoffset yoffset autoscale
+} {
+	Classy::Default set app print_$type $print($type)
+}
+}]
 	$window.options.button1 configure \
 		-command [varsubst window {$window.options.file set [Classy::selectfile]}]
 	$window.options.paper.width configure \
@@ -240,6 +250,9 @@ proc Classy::print_autoscale {window} {
 		if {$hs<$print(scale)} {set print(scale) $hs}
 	}
 }
+
+
+
 
 
 

@@ -37,8 +37,8 @@ Classy::configmenu MainMenu {Main application menu} {
 		action "Clear undo buffer" {%W undo clear} <<ClearUndo>>
 	}
 	menu "Windows" {
-		action "Zoom" {zoomdialog} <<ZoomDialog>>
-		action "Configure objects" {configwindow} <<ConfigObjects>>
+		action "Zoom" {catch {destroy .zoomdialog};zoomdialog} <<ZoomDialog>>
+		action "Configure objects" {catch {destroy .configwindow};configwindow -startw %W} <<ConfigObjects>>
 	}
 	menu "Mode" {
 		action "Select" {select_start %W} <<Select>>
@@ -62,7 +62,12 @@ Classy::configmenu MainMenu {Main application menu} {
 
 
 
+
+
+
 }
+
+
 
 
 

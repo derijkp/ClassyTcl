@@ -69,9 +69,10 @@ proc configwindow args {# ClassyTcl generated Toplevel
 	} else {
 		set window .configwindow
 	}
-	Classy::parseopt $args opt {}
+	Classy::parseopt $args opt {-startw {} {}}
 	# Create windows
-	Classy::Toplevel $window 
+	Classy::Toplevel $window  \
+		-keepgeometry all
 	button $window.font \
 		-command {$current(w) itemconfigure _sel -font [Classy::getfont]} \
 		-text {Select font}
@@ -234,6 +235,9 @@ proc configwindow args {# ClassyTcl generated Toplevel
 	$window.arrow.none configure \
 		-command [varsubst window {line_cap $window}] \
 		-image [Classy::geticon arrow_none]
+# ClassyTcl Finalise
+set ::current(w) $opt(-startw)
+	return $window
 	return $window
 }
 
@@ -246,7 +250,8 @@ proc zoomdialog args {# ClassyTcl generated Dialog
 	Classy::parseopt $args opt {}
 	# Create windows
 	Classy::Dialog $window  \
-		-destroycommand {destroy .try.dedit.work}
+		-destroycommand {destroy .try.dedit.work} \
+		-keepgeometry all
 	Classy::NumEntry $window.options.numentry1 \
 		-command {zoom $current(w)} \
 		-label Zoom \
@@ -292,7 +297,15 @@ proc zoomdialog args {# ClassyTcl generated Dialog
 	grid columnconfigure $window.options 2 -weight 1
 
 	# End windows
+	# Parse this
+	$window persistent set 
 	return $window
 }
+
+
+
+
+
+
 
 

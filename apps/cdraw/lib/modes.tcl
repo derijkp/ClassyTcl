@@ -149,6 +149,7 @@ bind DrawText <KP_Enter> {# nothing}
 }
 
 proc select_init {} {
+bind Select <<MExecute>> {rotate_switch %W %x %y}
 bind Select <<Action-ButtonPress>> {select_action %W %x %y}
 bind Select <<Action-ButtonRelease>> {select_release %W %x %y}
 bind Select <<Action-Motion>> {select_drag %W %x %y}

@@ -37,3 +37,39 @@ proc addpoint {w {x {}} {y {}}} {
 	$w itemconfigure _ind -foreground red
 	$w itemconfigure $item -foreground blue
 }
+
+proc update_x {w x} {
+	global current
+	set w $current(w)
+	set zoom [$w zoom]
+	if [info exists current(cpos)] {
+		set x [expr {$x*$zoom}]
+		set y [expr {$current(py)*$zoom}]
+		$w coord $current(cur) $current(cpos) $x $y
+		$w noundo coords _ind_$current(cpos) $x $y
+		set current(x) $x
+	} else {
+		set x [expr {$x*$zoom}]
+		set xmove [expr {$x-$current(x)}]
+		$w move _sel $xmove 0
+		set current(x) $x
+	}
+}
+
+proc update_y {w y} {
+	global current
+	set w $current(w)
+	set zoom [$w zoom]
+	if [info exists current(cpos)] {
+		set x [expr {$current(px)*$zoom}]
+		set y [expr {$y*$zoom}]
+		$w coord $current(cur) $current(cpos) $x $y
+		$w noundo coords _ind_$current(cpos) $x $y
+		set current(y) $y
+	} else {
+		set y [expr {$y*$zoom}]
+		set ymove [expr {$y-$current(y)}]
+		$w move _sel 0 $ymove
+		set current(y) $y
+	}
+}

@@ -1443,12 +1443,12 @@ Classy::Canvas method selection {action {list {}}} {
 			} else {
 				$w coords $data(cur) -1000 -1000 -1000 -1000
 			}
-			if ![info exists data(nw)] {
+			if {"[$w find withtag _sb]" == ""} {
 				foreach name {nw n ne e se s sw w} {
 					set data($name) [$w create bitmap -1000 -1000 \
 						-bitmap [Classy::getbitmap canvas_select] \
 						-foreground red \
-						-tags [list _sb _sb_$name _selbd]]
+						-tags [list _sb _sb_$name _selbd _np]]
 				}
 			}
 			set bbox [$w bbox _sel]
@@ -1484,7 +1484,7 @@ Classy::Canvas method selection {action {list {}}} {
 					$w create bitmap $x $y \
 						-bitmap [Classy::getbitmap canvas_current] \
 						-foreground red \
-						-tags [list _ind _ind_$num _selbd]
+						-tags [list _ind _ind_$num _selbd _np]
 					incr num
 				}
 			}
@@ -1536,7 +1536,7 @@ Classy::Canvas method current {args} {
 			$w create bitmap $x $y \
 				-bitmap [Classy::getbitmap canvas_current] \
 				-foreground red \
-				-tags [list _ind _ind_$num _selbd]
+				-tags [list _ind _ind_$num _selbd _np]
 			incr num
 		}
 		set data(ind) 1
@@ -1757,6 +1757,7 @@ Classy::Canvas method save {{tag all}} {
 	$w dtag _new
 	catch {unset save}
 	lappend result header "Classy::Canvas-0.1"
+	$w delete _np
 	set list [Classy::tag2items $object $w $tag]
 	lappend order {}
 	lappend order $list
@@ -1872,15 +1873,16 @@ Classy::Canvas method paste {} {
 }
 
 Classy::Canvas method _getprint {var} {
-putsvars var
 	private $object w data
 	upvar #0 ::$var print
 	if $print(portrait) {set rotate 0} else {set rotate 1}
+	set xoffset [winfo fpixels $object $print(xoffset)]
+	set yoffset [winfo fpixels $object $print(yoffset)]
 	return [$w postscript \
 		-rotate $rotate -colormode $print(colormode) \
 		-width $print(pwidth) -height $print(pheight) \
 		-pagewidth [expr {$print(scale)*$print(pwidth)/100.0}] \
-		-x $print(xoffset) -y $print(yoffset) \
+		-x $xoffset -y $yoffset \
 		-pageanchor nw -pagex 0 -pagey 0]
 }
 

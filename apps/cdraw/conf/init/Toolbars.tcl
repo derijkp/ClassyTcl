@@ -19,14 +19,16 @@ Classy::configtool MainTool {Application main toolbar} {	action open "Open" {fil
 	tool recttool "Rectangle"
 	tool ovaltool "Oval"
 	tool arctool "Arc"
-	tool zoomentry "Zoom %"
 	separator
 	action raiseobj "Raise objects" {raise_objects %W _sel}
 	action lowerobj "Lower objects" {lower_objects %W _sel}
 
 
 
+
 }
+
+
 
 
 

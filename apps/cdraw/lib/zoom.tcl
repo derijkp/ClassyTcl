@@ -87,9 +87,12 @@ catch {unset current(action)}
 proc zoom_start w {
 global current status
 catch {unset current}
+set current(w) $w
 $w selection set {}
 bindtags $w [list Zoom $w Classy::Menu_MainMenu Classy::Canvas Canvas .mainw all]
 set status($w,type) zoom
+catch {destroy .zoomdialog}
+zoomdialog
 }
 
 

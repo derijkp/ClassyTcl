@@ -638,9 +638,7 @@ test Classy::Canvas {save group} {
 } {{a _g4} {a _g4} {t0 _g5 _g6 _new} {t10 _g5 _g6 _new} {t20 _g7 _g6 _new} {t30 _g7 _g6 _new} {t40 _new}}
 
 test Classy::Canvas {print dialog} {
-source tools.tcl
 	classyclean
-Builder .b
 	Classy::Canvas .try
 	.try configure -papersize A4
 	pack .try -fill both -expand yes
@@ -648,7 +646,7 @@ Builder .b
 	.try create text 50 50 -text "B" -font {times 14 bold}
 	.try create line 20 10 60 50 -width 4
 	.try itemconfigure $id -text
-	.try printdialog
+	.try print
 	manualtest
 } {}
 
