@@ -155,9 +155,9 @@ proc ::class::classerror {class object result cmd arg} {
 		set error "wrong # args: should be \"$object [class::correctcmd $fcmd $cmd]\""
 	} elseif [regexp "^invalid command name \"(::class::${class},,c?m,.*)\"$" $result temp fcmd] {
 		if {"$class"=="$object"} {
-			set methods [join [lsort [concat [::class::info_ $class {} methods] [::class::info_ $class {} classmethods]]] ", "]
+			set methods [join [lsort [concat [::class::info_ $class $object methods] [::class::info_ $class $object classmethods]]] ", "]
 		} else {
-			set methods [join [lsort [::class::info_ $class {} methods]] ", "]
+			set methods [join [lsort [::class::info_ $class $object methods]] ", "]
 		}
 		set error "bad option \"$cmd\": must be $methods"
 	} else {
@@ -489,7 +489,7 @@ proc ::class::info_ {class object arg} {
 			}
 		}
 		classmethods {
-			if {"$class" == "$object"} {
+			if {("$class" == "$object")||("$object"=="")} {
 				if {$len == 1} {
 						set result ""
 						foreach cmd [lsort [info commands ::class::${class},,cm,*]] {

@@ -4,6 +4,7 @@ Classy::configmouse {Basic Buttons} {
 	Action <<Action>> <1> {The Action button is used to select something, to invoke a button, etc.}
 	Adjust <<Adjust>> <2> {The Adjust button provides an alternative action, eg. invoke button without closing dialog, etc}
 	{X paste} <<MXPaste>> <2> {paste the currently selected characters}
+	MainMenu <<MainMenu>> <Control-3> {The MainMenu button is used to pop up the main menu}
 	Menu <<Menu>> <3> {The Menu button can pop up a menu}
 	Execute <<MExecute>> <Double-1> {execute action, like when selecting in a listbox}
 	{Adjust Execute} <<MExecuteAjust>> <Double-2> {executes an alternative action, like when selecting in a listbox, but without removing the dialog it is in}

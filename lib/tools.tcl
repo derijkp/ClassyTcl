@@ -204,6 +204,65 @@ proc Classy::loadfunction {file function {pattern {}}} {
 	return $c
 }
 
+proc Classy::place {w {keepgeometry 1}} {
+	wm positionfrom $w program
+	wm withdraw $e
+	wm group $w .
+	wm protocol $object WM_DELETE_WINDOW [list catch [list destroy $w]]
+	after idle "Classy::doplace $w $keepgeometry"
+}
+
+proc Classy::doplace {w {keepgeometry 1}} {
+	set keeppos 0
+	set w [winfo reqwidth $w]
+	set h [winfo reqheight $w]
+	set x [lindex $resize 0]
+	set y [lindex $resize 1]
+	if {$x>=1} {set rx 1} else {set rx 0}
+	if {$y>=1} {set ry 1} else {set ry 0}
+	if {$x<=1} {set x $w}
+	if {$y<=1} {set y $h}
+	wm minsize $w $x $y
+	set keepgeometry [getprivate $object options(-keepgeometry)]
+	if [true $keepgeometry] {
+		set geom [Classy::Default get geometry $object]
+		if [regexp {^([0-9]+)x([0-9]+)\+([0-9]+)\+([0-9]+)} $geom temp xs ys prevx prevy] {
+			if {$xs>$w} {set w $xs}
+			if {$ys>$h} {set h $ys}
+			set temp [expr [winfo pointerx .]-$prevx]
+			if {($temp>0)&&($temp<$w)} {
+				set temp [expr [winfo pointery .]-$prevy]
+				if {($temp>0)&&($temp<$h)} {
+					set keeppos 1
+					set x $prevx
+					set y $prevy
+				}
+			}
+		}
+	}
+	wm resizable $object $rx $ry
+
+	# position
+	if !$keeppos {
+		set maxx [expr [winfo vrootwidth $object]-$w]
+		set maxy [expr [winfo vrootheight $object]-$h]
+		set x [expr [winfo pointerx .]-$w/2]
+		set y [expr [winfo pointery .]-$h/2]
+		if {$x>$maxx} {set x $maxx}
+		if {$y>$maxy} {set y $maxy}
+		if {$x<0} {set x 0}
+		if {$y<0} {set y 0}
+	}
+	wm geometry $object +1000000+1000000
+	wm deiconify $object
+	raise $object
+	if [true $keepgeometry] {
+		wm geometry $object ${w}x${h}+$x+$y
+	} else {
+		wm geometry $object +$x+$y
+	}
+}
+
 # For debugging purposes only
 
 proc ::Classy::msg {text} {

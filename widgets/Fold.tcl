@@ -109,3 +109,7 @@ Classy::Fold method close {} {
 	grid forget $object.content
 	uplevel #0 $options(-closecommand)
 }
+
+Classy::Fold method children {} {
+	return $object.content
+}

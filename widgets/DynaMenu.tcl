@@ -82,7 +82,7 @@ Classy::DynaMenu method makemenu {menutype menu cmdw bindtag {menuroot {}}} {
 	set cmdws($menu) $cmdw
 	set checks($menu) ""
 	bind $bindtag <<KeyMenu>> [list $object post $menu %X %Y]
-	bind $bindtag <<Menu>> [list $object post $menu %X %Y]
+	bind $bindtag <<MainMenu>> [list $object post $menu %X %Y]
 	bind $bindtag <FocusIn> [list $object cmdw $menu %W]
 	if ![winfo exists $menu] {
 		menu $menu -title [lindex $menutype 0]

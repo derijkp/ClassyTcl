@@ -56,6 +56,7 @@ if {"[info commands ::class::Tk_destroy]" == ""} {
 			if {"$w" == "."} {
 				exit
 			}
+			if {"$w" == ".classy__"} continue
 			foreach c [info commands ::class::Tk_$w.*] {
 				regexp {^::class::Tk_(.*)$} $c temp tempw
 				catch {$tempw destroy}
@@ -64,7 +65,7 @@ if {"[info commands ::class::Tk_destroy]" == ""} {
 				catch {$w destroy}
 			}
 		}
-		eval ::class::Tk_destroy $args
+		eval ::class::Tk_destroy [lremove $args .classy__]
 	}
 }
 
@@ -544,3 +545,5 @@ Widget method destroy {} {
 	}
 	catch {::class::Tk_destroy $object}
 }
+
+frame .classy__

@@ -11,6 +11,7 @@ proc browse {tree dir} {
 	if {"$dir" == ""} return
 	switch [try type $dir] {
 		e {
+			try selection set $dir
 			puts $dir
 		}
 		f {
@@ -37,6 +38,7 @@ proc browse {tree dir} {
 	}
 	.c configure -scrollregion [.c bbox all]
 }
+
 canvas .c -yscrollcommand {.s set}
 scrollbar .s -command {.c yview}
 pack .s -fill y -side left

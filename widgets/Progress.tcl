@@ -7,8 +7,8 @@
 #doc Progress title {
 #Progress
 #} descr {
-# subclass of <a href="Dialog.html">Dialog</a><br>
-# creates a dialog in which the progress of some action will be displayed.
+# subclass of <a href="Widget.html">Widget</a><br>
+# creates a widget in which the progress of some action will be displayed.
 # The progress will be displayed as the fraction of ticks passed (
 # ticks are passed by invoking the incr method), compared to the number 
 # of ticks to go (-ticks options). The display will be updated every
@@ -30,22 +30,18 @@ proc Progress {} {}
 #  Widget creation
 # ------------------------------------------------------------------
 
-Classy::Dialog subclass Classy::Progress
+Widget subclass Classy::Progress
 Classy::export Progress {}
 
 Classy::Progress classmethod init {args} {
-	super -title "Progress"
-#	wm title $object "Progress"
-#	wm resizable $object 0 0
-	message $object.options.message -text "Progress" -justify center
-	frame $object.options.frame -relief sunken -height 20
-	frame $object.options.frame.prog -relief raised -bg green -width 0 -height 20
-	label $object.options.percent -text "0%"
+	super
+	frame $object.frame -relief sunken -height 20
+	frame $object.frame.prog -relief raised -bg green -width 0 -height 20
+	label $object.frame.percent -text "0%" -anchor c -justify c
 
-	pack $object.options.message -fill x
-	pack $object.options.frame -fill x
-	pack $object.options.frame.prog -side left
-	pack $object.options.percent -fill x
+	pack $object.frame -fill x
+	pack $object.frame.prog -side left
+	place $object.frame.percent -relx 0.5 -rely 0.5 -anchor c
 
 	# REM Initialise variables and options
 	# ------------------------------------
@@ -59,7 +55,6 @@ Classy::Progress classmethod init {args} {
 	update idletasks
 }
 
-Classy::Progress component message {$object.options.message}
 # ------------------------------------------------------------------
 #  Widget options
 # ------------------------------------------------------------------
@@ -78,11 +73,7 @@ Classy::Progress addoption -width {width Width 200}
 
 #doc {Progress options -fg} option {-fg ? ?} descr {
 #}
-Classy::Progress chainoption -fg {$object.options.frame.prog} -bg
-
-#doc {Progress options -message} option {-message ? ?} descr {
-#}
-Classy::Progress chainoption -message {$object.options.message} -text
+Classy::Progress chainoption -fg {$object.frame.prog} -bg
 
 # ------------------------------------------------------------------
 #  Methods
@@ -102,8 +93,8 @@ Classy::Progress method incr {{value 1}} {
 	if {$value<0} {set value 0}
 	if {$value>$ticks} {set value $ticks}
 	set ratio [expr double($current)/$ticks]
-	$object.options.percent configure -text "[expr int($ratio*100)]%"
-	$object.options.frame.prog configure -width [expr int($ratio*[winfo width $object.options.frame])]
+	$object.frame.percent configure -text "[expr int($ratio*100)]%"
+	$object.frame.prog configure -width [expr int($ratio*[winfo width $object.frame])]
 	update idletasks
 }
 
@@ -118,8 +109,8 @@ Classy::Progress method set {value} {
 	if {$value<0} {set value 0}
 	if {$value>$ticks} {set value $ticks}
 	set ratio [expr double($current)/$ticks]
-	$object.options.percent configure -text "[expr int($ratio*100)]%"
-	$object.options.frame.prog configure -width [expr int($ratio*[winfo width $object.options.frame])]
+	$object.frame.percent configure -text "[expr int($ratio*100)]%"
+	$object.frame.prog configure -width [expr int($ratio*[winfo width $object.frame])]
 }
 
 #doc {Progress command get} cmd {
@@ -129,4 +120,8 @@ Classy::Progress method set {value} {
 Classy::Progress method get {} {
 	private $object current
 	return $current
+}
+
+Classy::Progress method children {} {
+	return ""
 }

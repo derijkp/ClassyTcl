@@ -57,6 +57,7 @@ Classy::Tree classmethod init {args} {
 		-roottext {}
 	}
 	setprivate $object order ""
+	setprivate $object selection ""
 	set options(-tag) "Tree:$object"
 	eval $object configure $args
 	set data() {t c}
@@ -212,7 +213,7 @@ Classy::Tree method _drawnode {node} {
 }
 
 Classy::Tree method _redraw {} {
-	private $object options data
+	private $object options data selection
 	::Classy::canceltodo $object _redraw
 	set canvas $options(-canvas)
 	if {"$canvas" == ""} return
@@ -240,10 +241,21 @@ Classy::Tree method _redraw {} {
 		set ti [$canvas create text \
 				[expr {$options(-startx) + $width/2 + $options(-padtext)}] $options(-starty) \
 				-text $options(-roottext) -anchor w -font $font\
-				-tags [list $options(-tag) classy::Tree {}]]
+				-tags [liszt $options(-tag) classy::Tree {}]]
 		set data() [structlset $data() i $i ti $ti]
 	}
 	$object _drawnode {}
+	$canvas delete $options(-tag)_selection
+	foreach node [lremove $selection {}] {
+		set bbox [$canvas bbox $node]
+		if {"$bbox" != ""} {
+			eval $canvas create rectangle [$canvas bbox $node] \
+				{-tags [list $options(-tag) $options(-tag)_selection]} \
+				-fill [option get $canvas selectBackground SelectBackground] \
+				-outline [option get $canvas selectBackground SelectBackground]
+			}
+	}
+	$canvas lower $options(-tag)_selection
 	::Classy::busy remove
 }
 
@@ -434,4 +446,24 @@ Classy::Tree method parentnode {node} {
 Classy::Tree method children {node} {
 	private $object data
 	return [structlget $data($node) l]
+}
+
+#doc {Tree command selection} cmd {
+# pathname selection
+# pathname selection clear
+# pathname selection add node ?node ...?
+# pathname selection set node ?node ...?
+# pathname selection remove node ?node ...?
+#} descr {
+#}
+Classy::Tree method selection {{cmd {}} args} {
+	private $object selection
+	switch $cmd {
+		"" {return $selection}
+		add {eval laddnew selection $args}
+		set {set selection $args}
+		remove {set selection [llremove $selection $args]}
+		clear {set selection ""}
+	}
+	Classy::todo $object _redraw
 }

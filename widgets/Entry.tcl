@@ -48,7 +48,13 @@ bind Classy::Entry <<Default>> {
 	set w [winfo parent %W]
 	if [winfo exists $w.defaults] {$w.defaults menu}
 }
-
+bind Classy::Entry <<Drop>> {
+	%W insert insert [DragDrop get]
+}
+bind Classy::Entry <<Drag-Motion>> {
+	tkEntryButton1 %W %x
+}
+bind Classy::Entry_frame <FocusIn> "focus %W.entry"
 
 # ------------------------------------------------------------------
 #  Widget creation
@@ -71,7 +77,7 @@ Classy::Entry classmethod init {args} {
 	# REM Create bindings
 	# -------------------
 	bindtags $object.entry [concat Classy::Entry [bindtags $object.entry]]
-	bind $object <FocusIn> "focus $object.entry"
+	bindtags $object [concat Classy::Entry_frame [bindtags $object]]
 	bind $object.entry <Any-KeyRelease> [list $object constrain warn]
 
 	# REM Initialise variables
@@ -258,5 +264,9 @@ Classy::Entry method _redrawentry {} {
 		pack $object.frame -side bottom -expand yes -fill x
 		return vertical
 	}
+}
+
+Classy::Entry method children {} {
+	return ""
 }
 

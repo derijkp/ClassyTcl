@@ -45,11 +45,10 @@ Classy::OptionBox classmethod init {args} {
 	
 	# REM Initialise variables
 	# ------------------------
-	private $object var
+	private $object var num
+	set num 1
 	set var {}
 	
-	setprivate $object options(-variable) [privatevar $object var]
-
 	# REM Configure initial arguments
 	# -------------------------------
 	if {"$args" != ""} {eval $object configure $args}
@@ -116,15 +115,22 @@ Classy::OptionBox addoption -variable {variable Variable {}} {
 #} descr {
 #}
 Classy::OptionBox method add {item text args} {
-	radiobutton $object.box.b$item -relief flat -anchor w\
-		-variable [getprivate $object options(-variable)] -text $text -value $item
-	if {"[getprivate $object options(-orient)]" == "vertical"} {
-		pack $object.box.b$item -side top -fill x -expand yes
+	private $object options num
+	if {"$options(-variable)" == ""} {
+		set varname [privatevar $object var]
 	} else {
-		pack $object.box.b$item -side left -fill x -expand yes
+		set varname $options(-variable)
 	}
-	if {"$args" != ""} {eval $object.box.b$item configure $args}
-	return $object.box.b$item
+	incr num
+	radiobutton $object.box.b$num -relief flat -anchor w\
+		-variable $varname -text $text -value $item
+	if {"$options(-orient)" == "vertical"} {
+		pack $object.box.b$num -side top -fill x -expand yes
+	} else {
+		pack $object.box.b$num -side left -fill x -expand yes
+	}
+	if {"$args" != ""} {eval $object.box.b$num configure $args}
+	return $object.box.b$num
 }
 
 #doc {OptionBox command set} cmd {
@@ -132,7 +138,13 @@ Classy::OptionBox method add {item text args} {
 #} descr {
 #}
 Classy::OptionBox method set {item} {
-	$object.box.b$item select
+	private $object options num
+	if {"$options(-variable)" == ""} {
+		set varname [privatevar $object var]
+	} else {
+		set varname $options(-variable)
+	}
+	uplevel #0 [list set $varname $item]
 }
 
 #doc {OptionBox command get} cmd {
@@ -140,7 +152,13 @@ Classy::OptionBox method set {item} {
 #} descr {
 #}
 Classy::OptionBox method get {} {
-	return [uplevel #0 set [getprivate $object options(-variable)]]
+	private $object options
+	if {"$options(-variable)" == ""} {
+		set varname [privatevar $object var]
+	} else {
+		set varname $options(-variable)
+	}
+	return [uplevel #0 set $varname]
 }
 
 #doc {OptionBox command items} cmd {
@@ -148,7 +166,24 @@ Classy::OptionBox method get {} {
 #} descr {
 #}
 Classy::OptionBox method items {} {
-	set list [winfo children $object.box]
-	regsub -all $object.box.b $list {} list
+	set list ""
+	foreach b [winfo children $object.box] {
+		lappend list [$b cget -value]
+	}
 	return $list
+}
+
+#doc {OptionBox command button} cmd {
+#pathname button item
+#} descr {
+#}
+Classy::OptionBox method button {item} {
+	foreach b [winfo children $object.box] {
+		if {"[$b cget -value]" == "$item"} {return $b}
+	}
+	return ""
+}
+
+Classy::OptionBox method children {} {
+	return ""
 }

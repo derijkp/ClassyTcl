@@ -96,6 +96,7 @@ Classy::NoteBook addoption -side {side Side top} {
 #}
 Classy::NoteBook method manage {label w args} {
 	private $object managed_options widget button num cmd
+	if [info exists widget($label)] {error "label \"$label\" exists"}
 	set pos [lsearch $args -command] 
 	if {$pos != -1} {
 		set cmd($label) [lindex $args [expr $pos+1]]
@@ -184,7 +185,7 @@ Classy::NoteBook method propagate {{state {}}} {
 #} descr {
 #}
 Classy::NoteBook method redraw {} {
-	private $object current button
+	private $object current button widget
 	set side [getprivate $object options(-side)]
 	set list ""
 	foreach item [lsort -dict [winfo children $object]] {
@@ -220,7 +221,9 @@ Classy::NoteBook method redraw {} {
 			-height [expr [winfo height $object] - $y - 2*$bd]
 		raise $object.book
 		if {"$current" != ""} {
+			if ![info exists widget($current)] return
 			raise $cw
+			raise $widget($current)
 			$cw configure -bg [$object.book cget -bg]
 			set bd [$cw cget -bd]
 			set x [expr $cx + $bd]
@@ -269,7 +272,9 @@ Classy::NoteBook method redraw {} {
 			-height [expr [winfo height $object] - 2*$bd]
 		raise $object.book
 		if {"$current" != ""} {
+			if ![info exists widget($current)] return
 			raise $cw
+			raise $widget($current)
 			set bd [$cw cget -bd]
 			set y [expr $cy + $bd]
 			set height [expr [winfo height $cw] - 2*$bd]
@@ -279,7 +284,72 @@ Classy::NoteBook method redraw {} {
 	}
 }
 
+#doc {NoteBook command get} cmd {
+#pathname get 
+#} descr {
+#}
 Classy::NoteBook method get {} {
 	private $object current
 	return $current
+}
+
+#doc {NoteBook command labels} cmd {
+#pathname labels 
+#} descr {
+#}
+Classy::NoteBook method labels {} {
+	private $object widget
+	return [array names widget]
+}
+
+#doc {NoteBook command window} cmd {
+#pathname window label 
+#} descr {
+#}
+Classy::NoteBook method window {label} {
+	private $object widget
+	return $widget($label)
+}
+
+#doc {NoteBook command button} cmd {
+#pathname button label
+#} descr {
+#}
+Classy::NoteBook method button {label} {
+	private $object button
+	return $object.tab$button($label)
+}
+
+#doc {NoteBook command delete} cmd {
+#pathname delete label 
+#} descr {
+#}
+Classy::NoteBook method delete {label} {
+	private $object widget button managed_options cmd current
+	if [info exists cmd($label)] {
+		unset cmd($label)
+	}
+	catch {unset widget($label)}
+	catch {unset managed_options($label)}
+	destroy $object.tab$button($label)
+	catch {unset button($label)}
+	if {"$current" == "$label"} {
+		$object select [lindex [array names widget] 0]
+	} else {
+		Classy::todo $object redraw
+	}
+}
+
+#doc {NoteBook command children} cmd {
+#pathname children
+#} descr {
+#}
+Classy::NoteBook method children {} {
+	set result ""
+	foreach w [lremove [winfo children $object] $object.label $object.book $object.cover_] {
+		if ![regexp "^$object.tab\[0-9\]+\$" $w] {
+			lappend result $w
+		}
+	}
+	return $result
 }

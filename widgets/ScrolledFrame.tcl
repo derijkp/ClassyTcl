@@ -67,7 +67,7 @@ Classy::ScrolledFrame method redraw {} {
 	update idletasks
 	set reqw [winfo reqwidth $w]
 	set reqh [winfo reqheight $w]
-	$object configure -width $reqw -height $reqh
+#	$object configure -width $reqw -height $reqh
 	update idletasks
 	set width [winfo width $object.view]
 	set height [winfo height $object.view]
@@ -80,6 +80,7 @@ Classy::ScrolledFrame method redraw {} {
 		place $w -width $reqw
 	} else {
 		if [winfo exists $object.hbar] {destroy $object.hbar}
+		$object configure -width $reqw
 		place $w -x 0 -width [winfo width $object.view]
 	}
 	if {$reqh > $height} {
@@ -91,6 +92,7 @@ Classy::ScrolledFrame method redraw {} {
 		place $w -height $reqh
 	} else {
 		if [winfo exists $object.vbar] {destroy $object.vbar}
+		$object configure -height $reqh
 		place $w -y 0 -height [winfo height $object]
 	}
 	grid columnconfigure $object 0 -weight 1
@@ -101,7 +103,6 @@ Classy::ScrolledFrame method redraw {} {
 	$object _sethbar
 	$object _setvbar
 }
-
 
 #doc {ScrolledFrame command xview} cmd {
 #pathname xview args
@@ -192,5 +193,9 @@ Classy::ScrolledFrame method _setvbar {args} {
 	set realh [winfo reqheight $w]
 	set viewh [winfo height $object.view]
 	$object.vbar set [expr -$y/$realh] [expr ($y+double($viewh))/$realh]
+}
+
+Classy::ScrolledFrame method children {} {
+	return [winfo children $object.view.frame]
 }
 

@@ -48,7 +48,18 @@ test Classy::RepeatButton {basic} {
 
 test Classy::Progress {basic} {
 	classyclean
-	Classy::Progress .try -message "Testing\n Please wait" -ticks 1000 -step 100
+	Classy::Progress .try -ticks 1000 -step 100
+	pack .try -fill x -expand yes
+	#.try set 50
+	for {set i 0} {$i<1000} {incr i} {
+		.try incr
+	}
+	.try get
+} {1000}
+
+test Classy::ProgressBox {basic} {
+	classyclean
+	Classy::ProgressBox .try -message "Testing\n Please wait" -ticks 1000 -step 100
 	#.try set 50
 	for {set i 0} {$i<1000} {incr i} {
 		.try incr

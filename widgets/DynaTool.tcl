@@ -19,16 +19,7 @@
 #<p>
 # Toolbar definitions for tooltype are usually controlled from the
 # Toolbars part of the <a href="../classy_configure.html">configuration 
-# system</a>. Creation of a toolbar of a certain type, will get the toolbar
-# definition from the option database by creating a dummy frame with 
-# class $tooltype and getting its option value for toolbar (class Toolbar).
-# you can add a tooltype in the configuration system by adding
-#<pre>
-### Sometool {this is an example toolbar} tool
-#option add *Sometool.Toolbar definition widgetDefault
-#</pre>
-# to the Toolbars configuration file. You will usually only need this 
-# configuration and the maketool method to get working toolbars.
+# system</a>.
 #<p>
 # A toolbar managed by DynaTool can control several widgets: The commands 
 # associated with the toolbar can include a %W, that on invocation is
@@ -150,10 +141,8 @@ Classy::DynaTool method maketool {tooltype tool cmdw} {
 #} descr {
 # set the definition describing the tools that will be generated 
 # for $tooltype.
-# If data is not given, the toolbar definition for $tooltype is obtained 
-# from the option database. A dummy frame with class $tooltype is created,
-# and the its option value for toolbar (class Toolbar) obtained. This option
-# will usually be set in the Toolbars part 
+# If data is not given, the toolbar definition for $tooltype will be returned.
+# Definition of toolbars is usually done in the
 # <a href="../classy_configure.html">configuration system</a>.
 # You will usually not invoke this method, as the maketool
 # method will automatically define a tooltype that isn't managed yet.
@@ -163,23 +152,19 @@ Classy::DynaTool method define {tooltype {data {}}} {
 	if [info exists tooldata($tooltype)] {set keep $tooldata($tooltype)}
 	if {"$data" != ""} {
 		set tooldata($tooltype) $data
+		$object redraw $tooltype
 	} else {
-		catch {destroy .classy__.temp}
-		frame .classy__.temp -class $tooltype
-		set tooldata($tooltype) [option get .classy__.temp toolbar Toolbar]
-		destroy .classy__.temp
+		return $tooldata($tooltype)
 	}
-	$object redraw $tooltype
 }
-
 
 #doc {DynaTool names} cmd {
 #pathname names 
 #} descr {
 #}
-Classy::DynaTool method names {} {
+Classy::DynaTool method names {{pattern *}} {
 	private $object tooldata
-	return [array names tooldata]
+	return [array names tooldata $pattern]
 }
 
 Classy::DynaTool method add {tooltype data} {

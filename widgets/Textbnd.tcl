@@ -47,6 +47,13 @@
 # The code below creates the default class bindings for entries.
 #-------------------------------------------------------------------------
 
+bind Classy::Text <<Drop>> {
+	catch {%W textinsert [DragDrop get]}
+}
+bind Classy::Text <<Drag-Motion>> {
+	%W position [::class::Tk_%W index @%x,%y]
+}
+
 bind Classy::Text <<Action>> {
 	%W position [::class::Tk_%W index @%x,%y]
 }

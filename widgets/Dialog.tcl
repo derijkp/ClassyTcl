@@ -7,7 +7,7 @@
 #doc Dialog title {
 #Dialog
 #} descr {
-# subclass of <a href="../basic/Widget.html">Widget</a><br>
+# subclass of <a href="../basic/Toplevel.html">Toplevel</a><br>
 # Dialog produces "intelligent" dialog. They have a simple option to
 #make tehm resizable or not. They automatically assume a reasonable
 #minimum size based on their content (The dialog will be placed on the
@@ -68,19 +68,15 @@ bind Classy::DialogButton <<Invoke>> {
 #  Widget creation
 # ------------------------------------------------------------------
 
-Widget subclass Classy::Dialog
+Classy::Toplevel subclass Classy::Dialog
 
 Classy::export Dialog {}
 
 Classy::Dialog classmethod init {args} {
 	# REM Create object
 	# -----------------
-	super toplevel
-#	wm geometry $object +1000000+1000000
-	wm positionfrom $object program
-	wm withdraw $object
-	wm group $object .
-	wm protocol $object WM_DELETE_WINDOW [list catch [list $object destroy]]
+	super
+	Classy::Dialog private options(-title) {title Title "Dialog"}
 	frame $object.options
 	frame $object.actions
 	button $object.actions.close -text "Close"
@@ -103,7 +99,6 @@ Classy::Dialog classmethod init {args} {
 	# REM Configure initial arguments
 	# -------------------------------
 	if {"$args" != ""} {eval $object configure $args}
-	Classy::todo $object place
 }
 
 Classy::Dialog component options {$object.options}
@@ -119,25 +114,6 @@ Classy::Dialog component options {$object.options}
 #}
 Classy::Dialog chainoption -closecommand {$object.actions.close} -command
 
-#doc {Dialog options -keepgeometry} option {-keepgeometry keepGeometry KeepGeometry} descr {
-#remember size of dialog for next creation
-#}
-Classy::Dialog addoption -keepgeometry {keepGeometry KeepGeometry yes}
-
-#doc {Dialog options -cache} option {-cache cache Cache} descr {
-#hide the dialog instead of destroying it when it is closed
-#}
-Classy::Dialog addoption -cache {cache Cache 0} {
-	set value [true $value]
-}
-
-#doc {Dialog options -title} option {-title dialog Dialog} descr {
-#}
-Classy::Dialog addoption -title {dialog Dialog "Dialog"} {
-	wm title $object $value
-	return $value
-}
-
 #doc {Dialog options -help} option {-help help Help} descr {
 # add a help button. A file with the name helpvalue.html will
 # be shown in a help window whein the button is invoked
@@ -151,28 +127,6 @@ Classy::Dialog addoption -help {help Help {}} {
 		pack $object.actions.help -side right -expand yes -padx 5 -pady 10
 		bind $object <<Help>> "$object invoke help"
 		bind $object <Control-h> "$object invoke help"
-	}
-	return $value
-}
-
-#doc {Dialog options -resize} option {-resize resize Resize} descr {
-#list of 2 values determining whether the dialog is resizable in x
-#and y direction
-#}
-Classy::Dialog addoption -resize {resize Resize {1 1}} {
-	set x [lindex $value 0]
-	set y [lindex $value 1]
-	if {$x>1} {set x 1}
-	if {$y>1} {set y 1}
-	wm resizable $object $x $y
-	return $value
-}
-
-#doc {Dialog options -autoraise} option {-autoraise autoRaise AutoRaise} descr {
-#}
-Classy::Dialog addoption -autoraise {autoRaise AutoRaise 0} {
-	if $value {
-		raise $object
 	}
 	return $value
 }
@@ -222,7 +176,7 @@ Classy::Dialog method add {button text command args} {
 	return $object.actions.$button
 }
 
-#doc {Dialog command add} cmd {
+#doc {Dialog command button} cmd {
 #pathname button ?button?
 #} descr {
 # returns a list of buttons; if button is given, returns the parameters given to this button.
@@ -322,74 +276,6 @@ Classy::Dialog method close {} {
 	}
 }
 
-#doc {Dialog command hide} cmd {
-#pathname hide 
-#} descr {
-#hide the dialog
-#}
-Classy::Dialog method hide {} {
-	Classy::Default set geometry $object [winfo geometry $object]
-	wm withdraw $object
-}
-
-#doc {Dialog command place} cmd {
-#pathname place 
-#} descr {
-#display the dialog in a proper position, size, ...
-#}
-Classy::Dialog method place {} {
-	set resize [getprivate $object options(-resize)]
-	update idletasks
-	set keeppos 0
-	set w [winfo reqwidth $object]
-	set h [winfo reqheight $object]
-	set x [lindex $resize 0]
-	set y [lindex $resize 1]
-	if {$x>=1} {set rx 1} else {set rx 0}
-	if {$y>=1} {set ry 1} else {set ry 0}
-	if {$x<=1} {set x $w}
-	if {$y<=1} {set y $h}
-	wm minsize $object $x $y
-	set keepgeometry [getprivate $object options(-keepgeometry)]
-	if [true $keepgeometry] {
-		set geom [Classy::Default get geometry $object]
-		if [regexp {^([0-9]+)x([0-9]+)\+([0-9]+)\+([0-9]+)} $geom temp xs ys prevx prevy] {
-			if {$xs>$w} {set w $xs}
-			if {$ys>$h} {set h $ys}
-			set temp [expr [winfo pointerx .]-$prevx]
-			if {($temp>0)&&($temp<$w)} {
-				set temp [expr [winfo pointery .]-$prevy]
-				if {($temp>0)&&($temp<$h)} {
-					set keeppos 1
-					set x $prevx
-					set y $prevy
-				}
-			}
-		}
-	}
-	wm resizable $object $rx $ry
-
-	# position
-	if !$keeppos {
-		set maxx [expr [winfo vrootwidth $object]-$w]
-		set maxy [expr [winfo vrootheight $object]-$h]
-		set x [expr [winfo pointerx .]-$w/2]
-		set y [expr [winfo pointery .]-$h/2]
-		if {$x>$maxx} {set x $maxx}
-		if {$y>$maxy} {set y $maxy}
-		if {$x<0} {set x 0}
-		if {$y<0} {set y 0}
-	}
-	wm geometry $object +1000000+1000000
-	wm deiconify $object
-	raise $object
-	if [true $keepgeometry] {
-		wm geometry $object ${w}x${h}+$x+$y
-	} else {
-		wm geometry $object +$x+$y
-	}
-}
-
 # patches from the original code in button.tcl
 
 proc Classy::DialogButtonDown w {
@@ -435,15 +321,5 @@ Classy::Dialog classmethod destroy {} {
 	rename ::Classy::DialogButtonInvoke {}
 	rename ::Classy::DialogButtonUp {}
 	rename ::Classy::DialogButtonDown {}
-}
-
-#doc {Dialog command destroy} cmd {
-#pathname destroy 
-#} descr {
-#}
-Classy::Dialog method destroy {} {
-	if [true [getprivate $object options(-keepgeometry)]] {
-		Classy::Default set geometry $object [winfo geometry $object]
-	}
 }
 

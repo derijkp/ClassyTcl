@@ -25,13 +25,12 @@ proc Builder {} {}
 #  Widget creation
 # ------------------------------------------------------------------
 
-Widget subclass Classy::Builder
+Classy::Toplevel subclass Classy::Builder
 Classy::export Builder {}
 
 Classy::Builder classmethod init {args} {
-	super toplevel
+	super -keepgeometry all -resize {10 10}
 	set w [Classy::window $object]
-	wm geometry $object +10000+10000
 
 	private $object browse
 	Classy::DynaMenu makemenu Classy::Builder .classy__.buildermenu $object Classy::BuilderMenu
@@ -43,30 +42,14 @@ Classy::Builder classmethod init {args} {
 
 	frame $object.bframe
 	Classy::OptionMenu $object.dirmenu
-	canvas $object.browse -width 80 -height 10\
-		-yscrollcommand [list $object.bvbar set] -xscrollcommand [list $object.bhbar set]
-	scrollbar $object.bvbar -orient vertical -command [list $object.browse yview]
-	scrollbar $object.bhbar -orient horizontal -command [list $object.browse xview]
-	catch {$object.tree destroy}
-	Classy::Tree $object.tree -canvas $object.browse
+	Classy::TreeWidget $object.browse -width 80 -height 10 \
+		-opencommand "$object opennode" \
+		-closecommand "$object closenode" \
+		-endnodecommand "$object openendnode"
 	grid $object.dirmenu -in $object.bframe -row 0 -column 0 -columnspan 2 -sticky nsew
 	grid $object.browse -in $object.bframe -row 1 -column 0 -sticky nsew
-	grid $object.bvbar -in $object.bframe -row 1 -column 1 -sticky ns
-	grid $object.bhbar -in $object.bframe -row 2 -column 0 -sticky ew
 	grid columnconfigure $object.bframe 0 -weight 1
 	grid rowconfigure $object.bframe 1 -weight 1
-
-	set w [winfo reqwidth $object]
-	set h [expr {[winfo reqheight $object]+300}]
-	set maxx [expr [winfo vrootwidth $object]-$w]
-	set maxy [expr [winfo vrootheight $object]-$h]
-	set x [expr [winfo pointerx .]-$w/2]
-	set y [expr [winfo pointery .]-$h/2]
-	if {$x>$maxx} {set x $maxx}
-	if {$y>$maxy} {set y $maxy}
-	if {$x<0} {set x 0}
-	if {$y<0} {set y 0}
-	wm geometry $object ${w}x${h}+$x+$y
 
 	grid $object.bframe -sticky nsew
 	grid columnconfigure $object 0 -weight 1	
@@ -126,8 +109,7 @@ Classy::Builder addoption -dirs {dirs Directories {}} {
 #} descr {
 #}
 Classy::Builder method destroy {} {
-	bind Classy::Builder_$object <<Action>> {}
-	$object.tree destroy
+	$object.browse destroy
 }
 
 # ------------------------------------------------------------------
@@ -139,19 +121,19 @@ Classy::Builder method close {} {
 	if ![info exists open(type)] {return 0}
 	switch $open(type) {
 		dialog - toplevel {
-			$object _creatededit $object.dedit
-			return [$object.dedit close]
+			return [catch {$object.dedit close}]
 		}
 		file {}
 		function {
-			if [$object.fedit.edit textchanged] {
-				if ![Classy::yorn "Are you sure you want to abort the current editing session"] {
-					return 1
+			catch {
+				if [$object.fedit.edit textchanged] {
+					if ![Classy::yorn "Are you sure you want to abort the current editing session"] {
+						return 1
+					}
+					$object.fedit.edit textchanged 0
 				}
-				$object.fedit.edit textchanged 0
+				$object.fedit hide
 			}
-			Classy::Default set geom $object.fedit [wm geometry $object.fedit]
-			wm withdraw $object.fedit
 		}
 		default {
 			return [$object.confedit.edit close]
@@ -162,13 +144,15 @@ Classy::Builder method close {} {
 
 Classy::Builder method new {type {name {}}} {
 	global auto_index
-	private $object browse options
+	private $object browse options dirs
 	if [$object close] return
 	if {"$name" == ""} {
 		catch {destroy $object.temp}
-		Classy::InputBox $object.temp -title "New file" -label "Name" -command "$object new $type \[$object.temp get\]"
+		Classy::InputBox $object.temp -title "New file" -label "Name" \
+			-command "$object new $type \[$object.temp get\]"
 		return
 	}
+	set browse(type) $type
 	if {"$type" == "file"} {
 		if ![regexp {\.tcl$} $name] {append name .tcl}
 		if [file isdir $browse(file)] {
@@ -176,6 +160,7 @@ Classy::Builder method new {type {name {}}} {
 		} else {
 			set file [file join [file dir $browse(file)] $name]
 		}
+		set browse(file) $file
 		if ![file exists $file] {
 			set f [open $file w]
 			puts $f "#Functions"
@@ -183,17 +168,17 @@ Classy::Builder method new {type {name {}}} {
 		}
 		set dir [file dir $file]
 		if {"$options(-dir)" == ""} {
-			set defdir [file join $::Classy::appdir lib]
+			set defdir [structlget $dirs [list [$object.dirmenu get]]]
 		} else {
 			set defdir $options(-dir)
 		}
 		set base [list $file {} file]
 		if {"$dir" == "$defdir"} {
-			$object.tree addnode {} $base -text [file tail $file] -image [Classy::geticon newfile]
+			$object.browse addnode {} $base -text [file tail $file] -image [Classy::geticon newfile]
 		} else {
-			$object.tree addnode $dir $base -text [file tail $file] -image [Classy::geticon newfile]
+			$object.browse addnode [list $dir {} dir] $base -text [file tail $file] -image [Classy::geticon newfile]
 		}
-		$object _drawselect $base
+		$object.browse selection set $base
 		return
 	}
 	if [info exists auto_index($name)] {
@@ -218,10 +203,10 @@ Classy::Builder method new {type {name {}}} {
 			$object.dedit new toplevel $name $file
 		}
 	}
-	set base [list $file $name file]
-	$object.tree addnode [list $file {} file] $base -type end -text $name -image [Classy::geticon new$type]
+	set base [list $file $name $type]
+	$object.browse addnode [list $file {} file] $base -type end -text $name -image [Classy::geticon new$type]
 	update idletasks
-	$object _drawselect $base
+	$object.browse selection set $base
 	$object open $file $name $type
 }
 
@@ -229,9 +214,7 @@ Classy::Builder method _creatededit {w} {
 	if ![winfo exists $w] {
 		Classy::WindowBuilder $w
 	} else {
-		wm withdraw $w
-		wm geometry $w [Classy::Default get geom $w]
-		wm deiconify $w
+		$w place
 	}
 }
 
@@ -240,6 +223,10 @@ Classy::Builder method open {file function type} {
 	global auto_index
 	private $object browse open
 	if [$object close] return
+	set browse(base) [list $file $function $type]
+	set browse(file) $file
+	set browse(name) $function
+	set browse(type) $type
 	set open(type) $type
 	switch $type {
 		toplevel -
@@ -262,15 +249,17 @@ Classy::Builder method cut {} {
 	global auto_index
 	private $object options browse
 	set file $browse(file)
+	$object close
 	if {"$browse(type)" == "file"} {
 		set browse(clipbf) $file
 		set browse(clipb) [readfile $file]
 		clipboard clear
 		clipboard append [readfile $file]
 		file rename -force $file $file~
-		$object.tree deletenode $file
+		$object.browse deletenode $browse(base)
 		return $file
-	} elseif {"$browse(type)" == "function"} {
+	} elseif {"$browse(type)" == "dir"} {
+	} else {
 		set result ""
 		set work ""
 		set function $browse(name)
@@ -292,8 +281,8 @@ Classy::Builder method cut {} {
 		writefile $file $result
 		catch {auto_mkindex [file dirname $file] *.tcl}
 		catch {unset auto_index($function)}
-		$object _drawselect {}
-		$object.tree deletenode [list $file $function]
+		$object.browse selection set {}
+		$object.browse deletenode $browse(base)
 		return $function
 	}
 }
@@ -345,8 +334,8 @@ Classy::Builder method paste {} {
 	set f [open $file a]
 	puts $f $browse(clipb)
 	close $f
-	$object browse $browse(file)
-	$object browse $browse(file)
+	$object closenode [list $browse(file) {} file]
+	$object opennode [list $browse(file) {} file]
 }
 
 Classy::Builder method save {} {
@@ -368,120 +357,124 @@ Classy::Builder method save {} {
 	return $result
 }
 
-Classy::Builder method browse {root base} {
-puts $base
+Classy::Builder method openendnode {base} {
 	private $object browse
 	if {"$base" == ""} return
 	set browse(base) $base
 	set browse(file) [lindex $base 0]
 	set browse(name) [lindex $base 1]
 	set browse(type) [lindex $base 2]
-	switch [$object.tree type $root] {
-		e {
-			$object open $browse(file) $browse(name) $browse(type)
-		}
-		f {
-			$object close
-			$object.tree clearnode $base
-			if ![file isdir $browse(file)] {
-				catch {$object open $browse(file) $browse(name) $browse(type)}
-			}
-		}
-		c {
-			if [file isdir $browse(file)] {
-				$object close
-				set list ""
-				set olist ""
-				foreach file [glob -nocomplain [file join $browse(file) *]] {
-					if [file isdir $file] {
-						$object.tree addnode $root [list $file {} dir] -text [file tail $file]
-					} elseif {"[file extension $file]" == ".tcl"} {
-						lappend list $file
-					} elseif [regexp {~$} $file]  {
-					} elseif {"[file tail $file]" == "tclIndex"}  {
-					} else {
-						lappend olist $file
-					}
-				}
-				foreach file [lsort $list] {
-					switch -- [file tail $file] {
-						Colors.tcl - Keys.tcl - Misc.tcl - Toolbars.tcl - 
-						Fonts.tcl - Menus.tcl - Mouse.tcl {
-							set f [open $file]
-							set line [gets $f]
-							close $f
-							if [regexp {^#ClassyTcl ([^ ]+) configuration file} $line temp type] {
-								set image [Classy::geticon Builder/config_$type]
-							} else {
-								set image [Classy::geticon newfile]
-							}
-						}
-						default {
-							set type file
-							set image [Classy::geticon newfile]
-						}
-					}
-					$object.tree addnode $root [list $file {} $type] -text [file tail $file] -image $image
-				}
-				foreach file [lsort $olist] {
-					$object.tree addnode $root [list $file {} file] -text [file tail $file] -type end -image [Classy::geticon newfile]
-				}
-			} else {
-				set f [open $browse(file)]
-				set browse(type) file
-				while {![eof $f]} {
-					set line [gets $f]
-					if [regexp ^proc $line] {
-						if [info complete $line] {
-							set func [lindex "$line" 1]
-						} else {
-							set func [lindex "$line\}" 1]
-						}
-						if [regexp {# ClassyTcl generated Dialog} $line] {
-							$object.tree addnode $root [list $browse(file) $func dialog] \
-								-type end -text $func -image [Classy::geticon newdialog]
-						} elseif [regexp {# ClassyTcl generated Toplevel} $line] {
-							$object.tree addnode $root [list $browse(file) $func toplevel] \
-								-type end -text $func -image [Classy::geticon newtoplevel]
-						} else {
-							$object.tree addnode $root [list $browse(file) $func function] -type end -text $func -image [Classy::geticon newfunction]
-						}
-					} elseif [regexp {^Classy::config([^ ]+) } $line temp type] {
-						if [info complete $line] {
-							set func [lindex "$line" 1]
-						} else {
-							set func [lindex "$line\}" 1]
-						}
-						set browse(type) $type
-						$object.tree addnode $root [list $browse(file) $func $type] \
-							-type end -text $func -image [Classy::geticon Builder/config_$type]
-					}
-				}
-				close $f
-				$object open $browse(file) $browse(name) $browse(type)
-			}
-		}
-	}
-	update idletasks
-	catch {$object _drawselect $browse(base)}
-	$object.browse configure -scrollregion [$object.browse bbox all]
+	$object open $browse(file) $browse(name) $browse(type)
+	$object.browse selection set $base
 }
 
-Classy::Builder method _drawselect {base} {
+Classy::Builder method closenode {base} {
 	private $object browse
-	$object.browse delete selection
 	if {"$base" == ""} return
-	eval $object.browse create rectangle [$object.browse bbox $base] \
-		-tags selection \
-		-fill [option get $object selectBackground SelectBackground] \
-		-outline [option get $object selectBackground SelectBackground]
-	$object.browse lower selection
+	set browse(base) $base
+	set browse(file) [lindex $base 0]
+	set browse(name) [lindex $base 1]
+	set browse(type) [lindex $base 2]
+	$object close
+	$object.browse clearnode $base
+	if ![file isdir $browse(file)] {
+		catch {$object open $browse(file) $browse(name) $browse(type)}
+	}
+}
+
+Classy::Builder method opennode {args} {
+	private $object browse
+	if {[llength $args] == 1} {
+		set base [lindex $args 0]
+		set root $base
+	} else {
+		set root [lindex $args 0]
+		set base [lindex $args 1]
+	}
+	if {"$base" == ""} return
+	set browse(base) $base
+	set browse(file) [lindex $base 0]
+	set browse(name) [lindex $base 1]
+	set browse(type) [lindex $base 2]
+	if [file isdir $browse(file)] {
+		$object close
+		set list ""
+		set olist ""
+		foreach file [glob -nocomplain [file join $browse(file) *]] {
+			if [file isdir $file] {
+				$object.browse addnode $root [list $file {} dir] -text [file tail $file]
+			} elseif {"[file extension $file]" == ".tcl"} {
+				lappend list $file
+			} elseif [regexp {~$} $file]  {
+			} elseif {"[file tail $file]" == "tclIndex"}  {
+			} else {
+				lappend olist $file
+			}
+		}
+		foreach file [lsort $list] {
+			switch -- [file tail $file] {
+				Colors.tcl - Keys.tcl - Misc.tcl - Toolbars.tcl - 
+				Fonts.tcl - Menus.tcl - Mouse.tcl {
+					set f [open $file]
+					set line [gets $f]
+					close $f
+					if [regexp {^#ClassyTcl ([^ ]+) configuration file} $line temp type] {
+						set image [Classy::geticon Builder/config_$type]
+					} else {
+						set image [Classy::geticon newfile]
+					}
+				}
+				default {
+					set type file
+					set image [Classy::geticon newfile]
+				}
+			}
+			$object.browse addnode $root [list $file {} $type] -text [file tail $file] -image $image
+		}
+		foreach file [lsort $olist] {
+			$object.browse addnode $root [list $file {} file] -text [file tail $file] -type end -image [Classy::geticon newfile]
+		}
+	} else {
+		set f [open $browse(file)]
+		set browse(type) file
+		while {![eof $f]} {
+			set line [gets $f]
+			if [regexp ^proc $line] {
+				if [info complete $line] {
+					set func [lindex "$line" 1]
+				} else {
+					set func [lindex "$line\}" 1]
+				}
+				if [regexp {# ClassyTcl generated Dialog} $line] {
+					$object.browse addnode $root [list $browse(file) $func dialog] \
+						-type end -text $func -image [Classy::geticon newdialog]
+				} elseif [regexp {# ClassyTcl generated Toplevel} $line] {
+					$object.browse addnode $root [list $browse(file) $func toplevel] \
+						-type end -text $func -image [Classy::geticon newtoplevel]
+				} else {
+					$object.browse addnode $root [list $browse(file) $func function] -type end -text $func -image [Classy::geticon newfunction]
+				}
+			} elseif [regexp {^Classy::config([^ ]+) } $line temp type] {
+				if [info complete $line] {
+					set func [lindex "$line" 1]
+				} else {
+					set func [lindex "$line\}" 1]
+				}
+				set browse(type) $type
+				$object.browse addnode $root [list $browse(file) $func $type] \
+					-type end -text $func -image [Classy::geticon Builder/config_$type]
+			}
+		}
+		close $f
+		$object open $browse(file) $browse(name) $browse(type)
+	}
+	$object.browse selection set $base
 }
 
 Classy::Builder method _drawtree {} {
 	private $object options browse dirs
 	if [$object close] return
-	$object.tree clearnode {}
+	$object.browse clearnode {}
 	if {"$options(-dir)" == ""} {
 		set dir [structlget $dirs [list [$object.dirmenu get]]]
 	} else {
@@ -489,23 +482,19 @@ Classy::Builder method _drawtree {} {
 	}
 	catch {auto_mkindex $dir *.tcl}
 	catch {source [file join $dir tclIndex]}
-	$object browse {} [list $dir {} dir]
+	$object opennode {} [list $dir {} dir]
 	update idletasks
-	set select [lindex [$object.tree children {}] 0]
-	$object browse $select $select
-	bind $object.browse <<Action>> "$object browse \[$object.tree node %x %y\] \[$object.tree node %x %y\]"
+	set select [lindex [$object.browse children {}] 0]
+	$object opennode $select
 }
 
 Classy::Builder method fedit {w file function type} {
 	if ![winfo exists $w] {
-		toplevel $w
-		wm protocol $w WM_DELETE_WINDOW [list catch [list destroy $w]]
-		Classy::Editor $w.edit -closecommand "Classy::Default set geom $w \[wm geometry $w\];wm withdraw $w"
+		Classy::Toplevel $w -keepgeometry all -resize {2 2}
+		Classy::Editor $w.edit -closecommand "$w hide"
 		pack $w.edit -fill both -expand yes
 	} else {
-		wm withdraw $w
-		wm geometry $w [Classy::Default get geom $w]
-		wm deiconify $w
+		$w place
 	}
 	wm title $w $file
 	$w.edit load $file
@@ -524,14 +513,11 @@ Classy::Builder method fedit {w file function type} {
 
 Classy::Builder method confedit {w file function type} {
 	if ![winfo exists $w] {
-		toplevel $w
-		wm protocol $w WM_DELETE_WINDOW [list catch [list destroy $w]]
-		Classy::Config $w.edit -closecommand "Classy::Default set geom $w \[wm geometry $w\];wm withdraw $w"
+		Classy::Toplevel $w -keepgeometry all
+		Classy::Config $w.edit -closecommand "$w hide"
 		pack $w.edit -fill both -expand yes
 	} else {
-		wm withdraw $w
-		wm geometry $w [Classy::Default get geom $w]
-		wm deiconify $w
+		$w place
 	}
 	wm title $w $file
 	$w.edit open $file $function $type

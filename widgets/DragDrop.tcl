@@ -115,22 +115,25 @@ Classy::DragDrop method _events {app x y} {
 	set dropw [winfo containing $x $y]
 	if {"$data(prev)" != ""} {
 		if {"$data(prev)" != "$dropw"} {
-			event generate $data(prev) <<Drag-Leave>> -x $x -y $y
+			set rx [expr {$x-[winfo rootx $data(prev)]}]
+			set ry [expr {$y-[winfo rooty $data(prev)]}]
+			event generate $data(prev) <<Drag-Leave>> -x $rx -y $ry
 		}
 	}
 	if {"$dropw" == ""} {
 		set data(prev) ""
 		return ""
 	}
+	set rx [expr {$x-[winfo rootx $dropw]}]
+	set ry [expr {$y-[winfo rooty $dropw]}]
 	if {"$data(prev)" != "$dropw"} {
-		event generate $dropw <<Drag-Enter>> -x $x -y $y
+		event generate $dropw <<Drag-Enter>> -x $rx -y $ry
 	}
-	set data(dropw) [winfo containing $x $y]
-	event generate $dropw <<Drag-Motion>> -x $x -y $y
+	event generate $dropw <<Drag-Motion>> -x $rx -y $ry
 	set data(prev) $dropw
 }
 
-#doc {DragDrop command start} cmd {
+#doc {DragDrop command move} cmd {
 # Classy::DragDrop move<br>
 #} descr {
 # This method is called while dragging. It updates the dragged window, and generates
@@ -149,15 +152,19 @@ Classy::DragDrop method move {} {
 	set curapp [tk appname]
 	if {"$data(prev)" != ""} {
 		if {"$data(prev)" != "$dropw"} {
-			event generate $data(prev) <<Drag-Leave>> -x $x -y $y
+			set rx [expr {$x-[winfo rootx $data(prev)]}]
+			set ry [expr {$y-[winfo rooty $data(prev)]}]
+			event generate $data(prev) <<Drag-Leave>> -x $rx -y $ry
 		}
 	}
 	if {"$dropw" != ""} {
+		set rx [expr {$x-[winfo rootx $dropw]}]
+		set ry [expr {$y-[winfo rooty $dropw]}]
 		set data(app) $curapp
 		if {"$data(prev)" != "$dropw"} {
-			event generate $dropw <<Drag-Enter>> -x $x -y $y
+			event generate $dropw <<Drag-Enter>> -x $rx -y $ry
 		}
-		event generate $dropw <<Drag-Motion>> -x $x -y $y
+		event generate $dropw <<Drag-Motion>> -x $rx -y $ry
 	} else {
 	    foreach app [lremove [winfo interps] $curapp] {
 			catch {send -- $app Classy::DragDrop _events [list $curapp] $x $y} res
@@ -166,7 +173,7 @@ Classy::DragDrop method move {} {
 	set data(prev) $dropw
 }
 
-#doc {DragDrop command start} cmd {
+#doc {DragDrop command configure} cmd {
 # Classy::DragDrop configure ?option? ?value? ?option value...?<br>
 #} descr {
 # returns or changes the options for the current drag. following options are supported:
