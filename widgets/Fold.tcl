@@ -21,9 +21,6 @@
 #doc {Fold command} h2 {
 #	Fold specific methods
 #}
-# Next is to get the attention of auto_mkindex
-# These will be added to tclIndex by Classy::auto_mkindex
-#auto_index Fold
 
 option add *Classy::Fold.relief flat widgetDefault
 option add *Classy::Fold.knob.relief flat widgetDefault
@@ -36,7 +33,6 @@ option add *Classy::Fold.spacer.width 10 widgetDefault
 # ------------------------------------------------------------------
 
 Widget subclass Classy::Fold
-Classy::export Fold {}
 
 Classy::Fold method init {args} {
 	# REM Create object

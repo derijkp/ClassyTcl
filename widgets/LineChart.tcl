@@ -42,15 +42,12 @@
 #	LineChart specific methods
 #} descr {
 #}
-# These will be added to tclIndex by Classy::auto_mkindex
-#auto_index LineChart
 
 # ------------------------------------------------------------------
 #  Widget creation
 # ------------------------------------------------------------------
 
 Class subclass Classy::LineChart
-Classy::export LineChart {}
 
 Classy::LineChart method init {args} {
 	super init

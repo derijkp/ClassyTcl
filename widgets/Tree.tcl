@@ -39,15 +39,12 @@
 #	Tree specific methods
 #} descr {
 #}
-# These will be added to tclIndex by Classy::auto_mkindex
-#auto_index Tree
 
 # ------------------------------------------------------------------
 #  Widget creation
 # ------------------------------------------------------------------
 
 Class subclass Classy::Tree
-Classy::export Tree {}
 
 Classy::Tree method init {args} {
 	super init
@@ -422,16 +419,15 @@ Classy::Tree method deletenode {node} {
 	$canvas delete $ca(i)
 	$canvas delete $ca(ti)
 	$canvas delete $ca(x)
-
 	set parent $ca(p)
 	array set pa $data($parent)
 	set pa(l) [lremove $pa(l) $node]
 	if {[llength $pa(l)] == 0} {
 		$object clearnode $parent
-		$canvas delete $ca(s)
+#		$canvas delete $ca(s)
+	} else {
+		set data($parent) [array get pa]
 	}
-	set data($parent) [array get pa]
-
 	catch {unset data($node)}
 	Classy::todo $object _redraw
 }

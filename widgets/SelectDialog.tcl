@@ -27,15 +27,12 @@
 #doc {SelectDialog command} h2 {
 #	SelectDialog specific methods
 #}
-# These will be added to tclIndex by Classy::auto_mkindex
-#auto_index SelectDialog
 
 # ------------------------------------------------------------------
 #  Widget creation
 # ------------------------------------------------------------------
 
 Classy::Dialog subclass Classy::SelectDialog
-Classy::export SelectDialog {}
 
 Classy::SelectDialog method init {args} {
 	super init

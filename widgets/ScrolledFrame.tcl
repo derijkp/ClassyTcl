@@ -20,8 +20,6 @@
 #doc {ScrolledFrame command} h2 {
 #	ScrolledFrame specific methods
 #}
-# These will be added to tclIndex by Classy::auto_mkindex
-#auto_index ScrolledFrame
 
 bind Classy::ScrolledFrame <Configure> {Classy::todo %W redraw}
 
@@ -29,7 +27,6 @@ bind Classy::ScrolledFrame <Configure> {Classy::todo %W redraw}
 #  Widget creation
 # ------------------------------------------------------------------
 Widget subclass Classy::ScrolledFrame
-Classy::export ScrolledFrame {}
 
 Classy::ScrolledFrame method init {args} {
 	# REM Create object
@@ -37,8 +34,8 @@ Classy::ScrolledFrame method init {args} {
 	super init
 	frame $object.view
 	frame $object.view.frame
-	::Classy::rebind $object.view.frame $object
-	::Classy::refocus $object $object.view.frame
+	$object _rebind $object.view.frame
+	bind $object <FocusIn> [list focus $object.view.frame]
 	grid $object.view -column 0 -row 0 -sticky nwse
 	grid $object.view.frame -column 0 -row 0 -sticky nwse
 	# REM Configure initial arguments
@@ -47,14 +44,11 @@ Classy::ScrolledFrame method init {args} {
 	Classy::todo $object redraw
 	return $object.view.frame
 }
-Classy::ScrolledFrame component frame {$object.view.frame}
+Classy::ScrolledFrame component frame {::Classy::rebind::$object.view.frame}
 
 # ------------------------------------------------------------------
 #  Widget destroy
 # ------------------------------------------------------------------
-Classy::ScrolledFrame method destroy {} {
-	::Classy::rebind $object.view.frame {}
-}
 
 # ------------------------------------------------------------------
 #  Widget options

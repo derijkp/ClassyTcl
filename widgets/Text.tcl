@@ -26,8 +26,6 @@
 #doc {Text command} h2 {
 #	Text specific methods
 #}
-# These will be added to tclIndex by Classy::auto_mkindex
-#auto_index Text
 
 source [file join $::class::dir widgets Textbnd.tcl]
 update idletasks
@@ -37,7 +35,6 @@ update idletasks
 # ------------------------------------------------------------------
 
 Widget subclass Classy::Text
-Classy::export Text {}
 
 Classy::Text method init {args} {
 	super init text

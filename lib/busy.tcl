@@ -4,8 +4,6 @@
 #
 # busy command
 # ----------------------------------------------------------------------
-# These will be added to tclIndex by Classy::auto_mkindex
-#auto_index busy
 
 proc ::Classy::busy {{action {add}} args} {
 	switch $action {
@@ -84,6 +82,4 @@ proc ::Classy::busy {{action {add}} args} {
 		}
 	}
 }
-
-Classy::export busy {}
 

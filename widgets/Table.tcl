@@ -34,8 +34,6 @@
 #doc {Table command} h2 {
 #	Table specific methods
 #}
-# These will be added to tclIndex by Classy::auto_mkindex
-#auto_index Table
 
 option add *GridWidth 1 widgetDefault
 
@@ -107,7 +105,6 @@ bind Classy::Table::single <<Escape>> {%W _restore;break}
 # ------------------------------------------------------------------
 
 Widget subclass Classy::Table
-Classy::export Table {}
 
 Classy::Table method init {args} {
 	# REM Create object

@@ -132,28 +132,16 @@ proc ::class::subclass {class arg} {
 	if {"[info commands ::$child]" != ""} {
 		return -code error "command \"$child\" exists"
 	}
-#	if {"$class" == "$child"} {
-#		return -code error "class and subclass \"$class\" are identical"
-#	}
 	regsub {^::} $child {} child
 	set namespace [namespace qualifiers $child]
 	if {"$namespace" != ""} {
-		namespace eval $namespace {
-			catch {namespace import ::class::super}
-			catch {namespace import ::class::private}
-			catch {namespace import ::class::privatevar}
-			catch {namespace import ::class::setprivate}
-			catch {namespace import ::class::getprivate}
-		}
+		namespace eval $namespace {}
 	}
 	set ::class::parent($child) $class
 	set ::class::${class},,subclass($child) 1
 	set body [info body ::$class]
 	regsub -all $class $body [list $child] body
 	proc ::$child {cmd args} $body
-
-#	???????????
-#	namespace eval ::$child {}
 
 	# copy methods
 	foreach cmd [info commands ::class::${class},,m,*] {
@@ -260,7 +248,7 @@ proc ::class::objectdestroy {class object} {
 	return ""
 }
 
-proc ::class::super {method args} {
+proc super {method args} {
 	upvar class class object object
 	set level [info level]
 	set plevel [expr {$level-2}]
@@ -904,21 +892,21 @@ proc ::class::propagatevar {class name value} {
 	}
 }
 
-proc ::class::private {object args} {
+proc private {object args} {
 	foreach var $args {
 		uplevel upvar #0 [list ::class::${object},,v,$var] [list $var]
 	}
 }
 
-proc ::class::privatevar {object var} {
+proc privatevar {object var} {
 	return ::class::${object},,v,$var
 }
 
-proc ::class::setprivate {object var value} {
+proc setprivate {object var value} {
 	set ::class::${object},,v,$var $value
 }
 
-proc ::class::getprivate {object var} {
+proc getprivate {object var} {
 	set ::class::${object},,v,$var
 }
 

@@ -21,15 +21,12 @@
 #doc {LineChartDialog command} h2 {
 #	LineChartDialog specific methods
 #}
-# These will be added to tclIndex by Classy::auto_mkindex
-#auto_index LineChartDialog
 
 # ------------------------------------------------------------------
 #  Widget creation
 # ------------------------------------------------------------------
 
 Classy::Dialog subclass ::Classy::LineChartDialog
-Classy::export LineChartDialog {}
 
 ::Classy::LineChartDialog method init {args} {
 	super init -resize {1 1}

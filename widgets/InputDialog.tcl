@@ -20,16 +20,12 @@
 #doc {InputDialog command} h2 {
 #	InputDialog specific methods
 #}
-# Next is to get the attention of auto_mkindex
-# These will be added to tclIndex by Classy::auto_mkindex
-#auto_index InputDialog
 
 # ------------------------------------------------------------------
 #  Widget creation
 # ------------------------------------------------------------------
 
 Classy::Dialog subclass Classy::InputDialog
-Classy::export InputDialog {}
 
 Classy::InputDialog method init {args} {
 	super init

@@ -28,8 +28,6 @@
 #<dt>-help
 #</dl>
 #}
-# These will be added to tclIndex by Classy::auto_mkindex
-#auto_index savefile
 proc Classy::savefile {args} {
 	global tcl_platform
 	Classy::parseopt $args opt {
@@ -83,5 +81,4 @@ proc Classy::savefile {args} {
 	}
 }
 
-Classy::export savefile {}
 

@@ -16,8 +16,6 @@
 #doc {MultiFrame command} h2 {
 #	MultiFrame specific methods
 #}
-# These will be added to tclIndex by Classy::auto_mkindex
-#auto_index MultiFrame
 
 bind Classy::MultiFrame <Configure> {Classy::todo %W redraw}
 
@@ -25,7 +23,6 @@ bind Classy::MultiFrame <Configure> {Classy::todo %W redraw}
 #  Widget creation
 # ------------------------------------------------------------------
 Widget subclass Classy::MultiFrame
-Classy::export MultiFrame {}
 
 Classy::MultiFrame method init {args} {
 	# REM Create object

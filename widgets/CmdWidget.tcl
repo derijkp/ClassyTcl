@@ -30,9 +30,6 @@
 #doc {CmdWidget command} h2 {
 #	CmdWidget specific methods
 #}
-# These will be added to tclIndex by Classy::auto_mkindex
-#auto_index ::Classy::CmdWidget
-#auto_index CmdWidget
 
 source [file join $::class::dir widgets CmdWidgetbnd.tcl]
 auto_load varsubst
@@ -41,7 +38,6 @@ auto_load varsubst
 # ------------------------------------------------------------------
 
 Widget subclass Classy::CmdWidget
-Classy::export CmdWidget {}
 
 Classy::CmdWidget method init {args} {
 	setprivate $object w [super init text $object -setgrid true]

@@ -20,8 +20,6 @@
 #doc {FileSelect command} h2 {
 #	FileSelect specific methods
 #}
-# These will be added to tclIndex by Classy::auto_mkindex
-#auto_index FileSelect
 
 if {"[Classy::Default get app Classy__FileSelect__curdir]"==""} {
 	Classy::Default set app Classy__FileSelect__curdir [pwd]
@@ -32,7 +30,6 @@ if {"[Classy::Default get app Classy__FileSelect__curdir]"==""} {
 # ------------------------------------------------------------------
 
 Classy::Dialog subclass Classy::FileSelect
-Classy::export FileSelect {}
 
 Classy::FileSelect method init {args} {
 	super init
@@ -46,14 +43,7 @@ Classy::FileSelect method init {args} {
 	listbox $w.files -yscrollcommand "$w.filesbar set" -exportselection no
 	scrollbar $w.filesbar -orient vertical -command "$w.files yview" -takefocus 0
 	Classy::Entry $w.file -label "File" -orient horizontal \
-		-command [list invoke {value} [varsubst object {
-			if [file isdir $value] {
-				$object configure -dir $value
-			} else {
-				$object invoke go
-				$object destroy
-			}
-		}]] \
+		-command [list $object _entrycmd] \
 		-validate [list $w.files selection clear 0 end]
 	frame $w.extra
 	Classy::Paned $w.pane -window $w.dirs
@@ -119,6 +109,14 @@ Classy::FileSelect method init {args} {
 	$w configure
 	focus $w.file
 	Classy::todo $object refresh
+}
+
+Classy::FileSelect method _entrycmd {value} {
+	if [file isdir $value] {
+		$object configure -dir $value
+	} else {
+		$object invoke go
+	}
 }
 
 Classy::FileSelect component extra {$object.options.extra}

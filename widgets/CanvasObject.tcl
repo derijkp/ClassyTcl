@@ -34,16 +34,12 @@
 #	CanvasObject specific methods
 #} descr {
 #}
-# These will be added to tclIndex by Classy::auto_mkindex
-#auto_index ::Classy::CanvasObject
-#auto_index CanvasObject
 
 # ------------------------------------------------------------------
 #  Widget creation
 # ------------------------------------------------------------------
 
 Class subclass Classy::CanvasObject
-Classy::export CanvasObject {}
 
 Classy::CanvasObject method init {args} {
 	super init

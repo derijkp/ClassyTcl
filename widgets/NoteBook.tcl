@@ -22,8 +22,6 @@
 #doc {NoteBook command} h2 {
 #	NoteBook specific methods
 #}
-# These will be added to tclIndex by Classy::auto_mkindex
-#auto_index NoteBook
 
 catch {option add *Classy::NoteBook.Background [Classy::realcolor darkBackground] widgetDefault}
 #option add *Classy::NoteBook.book.borderWidth 2 widgetDefault
@@ -37,7 +35,6 @@ bind Classy::NoteBook <Configure> {%W redraw}
 # ------------------------------------------------------------------
 
 Widget subclass Classy::NoteBook
-Classy::export NoteBook {}
 
 Classy::NoteBook method init {args} {
 	# REM Create object

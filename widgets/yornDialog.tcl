@@ -17,15 +17,12 @@
 #doc {yornDialog options} h2 {
 #	yornDialog specific options
 #}
-# These will be added to tclIndex by Classy::auto_mkindex
-#auto_index yornDialog
 
 # ------------------------------------------------------------------
 #  Widget creation
 # ------------------------------------------------------------------
 
 Classy::Dialog subclass Classy::yornDialog
-Classy::export yornDialog {}
 
 Classy::yornDialog method init {args} {
 	super init

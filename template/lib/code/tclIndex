@@ -7,5 +7,5 @@
 # a script that loads the command.
 
 set auto_index(main) [list source [file join $dir Main.tcl]]
-set auto_index(mainw) [list source [file join $dir Main.tcl]]
 
+# Addition of ClassyTcl classes defined in the directory

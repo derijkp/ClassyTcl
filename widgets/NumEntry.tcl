@@ -22,8 +22,6 @@
 #doc {NumEntry command} h2 {
 #	NumEntry specific methods
 #}
-# These will be added to tclIndex by Classy::auto_mkindex
-#auto_index NumEntry
 
 option add *Classy::NumEntry.highlightThickness 0 widgetDefault
 option add *Classy::NumEntry*Frame.highlightThickness 0 widgetDefault
@@ -37,7 +35,6 @@ option add *Classy::NumEntry.entry.width 5 widgetDefault
 # ------------------------------------------------------------------
 
 Classy::Entry subclass Classy::NumEntry
-Classy::export NumEntry {}
 
 Classy::NumEntry method init {args} {
 	super init

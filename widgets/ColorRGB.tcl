@@ -20,16 +20,12 @@
 #doc {ColorRGB command} h2 {
 #	ColorRGB specific methods
 #}
-# These will be added to tclIndex by Classy::auto_mkindex
-#auto_index ::Classy::ColorRGB
-#auto_index ColorRGB
 
 # ------------------------------------------------------------------
 #  Widget creation
 # ------------------------------------------------------------------
 
 Widget subclass Classy::ColorRGB
-Classy::export ColorRGB {}
 
 Classy::ColorRGB method init {args} {
 	# REM Create object

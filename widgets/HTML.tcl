@@ -21,8 +21,6 @@
 #doc {HTML command} h2 {
 #	HTML specific methods
 #}
-# These will be added to tclIndex by Classy::auto_mkindex
-#auto_index HTML
 
 source [file join $::class::dir html_library-0.3 html_library.tcl]
 
@@ -64,7 +62,6 @@ array set ::html::events {
 # ------------------------------------------------------------------
 
 Widget subclass Classy::HTML
-Classy::export HTML {}
 
 Classy::HTML method init {args} {
 	super init text

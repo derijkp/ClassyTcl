@@ -21,15 +21,12 @@
 #doc {OptionMenu command} h2 {
 #	OptionMenu specific methods
 #}
-# These will be added to tclIndex by Classy::auto_mkindex
-#auto_index OptionMenu
 
 # ------------------------------------------------------------------
 #  Widget creation
 # ------------------------------------------------------------------
 
 Widget subclass Classy::OptionMenu
-Classy::export OptionMenu {}
 
 Classy::OptionMenu method init {args} {
 	super init menubutton $object -text "" -menu $object.menu -indicatoron 1 \

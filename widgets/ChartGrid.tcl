@@ -40,16 +40,12 @@
 #	ChartGrid specific methods
 #} descr {
 #}
-# These will be added to tclIndex by Classy::auto_mkindex
-#auto_index ::Classy::ChartGrid
-#auto_index ChartGrid
 
 # ------------------------------------------------------------------
 #  Widget creation
 # ------------------------------------------------------------------
 
 Class subclass Classy::ChartGrid
-Classy::export ChartGrid {}
 
 Classy::ChartGrid method init {args} {
 	super init

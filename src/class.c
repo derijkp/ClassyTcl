@@ -215,7 +215,7 @@ int Classy_SubclassClassMethod(
 		}
 		if (pos != 1) {
 			subclassname[pos-1] = '\0';
-			error = Tcl_VarEval(interp,"namespace eval ::class::", subclassname, " {catch {namespace import ::class::super} ; catch {namespace import ::class::private} ; catch {namespace import ::class::privatevar} ; catch {namespace import ::class::setprivate} ; catch {namespace import ::class::getprivate}}", (char *)NULL);
+			error = Tcl_VarEval(interp,"namespace eval ::class::", subclassname, " {}", (char *)NULL);
 			subclassname[pos-1] = ':';
 		}
 	}

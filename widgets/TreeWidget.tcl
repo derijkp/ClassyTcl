@@ -21,15 +21,12 @@
 #doc {TreeWidget command} h2 {
 #	TreeWidget specific methods
 #}
-# These will be added to tclIndex by Classy::auto_mkindex
-#auto_index TreeWidget
 
 # ------------------------------------------------------------------
 #  Widget creation
 # ------------------------------------------------------------------
 
 Widget subclass Classy::TreeWidget
-Classy::export TreeWidget {}
 
 bind Classy::TreeWidget <Configure> {%W redraw}
 bind Classy::TreeWidget <<Action>> {%W _action %x %y}
@@ -40,12 +37,12 @@ Classy::TreeWidget method init {args} {
 	# -----------------
 	super init
 	canvas $object.c -xscrollcommand [list $object.hbar set] -yscrollcommand [list $object.vbar set]
-	::Classy::rebind $object.c $object
-	::Classy::refocus $object $object.c
-	scrollbar $object.vbar -command [list $object.c yview] -orient vertical
-	scrollbar $object.hbar -command [list $object.c xview] -orient horizontal
+	$object _rebind $object.c
+	bind $object <FocusIn> [list focus $object.c]
+	scrollbar $object.vbar -command [list ::Classy::rebind::$object.c yview] -orient vertical
+	scrollbar $object.hbar -command [list ::Classy::rebind::$object.c xview] -orient horizontal
 	Classy::Tree $object.tree
-	$object.tree configure -canvas $object.c
+	$object.tree configure -canvas ::Classy::rebind::$object.c
 	grid $object.c $object.vbar -row 0 -sticky nwse
 	grid columnconfigure $object 0 -weight 1
 	grid columnconfigure $object 1 -weight 0
@@ -63,7 +60,7 @@ Classy::TreeWidget method init {args} {
 	if {"$args" != ""} {eval $object configure $args}
 }
 
-Classy::TreeWidget component canvas {$object.c}
+Classy::TreeWidget component canvas {::Classy::rebind::$object.c}
 
 # ------------------------------------------------------------------
 #  Destroy
@@ -77,7 +74,7 @@ Classy::TreeWidget method destroy {} {
 #  Widget options
 # ------------------------------------------------------------------
 
-#Classy::TreeWidget chainoptions {$object.c}
+#Classy::TreeWidget chainoptions {::Classy::rebind::$object.c}
 
 foreach option {
 	background cursor height highlightbackground highlightcolor highlightthickness
@@ -85,12 +82,12 @@ foreach option {
 	offset relief selectborderwidth selectforeground selectbackground
 	state takefocus width
 } {
-	Classy::TreeWidget chainoption -$option {$object.c} -$option
+	Classy::TreeWidget chainoption -$option {::Classy::rebind::$object.c} -$option
 }
 
 Classy::TreeWidget addoption -foreground {foreground Foreground {}} {
 	if {"$value" == ""} {
-		set col [Classy::realcolor [Classy::optionget $object.c foreground Foreground Foreground]]
+		set col [Classy::realcolor [Classy::optionget ::Classy::rebind::$object.c foreground Foreground Foreground]]
 	} else {
 		set col $value
 	}
@@ -124,7 +121,7 @@ Classy::TreeWidget addoption -executecommand {executeCommand ExecuteCommand {}} 
 #  Methods
 # ------------------------------------------------------------------
 
-Classy::TreeWidget chainallmethods {$object.c} canvas
+Classy::TreeWidget chainallmethods {::Classy::rebind::$object.c} canvas
 Classy::TreeWidget chainallmethods {$object.tree} Classy::Tree
 
 Classy::TreeWidget method redraw {} {
@@ -134,7 +131,7 @@ Classy::TreeWidget method redraw {} {
 
 Classy::TreeWidget method _handlebars {} {
 	update idletasks
-	set bbox [$object.c bbox all]
+	set bbox [::Classy::rebind::$object.c bbox all]
 	set w [lindex $bbox 2]
 	set h [lindex $bbox 3]
 	if {$w > [winfo width $object.c]} {
@@ -147,7 +144,7 @@ Classy::TreeWidget method _handlebars {} {
 	} else {
 		grid forget $object.vbar
 	}
-	$object.c configure -scrollregion [list 0 0 $w $h]
+	::Classy::rebind::$object.c configure -scrollregion [list 0 0 $w $h]
 }
 
 Classy::TreeWidget method _action {x y} {

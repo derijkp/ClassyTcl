@@ -20,8 +20,6 @@
 #doc {Selector command} h2 {
 #	Selector specific methods
 #}
-# These will be added to tclIndex by Classy::auto_mkindex
-#auto_index Selector
 
 catch {auto_load Classy::ScrolledText}
 option add *Classy::Selector.highlightThickness 0 widgetDefault
@@ -31,7 +29,6 @@ option add *Classy::Selector.highlightThickness 0 widgetDefault
 # ------------------------------------------------------------------
 
 Widget subclass Classy::Selector
-Classy::export Selector {}
 
 Classy::Selector method init {args} {
 	super init

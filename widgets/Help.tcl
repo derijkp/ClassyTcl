@@ -23,10 +23,6 @@
 #doc {Help command} h2 {
 #	Help specific methods
 #}
-# Next is to get the attention of auto_mkindex
-# These will be added to tclIndex by Classy::auto_mkindex
-#auto_index Help
-#auto_index help
 
 laddnew ::Classy::help_path [file join $class::dir help]
 laddnew ::Classy::help_path [file join $Extral::dir docs]
@@ -36,7 +32,6 @@ laddnew ::Classy::help_path [file join $Extral::dir docs]
 # ------------------------------------------------------------------
 
 Classy::Toplevel subclass Classy::Help
-Classy::export Help {}
 
 Classy::Help method init {args} {
 	super init
@@ -244,7 +239,6 @@ proc Classy::help {{subject {classy_help}}} {
 	raise .classy__.help
 	.classy__.help gethelp $subject
 }
-Classy::export {help newhelp} {}
 
 # ------------------------------------------------------------------
 #  destructor

@@ -37,19 +37,12 @@
 # The Widget classmethods are only available to Widget or one
 # of its subclasses, not to its instances.
 #}
-# These will be added to tclIndex by Classy::auto_mkindex
-#auto_index Widget
-#auto_index ::Widget
 
 package require Tk 8.0
 
 # ----------------------------------------------------------------------
 # special commands
 # ----------------------------------------------------------------------
-
-namespace eval ::class {
-	namespace export findoptions setoption getoption getconfigure
-}
 
 ;proc ::class::getwidgetoptions {w} {
 	foreach list [$w configure] {
@@ -545,14 +538,6 @@ Widget method destroy {} {
 	foreach name $rebind {
 		$object _unrebind $name
 	}
-#	foreach name [array names ::Classy::rebind $object.*] {
-#		unset ::Classy::rebind($name)
-#	}
-#	catch {unset ::Classy::rebind($object)}
-	foreach name [array names ::Classy::refocus $object.*] {
-		unset ::Classy::refocus($name)
-	}
-	catch {unset ::Classy::refocus($object)}
 	foreach c [info commands ::class::Tk_$object.*] {
 		regexp {^::class::Tk_(.*)$} $c temp child
 		catch {$child destroy}
@@ -560,18 +545,26 @@ Widget method destroy {} {
 	catch {::Tk::destroy $object}
 }
 
+namespace eval Classy::rebind {}
+
 Widget method _rebind {name} {
 	private $object rebind
 	bindtags $name [bindtags $object]
-	catch {rename ::Tk::$name {}}
-	rename $name ::Tk::$name
-	uplevel #0 [list proc $name args "eval $object \[string::change \$args \{$name $object\}\]"]
+	rename $name ::Classy::rebind::$name
+	set body [string::change {
+		if {[info level] == 1} {
+			eval @object@ [string::change $args {@name@ @object@}]
+		} else {
+			eval ::Classy::rebind::@name@ $args
+		}
+	} [list @name@ $name @object@ $object]]
+	uplevel #0 [list proc $name args $body]
 	lappend rebind $name
 }
 
 Widget method _unrebind {name} {
 	private $object rebind
 	uplevel #0 [list rename $name {}]
-	catch {rename ::Tk::$name {}}
+	catch {rename ::Classy::rebind::$name {}}
 	set rebind [lremove $rebind $name]
 }

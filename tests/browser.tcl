@@ -66,7 +66,7 @@ proc getdir {dir} {
 
 classyclean
 set object .try
-Browser .try -list [glob [pwd]/*]
+Classy::Browser .try -list [glob [pwd]/*]
 pack .try -fill both -expand yes
 bind .try <<Drag>> {DragDrop start %X %Y test}
 

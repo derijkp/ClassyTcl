@@ -30,8 +30,6 @@
 # changed to the current cmdw (command widget). The cmdw of a menu can be
 # changed at any time. DynaMenu also handles key shortcuts.
 #}
-# These will be added to tclIndex by Classy::auto_mkindex
-#auto_index DynaMenu
 
 option add *Classy::TopMenu.Button.padY 0 widgetDefault
 option add *Classy::TopMenu.Checkbutton.padY 1 widgetDefault
@@ -41,7 +39,6 @@ option add *Classy::TopMenu.Menubutton.padY 1 widgetDefault
 #  Widget creation
 # ------------------------------------------------------------------
 Class subclass Classy::DynaMenu
-Classy::export DynaMenu {}
 
 # ------------------------------------------------------------------
 #  Methods

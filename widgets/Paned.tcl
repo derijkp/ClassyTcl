@@ -18,8 +18,6 @@
 #doc {Paned options} h2 {
 #	Paned specific options
 #}
-# These will be added to tclIndex by Classy::auto_mkindex
-#auto_index Paned
 
 option add *Classy::Paned.hcursor sb_h_double_arrow widgetDefault
 option add *Classy::Paned.vcursor sb_v_double_arrow widgetDefault
@@ -37,7 +35,6 @@ bind Classy::Paned <<Action-Motion>> {%W _drag %X %Y}
 # ------------------------------------------------------------------
 
 Widget subclass Classy::Paned
-Classy::export Paned {}
 
 Classy::Paned method init {args} {
 	# REM Create object

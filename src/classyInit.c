@@ -23,15 +23,15 @@ Classy_Init(interp)
 	Tcl_CreateObjCommand(interp,"::class::reinit",(Tcl_ObjCmdProc *)Classy_ReinitObjCmd,
 		(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
 	Classy_InitSuper();
-	Tcl_CreateObjCommand(interp,"::class::super",(Tcl_ObjCmdProc *)Classy_SuperObjCmd,
+	Tcl_CreateObjCommand(interp,"super",(Tcl_ObjCmdProc *)Classy_SuperObjCmd,
 		(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
-	Tcl_CreateObjCommand(interp,"::class::private",(Tcl_ObjCmdProc *)Classy_PrivateObjCmd,
+	Tcl_CreateObjCommand(interp,"private",(Tcl_ObjCmdProc *)Classy_PrivateObjCmd,
 		(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
-	Tcl_CreateObjCommand(interp,"::class::setprivate",(Tcl_ObjCmdProc *)Classy_SetPrivateObjCmd,
+	Tcl_CreateObjCommand(interp,"setprivate",(Tcl_ObjCmdProc *)Classy_SetPrivateObjCmd,
 		(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
-	Tcl_CreateObjCommand(interp,"::class::getprivate",(Tcl_ObjCmdProc *)Classy_GetPrivateObjCmd,
+	Tcl_CreateObjCommand(interp,"getprivate",(Tcl_ObjCmdProc *)Classy_GetPrivateObjCmd,
 		(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
-	Tcl_CreateObjCommand(interp,"::class::privatevar",(Tcl_ObjCmdProc *)Classy_PrivateVarObjCmd,
+	Tcl_CreateObjCommand(interp,"privatevar",(Tcl_ObjCmdProc *)Classy_PrivateVarObjCmd,
 		(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
 	return TCL_OK;
 }

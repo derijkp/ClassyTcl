@@ -34,7 +34,7 @@ proc ::Classy::handletodo {object} {
 		if {"$list"!=""} {
 			if {"[info commands $object]" == ""} {return}
 			foreach todoitem $list {
-				if [catch {eval $object $todoitem} result] {
+				if [catch {uplevel #0 $object $todoitem} result] {
 					global errorInfo
 					return -code error -errorinfo $errorInfo $result
 				}
@@ -99,19 +99,6 @@ proc Classy::fullpath {file} {
 		return [file join [pwd] $file]
 	}
 }
-
-#proc Classy::splitcomplete {data} {
-#	set result ""
-#	set current ""
-#	foreach line [split $data "\n"] {
-#		append current "\n" $line
-#		if [info complete $current] {
-#			lappend result $current
-#			set current ""
-#		}
-#	}
-#	return $result
-#}
 
 # Classy::parseopt arguments variable list ?remain?
 # variable: name of array to set options in
@@ -378,25 +365,6 @@ proc Classy::orient {value} {
 	}
 }
 
-# Extral is not loaded when Class alone is loaded
-# So also define thisd here
-proc Classy::splitcomplete {data} {
-        set result ""
-        set current ""
-        regsub -all "\\\\\n" $data {} data
-        foreach line [split $data "\n"] {
-                if {"$current" != ""} {
-                        append current "\n"
-                }
-                append current $line
-                if [info complete $current] {
-                        lappend result $current
-                        set current ""
-                }
-        }
-        return $result
-}
-
 proc Classy::auto_mkindex {dir args} {
 	eval ::auto_mkindex $dir $args
 	global errorCode errorInfo
@@ -432,7 +400,6 @@ proc Classy::auto_mkindex {dir args} {
 							if ![info exists definedhere($c)] {
 								set name ::class::${c},,cm,$name
 								append index "set [list auto_index($name)] \[list source \[file join \$dir [list $file]\]\]\n"
-#								append index "set [list ::class::cm_auto_index([list $c $name])] \[list source \[file join \$dir [list $file]\]\]\n"
 							}
 						}
 						method {

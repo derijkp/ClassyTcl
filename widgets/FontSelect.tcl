@@ -20,9 +20,6 @@
 #doc {FontSelect command} h2 {
 #	FontSelect specific methods
 #}
-# Next is to get the attention of auto_mkindex
-# These will be added to tclIndex by Classy::auto_mkindex
-#auto_index FontSelect
 
 option add *Classy::FontSelect.relief raised widgetDefault
 
@@ -31,7 +28,6 @@ option add *Classy::FontSelect.relief raised widgetDefault
 # ------------------------------------------------------------------
 
 Widget subclass Classy::FontSelect
-Classy::export FontSelect {}
 
 Classy::FontSelect method init {args} {
 	# REM Create object

@@ -59,52 +59,6 @@ if {"[info commands ::Tk::destroy]" == ""} {
 	}
 }
 
-# ----------------------------------------------------------------------
-# Change the bind command
-# ----------------------------------------------------------------------
-#if {"[info commands ::Tk::bind]" == ""} {
-#	rename bind ::Tk::bind
-#	proc bind {args} {
-#		switch [llength $args] {
-#			1 {
-#				return [::Tk::bind [lindex $args 0]]
-#			}
-#			2 {
-#				set result [::Tk::bind [lindex $args 0] [lindex $args 1]]
-#				return [string::change $result {{[::Classy::_bind %W]} %W}]
-#			}
-#			3 {
-#				set cmd [string::change [lindex $args 2] {%W {[::Classy::_bind %W]}}]
-#				return [::Tk::bind [lindex $args 0] [lindex $args 1] $cmd]
-#			}
-#			default {
-#				return -code error "wrong # args: should be \"bind window ?pattern? ?command?\""
-#			}
-#		}
-#	}
-#}
-#
-#proc Classy::_bind {w} {
-#	if ![info exists ::Classy::rebind($w)] {
-#		return $w
-#	} else {
-#		return $::Classy::rebind($w)
-#	}
-#}
-#
-#proc Classy::rebind {w bindw} {
-#	if {"$bindw" != ""} {
-#		if [info exists ::Classy::rebind($w)] {
-#			Classy::rebind $::Classy::rebind($w) $bindw
-#			bindtags $::Classy::rebind($w) [lreplace [bindtags $::Classy::rebind($w)] 1 0]
-#		}
-#		set ::Classy::rebind($w) $bindw
-#		bindtags $w [concat $w [bindtags $bindw]]
-#	} else {
-#		unset ::Classy::rebind($w)
-#	}
-#}
-
 if {"[info commands send]" == ""} {
 	proc send {args} {
 	while 1 {
@@ -139,36 +93,6 @@ proc Classy::chainw {w cw} {
 	}]
 }
 
-# ----------------------------------------------------------------------
-# Change the focus command
-# ----------------------------------------------------------------------
-if {"[info commands ::Tk::focus]" == ""} {
-	rename focus ::Tk::focus
-	proc focus args {
-		if {[llength $args] == 1} {
-			set w [lindex $args 0]
-			if ![info exists ::Classy::refocus($w)] {
-				::Tk::focus $w
-			} else {
-				::Tk::focus $::Classy::refocus($w)
-			}
-		} else {
-			eval ::Tk::focus $args
-		}
-	}
-	proc ::Classy::refocus {w focusw} {
-		if {"$focusw" != ""} {
-			if [info exists ::Classy::refocus($focusw)] {
-				Classy::refocus $w $::Classy::refocus($focusw)
-			} else {
-				set ::Classy::refocus($w) $focusw
-			}
-		} else {
-			unset ::Classy::refocus($w)
-		}
-	}
-}
-
 #----------------------------------------------------------------------
 # Initialise
 #----------------------------------------------------------------------
@@ -177,8 +101,8 @@ entry .classy__.dummy
 button .classy__.dummyb
 
 source [file join $::class::dir lib Widget.tcl]
-source [file join [set ::class::dir] lib conf.tcl]
 source [file join [set ::class::dir] lib tools.tcl]
+source [file join [set ::class::dir] lib conf.tcl]
 option add *ColorList {{blue cyan green yellow orange red magenta} {blue3 cyan3 green3 yellow3 orange3 red3 magenta3} {black gray20 gray40 gray50 gray60 gray80 white}} widgetDefault
 
 Classy::initconf
@@ -186,6 +110,7 @@ if {[option get . patchTk PatchTk]==1} {
 	source [file join [set ::class::dir] patches patchtk.tcl]
 	source [file join [set ::class::dir] patches miscpatches.tcl]
 }
+
 # ----------------------------------------------------------------------
 # Change the bgerror command
 # ----------------------------------------------------------------------

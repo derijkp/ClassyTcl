@@ -36,6 +36,7 @@ invoke {} {
 		}
 	}
 }
+
 proc Classy::realcolor {color} {
 	if {[lsearch {Background darkBackground lightBackground Foreground activeBackground activeForeground disabledForeground selectBackground selectForeground selectColor highlightBackground highlightColor} $color] != -1} {
 		set temp [option get . $color $color]

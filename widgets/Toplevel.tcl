@@ -26,8 +26,6 @@
 #doc {Toplevel command} h2 {
 #	Toplevel specific methods
 #}
-# These will be added to tclIndex by Classy::auto_mkindex
-#auto_index Toplevel
 
 # ------------------------------------------------------------------
 #  Widget creation
@@ -35,13 +33,12 @@
 
 Widget subclass Classy::Toplevel
 
-Classy::export Toplevel {}
 
 Classy::Toplevel method init {args} {
 	# REM Create object
 	# -----------------
 	super init toplevel
-#	wm geometry $object +1000000+1000000
+	wm geometry $object +1000000+1000000
 	wm positionfrom $object program
 	wm withdraw $object
 	wm group $object .

@@ -34,16 +34,12 @@
 #	CanvasSeq specific methods
 #} descr {
 #}
-# These will be added to tclIndex by Classy::auto_mkindex
-#auto_index ::Classy::CanvasSeq
-#auto_index CanvasSeq
 
 # ------------------------------------------------------------------
 #  Widget creation
 # ------------------------------------------------------------------
 
 Classy::CanvasObject subclass Classy::CanvasSeq
-Classy::export CanvasSeq {}
 
 Classy::CanvasSeq method init {args} {
 	super init

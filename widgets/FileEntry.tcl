@@ -17,15 +17,12 @@
 # file selection dialog. When a file is selected in this dialog, it 
 # will be inserted in the entry.
 #}
-# These will be added to tclIndex by Classy::auto_mkindex
-#auto_index FileEntry
 
 # ------------------------------------------------------------------
 #  Widget creation
 # ------------------------------------------------------------------
 
 Classy::Entry subclass Classy::FileEntry
-Classy::export FileEntry {}
 
 Classy::FileEntry method init {args} {
 	super init

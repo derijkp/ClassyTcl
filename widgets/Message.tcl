@@ -21,8 +21,6 @@
 #doc {Message command} h2 {
 #	Message specific methods
 #}
-# These will be added to tclIndex by Classy::auto_mkindex
-#auto_index Message
 
 bind Classy::Message <Configure> {
 	%W redraw
@@ -33,7 +31,6 @@ bind Classy::Message <Configure> {
 # ------------------------------------------------------------------
 
 Widget subclass Classy::Message
-Classy::export Message {}
 
 Classy::Message method init {args} {
 	super init message

@@ -20,8 +20,6 @@
 #<dt>-font
 #</dl>
 #}
-# These will be added to tclIndex by Classy::auto_mkindex
-#auto_index getfont
 proc Classy::getfont {args} {
 	global tcl_platform
 	if {("$tcl_platform(platform)"=="windows")&&("[option get . getFont GetFont]"=="Win")} {
@@ -89,5 +87,4 @@ proc Classy::createfont {fontname font} {
 	}
 }
 
-Classy::export getfont {}
 

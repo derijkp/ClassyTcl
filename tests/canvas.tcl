@@ -27,10 +27,24 @@ if 0 {
 	.try selection add withtag try
 }
 
-test Classy::Canvas {create and destroy canvas} {
+test Classy::Canvas {create and destroy canvas object} {
 	classyclean
 	Classy::Canvas .try
-	catch {Canvas destroy}
+	catch {destroy .try}
+	Classy::Canvas .try
+} {}
+
+test Classy::Canvas {create and destroy canvas object} {
+	classyclean
+	Classy::Canvas .try
+	catch {.try destroy}
+	Classy::Canvas .try
+} {}
+
+test Classy::Canvas {create and destroy Canvas class} {
+	classyclean
+	Classy::Canvas .try
+	catch {Classy::Canvas destroy}
 	Classy::Canvas .try
 } {}
 

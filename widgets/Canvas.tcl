@@ -23,9 +23,6 @@
 #doc {Canvas command} h2 {
 #	Canvas specific methods
 #}
-# These will be added to tclIndex by Classy::auto_mkindex
-#auto_index ::Classy::Canvas
-#auto_index Canvas
 
 # ------------------------------------------------------------------
 #  Widget creation
@@ -40,7 +37,6 @@ if ![catch {.classy__.temp create line 10 10 10 10 -activefill red}] {
 }
 
 Widget subclass Classy::Canvas
-Classy::export Canvas {}
 
 Classy::Canvas method init {args} {
 	private $object data undo currentname w del

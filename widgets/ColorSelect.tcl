@@ -23,16 +23,12 @@
 #	ColorSelect specific methods
 #} descr {
 #}
-# These will be added to tclIndex by Classy::auto_mkindex
-#auto_index ::Classy::ColorSelect
-#auto_index ColorSelect
 
 # ------------------------------------------------------------------
 #  Widget creation
 # ------------------------------------------------------------------
 
 Widget subclass Classy::ColorSelect
-Classy::export ColorSelect {}
 
 Classy::ColorSelect method init {args} {
 	# REM Create object

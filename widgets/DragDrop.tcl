@@ -31,16 +31,12 @@
 #doc {DragDrop command} h2 {
 #	Config methods
 #}
-# These will be added to tclIndex by Classy::auto_mkindex
-#auto_index ::Classy::DragDrop
-#auto_index DragDrop
 
 # ------------------------------------------------------------------
 #  Class creation
 # ------------------------------------------------------------------
 
 Class subclass Classy::DragDrop
-Classy::export DragDrop {}
 
 # ------------------------------------------------------------------
 #  Class destroy
@@ -53,10 +49,10 @@ Classy::DragDrop classmethod destroy {} {
 #  Methods
 # ------------------------------------------------------------------
 
-::Tk::bind Classy::DragDrop <Motion> {Classy::DragDrop move}
-::Tk::bind Classy::DragDrop <ButtonRelease> {Classy::DragDrop drop}
-::Tk::bind Classy::DragDrop <<Escape>> {Classy::DragDrop abort}
-::Tk::bind Classy::DragDrop <KeyRelease> {Classy::DragDrop configure -transfer copy}
+bind Classy::DragDrop <Motion> {Classy::DragDrop move}
+bind Classy::DragDrop <ButtonRelease> {Classy::DragDrop drop}
+bind Classy::DragDrop <<Escape>> {Classy::DragDrop abort}
+bind Classy::DragDrop <KeyRelease> {Classy::DragDrop configure -transfer copy}
 
 #bind Classy::DragDrop <<Drag-Move>> {Classy::DragDrop configure -transfer move}
 #bind Classy::DragDrop <<Drag-Link>> {Classy::DragDrop configure -transfer link}
@@ -92,7 +88,7 @@ Classy::DragDrop classmethod start {x y value args} {
 	set data(cursor) [$from cget -cursor]
 	set data(bindtags) [bindtags $from]
 	set ftypes() {}
-	foreach event [::Tk::bind Classy::DragDrop_extra] {::Tk::bind Classy::DragDrop_extra $event {}}
+	foreach event [bind Classy::DragDrop_extra] {bind Classy::DragDrop_extra $event {}}
 	set w .classy__.dragdrop
 	if ![winfo exists $w] {
 		toplevel $w -class Classy::DragDrop -width 10 -height 10
@@ -308,7 +304,7 @@ Classy::DragDrop classmethod get {{type {}}} {
 # started with the start classmethod.
 #}
 Classy::DragDrop classmethod bind {args} {
-	eval ::Tk::bind Classy::DragDrop_extra $args
+	eval bind Classy::DragDrop_extra $args
 }
 
 Classy::DragDrop classmethod _events {app x y} {

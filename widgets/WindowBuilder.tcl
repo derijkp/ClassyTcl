@@ -17,8 +17,6 @@
 #doc {WindowBuilder command} h2 {
 #	WindowBuilder specific methods
 #}
-# These will be added to tclIndex by Classy::auto_mkindex
-#auto_index WindowBuilder
 
 source [file join $::class::dir widgets WindowBuilderTypes.tcl]
 option add *Classy::WindowBuilder_select.background black widgetDefault
@@ -51,7 +49,6 @@ bind Classy::WindowBuilder <Configure> "\[Classy::WindowBuilder_win %W\] _config
 # ------------------------------------------------------------------
 
 Classy::Toplevel subclass Classy::WindowBuilder
-Classy::export WindowBuilder {}
 
 Classy::WindowBuilder method init {args} {
 	super init	-keepgeometry all -resize {2 2}
@@ -561,28 +558,32 @@ Classy::WindowBuilder method code {{function {}}} {
 	return $body
 }
 
-Classy::WindowBuilder method open {file function} {
-putsvars file function
+Classy::WindowBuilder method open {file} {
 	global auto_index
 	private $object data current border
+	set c [splitcomplete [readfile $file]]
+	foreach line $c {
+		if [string length $c] break
+	}
+	if {"[lindex $line 1]" != "subclass"} {error "This is not a ClassyTcl Builder file"}
+	set type [lindex $line 0]
+	set function [lindex $line 2]
 	if [info exists data(base)] {
 		if ![Classy::yorn "Are you sure you want to abort editing the current object"] {
 			return 1
 		}
 	}
+putsvars file function
 	wm title $object $function
 	catch {destroy $object.work}
 	catch {unset current}
 	catch {unset data}
 	catch {unset border}
-	set data(tags) [list Classy::WindowBuilder [DynaMenu bindtag Classy::WindowBuilder]]
+	set data(tags) [list Classy::WindowBuilder [Classy::DynaMenu bindtag Classy::WindowBuilder]]
 	set data(options) ""
 	set data(methods) ""
 	set data(opt) 1
 	set data(param) {}
-	set c [splitcomplete [readfile $file]]
-	set pos [lsearch -glob $c [list * subclass $function]]
-	set type [lindex [lindex $c $pos] 0]
 	set pos [lsearch -glob $c [list $function method init *]]
 	set code [lindex $c $pos]
 	set poss [lfind -glob $c [list $function addoption *]]
@@ -660,6 +661,7 @@ putsvars file function
 	$object parsecode $data(code)
 	$object startedit $data(base)
 	Classy::todo $object select $data(base)
+	wm title $object $file
 }
 
 Classy::WindowBuilder method parsecode {code {window {}}} {
@@ -1102,44 +1104,29 @@ Classy::WindowBuilder method recreate {} {
 	if $error {return -code error -errorinfo $errorinfo $result}
 }
 
-Classy::WindowBuilder method save {} {
+Classy::WindowBuilder method save {{file {}}} {
 	global auto_index
 	private $object data
-	set file $data(file)
+	switch $data(type) {
+		toplevel {set type Toplevel}
+		frame {set type Topframe}
+		dialog {set type Dialog}
+	}
+	if [string length $file] {
+		catch {uplevel #0 Classy::$type subclass $data(function)}
+		set data(function) [file root [file tail $file]]
+		set data(file) $file
+		wm title $object $file
+	} else {
+		set file $data(file)
+	}
 	set function $data(function)
 	set code [$object code]
 	if ![info complete $code] {
 		error "error: generated code not complete (contains unmatched braces, parentheses, ...)"
 	}
 	uplevel #0 $code
-#	set c [splitcomplete [readfile $file]]
-#	set poss [lfind -glob $c [list $function addoption *]]
-#	set c [lsub $c -exclude $poss]
-#	set poss [lfind -glob $c [list $function method *]]
-#	set c [lsub $c -exclude $poss]
-#	set pos [lsearch -glob $c [list $function method init *]]
-#	set c [lreplace $c $pos $pos $code]
-#	catch {file copy -force $file $file~}
-#	set f [open $file w]
-#	set space 0
-#	foreach line $c {
-#		if ![string length $line] {
-#			if $space continue
-#			set space 1
-#		} else {
-#			set space 0
-#		}
-#		puts $f $line
-#	}
-#	close $f
-#	catch {Classy::auto_mkindex [file dirname $file] *.tcl}
-#	set auto_index($function) [list source $file]
-	switch $data(type) {
-		toplevel {set type Toplevel}
-		frame {set type Topframe}
-		dialog {set type Dialog}
-	}
-	[winfo parent $object] infile set $file $function "Classy::$type subclass $function\n$code"
+	writefile $file "Classy::$type subclass $function\n$code"
 	set result $function
 	return $result
 }

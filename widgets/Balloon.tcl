@@ -17,23 +17,20 @@
 # Balloon is not meant to be instanciated; the command can can rather be used
 # directly from the class.
 #}
-# These will be added to tclIndex by Classy::auto_mkindex
-#auto_index Balloon
 
 option add *Balloon.font {Helvetica 6 normal} widgetDefault
 option add *Balloon.text.background yellow widgetDefault
 option add *Balloon.background black widgetDefault
 option add *Balloon.borderWidth 0 widgetDefault
 
-bind all <Enter> {Balloon _schedule %W}
-bind all <Leave> {Balloon revoke}
+bind all <Enter> {Classy::Balloon _schedule %W}
+bind all <Leave> {Classy::Balloon revoke}
 
 # ------------------------------------------------------------------
 #  Widget creation
 # ------------------------------------------------------------------
 
 Class subclass Classy::Balloon
-Classy::export Balloon {}
 
 if [winfo exists .classy__.balloon] {destroy .classy__.balloon}
 toplevel .classy__.balloon -class Balloon

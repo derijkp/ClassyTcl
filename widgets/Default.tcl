@@ -28,16 +28,12 @@
 # Dialogs</a>.
 #</dl>
 #}
-# These will be added to tclIndex by Classy::auto_mkindex
-#auto_index ::Classy::Default
-#auto_index Default
 
 # ------------------------------------------------------------------
 #  Widget creation
 # ------------------------------------------------------------------
 
 Class subclass Classy::Default
-Classy::export Default {}
 
 # ------------------------------------------------------------------
 #  Methods

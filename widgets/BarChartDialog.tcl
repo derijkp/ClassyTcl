@@ -19,8 +19,6 @@
 #doc {BarChartDialog command} h2 {
 #	BarChartDialog specific methods
 #}
-# These will be added to tclIndex by Classy::auto_mkindex
-#auto_index BarChartDialog
 
 bind Classy::BarChartDialog <Configure> [list %W _autoscale]
 
@@ -29,7 +27,6 @@ bind Classy::BarChartDialog <Configure> [list %W _autoscale]
 # ------------------------------------------------------------------
 
 Classy::Dialog subclass ::Classy::BarChartDialog
-Classy::export BarChartDialog {}
 
 Classy::BarChartDialog method init {args} {
 	super init -resize {1 1}

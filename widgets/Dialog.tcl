@@ -34,9 +34,6 @@
 #doc {Dialog command} h2 {
 #	Dialog specific methods
 #}
-# These will be added to tclIndex by Classy::auto_mkindex
-#auto_index ::Classy::Dialog
-#auto_index Dialog
 
 option add *Classy::Dialog.options.relief raised widgetDefault
 option add *Classy::Dialog.options.highlightThickness 0 widgetDefault
@@ -71,8 +68,6 @@ bind Classy::DialogButton <<Invoke>> {
 # ------------------------------------------------------------------
 
 Classy::Toplevel subclass Classy::Dialog
-
-Classy::export Dialog {}
 
 Classy::Dialog method init {args} {
 	# REM Create object

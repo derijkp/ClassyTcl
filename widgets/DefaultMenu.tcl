@@ -24,16 +24,12 @@
 #	DefaultMenu specific methods
 #} descr {
 #}
-# These will be added to tclIndex by Classy::auto_mkindex
-#auto_index ::Classy::DefaultMenu
-#auto_index DefaultMenu
 
 # ------------------------------------------------------------------
 #  Widget creation
 # ------------------------------------------------------------------
 
 Widget subclass Classy::DefaultMenu
-Classy::export DefaultMenu {}
 
 bind Classy::DefaultMenu <<Action-ButtonPress>> "%W menu"
 bind Classy::DefaultMenu <Any-ButtonRelease> "%W _action"

@@ -16,9 +16,6 @@
 # but has a display to show the color in the entry when the Enter key
 # is pressed.
 #}
-# These will be added to tclIndex by Classy::auto_mkindex
-#auto_index ::Classy::ColorEntry
-#auto_index ColorEntry
 
 option add *Classy::ColorEntry.highlightThickness 0 widgetDefault
 option add *Classy::ColorEntry*Frame.highlightThickness 0 widgetDefault
@@ -32,7 +29,6 @@ option add *Classy::ColorEntry.entry.width 5 widgetDefault
 # ------------------------------------------------------------------
 
 Classy::Entry subclass Classy::ColorEntry
-Classy::export ColorEntry {}
 
 Classy::ColorEntry method init {args} {
 	super init

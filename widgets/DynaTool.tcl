@@ -30,8 +30,6 @@
 # changed to the current cmdw (command widget). The cmdw of a toolbar can be
 # changed at any time.
 #}
-# These will be added to tclIndex by Classy::auto_mkindex
-#auto_index DynaTool
 
 option add *Classy::DynaTool.Button.padY 0 widgetDefault
 option add *Classy::DynaTool.Checkbutton.padY 1 widgetDefault
@@ -44,7 +42,6 @@ bind Classy::DynaTool <Configure> "%W redraw"
 # ------------------------------------------------------------------
 
 Widget subclass Classy::DynaTool
-Classy::export DynaTool {}
 
 Classy::DynaTool method init {args} {
 	# REM Create object

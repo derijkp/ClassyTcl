@@ -12,8 +12,6 @@
 # select a color
 #getcolor
 #}
-# These will be added to tclIndex by Classy::auto_mkindex
-#auto_index getcolor
 
 #doc {getcolor getcolor} cmd {
 #getcolor ?option value ...?
@@ -63,6 +61,5 @@ proc Classy::getcolor {args} {
 		return $::Classy::temp
 	}
 }
-Classy::export getcolor {}
 
 

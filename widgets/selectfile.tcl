@@ -11,8 +11,6 @@
 #} shortdescr {
 # select a file to open
 #}
-# These will be added to tclIndex by Classy::auto_mkindex
-#auto_index selectfile
 #doc {selectfile selectfile} cmd {
 #selectfile ?option value ...?
 #} descr {
@@ -98,5 +96,4 @@ proc Classy::selectfile {args} {
 		return $::Classy::selectfile
 	}
 }
-Classy::export selectfile {}
 

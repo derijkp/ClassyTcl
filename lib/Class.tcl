@@ -18,8 +18,6 @@
 # will normally not be used by itself to create objects.
 #}
 #}
-# These will be added to tclIndex by Classy::auto_mkindex
-#auto_index Class
 
 proc putsvars {args} {
 	foreach var $args {
@@ -34,10 +32,6 @@ proc putsvars {args} {
 # Create the work namespace class
 # ------------------------------------------------------
 #
-namespace eval ::class {
-	namespace export super
-	namespace export private setprivate getprivate privatevar
-}
 
 if {"[info commands ::class::reinit]" != ""} {
 	set noc 0
@@ -46,5 +40,3 @@ if {"[info commands ::class::reinit]" != ""} {
 	set noc 1
 	source [file join $class::dir lib Class-tcl.tcl]
 }
-# this is for C and Tcl implementation again
-catch {namespace import ::class::private ::class::privatevar ::class::setprivate ::class::getprivate}

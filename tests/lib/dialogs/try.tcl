@@ -1,13 +1,3 @@
-#Functions
-
-proc test2 {} {
-	puts test2
-}
-
-proc test3 {} {
-	puts test3
-}
-
 Classy::Toplevel subclass try
 try method init args {
 	super init
@@ -35,3 +25,5 @@ try method init args {
 	return $object
 }
 
+
+proc try2 {} {}

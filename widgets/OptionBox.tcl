@@ -21,8 +21,6 @@
 #doc {OptionBox command} h2 {
 #	OptionBox specific methods
 #}
-# These will be added to tclIndex by Classy::auto_mkindex
-#auto_index OptionBox
 
 option add *Classy::OptionBox.relief raised widgetDefault
 #option add *Classy::OptionBox.label.anchor w widgetDefault
@@ -35,7 +33,6 @@ option add *Classy::OptionBox.box.highlightThickness 0 widgetDefault
 # ------------------------------------------------------------------
 
 Widget subclass Classy::OptionBox
-Classy::export OptionBox {}
 
 Classy::OptionBox method init {args} {
 	super init frame $object -highlightthickness 0 -class Classy::OptionBox

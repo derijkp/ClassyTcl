@@ -1,8 +1,3 @@
-proc main args {
-mainw .mainw
-focus .mainw
-}
-
 Classy::Toplevel subclass mainw
 mainw method init args {
 	super init

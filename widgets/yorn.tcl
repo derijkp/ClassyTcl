@@ -11,8 +11,6 @@
 #} shortdescr {
 # select yes or no
 #}
-# These will be added to tclIndex by Classy::auto_mkindex
-#auto_index yorn
 #doc {yorn yorn} cmd {
 #yorn message ?option value ...?
 #} descr {
@@ -44,5 +42,4 @@ proc Classy::yorn {message args} {
 	return $::Classy::yorn
 }
 
-Classy::export yorn {}
 

@@ -24,16 +24,12 @@
 #	ColorHSV specific methods
 #} descr {
 #}
-# These will be added to tclIndex by Classy::auto_mkindex
-#auto_index ::Classy::ColorHSV
-#auto_index ColorHSV
 
 # ------------------------------------------------------------------
 #  Widget creation
 # ------------------------------------------------------------------
 
 Widget subclass Classy::ColorHSV
-Classy::export ColorHSV {}
 
 Classy::ColorHSV method init {args} {
 

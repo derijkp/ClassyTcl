@@ -47,15 +47,12 @@
 #	BarChart methods
 #} descr {
 #}
-# These will be added to tclIndex by Classy::auto_mkindex
-#auto_index BarChart
 
 # ------------------------------------------------------------------
 #  Widget creation
 # ------------------------------------------------------------------
 
 Class subclass Classy::BarChart
-Classy::export BarChart {}
 
 Classy::BarChart method init {args} {
 	super init

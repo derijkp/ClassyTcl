@@ -43,6 +43,7 @@ proc clean {} {
 	catch {. configure -menu {}}
 	catch {rename ::Test {}}
 	catch {rename ::try {}}
+	catch {rename ::.try {}}
 	Class subclass Base
 }
 
@@ -51,6 +52,7 @@ proc classyclean {} {
 	catch {eval destroy [winfo children .]}
 	catch {. configure -menu {}}
 	catch {rename ::try {}}
+	catch {rename ::.try {}}
 	Classy::initconf
 }
 

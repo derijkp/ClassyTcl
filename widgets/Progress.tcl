@@ -24,15 +24,12 @@
 #doc {Progress command} h2 {
 #	Progress specific methods
 #}
-# These will be added to tclIndex by Classy::auto_mkindex
-#auto_index Progress
 
 # ------------------------------------------------------------------
 #  Widget creation
 # ------------------------------------------------------------------
 
 Widget subclass Classy::Progress
-Classy::export Progress {}
 
 Classy::Progress method init {args} {
 	super init

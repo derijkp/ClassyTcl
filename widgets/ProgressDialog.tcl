@@ -24,15 +24,12 @@
 #doc {ProgressDialog command} h2 {
 #	ProgressDialog specific methods
 #}
-# These will be added to tclIndex by Classy::auto_mkindex
-#auto_index ProgressDialog
 
 # ------------------------------------------------------------------
 #  Widget creation
 # ------------------------------------------------------------------
 
 Classy::Dialog subclass Classy::ProgressDialog
-Classy::export ProgressDialog {}
 
 Classy::ProgressDialog method init {args} {
 	super init -title "ProgressDialog"

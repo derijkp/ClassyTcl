@@ -1,3 +1,13 @@
+time {package require ClassyTcl}
+time {auto_load Classy::Entry}
+time {Classy::Entry .try}
+.try configure -label try -width 10
+destroy .try
+time {Class subclass Classy::Test}
+Classy::Test destroy
+time {Class subclass Test}
+Test destroy
+
 set dir test
 package require ClassyTcl
 package require BioDesc
