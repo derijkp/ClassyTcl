@@ -28,7 +28,7 @@ if {"$script"==""} {
 	set appname [file tail $script]
 }
 tk appname $appname
-package require ClassyTcl 0.2
+package require -exact ClassyTcl 0.2
 set pwd [pwd]
 lappend Classy::help_path [file join $Classy::appdir help]
 lappend auto_path [file join $Classy::appdir lib]

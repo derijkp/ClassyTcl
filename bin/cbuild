@@ -8,7 +8,7 @@ exec wish8.0 "$0" "$@"
 
 wm withdraw .
 tk appname cbuild
-package require ClassyTcl 0.2
+package require -exact ClassyTcl 0.2
 
 if {"$argv" != ""} {
 	set file [lindex $argv 0]

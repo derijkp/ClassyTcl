@@ -43,7 +43,7 @@ proc Widget {} {}
 proc ::Widget {} {}
 }
 
-package require Tk
+package require -exact Tk 8.0
 
 catch {Widget destroy}
 
