@@ -1,0 +1,4 @@
+
+action Builder/question {Dummy tool} {Classy::msg "Just a dummy toolbar"}
+action Save {Save} {Classy::msg "Just a dummy toolbar"}
+		

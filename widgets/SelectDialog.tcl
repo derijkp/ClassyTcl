@@ -83,6 +83,24 @@ Classy::SelectDialog addoption -default {default Default {}} {
 	return $value
 }
 
+#doc {SelectDialog options -combo} option {-combo combo Combo} descr {
+#}
+Classy::SelectDialog addoption -combo {combo Combo {}} {
+	if [winfo exists $object.options.add] {
+		$object.options.add configure -combo $value
+	}
+	return $value
+}
+
+#doc {SelectDialog options -combopreset} option {-combopreset comboPreset ComboPreset} descr {
+#}
+Classy::SelectDialog addoption -combopreset {comboPreset ComboPreset {}} {
+	if [winfo exists $object.options.add] {
+		$object.options.add configure -combo $value
+	}
+	return $value
+}
+
 #doc {SelectDialog options -addcommand} option {-addcommand addCommand AddCommand} descr {
 #}
 Classy::SelectDialog addoption -addcommand {addCommand AddCommand {}} {
@@ -91,7 +109,10 @@ Classy::SelectDialog addoption -addcommand {addCommand AddCommand {}} {
 	catch {destroy $object.options.add}
 	if {"$value" != ""} {
 		Classy::Entry $object.options.add -label "Add" -textvariable $options(-addvariable) \
-			-command "$object invoke add" -default [getprivate $object options(-default)]
+			-command "$object invoke add" \
+			-default [getprivate $object options(-default)] \
+			-combo [getprivate $object options(-combo)] \
+			-combopreset [getprivate $object options(-combopreset)] \
 		pack $object.options.add -side bottom -fill x
 		$object add add "Add" [list $object _add] Insert
 	}

@@ -72,6 +72,15 @@ test Classy::Entry {command} {
 	set ::c
 } {try}
 
+test Classy::Entry {command not at creation} {
+	classyclean
+	set ::c 0
+	Classy::Entry .try -labelwidth 5 -label try \
+		-command {set ::c try}
+	pack .try
+	set ::c
+} 0
+
 test Classy::Entry {constraint} {
 	classyclean
 	Classy::Entry .try -label try -constraint {^[a-z]*$} -warn 0
@@ -121,11 +130,22 @@ test Classy::Entry {combo with command} {
 	classyclean
 	proc t object {return [list $object try it now]}
 	set ::try t
-	Classy::Entry .try -textvariable try -combo t
+	Classy::Entry .try -textvariable try -combo {t .try}
 	pack .try
 	.try.defaults invoke
 	.try.defaults.combo.list get 0
 } {.try}
+
+test Classy::Entry {combo with preset} {
+	classyclean
+	set ::try t
+	Classy::Entry .try -textvariable try -combo 10 -combopreset {echo {pre1 pre2}}
+	pack .try -fill x
+	.try set test
+	.try set test2
+	.try.defaults invoke
+	.try.defaults.combo.list get end
+} {pre2}
 
 test Classy::FileEntry {create and configure} {
 	classyclean
@@ -140,6 +160,14 @@ test Classy::FileEntry {with combo} {
 	Classy::FileEntry .try
 	pack .try
 	.try configure -label test -combo 10
+	.try cget -label
+} {test}
+
+test Classy::Entry {-state} {
+	classyclean
+	Classy::Entry .try
+	pack .try
+	.try configure -label test -state disabled
 	.try cget -label
 } {test}
 

@@ -129,11 +129,8 @@ Classy::DynaMenu classmethod define {menutype args} {
 	switch [llength $args] {
 		0 {
 			if ![info exists menus($menutype)] {
-				if [info exists ::Classy::configmenu($menutype)] {
-					$class define $menutype $::Classy::configmenu($menutype)
-				} else {
-					return -code error "Menu type \"$menutype\" not defined"
-				}
+				set file [Classy::getconf menu/$menutype]
+				$class define $menutype [file_read $file]
 			}
 			return $menudata($menutype)
 		}
@@ -391,7 +388,7 @@ Classy::DynaMenu classmethod makepopup {menutype menu curmenu data cmdw bindtag}
 			append checks($menutype) "$curmenu entryconfigure [$curmenu index last] $command\n"
 			incr num
 		} elseif [regexp ^# $type] {
-		} elseif {"$type" ==""} {
+		} elseif {"$type" == ""} {
 		} else {
 			error "Unknown entrytype $type" 
 		}

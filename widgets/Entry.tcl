@@ -136,6 +136,11 @@ Classy::Entry addoption -state {state State normal} {
 		default {
 			$object.entry configure -state $value
 			catch {$object.defaults configure -state $value}
+			if [string_equal $value disabled] {
+				catch {$object.label configure -fg [Classy::realcolor disabledForeground]}
+			} else {
+				catch {$object.label configure -fg [Classy::realcolor Foreground]}
+			}
 		}
 	}
 }
@@ -152,6 +157,13 @@ Classy::Entry addoption -orient {orient Orient horizontal} {
 # max size of list to choose from (if larger use scrollbar)
 #}
 Classy::Entry addoption -combosize {comboSize ComboSize 10} {
+}
+
+#doc {Entry options -combopreset} option {-combopreset comboPreset ComboPreset} descr {
+# if set, the value will be executed as a command, and the result will give a number of values
+# that will be added to the combo list if they are not present already.
+#}
+Classy::Entry addoption -combopreset {comboPreset ComboPreset {}} {
 }
 
 #doc {Entry options -combo} option {-combo combo Combo} descr {
@@ -207,13 +219,17 @@ Classy::Entry addoption -combo {combo Combo {}} {
 #}
 Classy::Entry addoption -default {default Default {}} {
 	private $object options
+	set w $object.defaults
+	if [string_equal $value ""] {
+		if [winfo exists $w] {
+			destroy $w
+		}
+		return $value
+	}
 	if ![string_equal $options(-combo) ""] {
 		return -code error "-combo and default options cannot be combined"
 	}
-	set w $object.defaults
-	if {("$value"=="")&&([winfo exists $w])} {
-		destroy $w
-	} elseif ![winfo exists $w] {
+	if ![winfo exists $w] {
 		Classy::DefaultMenu $w -key $value \
 			-command "$object set" \
 			-getcommand "$object get"
@@ -335,12 +351,7 @@ Classy::Entry method get {} {
 Classy::Entry method command {} {
 	private $object options
 	if [isint $options(-combo)] {
-		set history [Classy::Default get app combo,$object]
-		set value [$object.entry get]
-		set history [list_remove $history $value]
-		list_unshift history $value
-		set history [lrange $history 0 $options(-combo)]
-		Classy::Default set app combo,$object $history
+		$object _combo_add
 	}
 	set command [getprivate $object options(-command)]
 	if ![string_equal $command ""] {
@@ -349,6 +360,16 @@ Classy::Entry method command {} {
 	} else {
 		return 0
 	}
+}	
+
+Classy::Entry method _combo_add {} {
+	private $object options
+	set history [Classy::Default get app combo,$object]
+	set value [$object.entry get]
+	set history [list_remove $history $value]
+	list_unshift history $value
+	set history [lrange $history 0 $options(-combo)]
+	Classy::Default set app combo,$object $history
 }	
 
 #doc {Entry command constrain} cmd {
@@ -448,7 +469,12 @@ Classy::Entry method combo_draw {args} {
 		set history [Classy::Default get app combo,$object]
 		set list $history
 	} else {
-		set list [uplevel #0 $options(-combo) $object]
+		set list [uplevel #0 $options(-combo)]
+	}
+	if [llength $options(-combopreset)] {
+		set prelist [uplevel #0 $options(-combopreset)]
+		set prelist [list_lremove $prelist $list]
+		set list [list_concat $list $prelist]
 	}
 	set w $object.defaults.combo
 	if [winfo ismapped $w] {

@@ -37,12 +37,13 @@ Classy::FileSelect method init {args} {
 	set w $object.options
 	checkbutton $w.hidden -text "Show (Unix) hidden files" -variable [privatevar $object hidden] \
 		-command "$object configure -hidden \[getprivate $object hidden\];$object refresh"
-	Classy::Entry $w.filter -label "Filter" -orient horizontal -default Classy__FileSelect__filter
+	Classy::Entry $w.filter -label "Filter" -orient horizontal -combo 20
 	listbox $w.dirs -yscrollcommand "$w.dirsbar set" -exportselection no -width 0
 	scrollbar $w.dirsbar -orient vertical -command "$w.dirs yview" -takefocus 0
 	listbox $w.files -yscrollcommand "$w.filesbar set" -exportselection no
 	scrollbar $w.filesbar -orient vertical -command "$w.files yview" -takefocus 0
 	Classy::Entry $w.file -label "File" -orient horizontal \
+		-combo 20 \
 		-command [list $object _entrycmd] \
 		-validate [list $w.files selection clear 0 end]
 	frame $w.extra
@@ -149,6 +150,14 @@ Classy::FileSelect addoption	-command [list command Command {}] {}
 #doc {FileSelect options -default} option {-default default Default} descr {
 #}
 Classy::FileSelect chainoption -default {$object.options.file} -default
+
+#doc {FileSelect options -combo} option {-combo combo Combo} descr {
+#}
+Classy::FileSelect chainoption -combo {$object.options.file} -combo
+
+#doc {FileSelect options -combopreset} option {-combopreset comboPreset ComboPreset} descr {
+#}
+Classy::FileSelect chainoption -combopreset {$object.options.file} -combopreset
 
 #doc {FileSelect options -defaultfilter} option {-defaultfilter default Default} descr {
 #}
@@ -284,6 +293,7 @@ Classy::FileSelect method movedir {movedir} {
 }
 
 Classy::FileSelect method _command {} {
+	$object.options.file _combo_add
 	set command [getprivate $object options(-command)]
 	if {"$command" != ""} {
 		uplevel #0 $command [list [$object get]]

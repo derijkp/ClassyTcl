@@ -55,9 +55,9 @@ Classy::WindowBuilder method init {args} {
 	private $object current options
 	set current(w) ""
 	set w [Classy::window $object]
-	Classy::DynaMenu attachmainmenu Classy::WindowBuilder $object
+	Classy::DynaMenu attachmainmenu Classy_WindowBuilder $object
 	frame $object.toolhold
-		Classy::DynaTool $object.tool -type Classy::WindowBuilder -cmdw $object
+		Classy::DynaTool $object.tool -type Classy_WindowBuilder -cmdw $object
 		Classy::OptionMenu $object.children -list {Select {Select parent}} \
 			-command "$object select"
 		$object.children set Select
@@ -67,7 +67,7 @@ Classy::WindowBuilder method init {args} {
 		grid $object.children -in $object.toolhold -row 0 -column 1 -sticky nsew
 		grid $object.current -in $object.toolhold -row 0 -column 2 -sticky nsew
 		grid columnconfigure $object.toolhold 2 -weight 1
-	Classy::DynaTool $object.icons -type Classy::WindowBuilder_icons -cmdw $object -width 30
+	Classy::DynaTool $object.icons -type Classy_WindowBuilder_icons -cmdw $object -width 30
 	foreach c [winfo children $object.icons] {
 		if {"[winfo class $c]" == "Button"} {
 			set command [$c cget -command]
@@ -422,7 +422,7 @@ Classy::WindowBuilder method add {type args} {
 		}
 		set base $data(base)
 		if {"$data(opt-mainmenu,$base)" != ""} return
-		$base configure -menu [eval Classy::DynaMenu menu Classy::Dummy $base]
+		$base configure -menu [eval Classy::DynaMenu menu Classy_Dummy $base]
 		set data(opt-mainmenu,$base) Classy::Dummy
 		set data(opt-menuwin,$base) $base
 		Classy::todo $object select $base
@@ -501,6 +501,7 @@ Classy::WindowBuilder method close {} {
 			set geom [wm geometry $object.work]
 		}
 		Classy::Default set geometry $object.work.keep $geom
+		catch {$object.work configure -destroycommand {}}
 		destroy $object.work
 		catch {Classy::Default unset geometry $object.work}
 	}
@@ -574,11 +575,12 @@ Classy::WindowBuilder method open {file} {
 		}
 	}
 	wm title $object $function
+	catch {$object.work configure -destroycommand {}}
 	catch {destroy $object.work}
 	catch {unset current}
 	catch {unset data}
 	catch {unset border}
-	set data(tags) [list Classy::WindowBuilder [Classy::DynaMenu bindtag Classy::WindowBuilder]]
+	set data(tags) [list Classy::WindowBuilder [Classy::DynaMenu bindtag Classy_WindowBuilder]]
 #	set data(options) ""
 #	set data(methods) ""
 	set data(opt) 1
@@ -607,6 +609,9 @@ Classy::WindowBuilder method open {file} {
 #	catch {$object.code.book.methods.methods configure -content $data(methods)}
 	set data(function) $function
 	set data(file) $file
+	catch {
+		foreach w [$function info children] {catch {$w configure -destroycommand {}}}
+	}
 	catch {rename $function {}}
 	uplevel #0 source $file
 	set data(code) $code
@@ -1084,6 +1089,7 @@ Classy::WindowBuilder method recreate {} {
 		}
 	}
 	uplevel #0 $data(code)
+	catch {$data(base) configure -destroycommand {}}
 	catch {destroy $data(base)}
 	if {"$data(type)" == "frame"} {
 		catch {destroy $object.work}

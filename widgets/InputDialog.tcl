@@ -52,6 +52,14 @@ Classy::InputDialog addoption	-command [list command Command {}] {}
 #}
 Classy::InputDialog chainoption -default {$object.options.entry} -default
 
+#doc {InputDialog options -combo} option {-combo combo Combo} descr {
+#}
+Classy::InputDialog chainoption -combo {$object.options.entry} -combo
+
+#doc {InputDialog options -combopreset} option {-combopreset comboPreset ComboPreset} descr {
+#}
+Classy::InputDialog chainoption -combopreset {$object.options.entry} -combopreset
+
 #doc {InputDialog options -buttontext} option {-buttontext buttonText Text} descr {
 #}
 Classy::InputDialog chainoption -buttontext {$object.actions.go} -text

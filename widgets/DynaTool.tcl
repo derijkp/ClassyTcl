@@ -85,11 +85,8 @@ Classy::DynaTool addoption -type {type Type {}} {
 	eval destroy [winfo children $object]
 	catch {unset data(slaves)}
 	if ![info exists tooldata($value)] {
-		if [info exists ::Classy::configtoolbar($value)] {
-			set tooldata($value) $::Classy::configtoolbar($value)
-		} else {
-			return -code error "Toolbar type \"$value\" not defined"
-		}
+		set file [Classy::getconf toolbar/$value]
+		set tooldata($value) [file_read $file]
 	}
 	set list [cmd_split $tooldata($value)]
 	if {[lsearch -regexp $list "^\[\t \]*nodisplay\[\t \]*\$"] != -1} {

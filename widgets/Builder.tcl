@@ -28,7 +28,7 @@ Classy::Builder method init {args} {
 	super init -keepgeometry all -resize {10 10}
 	set w [Classy::window $object]
 	private $object browse
-	Classy::DynaTool $object.tool -type Classy::Builder -cmdw $object
+	Classy::DynaTool $object.tool -type Classy_Builder -cmdw $object
 	frame $object.bframe
 	Classy::TreeWidget $object.browse -width 80 -height 10 -takefocus 1 \
 		-opencommand "$object opennode" \
@@ -36,7 +36,7 @@ Classy::Builder method init {args} {
 		-endnodecommand "$object selectnode" \
 		-executecommand "$object openendnode"
 	Classy::rebind $object.browse $object
-	Classy::DynaMenu attachmainmenu Classy::Builder $object
+	Classy::DynaMenu attachmainmenu Classy_Builder $object
 	grid $object.tool -row 0 -columnspan 3 -sticky ew
 	grid rowconfigure $object 0 -weight 0
 	grid rowconfigure $object 1 -weight 1
@@ -169,7 +169,12 @@ Classy::Builder method new {type {name {}}} {
 			close $f
 			set dir [file dir $file]
 			set base [list $file $name [string tolower $cmd]]
-			$object.browse addnode [list $dir {} dir] $base \
+			if [string_equal $dir $defdir] {
+				set parent {}
+			} else {
+				set parent [list $dir {} dir]
+			}
+			$object.browse addnode $parent $base \
 				-type end -text $name -image [Classy::geticon new[string tolower $cmd]]
 		}
 		return
@@ -818,10 +823,10 @@ Classy::Builder method opennode {args} {
 Classy::Builder method _drawtree {} {
 	private $object options browse defdir
 	$object.browse clearnode {}
-	$object.browse configure -roottext [file tail $defdir]
+	$object.browse addnode {} [list $defdir {} dir] -text [file tail $defdir]
 	catch {Classy::auto_mkindex $defdir *.tcl}
 	catch {source [file join $defdir tclIndex]}
-	$object opennode {} [list $defdir {} dir]
+	$object opennode [list $defdir {} dir]
 	$object.browse redraw
 	update idletasks
 	set select [lindex [$object.browse children {}] 0]

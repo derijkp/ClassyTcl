@@ -24,6 +24,8 @@
 #<dt>-title
 #<dt>-filter
 #<dt>-default
+#<dt>-combo
+#<dt>-combopreset
 #<dt>-transfercommand
 #<dt>-help
 #</dl>
@@ -37,7 +39,9 @@ proc Classy::savefile {args} {
 		-initialfile {} {}
 		-title {} {Save file}
 		-filter {} *
-		-default {} classy__fileselect
+		-default {} {}
+		-combo {} 20
+		-combopreset {} {}
 		-transfercommand {} {}
 		-help {} classy_file_save
 	} remain
@@ -70,7 +74,8 @@ proc Classy::savefile {args} {
 		catch {destroy .classy__.selectfile}
 		Classy::FileSelect .classy__.selectfile -dir $dir \
 			-title $opt(-title) -command {set ::Classy::selectfile} \
-			-filter $filter -default $opt(-default) -help $opt(-help) \
+			-filter $filter -help $opt(-help) \
+			-default $opt(-default) -combo $opt(-combo) -combopreset $opt(-combopreset) \
 			-closecommand {set ::Classy::selectfile ""}
 		if {"$remain"!=""} {eval .classy__.selectfile configure $remain}
 		if {"$opt(-initialfile)"!=""} {

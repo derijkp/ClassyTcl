@@ -41,8 +41,8 @@ Classy::Help method init {args} {
 	$object.html bindlink <<Action>> "$object gethelp \[%W linkat %x %y\]"
 	$object.html bindlink <<Adjust>> {Classy::newhelp [%W linkat %x %y]}
 	scrollbar $object.vbar -orient vertical -command "$object.html yview"
-	Classy::DynaMenu attachmainmenu Classy::Help $object
-	Classy::DynaTool $object.tool -type Classy::Help
+	Classy::DynaMenu attachmainmenu Classy_Help $object
+	Classy::DynaTool $object.tool -type Classy_Help
 	$object.tool cmdw $object
 	pack $object.tool -side top -fill x
 	if {"[option get $object scrollSide ScrollSide]" == "right"} {

@@ -88,6 +88,12 @@ Classy::Selector addoption -labelwidth {labelWidth LabelWidth {}} {
 	Classy::todo $object redraw
 }
 
+#doc {Selector options -state} option {-state state State} descr {
+#}
+Classy::Selector addoption -state {state State normal} {
+	Classy::todo $object redraw
+}
+
 # ------------------------------------------------------------------
 #  Methods
 # ------------------------------------------------------------------
@@ -167,14 +173,16 @@ Classy::Selector method redraw {} {
 	switch [lindex $options(-type) 0] {
 		int {
 			Classy::NumEntry $object.value -label $title -labelwidth $options(-labelwidth) \
-				-textvariable $var -command "$object _command" -orient $options(-orient)
+				-textvariable $var -command "$object _command" -orient $options(-orient) \
+				-state $options(-state)
 			grid $v.value -row 0 -column 0 -sticky nwe
 			grid columnconfigure $v 0 -weight 1
 			grid rowconfigure $object 0 -weight 1
 		}
 		line {
 			Classy::Entry $object.value -label $title -labelwidth $options(-labelwidth) \
-				-textvariable $var -command "$object _command" -orient $options(-orient)
+				-textvariable $var -command "$object _command" -orient $options(-orient) \
+				-state $options(-state)
 			grid $v.value -row 0 -column 0 -sticky nwe
 			grid columnconfigure $v 0 -weight 1
 			grid rowconfigure $object 0 -weight 1
@@ -187,7 +195,8 @@ Classy::Selector method redraw {} {
 				$object.change configure -text $title
 				$object.value textchanged 0
 				$object _command [set $var]
-			}]
+			}] \
+				-state $options(-state)
 			button $object.edit -text "Edit" -command [varsubst {object title} {
 				set w [Classy::edit]
 				wm title $w $title
@@ -196,8 +205,10 @@ Classy::Selector method redraw {} {
 					$w.editor textchanged 0
 				} $object $w]
 				$w.editor.edit link $object.value
-			}]
-			Classy::ScrolledText $object.value -wrap none -width 5 -height 2
+			}] \
+				-state $options(-state)
+			Classy::ScrolledText $object.value -wrap none -width 5 -height 2 \
+				-state $options(-state)
 			bind $object.value <<Save>> "$object.change invoke"
 			bind $object.value <<Empty>> "$object.value set {}"
 			grid $object.change -row 2 -column 0 -sticky we
@@ -217,13 +228,16 @@ Classy::Selector method redraw {} {
 		color {
 			set temp [Classy::optionget $object colorList ColorList]
 			regsub -all "\n" $temp { } temp
-			Classy::Default set app selector_color [eval concat $temp]
 			Classy::Entry $object.value -textvariable $var \
-				-default selector_color \
-				-command [list invoke value "$object _command \$value ; $v.sample configure -bg \[Classy::realcolor \$value\]"]
-			$v.value configure -label $title
+				-combo 10 \
+				-combopreset [list echo [eval concat $temp]] \
+				-command [list invoke value "$object _command \$value ; $v.sample configure -bg \[Classy::realcolor \$value\]"] \
+				-state $options(-state)
+			$v.value configure -label $title \
+				-state $options(-state)
 			label $v.sample -text sample
-			button $v.select -text "Select color" -command "$v.value set \[Classy::getcolor -initialcolor \[$v.value get\]\]"
+			button $v.select -text "Select color" -command "$v.value set \[Classy::getcolor -initialcolor \[$v.value get\]\]" \
+				-state $options(-state)
 			grid $v.value -row 2 -column 1 -sticky we
 			grid $v.select -row 2 -column 0 -sticky nwe
 			grid $v.sample -row 3 -column 0 -sticky nwe -columnspan 2
@@ -236,10 +250,13 @@ Classy::Selector method redraw {} {
 		}
 		font {
 			Classy::Entry $object.value -textvariable $var \
-				-command [list invoke value "$object _command \$value ; $v.sample configure -font \[Classy::realfont \$value\]"]
-			$v.value configure -label $title
+				-command [list invoke value "$object _command \$value ; $v.sample configure -font \[Classy::realfont \$value\]"] \
+				-state $options(-state)
+			$v.value configure -label $title \
+				-state $options(-state)
 			label $v.sample -text "ABCDEFGHIJKLMNOPQRSTUVWXYZ\nabcdefghijklmnopqrstuvwxyz\n0123456789"
-			button $v.select -text "Select font" -command "$v.value set \[Classy::getfont -font \[$v.value get\]\]"
+			button $v.select -text "Select font" -command "$v.value set \[Classy::getfont -font \[$v.value get\]\]" \
+				-state $options(-state)
 			grid $v.value -row 2 -column 1 -sticky we
 			grid $v.select -row 2 -column 0 -sticky nwe
 			grid $v.sample -row 3 -column 0 -sticky nwe -columnspan 2
@@ -252,14 +269,16 @@ Classy::Selector method redraw {} {
 		}
 		key {
 			Classy::Entry $object.value -label $title \
-				-textvariable $var -command "$object _command" -orient $options(-orient)
+				-textvariable $var -command "$object _command" -orient $options(-orient) \
+				-state $options(-state)
 			grid $v.value -row 0 -column 0 -sticky nwe
 			grid columnconfigure $v 0 -weight 1
 			grid rowconfigure $object 0 -weight 1
 		}
 		mouse {
 			Classy::Entry $object.value -label $title \
-				-textvariable $var -command "$object _command" -orient $options(-orient)
+				-textvariable $var -command "$object _command" -orient $options(-orient) \
+				-state $options(-state)
 			grid $v.value -row 0 -column 0 -sticky nwe
 			grid columnconfigure $v 0 -weight 1
 			grid rowconfigure $object 0 -weight 1
@@ -267,7 +286,8 @@ Classy::Selector method redraw {} {
 		anchor {
 			Classy::Entry $object.value -textvariable $var \
 				-command "$object _command" -label $title -orient vertical \
-				-orient vertical
+				-orient vertical \
+				-state $options(-state)
 			set row 0
 			set column 0
 			frame $v.select
@@ -275,7 +295,8 @@ Classy::Selector method redraw {} {
 				radiobutton $v.select.$type -indicatoron 0 -text $type \
 					-image [Classy::geticon $icon] \
 					-command "$v.value set $type" -value $type \
-					-variable $var
+					-variable $var \
+					-state $options(-state)
 				grid $v.select.$type -row $row -column $column -sticky we
 				incr column
 				if {$column == 3} {set column 0;incr row}
@@ -295,14 +316,16 @@ Classy::Selector method redraw {} {
 			}
 			set list $lists($options(-type))
 			Classy::Entry $object.value -textvariable $var \
-				-command "$object _command" -label $title -orient $options(-orient)
+				-command "$object _command" -label $title -orient $options(-orient) \
+				-state $options(-state)
 			$v.value configure -label $title
 			set column 0
 			foreach {type icon} $list {
 				radiobutton $object.$type -indicatoron 0 -text $type \
 					-image [Classy::geticon $icon] \
 					-command  "$v.value set $type" -value $type \
-					-variable $var
+					-variable $var \
+					-state $options(-state)
 				grid $object.$type -row 0 -column $column -sticky nwe
 				incr column
 			}
@@ -318,13 +341,16 @@ Classy::Selector method redraw {} {
 		select {
 			set list [lrange $options(-type) 1 end]
 			Classy::Entry $object.value -textvariable $var \
-				-command "$object _command" -label $title -orient $options(-orient)
-			$v.value configure -label $title
+				-command "$object _command" -label $title -orient $options(-orient) \
+				-state $options(-state)
+			$v.value configure -label $title \
+				-state $options(-state)
 			set column 0
 			foreach {type} $list {
 				radiobutton $object.b$type -indicatoron 0 -text $type \
 					-command  "$v.value set $type" -value $type \
-					-variable $var
+					-variable $var \
+					-state $options(-state)
 				grid $object.b$type -row 0 -column $column -sticky nwe
 				incr column
 			}
@@ -340,29 +366,38 @@ Classy::Selector method redraw {} {
 		sticky {
 			Classy::Entry $object.value -textvariable $var \
 				-command "$object _command" -label $title -orient vertical \
-				-orient vertical
+				-orient vertical \
+				-state $options(-state)
 			frame $v.select
 			grid $v.select -row 6 -column 0
 			checkbutton $v.select.n -image [Classy::geticon Builder/sticky_n] -indicatoron 0 -anchor c \
 				-variable [privatevar $object sticky(n)] \
-				-command "$object _stickyset"
+				-command "$object _stickyset" \
+				-state $options(-state)
 			checkbutton $v.select.s -image [Classy::geticon Builder/sticky_s] -indicatoron 0 -anchor c \
 				-variable [privatevar $object sticky(s)] \
-				-command "$object _stickyset"
+				-command "$object _stickyset" \
+				-state $options(-state)
 			checkbutton $v.select.e -image [Classy::geticon Builder/sticky_e] -indicatoron 0 -anchor c \
 				-variable [privatevar $object sticky(e)] \
-				-command "$object _stickyset"
+				-command "$object _stickyset" \
+				-state $options(-state)
 			checkbutton $v.select.w -image [Classy::geticon Builder/sticky_w] -indicatoron 0 -anchor c \
 				-variable [privatevar $object sticky(w)] \
-				-command "$object _stickyset"
+				-command "$object _stickyset" \
+				-state $options(-state)
 			button $v.select.all -image [Classy::geticon Builder/sticky_all] -anchor c \
-				 -command "$object.value set nesw"
+				-command "$object.value set nesw" \
+				-state $options(-state)
 			button $v.select.none -image [Classy::geticon Builder/sticky_none] -anchor c \
-				 -command "$object.value set {}"
+				-command "$object.value set {}" \
+				-state $options(-state)
 			button $v.select.we -image [Classy::geticon Builder/sticky_we] -anchor c \
-				 -command "$object.value set we"
+				-command "$object.value set we" \
+				-state $options(-state)
 			button $v.select.ns -image [Classy::geticon Builder/sticky_ns] -anchor c \
-				 -command "$object.value set ns"
+				-command "$object.value set ns" \
+				-state $options(-state)
 			grid $v.select.none -row 7 -column 1 -sticky we
 			grid $v.select.n -row 6 -column 1 -sticky we
 			grid $v.select.s -row 8 -column 1 -sticky we

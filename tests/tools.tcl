@@ -21,12 +21,14 @@ if ![info exists testleak] {
 }
 
 catch {
-	destroy .classy__.error
-	toplevel .classy__.error
-	wm geometry .classy__.error +0+0
-	raise .classy__.error
-	text .classy__.error.text
-	pack .classy__.error.text -expand yes -fill both
+	if !$tcl_interactive {
+		destroy .classy__.error
+		toplevel .classy__.error
+		wm geometry .classy__.error +0+0
+		raise .classy__.error
+		text .classy__.error.text
+		pack .classy__.error.text -expand yes -fill both
+	}
 }
 
 proc display {e} {

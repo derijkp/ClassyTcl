@@ -1,0 +1,612 @@
+Menus {
+	ClassyTcl {
+		Editor {_menu Classy_Editor {menu used in the ClassyTcl Editor} {
+menu "File" {
+	action "Open file" {eval %W load [Classy::selectfile -title Open -selectmode persistent]} <<Load>>
+	action "Open next" {%W loadnext} <<LoadNext>>
+	action "Save" {%W save} <<Save>>
+	action "Save as" {%W savedialog} <<SaveAs>>
+	action "Reopen" {%W reopenlist} <<Reopen>>
+	separator
+	action "New editor" {edit newfile} <<New>>
+	action "Command window" {Classy::cmd} <<Cmd>>
+	action "Customise application" {Classy::Config dialog} <<Customise>>
+	action "Customise menu" {Classy::Config dialog -node {Menus Classy::Editor}} <<CustomiseMenu>>
+	action "Customise toolbar" {Classy::Config dialog -node {Menus Classy::Editor}} <<CustomiseTool>>
+	action "Close" "%W close" <<Close>>
+}
+menu "Edit" {
+	action "Cut" "%W cut" <<Cut>>
+	action "Copy" "%W copy" <<Copy>>
+	action "Paste" "%W paste" <<Paste>>
+	action "Undo" "%W undo" <<Undo>>
+	action "Redo" "%W redo" <<Redo>>
+	action "Clear undo buffer" "%W clearundo" <<ClearUndo>>
+}
+menu "Find" {
+	action "Goto line" {Classy::InputDialog %W.goto -label "Goto line" -title Goto -buttontext Goto -command {%W gotoline}} <<Goto>>
+	action "Find" "%W finddialog" <<Find>>
+	action "Find next" "%W findsel -forwards" <<FindNext>>
+	action "Replace & Find next" "%W replace-find -forwards" <<ReplaceFindNext>>
+	action "Find prev" "%W findsel -backwards" <<FindPrev>>
+	action "Replace & Find prev" "%W replace-find -backwards" <<ReplaceFindPrev>>
+	check "Search Reopen" {-variable [privatevar %W options(-searchreopen)]} <<SearchReopen>>
+	action "Find Tcl function" "%W findfunction" <<FindFunction>>
+	action "Grep" "%W grep" <<Grep>>
+}
+menu "Select" {
+	action "Select all" "%W select all" <<SelectAll>>
+	action "Select none" "%W select none" <<SelectNone>>
+	action "Matching Brackets" "%W matchingbrackets" <Alt-bracketleft> <<MatchingBrackets>>
+	separator
+	action "Marker Box" "%W marker select" <<MarkerSelect>>
+	action "Marker set" "%W marker set" <<MarkerSet>>
+	action "Current Marker" "%W marker current" <<MarkerCurrent>>
+	action "Previous Marker" "%W marker previous" <<MarkerPrev>>
+}
+menu "Tools" {
+	action "Indented Return" "%W indentedcr" <<IndentCr>>
+	action "Indent in" "%W indent 1" <<IndentIn>>
+	action "Indent out" "%W indent -1" <<IndentOut>>
+	action "Comment" "%W comment add" <Alt-numbersign>
+	action "Remove comment" "%W comment remove" <Control-Alt-numbersign>
+	action "Set tab stops" {Classy::InputDialog %W.tabstops -label "Tab stops" -title Tabstops -buttontext Set -command {%W configure -tabs}} <<SetTabs>>
+	separator
+	action "Connect to" "%W connectto" <<Connect>>
+	action "Execute Tcl command" "%W execute" <<ExecuteCmd>>
+	action "format" "%W format 76" <<Format>>
+}
+activemenu "Macros" {%W getmacromenu}
+activemenu "Pattern" {%W getpatternmenu}
+menu "Help" {
+	action "Editor" {Classy::help classy_editor} <<Help>>
+	separator
+	action "ClassyTcl" {Classy::help ClassyTcl} <<HelpClassyTcl>>
+	action "Help" {Classy::help help} <<HelpHelp>>
+}
+
+		}}
+		Help {_menu Classy_Help {menu used in the ClassyTcl help system} {
+menu "File" {
+	action "Reload" {%W reload} <<Reload>>
+	action "Edit" {%W edit} <<Edit>>
+	action "Save source" {%W save [Classy::selectfile]} <<Save>>
+	action "Save as text" {%W save [Classy::selectfile] text} <<SaveText>>
+	separator
+	action "Editor" {edit newfile} <<Editor>>
+	action "Command window" {Classy::cmd} <<Cmd>>
+	action "Customise application" {Classy::Config dialog} <<Customise>>
+	action "Customise menu" {Classy::Config dialog -node {Menus Classy::Help}} <<CustomiseMenu>>
+	action "Customise toolbar" {Classy::Config dialog -node {Menus Classy::Help}} <<CustomiseTool>>
+	action "Close" {destroy %W} <<Close>>
+}
+activemenu "Contents" {%W getcontentsmenu}
+menu "Go" {
+	action "Back" {%W back} <<Back>>
+	action "Forward" {%W forward} <<Forward>>
+	action "History" {%W historymenu} <<History>>
+}
+activemenu "General" {%W getgeneralmenu}
+
+		}}
+		Filer {_menu Classy_Filer {menu used in the ClassyTcl Filer} {
+menu "Selection" {
+	action "Delete" {%W deletefiles sel} <<Delete>>
+	action "Rename" {%W renamebox} <<Rename>>
+	action "Copy" {%W copybox} <<Copy>>
+}
+menu "Options" {
+	check "Hidden files" {-variable [privatevar %W hidden] -onvalue yes -offvalue no -command {%W refresh}} <<HiddenFiles>>
+	action "Filter" "%W filterbox" <<Filter>>
+	separator
+	radio "Sort by extension" {-variable [privatevar %W order] -value extension -command {%W refresh}} <<SortExt>>
+	radio "Sort by time" {-variable [privatevar %W order] -value time -command {%W refresh}} <<SortTime>>
+	radio "Sort by access" {-variable [privatevar %W order] -value accesstime -command {%W refresh}} <<SortAccess>>
+	radio "Sort by size" {-variable [privatevar %W order] -value size -command {%W refresh}} <<SortSize>>
+	radio "Unsorted (as on disk)" {-variable [privatevar %W order] -value disk -command {%W refresh}} <<Unsorted>>
+	separator
+	radio "Normal icons" {-variable [privatevar %W view] -value normal -command {%W redraw}} <<NormalIcons>>
+	radio "Small icons" {-variable [privatevar %W view] -value small -command {%W redraw}} <<SmallIcons>>
+	radio "Full info" {-variable [privatevar %W view] -value full -command {%W redraw}} <<FullInfo>>
+}
+		}}
+		Builder {_menu Classy_Builder {menu used in the ClassyTcl Builder} {
+menu "File" {
+	action "Code directory" {%W configure -dir code} <<CodeDir>>
+	action "Help directory" {%W configure -dir help} <<HelpDir>>
+	action "Select directory" {%W configure -dir [Classy::selectfile]} <<Dir>>
+	action "Customise" {Classy::Config dialog} <<Customise>>
+	separator
+	action "Editor" "edit newfile" <<Editor>>
+	action "Command window" {Classy::cmd} <<Cmd>>
+	action "Close" {destroy %W} <<Close>>
+	action "Exit" {exit} <<Exit>>
+}
+menu "Add" {
+	action "New file" {%W new file} <<newfile>>
+	action "New function" {%W new function} <<newfunction>>
+	action "New Toplevel" {%W new toplevel} <<newtoplevel>>
+	action "New Dialog" {%W new dialog} <<newdialog>>
+	action "New Frame" {%W new frame} <<newframe>>
+	action "New option" {%W new option} <<newoption>>
+	action "New method" {%W new method} <<newmethod>>
+}
+menu "Edit" {
+	action "Edit" {%W openendnode [lindex [%W.browse selection] 0]} <<Edit>> <e>
+	action "Rename" {%W rename} <<Rename>>
+	separator
+	action "Copy" {%W copy} <<Copy>>
+	action "Cut" {%W cut} <<Cut>>
+	action "Delete" {%W delete} <<Delete>>
+	action "Paste" {%W paste} <<Paste>>
+}
+menu "Help" {
+	action "Builder" {Classy::help classy_builder} <<Help>>
+	separator
+	action "ClassyTcl" {Classy::help ClassyTcl} <<HelpClassyTcl>>
+	action "Help" {Classy::help classy_help} <<HelpHelp>>
+}
+		}}
+		WindowBuilder {_menu Classy_WindowBuilder {menu used in the ClassyTcl WindowBuilder} {
+menu "File" {
+	action "Save" {[Classy::WindowBuilder_win %W] save} <<Save>>
+	action "Test" {[Classy::WindowBuilder_win %W] test} <<Test>>
+	action "Fast test" {[Classy::WindowBuilder_win %W] ftest} <<FastTest>>
+	action "Recreate" {[Classy::WindowBuilder_win %W] recreate} <<Recreate>>
+	separator
+	action "Editor" "edit newfile" <<Editor>>
+	action "Command window" {Classy::cmd} <<Cmd>>
+	separator
+	action "Close" {[Classy::WindowBuilder_win %W] close} <<Close>>
+}
+menu "Edit" {
+	action "Copy" {[Classy::WindowBuilder_win %W] copy} <<Copy>>
+	action "Cut" {[Classy::WindowBuilder_win %W] cut} <<Cut>>
+	action "Delete" {[Classy::WindowBuilder_win %W] delete} <<Delete>>
+	action "Paste" {[Classy::WindowBuilder_win %W] paste} <<Paste>>
+	separator
+	action "Move up" {[Classy::WindowBuilder_win %W] geometryset up} <<Up>>
+	action "Move down" {[Classy::WindowBuilder_win %W] geometryset down} <<Down>>
+	action "Move left" {[Classy::WindowBuilder_win %W] geometryset left} <<Left>>
+	action "Move right" {[Classy::WindowBuilder_win %W] geometryset right} <<Right>>
+	action "Rowspan smaller" {[Classy::WindowBuilder_win %W] geometryset spanup} <<SelectUp>>
+	action "Rowspan larger" {[Classy::WindowBuilder_win %W] geometryset spandown} <<SelectDown>>
+	action "Columnspan smaller" {[Classy::WindowBuilder_win %W] geometryset spanleft} <<SelectLeft>>
+	action "Columnspan larger" {[Classy::WindowBuilder_win %W] geometryset spanright} <<SelectRight>>
+}
+menu "Tk" {
+	action Frame {[Classy::WindowBuilder_win %W] add frame}
+	action Entry {[Classy::WindowBuilder_win %W] add entry}
+	action Label {[Classy::WindowBuilder_win %W] add label}
+	action Button {[Classy::WindowBuilder_win %W] add button}
+	action "Check button" {[Classy::WindowBuilder_win %W] add checkbutton}
+	action "Radio button" {[Classy::WindowBuilder_win %W] add radiobutton}
+	action Message {[Classy::WindowBuilder_win %W] add message}
+	action "Vertical Scrollbar" {[Classy::WindowBuilder_win %W] add scrollbar -orient vertical}
+	action "Horizontal Scrollbar" {[Classy::WindowBuilder_win %W] add scrollbar -orient horizontal}
+	action Listbox {[Classy::WindowBuilder_win %W] add listbox}
+	action Text {[Classy::WindowBuilder_win %W] add text}
+	action Canvas {[Classy::WindowBuilder_win %W] add canvas}
+	action Scale {[Classy::WindowBuilder_win %W] add scale}
+}
+menu "ClassyTcl" {
+	action "Main Menu" {[Classy::WindowBuilder_win %W] add Classy::DynaMenu}
+	action "Toolbar" {%W add Classy::DynaTool}
+	action "Entry" {[Classy::WindowBuilder_win %W] add Classy::Entry}
+	action "Numerical Entry" {[Classy::WindowBuilder_win %W] add Classy::NumEntry}
+	action "ListBox" {[Classy::WindowBuilder_win %W] add Classy::ListBox}
+	action "scrolled Text" {[Classy::WindowBuilder_win %W] add Classy::ScrolledText}
+	action "Message" {%W add Classy::Message}
+	action "Text" {[Classy::WindowBuilder_win %W] add Classy::Text}
+	action "Canvas" {[Classy::WindowBuilder_win %W] add Classy::Canvas}
+	action "Notebook with tabs" {[Classy::WindowBuilder_win %W] add Classy::NoteBook}
+	action "OptionBox" {[Classy::WindowBuilder_win %W] add Classy::OptionBox}
+	action "OptionMenu" {[Classy::WindowBuilder_win %W] add Classy::OptionMenu}
+	action "Paned" {[Classy::WindowBuilder_win %W] add Classy::Paned}
+	action "Progress bar" {[Classy::WindowBuilder_win %W] add Classy::Progress}
+	action "Scrolled frame" {[Classy::WindowBuilder_win %W] add Classy::ScrolledFrame}
+	action "Table" {[Classy::WindowBuilder_win %W] add Classy::Table}
+	action "Fold" {[Classy::WindowBuilder_win %W] add Classy::Fold}
+	action "Font select" {[Classy::WindowBuilder_win %W] add button -text "Select font" -command {set font [Classy::getfont]}}
+	action "Color select" {[Classy::WindowBuilder_win %W] add button -text "Select color" -command {set color [Classy::getcolor]}}
+	action "Tree widget" {[Classy::WindowBuilder_win %W] add Classy::TreeWidget}
+	action "Browser" {[Classy::WindowBuilder_win %W] add Classy::Browser}
+	action "CmdWidget" {[Classy::WindowBuilder_win %W] add Classy::CmdWidget}
+}
+menu "Help" {
+	action "Window Builder" {Classy::help classy_windowbuilder} <<Help>>
+	action "Builder" {Classy::help classy_builder} <<HelpBuilder>>
+	separator
+	action "ClassyTcl" {Classy::help ClassyTcl} <<HelpClassyTcl>>
+	action "Help" {Classy::help help} <<HelpHelp>>
+}
+		}}
+		Dummy {_menu Classy_Dummy {menu used in the Builder as a dummy} {
+menu "Menu" {
+}
+		}}
+		Test {_menu Classy_Test {menu used for testing} {
+menu "File" {
+	action "Open file" {%W insert insert "Open: %W"} <<Load>>
+	action "Open next" {%W insert insert "Open next: %W"} <<LoadNext>>
+	action "Test" {%W insert insert "Test: %W"} <<Try>>
+	menu "Trying" {
+		action "Trying" {%W insert insert "submenu: %W"} Alt-d
+	}
+	action Save {puts save} Save
+	radio "Radio try" {-variable test -value try} <<Radio1>>
+	radio "Radio try2" {-variable test -value try2} <<Radio2>>
+} Alt-f
+# The find menu
+menu "Find" {
+	action "Goto line" {puts "Goto line"} <<Goto>>
+	action "Find" {%W insert end find} <<Find>>
+	separator
+	action "Replace & Find next" {%W insert end replace} <<ReplaceFindNext>>
+	check "Search Reopen" {-variable test%W -onvalue yes -offvalue no} <<SearchReopen>>
+}
+action "Test" {%W insert insert "Test: %W"} Alt-t
+		}}
+	}
+}
+Toolbars {
+	ClassyTcl {
+		Editor {_toolbar Classy_Editor {Editor toolbar} {
+nodisplay
+action save "Save" {%W save}
+action open "Open" {eval %W load [Classy::selectfile -title Open -selectmode persistent]}
+action undo "Undo" {%W undo}
+action redo "redo" {%W redo}
+separator
+action print "Print" {%W insert insert "Print: %W"}
+action open "Open next" {%W next}
+		}}
+		Help {_toolbar Classy_Help {Help toolbar} {
+action reload "Reload" {%W reload}
+action back "Back" {%W back}
+action forward "Forward" {%W forward}
+action edit "Edit" {%W edit}
+tool Classy::Help_find "Find" 
+tool Classy::Help_findword "Find word"
+tool Classy::Help_findfile "Find file"
+tool Classy::Help_findinfile "Find in files"
+		}}
+		Builder {_toolbar Classy_Builder {toolbar used in the ClassyTcl Builder} {
+action newfile "New file" {puts %W ; %W new file}
+action newfunction "New function" {%W new function}
+action newtoplevel "New Toplevel" {%W new toplevel}
+action newdialog "New Dialog" {%W new dialog}
+action newframe "New Frame" {%W new frame}
+action newoption "New option" {%W new option}
+action newmethod "New method" {%W new method}
+separator
+action copy "Copy" {%W copy}
+action cut "Cut" {%W cut}
+action paste "Paste" {%W paste}
+separator
+		}}
+		WindowBuilder {_toolbar Classy_WindowBuilder {toolbar used in the ClassyTcl WindowBuilder} {
+action cut "Delete" {%W delete}
+separator
+action save "Save" {%W save}
+action test "Test" {%W test}
+action ptest "Test with parameters" {%W testparam}
+action recreate "Recreate Dialog" {%W recreate}
+separator
+action close "Close" {destroy %W}
+		}}
+		{WindowBuilder icons} {_toolbar Classy_WindowBuilder_icons {Tk widget toolbar used in the ClassyTcl WindowBuilder} {
+action Builder/classy__dynatool {Toolbar} {%W add Classy::DynaTool}
+action Builder/frame Frame {%W add frame}
+action Builder/entry Entry {%W add entry}
+action Builder/classy__entry {ClassyTcl Entry} {%W add Classy::Entry}
+action Builder/classy__numentry {ClassyTcl Numerical Entry} {%W add Classy::NumEntry}
+action Builder/button Button {%W add button}
+action Builder/checkbutton {Check button} {%W add checkbutton}
+action Builder/radiobutton {Radio button} {%W add radiobutton}
+action Builder/label Label {%W add label}
+action Builder/classy__message "ClassyTcl Message" {%W add Classy::Message}
+action Builder/message Message {%W add message}
+action Builder/vscroll "Vertical Scrollbar" {%W add scrollbar -orient vertical}
+action Builder/hscroll "Horizontal Scrollbar" {%W add scrollbar -orient horizontal}
+action Builder/listbox Listbox {%W add listbox}
+action Builder/classy__listbox {ClassyTcl ListBox} {%W add Classy::ListBox}
+action Builder/text Text {%W add text}
+action Builder/classy__text {ClassyTcl Text} {%W add Classy::Text}
+action Builder/classy__scrolledtext {ClassyTcl scrolled Text} {%W add Classy::ScrolledText}
+action Builder/canvas Canvas {%W add canvas}
+action Builder/classy__canvas {ClassyTcl Canvas} {%W add Classy::Canvas}
+action Builder/scale Scale {%W add scale}
+action Builder/classy__notebook {Notebook with tabs} {%W add Classy::NoteBook}
+action Builder/classy__optionbox {ClassyTcl OptionBox} {%W add Classy::OptionBox}
+action Builder/classy__optionmenu {ClassyTcl OptionMenu} {%W add Classy::OptionMenu}
+action Builder/classy__paned {Paned} {%W add Classy::Paned}
+action Builder/classy__progress {Progress bar} {%W add Classy::Progress}
+action Builder/classy__scrolledframe {Scrolled frame} {%W add Classy::ScrolledFrame}
+action Builder/classy__table {Table} {%W add Classy::Table}
+action Builder/classy__fold {Fold} {%W add Classy::Fold}
+action Builder/classy__fontselect {Font select} {%W add button -text "Select font" -command {set font [Classy::getfont]}}
+action Builder/classy__colorselect {Color select} {%W add button -text "Select color" -command {set color [Classy::getcolor]}}
+action Builder/classy__fileselect {File select} {%W add button -text "Select file" -command {set file [Classy::selectfile]}}
+action Builder/classy__selector {Selector} {%W add Classy::Selector}
+action Builder/classy__treewidget {Tree widget} {%W add Classy::TreeWidget}
+action Builder/classy__browser {Browser} {%W add Classy::Browser}
+action Builder/classy__cmdwidget {CmdWidget} {%W add Classy::CmdWidget}
+		}}
+		Dummy {_toolbar Classy_Dummy {toolbar used as a dummy in the ClassyTcl WindowBuilder} {
+action Builder/question {Dummy tool} {Classy::msg "Just a dummy toolbar"}
+action Save {Save} {Classy::msg "Just a dummy toolbar"}
+		}}
+	}
+}
+Colors {
+	{Basic colors} {
+		Background {_color *Background {Default background color} #d9d9d9}
+		{Dark backgound} {_color *darkBackground {Default dark background color} #cacaca}
+		{Light backgound} {_color *lightBackground {Default dark background color} #dfdfdf}
+		Foreground {_color *Foreground {Default foreground color} black}
+		{Active background} {_color *activeBackground {Default active background color} white}
+		{Active foreground} {_color *activeForeground {Default active foreground color} black}
+		{Disabled foreground} {_color *disabledForeground {Default Disabled foreground color} #7f7f7f}
+		{Selection background} {_color *selectBackground {Default Selection background color} #bfdfff}
+		{Selection foreground} {_color *selectForeground {Default Selection foreground color} black}
+		{Select color} {_color *selectColor {Default Select color} orange}
+		{Highlight background} {_color *highlightBackground {Default Highlight background color} Background}
+		{Highlight color} {_color *highlightColor {Default Highlight color} black}
+		Colorlist {_text *ColorList {List of colors as used the getcolor} {
+			{blue cyan green yellow orange red magenta}
+			{blue3 cyan3 green3 yellow3 orange3 red3 magenta3}
+			{black gray20 gray40 gray50 gray60 gray80 white}
+		}}
+	}
+	{Widget Colors} {
+		{Entry background} {_color *Entry.background {Entry background color} Background}
+		{Text background} {_color *Text.background {Text background color} Background}
+		{Listbox background} {_color *Listbox.background {Listbox background color} lightBackground}
+		{Scale foreground} {_color *Scale.foreground {Scale foreground color} black}
+		{Scale active foreground} {_color *Scale.activeForeground {Scale active foreground color} Background}
+		{Scale background} {_color *Scale.background {Scale background color} Background}
+		{Scale slider foreground} {_color *Scale.sliderForeground {Scale slider foreground color} Background}
+		{Scale slider background} {_color *Scale.sliderBackground {Scale slider background color} lightBackground}
+		{Scrollbar foreground} {_color *Scrollbar.foreground {Scrollbar foreground color} Background}
+		{Scrollbar active foreground} {_color *Scrollbar.activeForeground {Scrollbar active foreground color} Background}
+		{Scrollbar background} {_color *Scrollbar.background {Scrollbar background color} lightBackground}
+		{Label background} {_color *LabelBg {Label background color} darkBackground}
+	}
+}
+Fonts {
+	{Basic Fonts} {
+		Font {_font *Font {basic font} {helvetica 10}}
+		{Bold Font} {_font *BoldFont {basic bold font class} {helvetica 10 bold}}
+		{Italic Font} {_font *ItalicFont {basic italic font class} {helvetica 10 italic}}
+		{Bold Italic Font} {_font *BoldItalicFont {basic bold-italic font class} {helvetica 10 bold italic}}
+		{Non Proportional Font} {_font *NonPropFont {basic non-proportional font class} {courier 10}}
+	}
+	{Widget Fonts} {
+		{Button Font} {_font *Button.font {font used on buttons} Font}
+		{Menu Font} {_font *Menu.font {font used in menus} BoldItalicFont}
+		{Menubutton font} {_font *Menubutton.font {font used in menu buttons} BoldItalicFont}
+		{Scale Font} {_font *Scale.font {font used in scales} BoldItalicFont}
+		{Text font} {_font *Text.font {font used in text widgets} NonPropFont}
+		{Tree font} {_font *treeFont {default font used for text in a tree} Font}
+		{Browser font} {_font *Classy::Browser.font {font used for names in the browser widget} BoldFont}
+		{Browser data font} {_font *Classy::Browser.dataFont {font used for data in the browser widget} Font}
+	}
+}
+Keys {
+	Edit {
+		Cut {_key <<Cut>> {Cut key} <Alt-x>}
+		Copy {_key <<Copy>> {Copy key} <Alt-c>}
+		Paste {_key <<Paste>> {Paste key} <Alt-v>}
+		Paste {_key <<PasteSpecial>> {special} {Paste special key} <Alt-V>}
+		Undo {_key <<Undo>> {Undo key} <Alt-u>}
+		Redo {_key <<Redo>> {Redo key} <Alt-U>}
+		Insert {_key <<Insert>> {Insert key} <Insert>}
+		Empty {_key <<Empty>> {Empty key} <Control-u>}
+		Delete {_key <<Delete>> {Delete key} <Delete>}
+		BackSpace {_key <<BackSpace>> {BackSpace key} <BackSpace>}
+		Transpose {_key <<Transpose>> {Transpose key: switches the letters before and after the cursor} <Control-t>}
+		DeleteEnd {_key <<DeleteEnd>> {Delete from cursor to end} <Control-k>}
+	}
+	Movement {
+		{Without selecting} {
+			Up {_key <<Up>> {Up key} <Up>}
+			Down {_key <<Down>> {Down key} <Down>}
+			Left {_key <<Left>> {Left key} <Left>}
+			Right {_key <<Right>> {Right key} <Right>}
+			Home {_key <<Home>> {Home key} {<Home> <Alt-Left>}}
+			End {_key <<End>> {End key} {<End> <Alt-Right>}}
+			Top {_key <<Top>> {Top key} <Control-Home>}
+			Bottom {_key <<Bottom>> {Bottom key} <Control-End>}
+			PageTop {_key <<PageTop>> {PageTop key} <Alt-Up>}
+			PageBottom {_key <<PageBottom>> {PageBottom key} <Alt-Down>}
+			PageUp {_key <<PageUp>> {PageUp key} <Prior>}
+			PageDown {_key <<PageDown>> {PageDown key} <Next>}
+			PageLeft {_key <<PageLeft>> {PageLeft key} <Alt-Prior>}
+			PageRight {_key <<PageRight>> {PageRight key} <Alt-Next>}
+			WordLeft {_key <<WordLeft>> {WordLeft key} <Control-Left>}
+			WordRight {_key <<WordRight>> {WordRight key} <Control-Right>}
+			ParaUp {_key <<ParaUp>> {ParaUp key} <Control-Up>}
+			ParaDown {_key <<ParaDown>> {ParaDown key} <Control-Down>}
+		}
+		{While selecting} {
+			SelectUp {_key <<SelectUp>> {SelectUp key} <Shift-Up>}
+			SelectDown {_key <<SelectDown>> {SelectDown key} <Shift-Down>}
+			SelectLeft {_key <<SelectLeft>> {SelectLeft key} <Shift-Left>}
+			SelectRight {_key <<SelectRight>> {SelectRight key} <Shift-Right>}
+			SelectHome {_key <<SelectHome>> {SelectHome key} {<Shift-Home> <Shift-Alt-Left>}}
+			SelectEnd {_key <<SelectEnd>> {SelectEnd key} {<Shift-End> <Shift-Alt-Right>}}
+			SelectTop {_key <<SelectTop>> {SelectTop key} <Shift-Control-Home>}
+			SelectBottom {_key <<SelectBottom>> {SelectBottom key} <Shift-Control-End>}
+			SelectPageTop {_key <<SelectPageTop>> {SelectPageTop key} <Shift-Alt-Up>}
+			SelectPageBottom {_key <<SelectPageBottom>> {SelectPageBottom key} <Shift-Alt-Down>}
+			SelectPageLeft {_key <<SelectPageLeft>> {SelectPageLeft key} <Shift-Alt-Prior>}
+			SelectPageRight {_key <<SelectPageRight>> {SelectPageRight key} <Shift-Alt-Next>}
+			SelectPageUp {_key <<SelectPageUp>> {SelectPageUp key} <Shift-Prior>}
+			SelectPageDown {_key <<SelectPageDown>> {SelectPageDown key} <Shift-Next>}
+			SelectWordLeft {_key <<SelectWordLeft>> {SelectWordLeft key} <Shift-Control-Left>}
+			SelectWordRight {_key <<SelectWordRight>> {SelectWordRight key} <Shift-Control-Right>}
+			SelectParaUp {_key <<SelectParaUp>> {SelectParaUp key} <Shift-Control-Up>}
+			SelectParaDown {_key <<SelectParaDown>> {SelectParaDown key} <Shift-Control-Down>}
+		}
+		Scroll {
+			ScrollPageUp {_key <<ScrollPageUp>>  {ScrollPageUp key} {<Control-Prior> <Control-Alt-Up>}}
+			ScrollPageDown {_key <<ScrollPageDown>> {ScrollPageDown key} {<Control-Next> <Control-Alt-Down>}}
+		}
+	}
+	Control {
+		Escape {_key <<Escape>> {Escape key} <Escape>}
+		Return {_key <<Return>> {Return key} <Return>}
+		Invoke {_key <<Invoke>> {Invoke key} <space>}
+		KeyMenu {_key <<KeyMenu>> {_keyMenu key} <Alt-m>}
+		Default {_key <<Default>> {Default key} <Alt-d>}
+		Complete {_key <<CompleteTab>> {Complete key} <Control-Shift-v>}
+		FocusNext {_key <<FocusNext>>  {FocusNext key} {<Tab> <Control-Tab>}}
+		FocusPrev {_key <<FocusPrev>> {FocusPrev key} <ISO_Left_Tab>}
+		SpecialFocusNext {_key <<SpecialFocusNext>> {TextFocusNext key} <Control-Tab>}
+		SpecialFocusPrev {_key <<SpecialFocusPrev>> {TextFocusPrev key} <ISO_Left_Tab>}
+	}
+	Select {
+		SelectAll {_key <<SelectAll>> {SelectAll key} <Alt-a>}
+		SelectNone {_key <<SelectNone>> {SelectNone key} <Alt-z>}
+		StartSelect {_key <<StartSelect>> {StartSelect key} <Control-space>}
+		EndSelect {_key <<EndSelect>> {EndSelect key} <Control-Shift-space>}
+	}
+	File {
+		Load {_key <<Load>> {Load key} <Alt-o>}
+		LoadNext {_key <<LoadNext>> {LoadNext key} <Control-Alt-o>}
+		Save {_key <<Save>> {Save key} <Alt-s>}
+		SaveAs {_key <<SaveAs>> {SaveAs key} <Alt-S>}
+		New {_key <<New>> {New key} <Alt-n>}
+		Quit {_key <<Quit>> {Quit key} <Alt-Q>}
+		Close {_key <<Close>> {Close key} <Alt-q>}
+		Reopen {_key <<Reopen>> {Reopen key} <Alt-r>}
+		Macro {_key <<Macro>> {Macro key} <Alt-m>}
+	}
+	Find {
+		Goto {_key <<Goto>> {Goto key} <Alt-j>}
+		Find {_key <<Find>> {Find key} <Alt-F>}
+		FindNext {_key <<FindNext>> {FindNext key} <Alt-f>}
+		FindPrev {_key <<FindPrev>> {FindPrev key} <Alt-b>}
+		ReplaceFindNext {_key <<ReplaceFindNext>> {ReplaceFindNext key} <Alt-g>}
+		FindFunction {_key <<FindFunction>> {FindFunction key} <Control-Alt-f>}
+	}
+	Misc {
+		New {_key <<New>> {Help key} <Alt-n>}
+		Help {_key <<Help>> {Help key} <F1>}
+		Format {_key <<Format>> {Format key} <Control-Alt-j>}
+		Print {_key <<Print>> {Print key} <Control-p>}
+		MarkerSet {_key <<MarkerSet>> {MarkerSet key} <Alt-w>}
+		MarkerSelect {_key <<MarkerSelect>> {MarkerSelect key} <Alt-Shift-w>}
+		MarkerCurrent {_key <<MarkerCurrent>> {MarkerCurrent key} <Control-w>}
+		MarkerPrev {_key <<MarkerPrev>> {MarkerPrev key} <Control-Shift-w>}
+		IndentIn {_key <<IndentIn>> {IndentIn key} <Alt-i>}
+		IndentOut {_key <<IndentOut>> {IndentOut key} <Alt-I>}
+		Connect {_key <<Connect>> {Connect key} <Control-c>}
+		Execute {_key <<ExecuteCmd>> {command} {Execute command key} <Alt-e>}
+		HistoryUp {_key <<HistoryUp>> {HistoryUp key} <Alt-Up>}
+		HistoryDown {_key <<HistoryDown>> {HistoryDown key} <Alt-Down>}
+	}
+	Table {
+		Singeline {
+			TableUp {_key <<TableUp>> {Table Up key} <Up>}
+			TableDown {_key <<TableDown>> {Table Down key} <Down>}
+			TableLeft {_key <<TableLeft>> {Table Left key} <Control-Left>}
+			TableRight {_key <<TableRight>> {Table Right key} <Control-Right>}
+			TableReturn {_key <<TableReturn>> {Table Return key} <Control-Return>}
+			SelectTableUp {_key <<SelectTableUp>> {Table Up Select key} <Shift-Up>}
+			SelectTableDown {_key <<SelectTableDown>> {Table Down Select key} <Shift-Down>}
+			SelectTableLeft {_key <<SelectTableLeft>> {Table Left Select key} <Shift-Control-Left>}
+			SelectTableRight {_key <<SelectTableRight>> {Table Right Select key} <Shift-Control-Right>}
+		}
+		Multiline {
+			TableUp {_key <<mTableUp>> {Table Up key} <Control-Up>}
+			TableDown {_key <<mTableDown>> {Table Down key} <Control-Down>}
+			TableLeft {_key <<mTableLeft>> {Table Left key} <Control-Left>}
+			TableRight {_key <<mTableRight>> {Table Right key} <Control-Right>}
+			SelectTableUp {_key <<SelectmTableUp>> {Table Up Select key} <Control-Shift-Up>}
+			SelectTableDown {_key <<SelectmTableDown>> {Table Down Select key} <Control-Shift-Down>}
+			SelectTableLeft {_key <<SelectmTableLeft>> {Table Left Select key} <Control-Shift-Left>}
+			SelectTableRight {_key <<SelectmTableRight>> {Table Right Select key} <Control-Shift-Right>}
+		}
+	}
+}
+Mouse {
+	{Basic Buttons} {
+		Action {_mouse <<Action>> {The Action button is used to select something, to invoke a button, etc.} <1>}
+		Adjust {_mouse <<Adjust>> {The Adjust button provides an alternative action, eg. invoke button without closing dialog, etc} <2>}
+		{X paste} {_mouse <<MXPaste>> {paste the currently selected characters} <2>}
+		MainMenu {_mouse <<MainMenu>> {The MainMenu button is used to pop up the main menu} <Control-3>}
+		Menu {_mouse <<Menu>> {The Menu button can pop up a menu} <3>}
+		Execute {_mouse <<MExecute>> {execute action, like when selecting in a listbox} <Double-1>}
+		{Adjust Execute} {_mouse <<MExecuteAjust>> {executes an alternative action, like when selecting in a listbox, but without removing the dialog it is in} <Double-2>}
+		icursor {_mouse <<MIcursor>> {set the insertion cursor, without removing the selection} <Control-1>}
+		position {_mouse <<MPosition>>  {set the a scrollbar to the give position} {<Control-1> <Control-2>}}
+	}
+	{Change selection} {
+		{Select word} {_mouse <<MSelectWord>> {Select entire words} <Double-1>}
+		{Select line} {_mouse <<MSelectLine>> {Select entire lines} <Triple-1>}
+		{Extend} {_mouse <<MExtend>> {extend the current selection} <Shift-1>}
+		{Extend by words} {_mouse <<MExtendWord>> {extend the current selection by entire words} <Double-Shift-1>}
+		{Extend by lines} {_mouse <<MExtendLine>> {extend the current selection by entire lines} <Triple-Shift-1>}
+		{Add} {_mouse <<MAdd>> {add to the current selection} <Control-1>}
+		{Add by words} {_mouse <<MAddWord>> {add to the current selection by entire words} <Double-Control-1>}
+		{Add by lines} {_mouse <<MAddLine>> {add to the current selection by entire lines} <Triple-Control-1>}
+	}
+	{Drag & Drop keys} {
+		{start drag} {_mouse <<Drag>> {start drag} <ButtonPress-1><B1-Motion>}
+		{Adjust drag} {_mouse <<AdjustDrag>> {start adjust drag} <ButtonPress-3><B3-Motion>}
+		{drag copy} {_mouse <<Drag-Copy>> {xcopy instead of move} {<KeyPress-Control_L> <KeyPress-Control_R>}}
+		{drag link} {_mouse <<Drag-Link>> {link instead of move} {<KeyPress-Shift_L> <KeyPress-Shift_R>}}
+	}
+}
+Misc {
+	Settings {
+		{patch Tk} {_bool *PatchTk {patch Tk to use virtual events. This will be only be really activated after a restart of the program (0/1)} 1}
+		bgerror {{_select Classy Tk} *Bgerror {patch Tk to use a different bgerror routine. This will be only be really activated after a restart of the program} Classy}
+		Menutype {{_select popup top} *MenuType {Menutype: can be popup or top} top}
+		{Scrollbar position} {{_select left right} *ScrollSide {Scrollbar position (left/right)} right}
+	}
+	Dialogs {
+		{Color select} {{_select Classy Tk} *GetColor {type of color selection dialog} Classy}
+		{Select File} {{_select Win Classy} *SelectFile {type of Select File dialog used when running Windows} Win}
+		{Save File} {{_select Win Classy}	*SaveFile {type of Save File dialog used when running Windows} Win}
+		{Font select} {{_select Win Classy} *GetFont {type of font selection dialog when running Windows} Win}
+	}
+	{Relief and borders} {
+		{Border width} {_int *borderWidth {Default Border width color} 1}
+		{Menu border width} {_int *Menu.BorderWidth {Default Menu border width color} 1}
+		{Option box border width} {_int *Classy::OptionBox.BorderWidth {Default Option box border width color} 1}
+		{Option box relief} {_relief *Classy::OptionBox.Relief {Default Option box relief color} groove}
+		{Scrollbar width} {_int *Scrollbar.width {Default Scrollbar width color} 10}
+		{Highlight thickness} {_int *HighlightThickness {Default Highlight thickness color} 1}
+		{Frame highlight thickness} {_int *Frame.HighlightThickness {Default Frame highlight thickness color} 0}
+		{Toplevel highlight thickness} {_int *Toplevel.HighlightThickness {Default Toplevel highlight thickness color} 0}
+		{Button padx} {_int *Button.padX {Default Button padx color} 1}
+		{Button pady} {_int *Button.padY {Default Button pady color} 1}
+		{Menu button padx} {_int *MenuButton.padX {Default Menu button padx color} 1}
+		{Menu button pady} {_int *MenuButton.padY {Default Menu button pady color} 1}
+		{Checkbutton anchor} {_anchor *Checkbutton.anchor {Default Checkbutton anchor color} w}
+	}
+	Other {
+		Papersizes {_text *PaperSizes {possible papersizes} {
+			User      "595p 842p"
+			Letter    "612p 792p"
+			Tabloid   "792p 1224p"
+			Ledger    "1224p 792p"
+			Legal     "612p 1008p"
+			Statement "396p 612p"
+			Executive "540p 720p"
+			A0        "2380p 3368p"
+			A1        "1684p 2380p"
+			A2        "1190p 1684p"
+			A3        "842p 1190p"
+			A4        "595p 842p"
+			A5        "420p 595p"
+			B4        "729p 1032p"
+			B5        "516p 729p"
+			Folio     "612p 936p"
+			Quarto    "610p 780p"
+		}}
+	}
+}

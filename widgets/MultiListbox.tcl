@@ -21,19 +21,21 @@
 #	MultiListbox specific methods
 #}
 
-bind Classy::MultiListbox <<Action>> {[Classy::mainw %W] select [[Classy::mainw %W] nearest %y]}
-bind Classy::MultiListbox <<Action-Motion>> {[Classy::mainw %W] select [[Classy::mainw %W] nearest %y]}
-bind Classy::MultiListbox <<MExecute>> {[Classy::mainw %W] command}
-bind Classy::MultiListbox <<Return>> {[Classy::mainw %W] command}
+bind Classy::MultiListbox <<Action>> {[Classy::mainw %W] select [[Classy::mainw %W] nearest %y];break}
+bind Classy::MultiListbox <<Action-Motion>> {[Classy::mainw %W] select [[Classy::mainw %W] nearest %y];break}
+bind Classy::MultiListbox <<MExecute>> {[Classy::mainw %W] command;break}
+bind Classy::MultiListbox <<Return>> {[Classy::mainw %W] command;break}
 bind Classy::MultiListbox <<Up>> {
 	set sel [[Classy::mainw %W] curselection]
 	incr sel -1
 	[Classy::mainw %W] select $sel
+	break
 }
 bind Classy::MultiListbox <<Down>> {
 	set sel [[Classy::mainw %W] curselection]
 	incr sel 1
 	[Classy::mainw %W] select $sel
+	break
 }
 
 # ------------------------------------------------------------------
@@ -98,10 +100,13 @@ Classy::MultiListbox method select {item} {
 	if {$item<0} {set item 0}
 	set max [expr [$object.list size] / $number]
 	if {$item>=$max} {set item [expr $max -1]}
-
 	set pos [expr $item * $number]
 	$object.list select clear 0 end
-	$object.list selection set $pos [expr $pos+$number-1]
+	set pos2 [expr $pos+$number-1]
+	$object.list selection set $pos $pos2
+	$object.list see $pos2
+	$object.list see $pos
+	focus $object.list
 }
 
 #doc {MultiListbox command command} cmd {

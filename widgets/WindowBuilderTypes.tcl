@@ -245,7 +245,7 @@ proc ::Classy::WindowBuilder::attredit_menu {object v option title {wide 0}} {
 			$v.menutype set $::Classy::temp
 		}
 	}]
-	button $v.edit -text "Edit menu" -command "Classy::Config dialog -node \[list Menus \[$v.menutype get\]\] -level appdef"
+	button $v.edit -text "Edit menu" -command "Classy::Config dialog -key menu,\[$v.menutype get\] -level appdef"
 	button $v.new -text "New menu" -command "Classy::Config new menu appdef \[$v.menutype get\]"
 	Classy::Entry $v.cmdw -width 2 -label "Menu window(s)"	-orient stacked \
 		-command "::Classy::WindowBuilder::menuset $object" \

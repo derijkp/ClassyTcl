@@ -84,77 +84,62 @@ proc Classy::realfont {font} {
 
 proc Classy::conf_buildcache {files} {
 	foreach file $files {
-		if [catch {set f [open $file]}] continue
-		while {![eof $f]} {
-			set line [gets $f]
-			if ![string length $line] continue
-			set pos [string trimleft $line "# "]
-			set descr [string trimleft [gets $f] "# "]
-			set line [gets $f]
-			while {![eof $f]} {
-				set l [gets $f]
-				if ![string length $l] break
-				append line \n$l
-			}
-			if [catch {foreach {type key value} $line {}}] {
-				error "error in configuration file \"$file\" at \"$line\""
-			}
-			if {"[string index $type 0]" == "#"} continue
-			set conf($type,$key) $line
-			lappend conftype($type) $type,$key
-		}
-		close $f
+		catch {array set conf [file_read $file]}
 	}
 	set result ""
 	foreach option {
 		Background darkBackground lightBackground Foreground activeBackground activeForeground 
 		disabledForeground selectBackground selectForeground selectColor highlightBackground highlightColor
 	} {
-		if [info exists conf(color,*$option)] {
-			foreach {type key value} $conf(color,*$option) {}
+		set key *$option
+		set option color,*$option
+		if [info exists conf($option)] {
+			set value $conf($option)
 			option add $key [Classy::realcolor $value] widgetDefault
 			append result [list option add $key [Classy::realcolor $value] widgetDefault]\n
-			unset conf(color,*$option)
+			unset conf($option)
 		} else {
 			option add $key [Classy::realcolor $option] widgetDefault
 			append result [list option add $key [Classy::realcolor $option] widgetDefault]\n
 		}
 	}
-	foreach option $conftype(color) {
+	foreach option [array names conf color,*] {
 		if ![info exists conf($option)] continue
-		foreach {type key value} $conf($option) {}
+		foreach {type key} [split $option ,] break
+		set value $conf($option)
 		option add $key [Classy::realcolor $value] widgetDefault
 		append result [list option add $key [Classy::realcolor $value] widgetDefault]\n
 		unset conf($option)
 	}
-	unset conftype(color)
 	foreach option {Font BoldFont ItalicFont BoldItalicFont NonPropFont} {
-		if [info exists conf(font,*$option)] {
-			foreach {type key value} $conf(font,*$option) {}
+		set key *$option
+		set option font,*$option
+		if [info exists conf($option)] {
+			set value $conf($option)
 			option add $key [Classy::realfont $value] widgetDefault
 			append result [list option add $key [Classy::realfont $value] widgetDefault]\n
-			unset conf(font,*$option)
+			unset conf($option)
 		} else {
 			option add $key [Classy::realfont $option] widgetDefault
 			append result [list option add $key [Classy::realfont $option] widgetDefault]\n
 		}
 	}
-	foreach option $conftype(font) {
+	foreach option [array names conf font,*] {
 		if ![info exists conf($option)] continue
-		foreach {type key value} $conf($option) {}
+		foreach {type key} [split $option ,] break
+		set value $conf($option)
 		option add $key [Classy::realfont $value] widgetDefault
 		append result [list option add $key [Classy::realfont $value] widgetDefault]\n
 		unset conf($option)
 	}
-	unset conftype(font)
-	foreach option $conftype(key) {
+	foreach option [array names conf key,*] {
 		if ![info exists conf($option)] continue
-		foreach {type key value} $conf($option) {}
+		foreach {type key} [split $option ,] break
+		set value $conf($option)
 		eval {event add $key} $value
 		append result [concat [list event add $key] $value]\n
 		unset conf($option)
 	}
-	unset conftype(key)
 	# Mouse button bindings
 	# Which mousebutton does what?
 	# Action = select, invoke button, ...
@@ -168,7 +153,9 @@ proc Classy::conf_buildcache {files} {
 	# -----------------------------------------------------------------
 	foreach {name pre num} {Action {} 1 Adjust {} 2 Menu {} 3 MAdd Control- 1 MExtend Shift- 1} {
 		if [info exists conf(mouse,<<$name>>)] {
-			foreach {type key value} $conf(mouse,<<$name>>) {}
+			set option mouse,<<$name>>
+			set key <<$name>>
+			set value $conf($option)
 			regexp {^<(.*)([0-9]+)>$} $value temp pre num
 			unset conf(mouse,<<$name>>)
 		}
@@ -188,36 +175,19 @@ proc Classy::conf_buildcache {files} {
 			append result [list event add <<$name-$combo>> <${pre}B$num-$combo>]\n
 		}
 	}
-	foreach option $conftype(mouse) {
+	foreach option [array names conf mouse,*] {
 		if ![info exists conf($option)] continue
-		foreach {type key value} $conf($option) {}
+		foreach {type key} [split $option ,] break
+		set value $conf($option)
 		eval {event add $key} $value
 		append result [concat [list event add $key] $value]\n
 		unset conf($option)
 	}
-	unset conftype(mouse)
-	foreach option $conftype(menu) {
-		if ![info exists conf($option)] continue
-		foreach {type key value} $conf($option) {}
-		set ::Classy::configmenu($key) $value
-		append result [list set ::Classy::configmenu($key) $value]\n
-		unset conf($option)
-	}
-	unset conftype(menu)
-	foreach option $conftype(toolbar) {
-		if ![info exists conf($option)] continue
-		foreach {type key value} $conf($option) {}
-		set ::Classy::configtoolbar($key) $value
-		append result [list set ::Classy::configtoolbar($key) $value]\n
-		unset conf($option)
-	}
-	unset conftype(toolbar)
-	foreach conft [array names conftype] { 
-		foreach option $conftype($conft) {
-			foreach {type key value} $conf($option) {}
-			option add $key $value widgetDefault
-			append result [list option add $key $value widgetDefault]\n
-		}
+	foreach conft [array names conf] {
+		foreach {type key} [split $conft ,] break
+		set value $conf($conft)
+		option add $key $value widgetDefault
+		append result [list option add $key $value widgetDefault]\n
 	}
 	return $result
 }
@@ -226,7 +196,7 @@ proc Classy::initconf {} {
 	set cachefile [file join $::Classy::dir(appuser) config.cache]
 	set files ""
 	foreach dir [set ::Classy::dirs] {
-		lappend files [file join $dir init.conf]
+		lappend files [file join $dir conf.values]
 	}
 	if ![file exists $cachefile] {
 		set makecache 1
@@ -252,6 +222,15 @@ proc Classy::initconf {} {
 		}
 		uplevel 0 source $cachefile
 	}
+}
+
+proc Classy::getconf {file} {
+	foreach dir [list_reverse [set ::Classy::dirs]] {
+		set result [file join $dir $file]
+		if [file exists $result] break
+	}
+	if ![file exists $result] {error "Configuration file \"$file\" not found"}
+	return $result
 }
 
 proc Classy::newconfig {type level {name {}} {descr {}}} {
@@ -310,22 +289,26 @@ proc Classy::Config {option args} {
 	switch $option {
 		dialog {
 			if ![winfo exists $window] {
-				eval Classy_config $window
+				Classy::config_dialog
 			}
 			raise $window
 			Classy::parseopt $args opt {
+				-key {} {}
 				-node {} {}
 				-level {} {}
 				-reload {0 1} 0
 			}
 			if [true $opt(-reload)] {
-				Classy::config_start $window
+				Classy::config_dialog
 			}
 			if [llength $opt(-node)] {
-				Classy::config_open $window.browse $opt(-node)
+				Classy::config_gotoitem $opt(-node)
+			}
+			if [llength $opt(-key)] {
+				Classy::config_gotokey $opt(-key)
 			}
 			if [llength $opt(-level)] {
-				Classy::config_selectlevel $window $opt(-level)
+				Classy::config_level $opt(-level)
 			}
 		}
 		config {

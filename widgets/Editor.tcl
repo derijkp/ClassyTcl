@@ -44,11 +44,11 @@ Classy::Editor method init {args} {
 			if ![regexp {\*$} [wm title $top]] {catch [wm title $top "[wm title $top] *"]}
 		}]
 	bindtags $object [list $object Classy::Menu_macro Classy::Menu_pattern Classy::Editor Classy::Text all]
-	Classy::DynaMenu attachmainmenu Classy::Editor $object
+	Classy::DynaMenu attachmainmenu Classy_Editor $object
 	Classy::rebind $object.edit $object
 	scrollbar $object.vbar -orient vertical -command "$object.edit yview"
 	scrollbar $object.hbar -orient horizontal -command "$object.edit xview"
-	Classy::DynaTool $object.tool -type Classy::Editor -cmdw $object
+	Classy::DynaTool $object.tool -type Classy_Editor -cmdw $object
 	grid $object.tool - -sticky we
 	grid rowconfigure $object 1 -weight 1
 	if {"[option get $object scrollSide ScrollSide]"=="left"} {
@@ -584,8 +584,8 @@ Classy::Editor method finddialog {} {
 		$w add repl Replace "$object replace"
 		$w add replall "Replace all" "$object replace all"
 	
-		Classy::Entry $w.options.find -label Find -textvariable [privatevar $object findwhat]
-		Classy::Entry $w.options.replace -label Replace -textvariable [privatevar $object replace]
+		Classy::Entry $w.options.find -label Find -textvariable [privatevar $object findwhat] -combo 20
+		Classy::Entry $w.options.replace -label Replace -textvariable [privatevar $object replace] -combo 20
 		frame $w.options.frame
 		Classy::OptionBox $w.options.type -label "Type" -orient vertical -variable [privatevar $object options(-searchtype)]
 		$w.options.type add exact Exact
@@ -652,10 +652,16 @@ Classy::Editor method indent {number} {
 	}
 }
 
+array set Classy::Editor_trace_ignore {
+	finddialog 1
+	savedialog 1
+}
+
 proc Classy::Editor_trace {object var command} {
 	set w [list_shift command]
 	set level [info level]
-	if {$level == 2} {
+	if [info exists ::Classy::Editor_trace_ignore($command)] return
+	if {$level == 1} {
 		if {[lsearch {trace index} [lindex $command 0]] == -1} {
 			lappend $var "\$object $command"
 		}
@@ -706,10 +712,12 @@ Classy::Editor method macro {} {
 	#--------
 	private $object macrokey macroname
 	Classy::Entry $object.macro.options.name -label "Name" \
-		-default Classy::Editor_macros \
+		-combo 10 \
+		-combopreset {Classy::Default get app Classy::Editor_macros} \
 		-textvariable [privatevar $object macroname] \
 		-command [list $object.macro invoke get]
 	Classy::Entry $object.macro.options.key -label "Key-code" \
+		-combo 10 \
 		-textvariable [privatevar $object macrokey]
 	scrollbar $object.macro.options.scroll -command "$object.macro.options.text yview"
 	Classy::Text $object.macro.options.text -yscrollcommand "$object.macro.options.scroll set" -width 20 -height 10
@@ -736,7 +744,7 @@ Classy::Editor method setmacro {name command {key {}}} {
 	Classy::Default set app Classy::Editor_macros $macros
 	Classy::Default set app Classy::Editor_macro_$name [list $command $key]
 	update idletasks
-	Classy::DynaMenu updateactive Classy::Editor
+	Classy::DynaMenu updateactive Classy_Editor
 }
 
 #doc {Editor command deletemacro} cmd {
@@ -749,7 +757,7 @@ Classy::Editor method deletemacro {name} {
 		return
 	}
 	Classy::Default unset app Classy::Editor_macro_$name
-	Classy::DynaMenu updateactive Classy::Editor
+	Classy::DynaMenu updateactive Classy_Editor
 }
 
 #doc {Editor command getmacromenu} cmd {
@@ -785,7 +793,7 @@ Classy::Editor method pattern {args} {
 	if {"$args" != ""} {
 		set pattern [lindex $args 0]
 	} else {
-		Classy::InputDialog $object.pattern -label Pattern -textvariable [privatevar $object pattern] -default Classy::Editor_patterns
+		Classy::InputDialog $object.pattern -label Pattern -textvariable [privatevar $object pattern] -combo 20
 	}
 }
 
@@ -807,7 +815,7 @@ Classy::Editor method getpatternmenu {} {
 		set r [$object.edit search -regexp -- $pattern $index end]
 		if {"$r" == ""} break
 		set line [$object.edit get "$r linestart" "$r lineend"]
-		append data [list action $line [list %W see $r] <<Pattern$num>>]\n
+		append data [list action $line "[list %W see $r]\n[list %W mark set insert $r]" <<Pattern$num>>]\n
 		incr num
 		set index "$r +1c"
 	}
@@ -1231,6 +1239,7 @@ Classy::Editor method grep {} {
 		Classy::FileEntry $w.options.files -label Files -selectmode persistent -orient stacked \
 			-textvariable [privatevar $object grep(files)] -command "$object _grep ; break"
 		Classy::Entry $w.options.pattern -label Pattern \
+			-combo 20 \
 			-textvariable [privatevar $object grep(pattern)] \
 			-command [list $object _grep]
 		Classy::ListBox $w.options.list -command [list $object _grepgoto]

@@ -117,14 +117,14 @@ Classy::Entry addoption -state {state State normal} {
 				return -code error "state \"combo\" not allowed on entry without combo"
 			}
 			$object.entry configure -state disabled
-			$object.controls.incr configure -state disabled
-			$object.controls.decr configure -state disabled
+			catch {$object.controls.incr configure -state disabled}
+			catch {$object.controls.decr configure -state disabled}
 			catch {$object.defaults configure -state normal}
 		}
 		default {
 			$object.entry configure -state $value
-			$object.controls.incr configure -state $value
-			$object.controls.decr configure -state $value
+			catch {$object.controls.incr configure -state $value}
+			catch {$object.controls.decr configure -state $value}
 			catch {$object.defaults configure -state $value}
 		}
 	}

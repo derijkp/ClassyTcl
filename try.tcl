@@ -1,112 +1,31 @@
-source cfiles/cfiles.tcl
+source testapp.tcl
+Classy::Builder .builder
 
-time {package require ClassyTcl}
-time {auto_load Classy::Entry}
-time {Classy::Entry .try}
-.try configure -label try -width 10
-destroy .try
-time {Class subclass Classy::Test}
-Classy::Test destroy
-time {Class subclass Test}
-Test destroy
-
-set dir test
-package require ClassyTcl
-package require BioDesc
-
-source cdraw.tcl
-Builder .try
-set object .try
-set file lib/Main.tcl
+set file /home/peter/dev/ClassyTcl/tests/testapp/lib/interface/mainw.tcl
 set function mainw
-set object .try.dedit
-private $object data
+set type toplevel
 
-set data [Classy::config_get $level {}]
+set object .builder
+$object _creatededit $object.dedit
+
+$object.dedit open $file
+
+
 
 source tools.tcl
-set object .try
-canvas .try
-pack .try -fill both -expand yes
-set id [.try create text 10 10]
-	.try itemconfigure $id -anchor nw -text "Hallo allemaal" -width 50
-.try delete all
-for {set y 10} {$y < 500} {incr y 50} {
-	for {set x 10} {$x < 500} {incr x 50} {
-		.try create text $x $y -anchor nw -text "Hallo allemaal" -width 50
-	}
-}
 
-classyclean
-catch {CanvasSeq destroy}
-catch {try destroy}
-canvas .try
-pack .try -fill both -expand yes
-update idletasks
-Classy::CanvasSeq new try -boxwidth 0 -canvas .try -area {10 10 210 250}
-try configure -area {10 10 510 250} -end 780 -basesperline 500
-try configure -endtick 1
-bind .try <1> {
-	puts "set x %x"
-	puts "set y %y"
-	puts [try xpos %x %y]
-}
-proc getboxes {start end} {
-	return {
-		{blue 20 160 20 {-fill blue}}
-		{green 400 550 20 {-fill green}}
-		{orange 650 720 -20 {-fill orange}}
-	}
-}
-try configure -getboxes getboxes
+set file temp.descr
+set file ../conf/conf.descr
+Classy::config_edit $file
 
+Classy::config_edit_getdef {}
 
+Classy::config_edit_pos {Menus ClassyTcl}
+Classy::config_edit_pos {Menus ClassyTcl Help}
+Classy::config_edit_pos {Menus ClassyTcl {}}
 
+Classy::config_dialog
 
-source cfiles
-set object .try
-Classy::Builder .try
-set object .try
-set window .try.work
+Classy::config_dialog {Colors {Basic colors} Foreground}
 
-proc t {} {
-	global data
-	set level 0
-	while 1 {
-		if ![info exists data(v,$level)] break
-		puts "$level: $data(v,$level) $data(a,$level)"
-		incr level
-	}
-}
-
-#.try configure -dir /home/peter/dev/ClassyTcl/widgets/
-
-#caused segfault
-source tools.tcl
-set object .try
-Classy::Builder .try
-set object .try.dedit
-set window .try.dedit.work
-source ../../dialogs/ConfigDialogs.tcl
-.try open /home/peter/dev/ClassyTcl/dialogs/ConfigDialogs.tcl Classy::config_frame frame
-proc wrong {} {sfdgsdh}
-Classy::Dialog .classy__.try
-.classy__.try add go "Go" "$object test try" default
-Classy::Dialog method invoke {item {button Action}} {
-	after idle destroy $object
-	.try.dedit test try
-}
-.classy__.try invoke go
-
-#caused segfault
-source tools.tcl
-set args {}
-set base .try
-Classy::Selector $base -type color
-$base set white
-eval $base configure $args
-after idle "$base redraw"
-after idle "$base redraw"
-$base redraw
-
-
+set pos {Menus ClassyTcl {}}

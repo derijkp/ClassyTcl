@@ -12,34 +12,36 @@ general settings can be changed.
 <p>
 Configuration can be changed at different levels, making it possible to eg. to change the 
 configuration for either all ClassyTcl applications or for one specific application, 
-for all users (global) or just one specific user (personal). 
+for all users (Default) or just one specific user (personal). 
 At startup, a ClassyTcl application will parse the settings in the different levels in the following 
 order:
 <ol>
-<li><b>Default (def)</b>: Global ClassyTcl default settings
+
+<li><b>Default ClassyTcl settings</b> (def)
 <br>
 This level contains the most general configuration settings. They apply to any ClassyTcl 
 application, and should never be deleted. However, they can be overruled by any of the other 
-levels. (The configuration files for this level are stored in the file init.conf  in the conf 
-subdirectory of the ClassyTcl installation directory. Icons are stored in the corresponding 
-conf/icons subdirectory.)
-<li><b>User (user)</b>: Personal ClassyTcl settings
+levels. (The configuration files for this level are stored in the conf subdirectory of 
+the ClassyTcl installation directory. Most settings are in the file conf.values. Icons,menus
+and toolbars are stored in the corresponding conf/icons, conf/menu and conf/toolbar subdirectory.)
+
+<li><b>User  ClassyTcl settings</b> (user)
 <br>
 Settings at this level overrule the default settings for a particular user.
-The settings are stored in the file .classy/init.conf (or equivalent depending on OS) 
-in the home directory of the user. Icons are stored in the corresponding 
-.classy/icons subdirectory.
-<li><b>Application (appdef)</b>: Global application specific settings
+The settings are stored in the subdirector .classy (or equivalent depending on OS) 
+of the home directory of the user.
+
+<li><b>Default application settings</b> (appdef)
 <br>
 Settings at this level overrule the default settings for a particular application.
-The configuration is stored in files in the file conf/init.conf of the 
-application directory. Icons are stored in the corresponding conf/icons subdirectory.
-<li><b>Final (appuser)</b>: Personal application specific settings<br>
+The configuration is stored in files in the subdirectory conf of the 
+application directory.
+
+<li><b>User application settings</b> (appuser)
 These configuration  settings are specific to the current user (Unix) and application.
 Settings at this level will overrule any other settings for that appliction and user.
-The settings are stored in the file .classy-apps/&lt;application name&gt;/init.conf of 
-the users home directory (or equivalent depending on OS).  Icons are stored in the corresponding 
-.classy-apps/&lt;application name&gt;/icons subdirectory.
+The settings are stored in the subdirectory .classy-apps/&lt;application name&gt; of 
+the users home directory (or equivalent depending on OS).
 </ol>
 
 <h2>Icons</h2>
@@ -51,22 +53,30 @@ appdef, user and def levels. (Icons are retrieved using the command "Classy::get
 <h2>Themes</h2>
 A theme is a file that contains a collection of configuration settings (eg. blue or 
 gray color style, Unix or Windows keys) that can be loaded into the 
-currently selected level using the "load" button and created using the "saveAs" button.. 
+currently selected level using the "Themes" button and created using the "Save As" button.. 
 
-<h2>The configuration dialogs</h2>
-The configuration dialog consists of a tree which represents all possible configuration
-settings, and a pane where a selected setting can be changed. At the top the current level
-can be selected. Under this is a button with the following buttons:
+<h2>The configuration dialog</h2>
+The configuration dialog consists of a notebook which presents all possible configuration
+settings in a hierarchy. A list of settings in the current hierarchy and a pane where a 
+selected setting can be changed is shown. At the bottom of this pane are the 
+following buttons:
 <ul>
-<li><b>test</b>: change the settings of the running application to the current settings
-<li><b>Save</b>: save the current settings
-<li><b>SaveAs</b>: save the current settings as a theme
-<li><b>load</b>: load a theme into the current level
-<li><b>reset</b>: reset to the settings in the configuration files
-<li><b>clear level</b>: clears the settings at the current level. This
-will cause the settings of one of the lower levels to be used.
-<li><b>Advanved Edit</b>: pops up a dialog from which new configuration settings (nodes) can be added, 
-or existing ones can be deleted. Descriptions and actual keys can also be changed.
+<li><b>Default entry</b>: Clear the setting for the currently selected entry. A default value
+(from previous levels) will be used instead.
+<li><b>Default list</b>: Clear the settings for all entries in the list shown.
+<li><b>Default all</b>: Clear the settings for all configuration entries (at this level).
+<li><b>Reset entry</b>: Reset the value of the current entry to the original value
+<li><b>Reset list</b>: Reset the settings for all entries in the list shown.
+<li><b>Reset all</b>: Reset the settings for all configuration entries (at this level).
+</ul>
+<p>
+The dialog box has the following buttons:
+<ul>
+<li><b>Save</b>: save the current settings (at the current level)
+<li><b>Apply</b>: change the settings of the running application to the current settings
+<li><b>Themes</b>: Pop up the <a href="classy_config_themes.html">theme selection dialog box</a>
+<li><b>Save As</b>: save the current settings as a theme using the <a href="classy_config_saveas.html">save configuration as dialog box</a>
+<li><b>Select level</b>: Select the current configuration level
 <li><b>Help</b>: show this help text
 <li><b>Close</b>: close the dialog
 </ul>

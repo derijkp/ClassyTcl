@@ -1,0 +1,23 @@
+
+menu "File" {
+	action "Reload" {%W reload} <<Reload>>
+	action "Edit" {%W edit} <<Edit>>
+	action "Save source" {%W save [Classy::selectfile]} <<Save>>
+	action "Save as text" {%W save [Classy::selectfile] text} <<SaveText>>
+	separator
+	action "Editor" {edit newfile} <<Editor>>
+	action "Command window" {Classy::cmd} <<Cmd>>
+	action "Customise application" {Classy::Config dialog} <<Customise>>
+	action "Customise menu" {Classy::Config dialog -node {Menus Classy::Help}} <<CustomiseMenu>>
+	action "Customise toolbar" {Classy::Config dialog -node {Menus Classy::Help}} <<CustomiseTool>>
+	action "Close" {destroy %W} <<Close>>
+}
+activemenu "Contents" {%W getcontentsmenu}
+menu "Go" {
+	action "Back" {%W back} <<Back>>
+	action "Forward" {%W forward} <<Forward>>
+	action "History" {%W historymenu} <<History>>
+}
+activemenu "General" {%W getgeneralmenu}
+
+		

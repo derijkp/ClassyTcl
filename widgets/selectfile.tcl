@@ -38,7 +38,9 @@ proc Classy::selectfile {args} {
 		-title {} {Select file}
 		-filter {} {}
 		-selectmode {single browse multiple extended persistent} browse
-		-default {} Classy__fileselect
+		-default {} {}
+		-combo {} 20
+		-combopreset {} {}
 		-help {} Classy_file_select
 	}
 	set filter $opt(-filter)
@@ -87,7 +89,8 @@ proc Classy::selectfile {args} {
 		catch {destroy .classy__.selectfile}
 		Classy::FileSelect .classy__.selectfile -dir $dir \
 			-title $opt(-title) -textvariable ::Classy::selectfile \
-			-filter $filter -default $opt(-default) -selectmode $opt(-selectmode) -help $opt(-help) \
+			-filter $filter -selectmode $opt(-selectmode) -help $opt(-help) \
+			-default $opt(-default) -combo $opt(-combo) -combopreset $opt(-combopreset) \
 			-closecommand {set ::Classy::selectfile ""}
 		if {"$opt(-initialfile)" != ""} {
 			.classy__.selectfile set $opt(-initialfile)

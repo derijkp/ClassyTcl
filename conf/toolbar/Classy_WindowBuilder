@@ -1,0 +1,10 @@
+
+action cut "Delete" {%W delete}
+separator
+action save "Save" {%W save}
+action test "Test" {%W test}
+action ptest "Test with parameters" {%W testparam}
+action recreate "Recreate Dialog" {%W recreate}
+separator
+action close "Close" {destroy %W}
+		

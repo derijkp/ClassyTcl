@@ -77,6 +77,14 @@ Classy::SaveDialog addoption -transfercommand {}
 #}
 Classy::SaveDialog chainoption -default {$object.options.entry} -default
 
+#doc {SaveDialog options -combo} option {-combo ? ?} descr {
+#}
+Classy::SaveDialog chainoption -combo {$object.options.entry} -combo
+
+#doc {SaveDialog options -combopreset} option {-combopreset ? ?} descr {
+#}
+Classy::SaveDialog chainoption -combopreset {$object.options.entry} -combopreset
+
 #doc {SaveDialog options -buttontext} option {-buttontext ? ?} descr {
 #}
 Classy::SaveDialog chainoption -buttontext {$object.actions.save} -text

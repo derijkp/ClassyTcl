@@ -5,9 +5,11 @@ proc ::Classy::WindowBuilder::edit_Classy::Entry {object base} {
 	::Classy::WindowBuilder::defattredit $object $base {
 		-label Label 0 -textvariable Textvariable 0 
 		-orient Orientation 0 -labelwidth Labelwidth 0 
+		-combo Combo 0
+		-combopreset ComboPreset 0
 		-default Default 0
 		-command Command 1
-	} 10 0
+	} 12 0
 }
 
 proc ::Classy::WindowBuilder::add_Classy::Entry {object base args} {

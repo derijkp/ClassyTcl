@@ -44,7 +44,7 @@ Classy::FontSelect method init {args} {
 	Classy::Entry $object.font -textvariable [privatevar $object font] -width 5\
 		-label "Font" \
 		-command "$object set ; Classy::todo $object display" \
-		-default classy__font
+		-combo 20
 	Classy::NumEntry $object.size -textvariable [privatevar $object size] -width 5 \
 		-command "Classy::todo $object display" \
 		-min 0 -increment 1 \

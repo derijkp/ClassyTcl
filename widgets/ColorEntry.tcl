@@ -31,7 +31,7 @@ option add *Classy::ColorEntry.entry.width 5 widgetDefault
 Classy::Entry subclass Classy::ColorEntry
 
 Classy::ColorEntry method init {args} {
-	super init
+	super init -combo 10 -combopreset [list $object colors]
 	bindtags $object [lreplace [bindtags $object] 2 0 Classy::Entry]
 	bindtags $object.entry [lreplace [bindtags $object.entry] 3 0 Classy::Entry]
 	frame $object.sample -relief raised -width 25 -borderwidth 2
@@ -73,4 +73,8 @@ Classy::ColorEntry method command {} {
 	}
 }	
 
-
+Classy::ColorEntry method colors {args} {
+	set list [Classy::optionget $object colorList ColorList]
+	regsub -all \n $list { } list
+	return [eval list_concat $list]
+}

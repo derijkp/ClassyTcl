@@ -135,6 +135,7 @@ Classy::NoteBook method select {{label {}}} {
 	grid columnconfigure $object.book 0 -weight 1
 	grid rowconfigure $object.book 0 -weight 1
 	Classy::todo $object redraw
+	return $widget($label)
 }
 
 #doc {NoteBook command propagate} cmd {

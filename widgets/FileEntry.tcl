@@ -52,6 +52,7 @@ Classy::FileEntry method init {args} {
 			]
 		if {"$::Classy::current"!=""} {$object set $::Classy::current}
 	}]
+	bindtags $object.entry [list $object Classy::FileEntry Classy::Entry .try.entry Entry . all]
 	pack $object.browse -in $object.frame -side left
 
 	# REM Configure initial arguments
