@@ -9,7 +9,8 @@ mainw method init args {
 		-width 10
 	grid $object.test -row 0 -column 1 -sticky nesw
 	Classy::Paned $object.paned2 \
-		-orient vertical
+		-orient vertical \
+		-cursor sb_v_double_arrow
 	grid $object.paned2 -row 2 -column 0 -columnspan 2 -sticky nesw
 	Classy::CmdWidget $object.cmd \
 		-prompt {[file tail [pwd]] % } \
@@ -103,11 +104,9 @@ Classy::DynaTool} \
 	grid columnconfigure $object 1 -weight 1
 	grid rowconfigure $object 0 -weight 1
 
-	# End windows
 	if {"$args" == "___Classy::Builder__create"} {return $object}
 	# Parse this
 	$object configure \
-		-destroycommand "exit" \
 		-title [tk appname]
 	$object.paned2 configure \
 		-window [varsubst object {$object.cmd}]
@@ -136,9 +135,7 @@ grid $object.test.widget -row 0 -column 0 -sticky $sticky}] \
 	$object.frame.entry1 configure \
 		-command [varsubst object {drawwidget $object}]
 	$object.optionvalue configure \
-		-command [varsubst object {invoke value {
-	$object.test.widget configure [$object.frame.options get] $value
-}}]
+		-command [varsubst object {changeattribute $object}]
 	$object.cmds configure \
 		-browsecommand [varsubst object {invoke value {
 	$object.cmd insert end "\$w $value"
@@ -150,5 +147,5 @@ grid $object.test.widget -row 0 -column 0 -sticky $sticky}] \
 set ::grid(hor) 1
 set ::grid(vert) 1
 	return $object
-	return $object
 }
+

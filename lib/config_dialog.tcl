@@ -86,15 +86,7 @@ proc Classy::config_item {name w item} {
 		set value ""
 		set color [Classy::realcolor darkBackground]
 	}
-	switch $type {
-		menu {
-			set type text
-		}
-		toolbar {
-			set type text
-		}
-	}
-	$w.select configure -type $type -command [list Classy::config_set $name $w]
+	$w.select configure -type $type -label [lindex $name end] -command [list Classy::config_set $name $w]
 	$w.descr configure -text $descr -bg $color
 	$w.select set $value
 }

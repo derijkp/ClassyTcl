@@ -1,11 +1,12 @@
-Classy::Toplevel subclass Classy_menueditor
-Classy_menueditor method init args {
+Classy::Toplevel subclass Classy_toolbareditor
+Classy_toolbareditor method init args {
 	super init
 	# Create windows
 	Classy::Paned $object.paned1
 	grid $object.paned1 -row 1 -column 1 -sticky nesw
 	Classy::TreeWidget $object.browse \
-		-width 100
+		-width 100 \
+		-height 50
 	grid $object.browse -row 1 -column 0 -sticky nesw
 	frame $object.basic  \
 		-borderwidth 2 \
@@ -14,7 +15,7 @@ Classy_menueditor method init args {
 		-width 10
 	grid $object.basic -row 1 -column 2 -sticky nesw
 	Classy::Entry $object.basic.name \
-		-label Name \
+		-label {Name (Help)} \
 		-labelwidth 11 \
 		-width 4
 	grid $object.basic.name -row 1 -column 0 -sticky nesw
@@ -23,21 +24,21 @@ Classy_menueditor method init args {
 		-type text
 	grid $object.basic.command -row 3 -column 0 -sticky nesw
 	Classy::Entry $object.basic.type \
-		-combopreset {echo {menu action radio check activemenu separator}} \
+		-combopreset {echo {action radio check widget tool label separator}} \
 		-label Type \
 		-labelwidth 11 \
 		-combo 0 \
 		-width 4
 	grid $object.basic.type -row 0 -column 0 -sticky nesw
 	Classy::Selector $object.basic.key \
-		-label {Key shortkut} \
+		-label {Label / icon / proc} \
 		-orient vertical \
-		-type key
+		-type text
 	grid $object.basic.key -row 2 -column 0 -sticky nesw
 	grid columnconfigure $object.basic 0 -weight 1
 	grid rowconfigure $object.basic 3 -weight 1
 	Classy::DynaTool $object.dynatool1  \
-		-type Classy_MenuEditor
+		-type Classy_ToolbarEditor
 	grid $object.dynatool1 -row 0 -column 0 -columnspan 3 -sticky nesw
 	grid columnconfigure $object 2 -weight 1
 	grid rowconfigure $object 1 -weight 1
@@ -45,7 +46,7 @@ Classy_menueditor method init args {
 	if {"$args" == "___Classy::Builder__create"} {return $object}
 	# Parse this
 	$object configure  \
-		-title {Menu Editor}
+		-title {Toolbar Editor}
 	$object.paned1 configure \
 		-window [varsubst object {$object.browse}]
 	$object.browse configure \
@@ -63,7 +64,7 @@ Classy_menueditor method init args {
 		-command [varsubst object {$object rekey}]
 	$object.dynatool1 configure \
 		-cmdw [varsubst object {$object}]
-	Classy::DynaMenu attachmainmenu Classy_MenuEditor $object
+	Classy::DynaMenu attachmainmenu Classy_ToolbarEditor $object
 	# Configure initial arguments
 	if {"$args" != ""} {eval $object configure $args}
 # ClassyTcl Finalise
@@ -71,42 +72,62 @@ $object finalise
 	return $object
 }
 
-Classy_menueditor addoption -savecommand {savecommand Savecommand {}} {}
+Classy_toolbareditor addoption -savecommand {savecommand Savecommand {}} {}
 
-Classy_menueditor method finalise {} {
+Classy_toolbareditor method finalise {} {
 	private $object current
 	set current(changed) 0
 }
 
-Classy_menueditor method load data {
-	private $object menu current
-	catch {unset menu}
-	set menu() [$object _recload $data {}]
+Classy_toolbareditor method _recload {data name} {
+	private $object toolbar
+	set result {}
+	set num 1
+	foreach current [cmd_split $data] {
+		if ![llength $current] continue
+		if [regexp ^# $current] continue
+		foreach {type key text command} $current break
+		if [string_equal $type separator] {
+			set text separator$num
+			incr num
+		}
+		lappend result $text
+		set newnode $name
+		lappend newnode $text
+		if {"$type"=="toolbar"} {
+			set toolbar($newnode) [list $type {} $key]
+			lappend result [$object _recload [lindex $current 2] $newnode]
+		} else {
+			set toolbar($newnode) [list $type $command $key]
+			lappend result {}
+		}
+	}
+	return $result
+}
+
+Classy_toolbareditor method load data {
+	private $object toolbar current
+	catch {unset toolbar}
+	set toolbar() [$object _recload $data {}]
 	update idletasks
 	$object.browse clearnode {}
-	$object.browse configure -rootimage [Classy::geticon newmenu]
+	$object.browse configure -rootimage [Classy::geticon newtoolbar]
 	$object opennode {}
 	$object changed 0
 	set current(changed) 0
 }
 
-Classy_menueditor method opennode node {
-	private $object menu current
-	set entries [structlist_fields $menu() $node]
+Classy_toolbareditor method opennode node {
+	private $object toolbar current
+	set entries [structlist_fields $toolbar() $node]
 	foreach text $entries {
 		set base $node
 		lappend base $text
-		foreach {type command key} $menu($base) break
+		foreach {type command key} $toolbar($base) break
 		set icon new$type
 		set newnode $node
 		lappend newnode $text
 		switch $type {
-			menu {
-				set type folder
-			}
-			activemenu {
-				set type end
-			}
 			action {
 				set type end
 			}
@@ -124,58 +145,71 @@ Classy_menueditor method opennode node {
 				set icon sm_file
 			}
 		}
+		if [catch {Classy::geticon $key} icon] {
+			set icon [Classy::geticon nothing]
+		}
 		$object.browse addnode $node $newnode -text $text -type $type \
-			-image [Classy::geticon $icon]
+			-image $icon
 	}
 	$object select $node
 }
 
-Classy_menueditor method openendnode node {
-	private $object current menu
+Classy_toolbareditor method openendnode node {
+	private $object current toolbar
 	if ![llength $node] return
 	$object select $node
 }
 
-Classy_menueditor method closenode node {
-	private $object menu
+Classy_toolbareditor method closenode node {
+	private $object toolbar
 	$object select $node
-	foreach {type command key} $menu($node) break
+	foreach {type command key} $toolbar($node) break
 	set text [lindex $node end]
-	$object.basic.type nocmdset menu
+	$object.basic.type nocmdset toolbar
 	$object.basic.name nocmdset $text
 	$object.basic.command configure -state disabled
 	$object.basic.key set $key
 	$object.browse clearnode $node
 }
 
-Classy_menueditor method _recload {data name} {
-	private $object menu
+Classy_toolbareditor method _copy node {
+	private $object toolbar
 	set result {}
-	set num 1
-	foreach current [cmd_split $data] {
-		if ![llength $current] continue
-		if [regexp ^# $current] continue
-		foreach {type text command key} $current break
-		if [string_equal $type separator] {
-			set text separator$num
-			incr num
-		}
-		lappend result $text
-		set newnode $name
-		lappend newnode $text
-		if {"$type"=="menu"} {
-			set menu($newnode) [list $type {} $key]
-			lappend result [$object _recload [lindex $current 2] $newnode]
-		} else {
-			set menu($newnode) [list $type $command $key]
-			lappend result {}
-		}
+	if ![llength $node] {
+		set type toolbar
+	} else {
+		set type [lindex $toolbar($node) 0]
 	}
-	return $result
+	if [string_equal $type toolbar] {
+		set data [structlist_get $toolbar() $node]
+		foreach {entry value} $data {
+			set base $node
+			lappend base $entry
+			if ![llength $value] {
+				if [string_equal [lindex $toolbar($base) 0] separator] {
+					append result separator\n
+				} else {
+					foreach {type command key} $toolbar($base) break
+					append result [list $type $key [lindex $base end] $command]\n
+				}
+			} else {
+				set sub [$object _copy $base]
+				append result $sub\n
+			}
+		}
+		if ![llength $node] {
+			return $result
+		} else {
+			return [lreplace $toolbar($node) 1 2 [lindex $node end] \n$result]
+		}
+	} else {
+		foreach {type command key} $toolbar($node) break
+		return [list $type $key [lindex $node end] $command]
+	}
 }
 
-Classy_menueditor method copy {args} {
-	private $object current menu
+Classy_toolbareditor method copy {args} {
+	private $object current toolbar
 	if [llength $args] {
 		set node [lindex $args 0]
 	} else {
@@ -186,63 +220,29 @@ Classy_menueditor method copy {args} {
 	return $result
 }
 
-Classy_menueditor method _copy node {
-	private $object menu
-	set result {}
-	if ![llength $node] {
-		set type menu
-	} else {
-		set type [lindex $menu($node) 0]
-	}
-	if [string_equal $type menu] {
-		set data [structlist_get $menu() $node]
-		foreach {entry value} $data {
-			set base $node
-			lappend base $entry
-			if ![llength $value] {
-				if [string_equal [lindex $menu($base) 0] separator] {
-					append result separator\n
-				} else {
-					append result [lreplace $menu($base) 1 -1 [lindex $base end]]\n
-				}
-			} else {
-				set sub [$object _copy $base]
-				append result $sub\n
-			}
-		}
-		if ![llength $node] {
-			return $result
-		} else {
-			return [lreplace $menu($node) 1 2 [lindex $node end] \n$result]
-		}
-	} else {
-		return [lreplace $menu($node) 1 -1 [lindex $node end]]
-	}
-}
-
-Classy_menueditor method cut {args} {
+Classy_toolbareditor method cut {args} {
 	eval $object copy $args
 	eval $object delete $args
 }
 
-Classy_menueditor method paste {{node {}} {newname {}}} {
-	private $object current menu
+Classy_toolbareditor method paste {{node {}} {newname {}}} {
+	private $object current toolbar
 	set data $current(buffer)
 	if ![llength $node] {set node $current(node)}
 	set parent $node
 	if ![string length $node] {
-		set ptype menu
-	} elseif ![info exists menu($parent)] {
+		set ptype toolbar
+	} elseif ![info exists toolbar($parent)] {
 		set ptype separator
 	} else {
-		set ptype [lindex $menu($node) 0]
+		set ptype [lindex $toolbar($node) 0]
 	}
-	if [string_equal $ptype menu] {
-		set list [structlist_fields $menu() $parent]
+	if [string_equal $ptype toolbar] {
+		set list [structlist_fields $toolbar() $parent]
 		set pos 0
 	} else {
 		set tail [list_pop parent]
-		set list [structlist_fields $menu() $parent]
+		set list [structlist_fields $toolbar() $parent]
 		set pos [lsearch $list $tail]
 		incr pos
 	}
@@ -260,13 +260,13 @@ Classy_menueditor method paste {{node {}} {newname {}}} {
 	}
 	set newnode $parent
 	lappend newnode $newname
-	if [string_equal [lindex $data 0] menu] {
+	if [string_equal [lindex $data 0] toolbar] {
 		set sub [$object _recload [lreplace $data 1 1 $newname] $parent]
 	} else {
 		set sub {}
-		set menu($newnode) [lreplace $data 1 1]
+		set toolbar($newnode) [lreplace $data 1 1]
 	}
-	set mpart [structlist_get $menu() $parent]
+	set mpart [structlist_get $toolbar() $parent]
 	set len [llength $mpart]
 	set pos [expr {2*$pos}]
 	if {$pos < $len} {
@@ -274,34 +274,34 @@ Classy_menueditor method paste {{node {}} {newname {}}} {
 	} else {
 		lappend mpart $newname [lindex $sub 1]
 	}
-	set menu() [structlist_set $menu() $parent $mpart]
+	set toolbar() [structlist_set $toolbar() $parent $mpart]
 	$object closenode $parent
 	$object opennode $parent
 	$object select $newnode
 	$object changed 1
 }
 
-Classy_menueditor method delete {args} {
-	private $object current menu
+Classy_toolbareditor method delete {args} {
+	private $object current toolbar
 	if [llength $args] {
 		set node [lindex $args 0]
 	} else {
 		set node $current(node)
 	}
-	if [info exists menu($node)] {
-		if [string_equal [lindex $menu($node) 0] menu] {
-			if ![Classy::yorn "Are you sure you want to delete submenu \"$node\""] return
+	if [info exists toolbar($node)] {
+		if [string_equal [lindex $toolbar($node) 0] toolbar] {
+			if ![Classy::yorn "Are you sure you want to delete subtoolbar \"$node\""] return
 		}
 	}
 	set parent $node
 	set tail [list_pop parent]
-	set list [structlist_fields $menu() $parent]
+	set list [structlist_fields $toolbar() $parent]
 	set pos [lsearch $list $tail]
 	if {$pos == -1} return
-	set mpart [structlist_get $menu() $parent]
+	set mpart [structlist_get $toolbar() $parent]
 	set deleted [lindex $mpart [expr {2*$pos+1}]]
 	set mpart [lreplace $mpart [expr {2*$pos}] [expr {2*$pos+1}]]
-	set menu() [structlist_set $menu() $parent $mpart]
+	set toolbar() [structlist_set $toolbar() $parent $mpart]
 	if [llength $parent] {
 		$object closenode $parent
 		$object opennode $parent
@@ -309,7 +309,7 @@ Classy_menueditor method delete {args} {
 		$object.browse clearnode {}
 		$object opennode {}
 	}
-	set list [structlist_fields $menu() $parent]
+	set list [structlist_fields $toolbar() $parent]
 	incr pos -1
 	if {$pos < 0} {set pos 0}
 	set newnode $parent
@@ -322,7 +322,7 @@ Classy_menueditor method delete {args} {
 	$object changed 1
 }
 
-Classy_menueditor method changed {changed} {
+Classy_toolbareditor method changed {changed} {
 	private $object current
 	if [true $changed] {
 		set current(changed) 1
@@ -337,8 +337,8 @@ Classy_menueditor method changed {changed} {
 	}
 }
 
-Classy_menueditor method select {node} {
-	private $object current menu
+Classy_toolbareditor method select {node} {
+	private $object current toolbar
 	$object.browse selection clear
 	$object.browse selection add $node	
 	set current(node) $node
@@ -346,7 +346,20 @@ Classy_menueditor method select {node} {
 	$object.basic.name configure -state normal
 	$object.basic.command configure -state normal
 	$object.basic.key configure -state normal
-	if ![info exists menu($node)] {
+	if [string_equal $node {}] {
+		set type toolbar
+		set key {}
+	} else {
+		foreach {type command key} $toolbar($node) break
+	}
+	set text [lindex $node end]
+	if [string_equal $type toolbar] {
+		$object.basic.type nocmdset toolbar
+		$object.basic.name nocmdset $text
+		$object.basic.key set $key
+		$object.basic.command set {}
+		$object.basic.command configure -state disabled
+	} elseif [string_equal $type separator] {
 		$object.basic.type nocmdset separator
 		$object.basic.name nocmdset {}
 		$object.basic.command set {}
@@ -355,21 +368,6 @@ Classy_menueditor method select {node} {
 		$object.basic.command configure -state disabled
 		$object.basic.key configure -state disabled
 		$object.basic.type configure -state disabled
-		return
-	}
-	if [string_equal $node {}] {
-		set type menu
-		set key {}
-	} else {
-		foreach {type command key} $menu($node) break
-	}
-	set text [lindex $node end]
-	if [string_equal $type menu] {
-		$object.basic.type nocmdset menu
-		$object.basic.name nocmdset $text
-		$object.basic.key set $key
-		$object.basic.command set {}
-		$object.basic.command configure -state disabled
 	} else {
 		$object.basic.type nocmdset $type
 		$object.basic.name nocmdset $text
@@ -378,24 +376,27 @@ Classy_menueditor method select {node} {
 		set current(node) $node
 	}
 	$object.basic.type configure -state combo
+	update idletasks
+	$object.basic.key changed 0
+	$object.basic.command changed 0
 }
 
-Classy_menueditor method retype {value} {
-	private $object current menu
+Classy_toolbareditor method retype {value} {
+	private $object current toolbar
 	set node $current(node)
-	set ctype [lindex $menu($node) 0]
-	if [string_equal $value menu] {
-		if ![string_equal $ctype menu] {
+	set ctype [lindex $toolbar($node) 0]
+	if [string_equal $value toolbar] {
+		if ![string_equal $ctype toolbar] {
 			$object.basic.type set $ctype
-			error "Cannot change other types into menu"
+			error "Cannot change other types into toolbar"
 		}
 	} else {
-		if [string_equal $ctype menu] {
+		if [string_equal $ctype toolbar] {
 			$object.basic.type set $ctype
-			error "Cannot change menu into other types"
+			error "Cannot change toolbar into other types"
 		}
 	}
-	set menu($node) [lreplace $menu($node) 0 0 $value]
+	set toolbar($node) [lreplace $toolbar($node) 0 0 $value]
 	set parent $node
 	set tail [list_pop parent]
 	$object closenode $parent
@@ -404,22 +405,22 @@ Classy_menueditor method retype {value} {
 	$object changed 1
 }
 
-Classy_menueditor method rekey {value} {
-	private $object current menu
+Classy_toolbareditor method rekey {value} {
+	private $object current toolbar
 	set node $current(node)
-	set menu($node) [lreplace $menu($node) 2 2 $value]
+	set toolbar($node) [lreplace $toolbar($node) 2 2 $value]
 	$object changed 1
 }
 
-Classy_menueditor method recommand {value} {
-	private $object current menu
+Classy_toolbareditor method recommand {value} {
+	private $object current toolbar
 	set node $current(node)
-	set menu($node) [lreplace $menu($node) 1 1 $value]
+	set toolbar($node) [lreplace $toolbar($node) 1 1 $value]
 	$object changed 1
 }
 
-Classy_menueditor method _rename {oldbase newbase list} {
-	private $object menu
+Classy_toolbareditor method _rename {oldbase newbase list} {
+	private $object toolbar
 	foreach {key value} $list {
 		set oldnode $oldbase
 		lappend oldnode $key
@@ -428,40 +429,40 @@ Classy_menueditor method _rename {oldbase newbase list} {
 		if [llength $value] {
 			$object _rename $oldnode $newnode $value
 		}
-		set menu($newnode) $menu($oldnode)
-		unset menu($oldnode)
+		set toolbar($newnode) $toolbar($oldnode)
+		unset toolbar($oldnode)
 	}
 }
 
-Classy_menueditor method rename newname {
-	private $object current menu
+Classy_toolbareditor method rename newname {
+	private $object current toolbar
 	set node $current(node)
 	set pnode $node
 	set tail [list_pop pnode]
 	set newnode $pnode
 	lappend newnode $newname
-	if ![catch {structlist_get $menu() $newnode}] {
+	if ![catch {structlist_get $toolbar() $newnode}] {
 		error "node \"$newnode\" already exists"
 	}
-	set sub [structlist_get $menu() $node]
+	set sub [structlist_get $toolbar() $node]
 	if [llength $sub] {
 		$object _rename $node $newnode $sub
 	}
-	set menu($newnode) $menu($node)
-	unset menu($node)
-	set pdata [structlist_get $menu() $pnode]
+	set toolbar($newnode) $toolbar($node)
+	unset toolbar($node)
+	set pdata [structlist_get $toolbar() $pnode]
 	set list [structlist_fields $pdata]
 	set pos [lsearch $list $tail]
 	set pdata [lreplace $pdata [expr {2*$pos}] [expr {2*$pos}] $newname]
-	set menu() [structlist_set $menu() $pnode $pdata]
+	set toolbar() [structlist_set $toolbar() $pnode $pdata]
 	$object closenode $pnode
 	$object opennode $pnode
 	$object select $newnode
 	$object changed 1
 }
 
-Classy_menueditor method selectroot {} {
-	private $object current menu
+Classy_toolbareditor method selectroot {} {
+	private $object current toolbar
 	$object.browse selection set {}
 	set current(node) {}
 	$object.basic.type nocmdset {}
@@ -474,26 +475,38 @@ Classy_menueditor method selectroot {} {
 	$object.basic.key configure -state disabled
 }
 
-Classy_menueditor method new type {
-	private $object current menu
+Classy_toolbareditor method new type {
+	private $object current toolbar
 	set node $current(node)
 	set pnode $node
 	set keep [get current(buffer) ""]
-	set current(buffer) [list $type $type {}]
+	set key $type
+	set command {}
+	switch $type {
+		check {
+			set key $type
+			set command [list -variable $type -onvalue 1 -ofvalue 0]
+		}
+		radio {
+			set key $type
+			set command [list -variable $type -value test]
+		}
+	}
+	set current(buffer) [list $type $type $command $key]
 	$object paste
 	set current(buffer) $keep
 	$object changed 1
 }
 
-Classy_menueditor method close {} {
+Classy_toolbareditor method close {} {
 	private $object current
 	if [true $current(changed)] {
-		if ![Classy::yorn "Closing menueditor, some changes are not saved, close anyway (changes will be lost)?"] return
+		if ![Classy::yorn "Closing toolbareditor, some changes are not saved, close anyway (changes will be lost)?"] return
 	}
 	destroy $object
 }
 
-Classy_menueditor method save {} {
+Classy_toolbareditor method save {} {
 	private $object current options
 	set data [$object copy {}]
 	set cmd "$options(-savecommand) [list $data]"
@@ -501,8 +514,8 @@ Classy_menueditor method save {} {
 	$object changed 0
 }
 
-Classy_menueditor method move {dir args} {
-	private $object current menu
+Classy_toolbareditor method move {dir args} {
+	private $object current toolbar
 	if [llength $args] {
 		set node [lindex $args 0]
 	} else {
@@ -510,9 +523,9 @@ Classy_menueditor method move {dir args} {
 	}
 	set parent $node
 	set tail [list_pop parent]
-	set entries [structlist_fields $menu() $parent]
+	set entries [structlist_fields $toolbar() $parent]
 	set pos [lsearch $entries $tail]
-	set data [structlist_get $menu() $parent]
+	set data [structlist_get $toolbar() $parent]
 	set tpos [expr {2*$pos}]
 	set move [lrange $data $tpos [expr {$tpos+1}]]
 	set data [lreplace $data $tpos [expr {$tpos+1}]]
@@ -538,18 +551,19 @@ Classy_menueditor method move {dir args} {
 			error "Unknown direction \"$dir\""
 		}
 	}
-	set menu() [structlist_set $menu() $parent $data]
+	set toolbar() [structlist_set $toolbar() $parent $data]
 	$object closenode $parent
 	$object opennode $parent
 	$object select $node
 	$object changed 1
 }
 
-proc Classy::menu_edit {level key} {
-	.classy__.menueditor close
-	set file [file join $::Classy::dir($level) menu $key]
+proc Classy::toolbar_edit {level key} {
+	.classy__.toolbareditor close
+	set file [file join $::Classy::dir($level) toolbar $key]
 	set data [file_read $file]
-	Classy_menueditor .classy__.menueditor -savecommand [list file_write $file]
-	.classy__.menueditor load $data
-	wm title .classy__.menueditor "$key ($level)"
+	Classy_toolbareditor .classy__.toolbareditor -savecommand [list file_write $file]
+	.classy__.toolbareditor load $data
+	wm title .classy__.toolbareditor "$key ($level)"
 }
+

@@ -63,6 +63,22 @@ test Classy::Notebook {reorder} {
 	.try labels
 } {{Button 2} Button Text}
 
+test Classy::Notebook {in toplevel} {
+	classyclean
+	catch {Classy::Default unset geometry .try.book}
+	Classy::Toplevel .try
+	Classy::NoteBook .try.book
+	pack .try.book -fill both -expand yes
+	text .try.text
+	.try.book manage Text .try.text -command {set ::try ok}
+	button .try.b -text "Try"
+	.try.book manage Button .try.b -sticky {}
+	button .try.b2 -text "Try 2"
+	.try.book manage {Button 2} .try.b2 -sticky {}
+	.try.book select Text
+	set ::try
+} {ok}
+
 testsummarize
 
 

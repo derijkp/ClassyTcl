@@ -23,33 +23,33 @@ color,*Scale.foreground black
 key,<<SelectTableRight>> <Shift-Control-Right>
 mouse,<<AdjustDrag>> <ButtonPress-3><B3-Motion>
 key,<<Redo>> <Alt-U>
-key,<<PageRight>> <Alt-Next>
 anchor,*Checkbutton.anchor w
+key,<<PageRight>> <Alt-Next>
 key,<<Right>> <Right>
 key,<<SelectEnd>> {<Shift-End> <Shift-Alt-Right>}
-key,<<SelectPageTop>> <Shift-Alt-Up>
 bool,*PatchTk 1
+key,<<SelectPageTop>> <Shift-Alt-Up>
 color,*Scrollbar.foreground Background
 mouse,<<MPosition>> {<Control-1> <Control-2>}
 font,*treeFont Font
 key,<<ReplaceFindNext>> <Alt-g>
-mouse,<<Menu>> <3>
 int,*Frame.HighlightThickness 0
+mouse,<<Menu>> <3>
 key,<<TableRight>> <Control-Right>
-font,*Classy::Browser.font BoldFont
-key,<<CompleteTab>> <Control-Shift-v>
-key,<<SelectTableDown>> <Shift-Down>
 mouse,<<MExecute>> <Double-1>
+key,<<SelectTableDown>> <Shift-Down>
+key,<<CompleteTab>> <Control-Shift-v>
+font,*Classy::Browser.font BoldFont
 font,*BoldItalicFont {helvetica 10 bold italic}
-color,*disabledForeground #7f7f7f
 key,<<HistoryUp>> <Alt-Up>
+color,*disabledForeground #7f7f7f
 key,<<SelectHome>> {<Shift-Home> <Shift-Alt-Left>}
 {select left right,*ScrollSide} right
-key,<<SelectTop>> <Shift-Control-Home>
 key,<<TableLeft>> <Control-Left>
+key,<<SelectTop>> <Shift-Control-Home>
 int,*MenuButton.padX 1
-key,<<SelectPageDown>> <Shift-Next>
 int,*MenuButton.padY 1
+key,<<SelectPageDown>> <Shift-Next>
 color,*darkBackground #cacaca
 color,*Foreground black
 font,*ItalicFont {helvetica 10 italic}

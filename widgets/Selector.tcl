@@ -53,8 +53,9 @@ Classy::Selector method init {args} {
 #doc {Selector options -type} option {-type type Type} descr {
 #}
 Classy::Selector addoption -type {type Type {}} {
-	set list {int line text color font key mouse menu anchor justify bool orient relief select sticky}
+	set list {int line string text color font key mouse menu toolbar anchor justify bool orient relief select sticky image bitmap}
 	if {[lsearch $list [lindex $value 0]] == -1} {return -code error "Unknown type \"$value\""}
+	Classy::canceltodo $object redraw
 	Classy::todo $object draw
 }
 
@@ -76,6 +77,7 @@ Classy::Selector addoption -variable {variable Variable {}} {
 #doc {Selector options -orient} option {-orient orient Orient} descr {
 #}
 Classy::Selector addoption -orient {orient Orient horizontal} {
+	Classy::canceltodo $object redraw
 	Classy::todo $object draw
 }
 
@@ -143,6 +145,12 @@ Classy::Selector method _command {value} {
 	}
 }
 
+Classy::Selector method changed {args} {
+	private $object options
+	eval $object.value textchanged $args
+	catch {$object.change configure -text $options(-label)}
+}
+
 Classy::Selector method redraw {} {
 	private $object options var
 	upvar #0 $var v
@@ -157,7 +165,7 @@ Classy::Selector method redraw {} {
 				-textvariable $var -command "$object _command" -orient $options(-orient) \
 				-state $options(-state)
 		}
-		line {
+		line - string {
 			$object.value configure -label $title -labelwidth $options(-labelwidth) \
 				-textvariable $var -command "$object _command" -orient $options(-orient) \
 				-state $options(-state)
@@ -185,6 +193,21 @@ Classy::Selector method redraw {} {
 				-state $options(-state)
 			$object.edit configure -text "Menu Editor" \
 				-command [list $object _menuedit] \
+				-state $options(-state)
+			$object.value configure -wrap none -width 5 -height 2 \
+				-state $options(-state) \
+				-changedcommand [list $object _textchanged]
+			$object.value set $v
+			$object.value textchanged 0
+		}
+		toolbar {
+			if ![info exists v] {set v ""}
+			set title $options(-label)
+			$object.change configure -text "$title" \
+				-command [list $object _textset] \
+				-state $options(-state)
+			$object.edit configure -text "Toolbar Editor" \
+				-command [list $object _toolbaredit] \
 				-state $options(-state)
 			$object.value configure -wrap none -width 5 -height 2 \
 				-state $options(-state) \
@@ -261,7 +284,7 @@ Classy::Selector method redraw {} {
 			$object.value configure -label $title \
 				-state $options(-state)
 			foreach {type} $list {
-				radiobutton $object.b$type \
+				$object.b$type configure \
 					-command  "$object.value set $type" -value $type \
 					-variable $var \
 					-state $options(-state)
@@ -288,6 +311,11 @@ Classy::Selector method redraw {} {
 			$object.select.we configure -state $options(-state)
 			$object.select.ns configure -state $options(-state)
 			$object _stickyset [$object.value get]
+		}
+		default {
+			$object.value configure -label $title -labelwidth $options(-labelwidth) \
+				-textvariable $var -command "$object _command" -orient $options(-orient) \
+				-state $options(-state)
 		}
 	}
 	Classy::canceltodo $object redraw
@@ -321,7 +349,7 @@ Classy::Selector method _textset {} {
 	set title $options(-label)
 	upvar #0 $var v
 	set v [string trimright [$object.value get]]
-	$object.change configure -text $title
+	catch {$object.change configure -text $title}
 	$object.value textchanged 0
 	$object _command $v
 }
@@ -346,9 +374,11 @@ Classy::Selector method _textchanged {args} {
 	private $object var
 	upvar #0 $var var
 	set var [$object.value get]
-	set title [$object.change cget -text]
-	if ![regexp { \*$} $title] {
-		$object.change configure -text "$title *"
+	catch {
+		set title [$object.change cget -text]
+		if ![regexp { \*$} $title] {
+			$object.change configure -text "$title *"
+		}
 	}
 }
 
@@ -367,6 +397,21 @@ Classy::Selector method _menuedit {} {
 	$object.menueditor load $value
 }
 
+Classy::Selector method _toolbaredit {} {
+	private $object options var
+	set title $options(-label)
+	upvar #0 $var v
+	catch {destroy $object.toolbareditor}
+	Classy_toolbareditor $object.toolbareditor
+	wm title $object.toolbareditor "Toolbar Editor: $title"
+	$object.toolbareditor configure -savecommand [list $object _texteditdone $object.toolbareditor]
+	set value [$object.value get]
+	if ![llength $value] {
+		set value {action "Some Action" {}}
+	}
+	$object.toolbareditor load $value
+}
+
 Classy::Selector method draw {} {
 	private $object options var
 	upvar #0 $var v
@@ -383,7 +428,7 @@ Classy::Selector method draw {} {
 			grid columnconfigure $object 0 -weight 1
 			grid rowconfigure $object 0 -weight 1
 		}
-		line {
+		line - string {
 			Classy::Entry $object.value -label $title -labelwidth $options(-labelwidth) \
 				-textvariable $var -command "$object _command" -orient $options(-orient) \
 				-state $options(-state)
@@ -421,6 +466,28 @@ Classy::Selector method draw {} {
 				-state $options(-state)
 			button $object.edit -text "Menu Editor" \
 				-command [list $object _menuedit] \
+				-state $options(-state)
+			Classy::ScrolledText $object.value -wrap none -width 5 -height 2 \
+				-state $options(-state) \
+				-changedcommand [list $object _textchanged]
+			bind $object.value <<Save>> "$object _textset ; break"
+			bind $object.value <<Empty>> "$object.value set {} ; break"
+			grid $object.change -row 2 -column 0 -sticky we
+			grid $object.edit -row 2 -column 1 -sticky we
+			grid $object.value -row 3 -column 0 -sticky nswe -columnspan 2
+			grid columnconfigure $object 0 -weight 1
+			grid rowconfigure $object 3 -weight 1
+			$object.value set $v
+			$object.value textchanged 0
+		}
+		toolbar {
+			if ![info exists v] {set v ""}
+			set title $options(-label)
+			button $object.change -text "$title" \
+				-command [list $object _textset] \
+				-state $options(-state)
+			button $object.edit -text "Toolbar Editor" \
+				-command [list $object _toolbaredit] \
 				-state $options(-state)
 			Classy::ScrolledText $object.value -wrap none -width 5 -height 2 \
 				-state $options(-state) \
@@ -621,6 +688,14 @@ Classy::Selector method draw {} {
 			grid columnconfigure $object 1 -weight 1
 			grid rowconfigure $object 2 -weight 1
 			$object _stickyset [$object.value get]
+		}
+		default {
+			Classy::Entry $object.value -label $title -labelwidth $options(-labelwidth) \
+				-textvariable $var -command "$object _command" -orient $options(-orient) \
+				-state $options(-state)
+			grid $object.value -row 0 -column 0 -sticky nwe
+			grid columnconfigure $object 0 -weight 1
+			grid rowconfigure $object 0 -weight 1
 		}
 	}
 	Classy::canceltodo $object draw

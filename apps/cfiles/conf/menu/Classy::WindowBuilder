@@ -1,0 +1,75 @@
+
+menu "File" {
+	action "Save" {[Classy::WindowBuilder_win %W] save} <<Save>>
+	action "Test" {[Classy::WindowBuilder_win %W] test} <<Test>>
+	action "Test parameters" {[Classy::WindowBuilder_win %W] testparam} <<TestParam>>
+	action "Recreate" {[Classy::WindowBuilder_win %W] recreate} <<Recreate>>
+	separator
+	action "Editor" "edit newfile" <<Editor>>
+	action "Command window" {Classy::cmd} <<Cmd>>
+	action "Customise application" {Classy::Config dialog} <<Customise>>
+	action "Customise menu" {Classy::Config config menu Classy::Editor} <<CustomiseMenu>>
+	action "Customise toolbar" {Classy::Config config tool Classy::Editor} <<CustomiseTool>>
+	action "Close" {[Classy::WindowBuilder_win %W] close} <<Close>>
+}
+menu "Edit" {
+	action "Copy" {[Classy::WindowBuilder_win %W] copy} <<Copy>>
+	action "Cut" {[Classy::WindowBuilder_win %W] cut} <<Cut>>
+	action "Delete" {[Classy::WindowBuilder_win %W] delete} <<Delete>>
+	action "Paste" {[Classy::WindowBuilder_win %W] paste} <<Paste>>
+	separator
+	action "Move up" {[Classy::WindowBuilder_win %W] geometryset up} <<Up>>
+	action "Move down" {[Classy::WindowBuilder_win %W] geometryset down} <<Down>>
+	action "Move left" {[Classy::WindowBuilder_win %W] geometryset left} <<Left>>
+	action "Move right" {[Classy::WindowBuilder_win %W] geometryset right} <<Right>>
+	action "Rowspan smaller" {[Classy::WindowBuilder_win %W] geometryset spanup} <<SelectUp>>
+	action "Rowspan larger" {[Classy::WindowBuilder_win %W] geometryset spandown} <<SelectDown>>
+	action "Columnspan smaller" {[Classy::WindowBuilder_win %W] geometryset spanleft} <<SelectLeft>>
+	action "Columnspan larger" {[Classy::WindowBuilder_win %W] geometryset spanright} <<SelectRight>>
+}
+menu "Tk" {
+	action Frame {[Classy::WindowBuilder_win %W] add frame}
+	action Entry {[Classy::WindowBuilder_win %W] add entry}
+	action Label {[Classy::WindowBuilder_win %W] add label}
+	action Button {[Classy::WindowBuilder_win %W] add button}
+	action "Check button" {[Classy::WindowBuilder_win %W] add checkbutton}
+	action "Radio button" {[Classy::WindowBuilder_win %W] add radiobutton}
+	action Message {[Classy::WindowBuilder_win %W] add message}
+	action "Vertical Scrollbar" {[Classy::WindowBuilder_win %W] add scrollbar -orient vertical}
+	action "Horizontal Scrollbar" {[Classy::WindowBuilder_win %W] add scrollbar -orient horizontal}
+	action Listbox {[Classy::WindowBuilder_win %W] add listbox}
+	action Text {[Classy::WindowBuilder_win %W] add text}
+	action Canvas {[Classy::WindowBuilder_win %W] add canvas}
+	action Scale {[Classy::WindowBuilder_win %W] add scale}
+}
+menu "ClassyTcl" {
+	action "Main Menu" {[Classy::WindowBuilder_win %W] add Classy::DynaMenu}
+	action "Toolbar" {%W add Classy::DynaTool}
+	action "Entry" {[Classy::WindowBuilder_win %W] add Classy::Entry}
+	action "Numerical Entry" {[Classy::WindowBuilder_win %W] add Classy::NumEntry}
+	action "ListBox" {[Classy::WindowBuilder_win %W] add Classy::ListBox}
+	action "scrolled Text" {[Classy::WindowBuilder_win %W] add Classy::ScrolledText}
+	action "Message" {%W add Classy::Message}
+	action "Text" {[Classy::WindowBuilder_win %W] add Classy::Text}
+	action "Canvas" {[Classy::WindowBuilder_win %W] add Classy::Canvas}
+	action "Notebook with tabs" {[Classy::WindowBuilder_win %W] add Classy::NoteBook}
+	action "OptionBox" {[Classy::WindowBuilder_win %W] add Classy::OptionBox}
+	action "OptionMenu" {[Classy::WindowBuilder_win %W] add Classy::OptionMenu}
+	action "Paned" {[Classy::WindowBuilder_win %W] add Classy::Paned}
+	action "Progress bar" {[Classy::WindowBuilder_win %W] add Classy::Progress}
+	action "Scrolled frame" {[Classy::WindowBuilder_win %W] add Classy::ScrolledFrame}
+	action "Table" {[Classy::WindowBuilder_win %W] add Classy::Table}
+	action "Fold" {[Classy::WindowBuilder_win %W] add Classy::Fold}
+	action "Font select" {[Classy::WindowBuilder_win %W] add button -text "Select font" -command {set font [Classy::getfont]}}
+	action "Color select" {[Classy::WindowBuilder_win %W] add button -text "Select color" -command {set color [Classy::getcolor]}}
+	action "Tree widget" {[Classy::WindowBuilder_win %W] add Classy::TreeWidget}
+	action "Browser" {[Classy::WindowBuilder_win %W] add Classy::Browser}
+	action "CmdWidget" {[Classy::WindowBuilder_win %W] add Classy::CmdWidget}
+}
+menu "Help" {
+	action "Window Builder" {Classy::help classy_windowbuilder} <<Help>>
+	action "Builder" {Classy::help classy_builder} <<HelpBuilder>>
+	separator
+	action "ClassyTcl" {Classy::help ClassyTcl} <<HelpClassyTcl>>
+	action "Help" {Classy::help help} <<HelpHelp>>
+}

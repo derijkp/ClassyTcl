@@ -7,8 +7,10 @@
 # a script that loads the command.
 
 set auto_index(::Classy::menu_edit) [list source [file join $dir Classy_menueditor.tcl]]
+set auto_index(::Classy::toolbar_edit) [list source [file join $dir Classy_toolbareditor.tcl]]
 
 # Addition of ClassyTcl classes defined in the directory
 set auto_index(Classy_printdialog) [list source [file join $dir Classy_printdialog.tcl]]
 set auto_index(Classy_menueditor) [list source [file join $dir Classy_menueditor.tcl]]
+set auto_index(Classy_toolbareditor) [list source [file join $dir Classy_toolbareditor.tcl]]
 set auto_index(Classy_printscalingdialog) [list source [file join $dir Classy_printscalingdialog.tcl]]

@@ -8,11 +8,11 @@ proc Classy::destroyrebind {w} {
 		unset ::Classy::rebindw($name)
 	}
 	if [info exists ::Classy::rebind($w)] {
-		unset ::Classy::rebindw($::Classy::rebind($w))
+		catch {unset ::Classy::rebindw($::Classy::rebind($w))}
 		unset ::Classy::rebind($w)
 	}
 	if [info exists ::Classy::rebindw($w)] {
-		unset ::Classy::rebind($::Classy::rebindw($w))
+		catch {unset ::Classy::rebind($::Classy::rebindw($w))}
 		unset ::Classy::rebindw($w)
 	}
 }

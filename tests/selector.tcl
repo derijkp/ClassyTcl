@@ -122,6 +122,7 @@ test Classy::Selector {sticky} {
 
 test Classy::Selector {menu} {
 	classyclean
+	catch {Classy::Default unset geometry .try.menueditor}
 	Classy::Selector .try -type menu -label try -variable ::try
 	pack .try -fill both -expand yes
 	.try configure -state disabled
@@ -129,6 +130,17 @@ test Classy::Selector {menu} {
 	.try set {menu File {}}
 	set ::try
 } {menu File {}}
+
+test Classy::Selector {toolbar} {
+	classyclean
+	catch {Classy::Default unset geometry .try.toolbareditor}
+	Classy::Selector .try -type toolbar -label try -variable ::try
+	pack .try -fill both -expand yes
+	.try configure -state disabled
+	.try configure -state normal
+	.try set {action Action {}}
+	set ::try
+} {action Action {}}
 
 test Classy::Selector {key} {
 	classyclean

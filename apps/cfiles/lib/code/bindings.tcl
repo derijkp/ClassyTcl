@@ -1,6 +1,8 @@
 #Functions
 
-proc filer_exec {w name} {
+proc filer_exec {w x y} {
+	set w [Classy::object $w]
+	set name [$w name $x $y]
 	if {"$name" == ""} return
 	$w active set $name
 	set curdir [file dirname [lindex [$w cget -list] 1]]
@@ -19,7 +21,9 @@ proc filer_exec {w name} {
 	}
 }
 
-proc filer_exec_adjust {w name} {
+proc filer_exec_adjust {w x y} {
+	set w [Classy::object $w]
+	set name [$w name $x $y]
 	if {"$name" == ""} return
 	$w active set $name
 	set curdir [file dirname [lindex [$w cget -list] 1]]
@@ -41,7 +45,9 @@ proc filer_exec_adjust {w name} {
 	}
 }
 
-proc filer_action {w name} {
+proc filer_action {w x y} {
+	set w [Classy::object $w]
+	set name [$w name $x $y]
 	if {"$name" == ".."} return
 	if {"$name" == ""} return
 	setfile $w $name
@@ -52,7 +58,9 @@ proc filer_action {w name} {
 	}
 }
 
-proc filer_adjust {w name} {
+proc filer_adjust {w x y} {
+	set w [Classy::object $w]
+	set name [$w name $x $y]
 	if {"$name" == ".."} return
 	if {"$name" == ""} return
 	setfile $w $name

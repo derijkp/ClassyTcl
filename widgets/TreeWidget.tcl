@@ -128,11 +128,11 @@ Classy::TreeWidget chainallmethods {$object.tree} Classy::Tree
 
 Classy::TreeWidget method redraw {} {
 	$object.tree _redraw
-	$object _handlebars
+	Classy::todo $object _handlebars
 }
 
 Classy::TreeWidget method _handlebars {} {
-	update idletasks
+#	update idletasks
 	set bbox [$object.c bbox all]
 	set w [lindex $bbox 2]
 	set h [lindex $bbox 3]
@@ -173,7 +173,7 @@ Classy::TreeWidget method _action {x y} {
 			uplevel #0 $options(-opencommand) [list $node]
 		}
 	}
-	$object _handlebars
+	Classy::todo $object _handlebars
 }
 
 Classy::TreeWidget method _execute {x y} {
@@ -182,7 +182,7 @@ Classy::TreeWidget method _execute {x y} {
 	if {"$node" == ""} return
 	if {"$options(-executecommand)" == ""} return
 	uplevel #0 $options(-executecommand) [list $node]
-	$object _handlebars
+	Classy::todo $object _handlebars
 }
 
 

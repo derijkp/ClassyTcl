@@ -1,0 +1,40 @@
+
+menu "File" {
+	action "Code dir" {%W configure -dir code} <<CodeDir>>
+	action "Configuration dir" {%W configure -dir config} <<ConfDir>>
+	action "Help dir" {%W configure -dir help} <<HelpDir>>
+	action "Application dir" {%W configure -dir {}} <<AppDir>>
+	action "Select dir" {%W configure -dir [Classy::selectfile -default Classy::Builder]} <<Dir>>
+	action "Save" {%W save} <<Save>>
+	action "Editor" "edit newfile" <<Editor>>
+	action "Command window" {Classy::cmd} <<Cmd>>
+	separator
+	action "Customise application" {Classy::Config dialog} <<Customise>>
+	action "Customise menu" {Classy::Config config menu Classy::Editor} <<CustomiseMenu>>
+	action "Customise toolbar" {Classy::Config config tool Classy::Editor} <<CustomiseTool>>
+	action "Close" {destroy %W} <<Close>>
+	action "Exit" {exit} <<Exit>>
+}
+menu "Add" {
+	action "New file" {%W new file} <<newfile>>
+	action "New Toplevel" {%W new toplevel} <<newtoplevel>>
+	action "New Dialog" {%W new dialog} <<newdialog>>
+	action "New Frame" {%W new frame} <<newframe>>
+	action "New function" {%W new function} <<newfunction>>
+	action "New configuration" {%W new config} <<newfile>>
+}
+menu "Edit" {
+	action "Edit" {%W openendnode [lindex [%W.browse selection] 0]} <<Edit>>
+	action "Rename" {%W rename} <<Rename>>
+	separator
+	action "Copy" {%W copy} <<Copy>>
+	action "Cut" {%W cut} <<Cut>>
+	action "Delete" {%W delete} <<Delete>>
+	action "Paste" {%W paste} <<Paste>>
+}
+menu "Help" {
+	action "Builder" {Classy::help classy_builder} <<Help>>
+	separator
+	action "ClassyTcl" {Classy::help ClassyTcl} <<HelpClassyTcl>>
+	action "Help" {Classy::help help} <<HelpHelp>>
+}

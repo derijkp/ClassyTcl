@@ -9,9 +9,10 @@ exec wish8.0 "$0" "$@"
 package require -exact ClassyTcl 0.3
 set file [lindex $argv 0]
 
-proc convtool {src} {
+proc convtool {confdir confvar descrvar src} {
 puts "Converting $src"
-	set result ""
+	upvar $confvar conf
+	upvar $descrvar confdescr
 	array set ttl {
 		Classy::configtool Toolbars
 		Classy::configmenu Menus
@@ -26,18 +27,17 @@ puts "Converting $src"
 		if [regexp ^Classy::config $line] {
 			foreach {type name descr value} $line {}
 			regsub -all \n\n\n* $value \n value
-			append result [list # $ttl($type) $name]\n
-			append result "# $descr\n"
-			append result [list $tp($type) $name $value]\n
-			append result "\n"
+			file_write [file join $confdir $tp($type) $name] $value
+			set confdescr [structlist_set $confdescr [list $ttl($type) Application $name] [list _$tp($type) $name $descr]]
 		}
 	}
 	close $f
-	return $result
 }
 
-proc convother {src} {
+proc convother {confvar descrvar src} {
 puts "Converting $src"
+	upvar $confvar conf
+	upvar $descrvar confdescr
 	array set ttl {
 		Classy::configkey Keys
 		Classy::configmouse Mouse
@@ -61,32 +61,32 @@ puts "Converting $src"
 			foreach {name key value type descr} $cmd {
 				if [regexp ^# $name] {
 					set name [string range $name 1 end]
-					set comment #
+					set comment 1
 				} else {
-					set comment ""
+					set comment 0
 				}
 				regsub -all \n\n $value \n value
 				regsub -all \n\n $value \n value
-				append result [list # Misc $title $name]\n
-				append result "# $descr\n"
-				append result $comment[list $type $key $value]\n
-				append result "\n"
+				if !$comment {
+					lappend conf $type,$key $value
+				}
+				set confdescr [structlist_set $confdescr [list Misc $title $name] [list _$type $key $descr]]
 			}
 		} elseif [regexp ^Classy::config $line] {
 			foreach {type title cmd} $line {}
 			foreach {name key value descr} $cmd {
 				if [regexp ^# $name] {
 					set name [string range $name 1 end]
-					set comment #
+					set comment 1
 				} else {
-					set comment ""
+					set comment 0
 				}
 				regsub -all \n\n $value \n value
 				regsub -all \n\n $value \n value
-				append result [list # $ttl($type) $title $name]\n
-				append result "# $descr\n"
-				append result $comment[list $tp($type) $key $value]\n
-				append result "\n"
+				if !$comment {
+					lappend conf $tp($type),$key $value
+				}
+				set confdescr [structlist_set $confdescr [list $ttl($type) $title $name] [list _$tp($type) $key $descr]]
 			}
 		}
 	}
@@ -94,20 +94,27 @@ puts "Converting $src"
 	return $result
 }
 
-proc convfiles {files} {
-	set result ""
+proc convfiles {confdir confvar descrvar files} {
+	upvar $confvar conf
+	upvar $descrvar confdescr
+	set conf {}
+	set confdescr {}
 	foreach src $files {
 		set file [file tail $src]
 		switch $file {
 			Toolbars.tcl - Menus.tcl {
-				append result [convtool $src]
+				convtool $confdir conf confdescr $src
 			}
 			Keys.tcl - Mouse.tcl - Colors.tcl - Fonts.tcl - Misc.tcl {
-				append result [convother $src]
+				convother conf confdescr $src
 			}
 		}
 	}
-	return $result
+	set f [open [file join $confdir conf] w]
+	foreach {key value} $conf {
+		puts $f [list $key $value]
+	}
+	close $f
 }
 
 proc convrec {src} {
@@ -223,8 +230,27 @@ invoke {file} {
 	}
 	if [file exists [file join $dir conf init]] {
 		puts "file $dir in older format: converting"
-		set c [convfiles [glob [file join $dir conf init *.tcl]]]
-		file_write [file join $dir conf init.conf] $c
+		file mkdir [file join $dir conf menu]
+		file mkdir [file join $dir conf toolbar]
+		file mkdir [file join $dir conf themes]
+		convfiles [file join $dir conf] conf descr [glob [file join $dir conf init *.tcl]]
+		set f [open [file join $dir conf conf] w]
+		foreach {key value} $conf {
+			puts $f [list $key $value]
+		}
+		close $f
+		set f [open [file join $dir conf conf.descr] w]
+		foreach {type value} $descr {
+			puts $f "[list $type] \{"
+			foreach {type value} $value {
+				puts $f "\t[list $type] \{"
+					foreach {type value} $value {
+						puts $f \t\t[list $type $value]
+					}
+				puts $f "\t\}"
+			}
+		}
+		close $f
 		catch {file delete -force [file join $dir conf init]}
 	}
 	convrec [file join $dir conf]
@@ -243,3 +269,7 @@ invoke {file} {
 } $file
 
 exit
+
+if 0 {
+	set file ccalc
+}

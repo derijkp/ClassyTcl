@@ -15,6 +15,12 @@ Menus {
 		WindowBuilder {
 			_menu Classy_WindowBuilder {menu used in the ClassyTcl WindowBuilder}
 		}
+		MenuEditor {
+			_menu Classy_MenuEditor {menu used in the ClassyTcl MenuEditor}
+		}
+		ToolbarEditor {
+			_menu Classy_ToolbarEditor {menu used in the ClassyTcl ToolbarEditor}
+		}
 		Dummy {
 			_menu Classy_Dummy {menu used in the Builder as a dummy}
 		}
@@ -39,6 +45,9 @@ Toolbars {
 		}
 		MenuEditor {
 			_toolbar Classy_MenuEditor {toolbar used in the ClassyTcl MenuEditor}
+		}
+		ToolbarEditor {
+			_toolbar Classy_ToolbarEditor {toolbar used in the ClassyTcl ToolbarEditor}
 		}
 		{WindowBuilder icons} {
 			_toolbar Classy_WindowBuilder_icons {Tk widget toolbar used in the ClassyTcl WindowBuilder}

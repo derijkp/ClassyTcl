@@ -75,10 +75,8 @@ Classy::Tree method init {args} {
 #}
 Classy::Tree method destroy {} {
 	private $object options
-	::Classy::busy
 	$options(-canvas) delete $options(-tag)
-	update idletasks
-	::Classy::busy remove
+#	update idletasks
 }
 
 # ------------------------------------------------------------------
@@ -111,7 +109,7 @@ Classy::Tree method configure {args} {
 					if {"$options(-tag)" == ""} {
 						set options(-tag) Tree::$object
 					}
-					update idletasks
+#					update idletasks
 					::Classy::todo $object _redraw
 				}
 				-padx {

@@ -3,6 +3,7 @@ mainw method init args {
 	super init
 	# Create windows
 	Classy::Browser $object.browser  \
+		-list {[concat .. [glob [pwd]/*]]} \
 		-gettext gettext \
 		-getdata getdata \
 		-getimage getimage \
@@ -16,12 +17,14 @@ mainw method init args {
 	grid $object.dir -row 0 -column 0 -sticky nesw
 	Classy::DynaTool $object.dir.tool  \
 		-cmdw .try.dedit.work \
-		-type DirTool \
-		-height 21
+		-height 21 \
+		-type DirTool
 	grid $object.dir.tool -row 0 -column 0 -sticky nesw
 	Classy::Entry $object.dir.entry \
+		-command {[varsubst object {setdir $object.browser}]} \
 		-label Dir \
 		-default dir \
+		-textvariable {[varsubst object {status($object.browser,dir)}]} \
 		-width 4
 	grid $object.dir.entry -row 0 -column 1 -sticky nesw
 	grid columnconfigure $object.dir 1 -weight 1
@@ -31,38 +34,30 @@ mainw method init args {
 		-width 10
 	grid $object.file -row 1 -column 0 -sticky nesw
 	Classy::Entry $object.file.entry \
+		-command {[varsubst object {file_rename $object.browser}]} \
 		-label File \
+		-textvariable {[varsubst object {status($object.browser,file)}]} \
 		-width 4
 	grid $object.file.entry -row 0 -column 1 -sticky nesw
 	Classy::DynaTool $object.file.tool  \
 		-cmdw .try.dedit.work \
-		-type FileTool \
-		-height 17
+		-height 17 \
+		-type FileTool
 	grid $object.file.tool -row 0 -column 0 -sticky nesw
 	grid columnconfigure $object.file 1 -weight 1
 	grid columnconfigure $object 0 -weight 1
 	grid rowconfigure $object 2 -weight 1
 
-	# End windows
 	if {"$args" == "___Classy::Builder__create"} {return $object}
 	# Parse this
-	$object configure \
-		-destroycommand {} \
+	$object configure  \
 		-title {[tk appname]}
-	$object.browser configure \
-		-list {[concat .. [glob [pwd]/*]]}
-	bind $object.browser <<Drop>> {filer_drop w x y}
-	bind $object.browser <<MExecuteAjust>> {filer_exec_adjust %W [%W name %x %y]}
-	bind $object.browser <<Adjust>> {filer_adjust %W [%W name %x %y]}
-	bind $object.browser <<MExecute>> {filer_exec %W [%W name %x %y]}
-	bind $object.browser <<Action>> {filer_action %W [%W name %x %y]}
+	bind $object.browser <<Action>> {filer_action %W %x %y}
+	bind $object.browser <<Adjust>> {filer_adjust %W %x %y}
 	bind $object.browser <<Drag>> {filer_drag %W %x %y %X %Y}
-	$object.dir.entry configure \
-		-command {[varsubst object {setdir $object.browser}]} \
-		-textvariable {[varsubst object {status($object.browser,dir)}]}
-	$object.file.entry configure \
-		-command {[varsubst object {file_rename $object.browser}]} \
-		-textvariable {[varsubst object {status($object.browser,file)}]}
+	bind $object.browser <<Drop>> {filer_drop w x y}
+	bind $object.browser <<MExecute>> {filer_exec %W %x %y}
+	bind $object.browser <<MExecuteAjust>> {filer_exec_adjust %W %x %y}
 	Classy::DynaMenu attachmainmenu MainMenu $object.browser
 	# Configure initial arguments
 	if {"$args" != ""} {eval $object configure $args}
@@ -70,3 +65,4 @@ mainw method init args {
 setdir $object.browser [pwd]
 	return $object
 }
+

@@ -51,6 +51,7 @@ set ::w $window.test.widget
 }
 
 proc selectoption {window option} {
+putsvars window option
 $window.optionvalue configure -label $option
 if [info exists ::Classy::WindowBuilder::options($option)] {
 	$window.optionvalue configure -type [lindex $::Classy::WindowBuilder::options($option) end]
@@ -58,5 +59,11 @@ if [info exists ::Classy::WindowBuilder::options($option)] {
 	$window.optionvalue configure -type line
 }
 $window.optionvalue set [$window.test.widget cget $option]
+}
+
+proc changeattribute {object value} {
+$object.test.widget configure [$object.frame.options get] $value
+
+
 }
 

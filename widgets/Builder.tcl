@@ -94,8 +94,6 @@ Classy::Builder method destroy {} {
 	if {"winfo children .]" == ".classy__"} {
 		if ![Classy::yorn "Close application?"] return
 		exit
-	} else {
-		$object.browse destroy
 	}
 }
 

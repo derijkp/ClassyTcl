@@ -1,3 +1,4 @@
+
 	action open "Open" {error "cannot load \"[Classy::selectfile -title Open -selectmode persistent]\" yet"}
 	action save "Save" {error "saving not implemented yet"}
 	action print "Print" {error "print not implemented yet"}
