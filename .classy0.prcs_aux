@@ -60,7 +60,7 @@
 (tests/temp.txt 24800 927902187 r/11_temp.txt 1.1)
 (tests/autoload.tcl 465 921749090 q/5_autoload.t 1.1)
 (conf/icons/Builder/classy__progress.gif 94 899485204 i/15_classy__pr 1.2)
-(widgets/Canvas.tcl 54157 928482994 b/36_Canvas.tcl 1.5.1.10.1.6)
+(widgets/Canvas.tcl 54582 928772840 b/36_Canvas.tcl 1.5.1.10.1.7)
 (apps/cdraw/lib/code/tclIndex 5653 927895867 l/3_tclIndex 1.5.1.4)
 (widgets/Builder/classy_scrolledtext.tcl 1176 900493641 j/22_classy_scr 1.2)
 (tests/autoload_test/method.tcl 127 921749090 q/3_method.tcl 1.1)

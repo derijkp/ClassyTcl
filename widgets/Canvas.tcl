@@ -42,8 +42,8 @@ Classy::Canvas method init {args} {
 	private $object data undo currentname w del
 	setprivate $object data(w) [super init canvas]
 	set w $data(w)
-	set data(page) [$w create rectangle -10000 -10000 0 0 -fill white -outline white -tags _page]
-	set del($data(page)) _page
+	set data(paper) [$w create rectangle -10000 -10000 0 0 -fill white -outline white -tags _paper]
+	set del($data(paper)) _paper
 	set data(sel) [$w create rectangle -10000 -10000 -10000 -10000 -outline red -tags {_selection _h _selbd}]
 	set del($data(sel)) _sel
 	set data(cur) [$w create rectangle -10000 -10000 -10000 -10000 -outline blue -tags {_cur _h _selbd}]
@@ -99,7 +99,7 @@ Classy::Canvas	addoption -papersize {papeSize PaperSize {}} {
 	private $object w data
 	set len [llength $value]
 	if {$len == 0} {
-		$w coords _page -10000 -10000 0 0
+		$w coords $data(paper) -10000 -10000 0 0
 		$object configure -scrollregion {}
 		return
 	} elseif {$len==1} {
@@ -131,9 +131,17 @@ Quarto    "610p 780p"}] $p]
 	} else {
 		set c $value
 	}
-	eval $w coords _page 0 0 $c
-	$w scale _page 0 0 $data(zoom) $data(zoom)
-	$w configure -scrollregion [$w coords _page]
+	eval $w coords $data(paper) 0 0 $c
+	$w scale $data(paper) 0 0 $data(zoom) $data(zoom)
+	$w configure -scrollregion [$w coords $data(paper)]
+}
+
+#doc {Entry options -papersize} option {-papersize paperSize PaperSize} descr {
+# determines the papersize
+#}
+Classy::Canvas	addoption -papercolor {paperColor PaperColor white} {
+	private $object w data
+	$w itemconfigure $data(paper) -fill $value
 }
 
 # ------------------------------------------------------------------
@@ -210,7 +218,7 @@ Classy::Canvas method undo {{action {}} args} {
 		clear {
 			private $object options
 			foreach name [array names del] {
-				if [inlist {_page _sel} $del($name)] continue
+				if [inlist {_paper _sel} $del($name)] continue
 				$w delete $del($name)
 				unset del($name)
 			}
@@ -629,7 +637,7 @@ Classy::Canvas method zoom {{factor {}}} {
 	}
 	set data(zoom) $factor
 	if {"[$w configure -scrollregion]" != ""} {
-		$w configure -scrollregion "0 0 [lrange [$w coords _page] 2 3]"
+		$w configure -scrollregion "0 0 [lrange [$w coords $data(paper)] 2 3]"
 	}
 }
 
@@ -788,8 +796,8 @@ Classy::Canvas method clear {} {
 	catch {unset fonts}
 	catch {unset rfont}
 	$w delete all
-	set data(page) [$w create rectangle -10000 -10000 0 0 -fill white -outline white -tags _page]
-	set del($data(page)) _page
+	set data(paper) [$w create rectangle -10000 -10000 0 0 -fill white -outline white -tags _paper]
+	set del($data(paper)) _paper
 	set data(sel) [$w create rectangle -10000 -10000 -10000 -10000 -outline red -tags {_selection _h _selbd}]
 	set del($data(sel)) _sel
 	set data(cur) [$w create rectangle -10000 -10000 -10000 -10000 -outline blue -tags {_cur _h _selbd}]
@@ -915,7 +923,7 @@ Classy::Canvas method mitemcget {tagOrId option} {
 
 Classy::Canvas method coords {tagOrId args} {
 	private $object w data del
-	if {"$args"==""} {
+	if ![llength $args] {
 		return [$w coords $tagOrId]
 	} else {
 		if $data(undo) {
@@ -932,7 +940,7 @@ Classy::Canvas method coords {tagOrId args} {
 
 Classy::Canvas method coord {tagOrId pos args} {
 	private $object w data del
-	if {"$args"==""} {
+	if ![llength $args] {
 		set pos [expr {2*$pos}]
 		return [lrange [$w coords $tagOrId] $pos [expr {$pos+1}]]
 	} else {
@@ -1420,7 +1428,7 @@ Classy::Canvas method selection {action {list {}}} {
 				catch {$w itemconfigure _sel -stipple {}}
 				catch {$w itemconfigure _sel -outlinestipple {}}
 			}
-			$w itemconfigure _page -stipple {}
+			$w itemconfigure $data(paper) -stipple {}
 			if $data(undo) {
 				set post [$w find withtag _sel]
 				if {"$pre" != "$post"} {
@@ -1442,7 +1450,7 @@ Classy::Canvas method selection {action {list {}}} {
 			catch {$w itemconfigure all -outlinestipple gray50}
 			catch {$w itemconfigure _sel -stipple {}}
 			catch {$w itemconfigure _sel -outlinestipple {}}
-			$w itemconfigure _page -stipple {}
+			$w itemconfigure $data(paper) -stipple {}
 			if $data(undo) {
 				set post [$w find withtag _sel]
 				if {"$pre" != "$post"} {
@@ -1918,7 +1926,7 @@ Classy::Canvas method _getprint {var} {
 		catch {$w itemconfigure all -outlinestipple gray50}
 		catch {$w itemconfigure _sel -stipple {}}
 		catch {$w itemconfigure _sel -outlinestipple {}}
-		$w itemconfigure _page -stipple {}
+		$w itemconfigure $data(paper) -stipple {}
 		Classy::todo $object selection redraw
 	}
 	return $result
@@ -1932,6 +1940,11 @@ Classy::Canvas method addbitmap {x y file} {
 	}
 	$object create image $x $y -image $load(image,$name)
 	return $name
+}
+
+Classy::Canvas method papersize {} {
+	private $object w data
+	return [$w coords $data(paper)]
 }
 
 #doc {Canvas command cut} cmd {
@@ -2024,7 +2037,7 @@ Classy::Canvas method wincopy {{tag all}} {
 } else {
 Classy::Canvas method print {{tag all}} {
 	private $object w data
-	set page [$w coords _page]
+	set page [$w coords $data(paper)]
 	if [winfo exists .classy__.printdialog] {
 		destroy .classy__.printdialog
 	}
