@@ -10,7 +10,7 @@ package require Tcl 8.0
 # $Format: "set ::class::version 0.$ProjectMajorVersion$"$
 set ::class::version 0.3
 # $Format: "set ::class::patchlevel $ProjectMinorVersion$"$
-set ::class::patchlevel 5
+set ::class::patchlevel 10
 package provide Class $::class::version
 
 

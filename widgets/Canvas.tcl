@@ -44,9 +44,9 @@ Classy::Canvas method init {args} {
 	set w $data(w)
 	set data(paper) [$w create rectangle -10000 -10000 0 0 -fill white -outline white -tags _paper]
 	set del($data(paper)) _paper
-	set data(sel) [$w create rectangle -10000 -10000 -10000 -10000 -outline red -tags {_selection _h _selbd}]
+	set data(sel) [$w create rectangle -10000 -10000 -10000 -10000 -outline red -tags {_selection _selbd}]
 	set del($data(sel)) _sel
-	set data(cur) [$w create rectangle -10000 -10000 -10000 -10000 -outline blue -tags {_cur _h _selbd}]
+	set data(cur) [$w create rectangle -10000 -10000 -10000 -10000 -outline blue -tags {_cur _selbd}]
 	set del($data(cur)) _sel
 	set data(selector) [$w create rectangle -10000 -10000 -10000 -10000 -outline red -tags _selector]
 	set del($data(selector)) _sel
@@ -144,6 +144,13 @@ Classy::Canvas	addoption -papercolor {paperColor PaperColor white} {
 	$w itemconfigure $data(paper) -fill $value
 }
 
+#doc {Entry options -progresswindow} option {-progresswindow progressWindow ProgressWindow} descr {
+# window in which progress of loading and saving can be shown; must be api compatible with
+# Classy::Progress
+#}
+Classy::Canvas	addoption -progresswindow {progressWindow ProgressWindow {}} {
+}
+
 # ------------------------------------------------------------------
 #  destroy
 # ------------------------------------------------------------------
@@ -217,8 +224,7 @@ Classy::Canvas method undo {{action {}} args} {
 		}
 		clear {
 			private $object options
-			foreach name [array names del] {
-				if [inlist {_paper _sel} $del($name)] continue
+			foreach name [list_remove [array names del] $data(paper) $data(sel) $data(cur) $data(selector)] {
 				$w delete $del($name)
 				unset del($name)
 			}
@@ -229,8 +235,8 @@ Classy::Canvas method undo {{action {}} args} {
 		}
 		add {
 			if ![info exists undo(pos)] {
-				lappend undo(redo) [concat a [lindex $args 0]]
-				lappend undo(undo) [concat a [lindex $args 1]]
+				lappend undo(redo) [list a [lindex $args 0]]
+				lappend undo(undo) [list a [lindex $args 1]]
 			}
 		}
 		0 -
@@ -264,7 +270,7 @@ Classy::Canvas method _undoone {current} {
 		create {
 			set item [lindex $current 0]
 			set del($item) [$w gettags $item]
-			$w itemconfigure $item -tags {_del _h}
+			$w itemconfigure $item -tags {_del}
 			$w move $item -10000 -10000
 			$w lower $item
 		}
@@ -277,7 +283,12 @@ Classy::Canvas method _undoone {current} {
 				set item [lindex $items $i]
 				$w itemconfigure $item -tags $del($item)
 				$w move $item 10000 10000
-				$w lower $item [lindex $poss $i]
+				set above [lindex $poss $i]
+				if [string length $above] {
+					$w lower $item $above
+				} else {
+					$w raise $item
+				}
 				unset del($item)
 			}
 		}
@@ -454,7 +465,7 @@ Classy::Canvas method _redoone {current} {
 			set items [lindex $current 0]
 			foreach item $items {
 				set del($item) [$w gettags $item]
-				$w itemconfigure $item -tags {_del _h}
+				$w itemconfigure $item -tags {_del}
 				$w move $item -10000 -10000
 			}
 		}
@@ -559,6 +570,7 @@ Classy::Canvas method _redoone {current} {
 Classy::Canvas method addundo {redodata undodata} {
 	private $object undo
 	if [info exists undo(pos)] {
+		incr undo(pos) -1
 		set undo(redo) [lrange $undo(redo) 0 $undo(pos)]
 		set undo(undo) [lrange $undo(undo) 0 $undo(pos)]
 		unset undo(pos)
@@ -583,8 +595,9 @@ Classy::Canvas method noundo {args} {
 	private $object data
 	set keep $data(undo)
 	set data(undo) 0
-	eval $object $args
+	set result [eval $object $args]
 	set data(undo) $keep
+	return $result
 }
 
 proc Classy::tag2items {object w tagOrId} {
@@ -760,17 +773,22 @@ Classy::Canvas method delete {args} {
 	Classy::todo $object selection redraw
 	if $data(undo) {
 		private $object itemw
+		set items [list]
 		foreach tagOrId $args {
-			set items [Classy::tag2items $object $w $tagOrId]
-			set poss ""
-			foreach item $items {
-				lappend poss [$w find above $item]
-				set del($item) [$w gettags $item]
-				$w itemconfigure $item -tags {_del _h}
-				$w move $item -10000 -10000
+			if [isint $tagOrId] {
+				lappend items $tagOrId
+			} else {
+				eval lappend items [Classy::tag2items $object $w $tagOrId]
 			}
-			$object addundo [list delete $items] [list delete $items $poss]
 		}
+		set poss ""
+		foreach item $items {
+			lappend poss [$w find above $item]
+			set del($item) [$w gettags $item]
+			$w itemconfigure $item -tags {_del}
+			$w move $item -10000 -10000
+		}
+		$object addundo [list delete $items] [list delete $items $poss]
 		return ""
 	} else {
 		return [leval $w delete $args]
@@ -798,9 +816,9 @@ Classy::Canvas method clear {} {
 	$w delete all
 	set data(paper) [$w create rectangle -10000 -10000 0 0 -fill white -outline white -tags _paper]
 	set del($data(paper)) _paper
-	set data(sel) [$w create rectangle -10000 -10000 -10000 -10000 -outline red -tags {_selection _h _selbd}]
+	set data(sel) [$w create rectangle -10000 -10000 -10000 -10000 -outline red -tags {_selection _selbd}]
 	set del($data(sel)) _sel
-	set data(cur) [$w create rectangle -10000 -10000 -10000 -10000 -outline blue -tags {_cur _h _selbd}]
+	set data(cur) [$w create rectangle -10000 -10000 -10000 -10000 -outline blue -tags {_cur _selbd}]
 	set del($data(cur)) _sel
 	set data(selector) [$w create rectangle -10000 -10000 -10000 -10000 -outline red -tags _selector]
 	set del($data(selector)) _sel
@@ -1833,9 +1851,15 @@ Classy::Canvas method save {{tag all}} {
 #}
 Classy::Canvas method load {c} {
 	if ![regexp {^header Classy::Canvas} $c] {error "wrong format"}
-	private $object w load data tag
+	private $object w load data tag options
 	catch {unset load}
 	$w dtag _new
+	set pw $options(-progresswindow)
+	if [string length $pw] {
+		set usepw 1
+	} else {
+		set usepw 0
+	}
 	foreach {type idata} [lrange $c 0 end] {
 		set tags [lindex $idata 0]
 		foreach pos [list_find -glob $tags _g*] {
@@ -1848,6 +1872,7 @@ Classy::Canvas method load {c} {
 		}
 		lappend tags _new
 		catch {::Classy::Canvas_load_$type $object $w $idata $tags}
+		if $usepw {$pw incr}
 	}
 	return {}
 }
@@ -1884,52 +1909,6 @@ Classy::Canvas method findgroup {tagOrId} {
 	} else {
 		return {}
 	}
-}
-
-Classy::Canvas method _getprint {var} {
-	private $object w data
-	upvar #0 ::$var print
-	if $print(portrait) {set rotate 0} else {set rotate 1}
-	set x [winfo fpixels $object $print(x)]
-	set y [winfo fpixels $object $print(y)]
-	if $print(scaledxy) {
-		set x [expr {100.0*$x/$print(scale)}]
-		set y [expr {100.0*$y/$print(scale)}]
-	}
-	set pagewidth [expr {$print(scale)*$print(pwidth)/[winfo fpixels $object 100p]}]
-	set pagey $print(pagey)
-	if $print(portrait) {
-		set height $print(height)
-		if [regexp {[0-9]$} $height] {append height p}
-		if [regexp {[0-9]$} $pagey] {append pagey p}
-		set pagey [expr {([winfo fpixels $object $height] - [winfo fpixels $object $pagey])/[winfo fpixels $object 1p]}]
-	}
-	set list [$w find withtag _sel]
-	if {"$list" != ""} {
-		catch {$w itemconfigure all -stipple {}}
-		catch {$w itemconfigure all -outlinestipple {}}
-		$w coords $data(cur) -1000 -1000 -1000 -1000
-		foreach name {nw n ne e se s sw w} {
-			$w coords $data($name) -1000 -1000
-		}
-		$w coords $data(sel) -1000 -1000 -1000 -1000
-		$w delete _ind
-	}
-	set result [$w postscript \
-		-rotate $rotate -colormode $print(colormode) \
-		-width $print(pwidth) -height $print(pheight) \
-		-pagewidth $pagewidth \
-		-x $x -y $y \
-		-pageanchor $print(pageanchor) -pagex $print(pagex) -pagey $pagey]
-	if {"$list" != ""} {
-		catch {$w itemconfigure all -stipple gray50}
-		catch {$w itemconfigure all -outlinestipple gray50}
-		catch {$w itemconfigure _sel -stipple {}}
-		catch {$w itemconfigure _sel -outlinestipple {}}
-		$w itemconfigure $data(paper) -stipple {}
-		Classy::todo $object selection redraw
-	}
-	return $result
 }
 
 Classy::Canvas method addbitmap {x y file} {
@@ -1988,6 +1967,7 @@ Classy::Canvas method paste {} {
 # pops up a print dialog and prints the current canvas.
 #}
 if ![catch {load [file join $class::dir visitors visexport[info sharedlibextension]]}] {
+
 Classy::Canvas method print {{tag all}} {
 	set x [lindex [$object xview] 0]
 	set y [lindex [$object yview] 0]
@@ -2035,14 +2015,148 @@ Classy::Canvas method wincopy {{tag all}} {
 }
 
 } else {
+
 Classy::Canvas method print {{tag all}} {
 	private $object w data
+	set data(printtag) $tag
 	set page [$w coords $data(paper)]
+	set width [lindex $page 2]
+	set height [lindex $page 3]
+	if {$width < $height} {
+		set portrait 1
+	} else {
+		set portrait 0
+	}
 	if [winfo exists .classy__.printdialog] {
 		destroy .classy__.printdialog
 	}
-	Classy::printdialog .classy__.printdialog -papersize [lrange $page 2 3] -getdata [list $object _getprint]
-	.classy__.printdialog configure -cache 1
+	Classy_printdialog .classy__.printdialog -width $width -height $height \
+		-command [list $object doprint] -portrait $portrait
+}
+
+Classy::Canvas method doprint {args} {
+putsvars args
+	private $object w data
+	array set print {
+		-tofile 0
+		-tag all
+		-printsize A4
+		-printwidth 595p
+		-printheight 842p
+		-portrait 1
+		-colormode mono
+		-autoscale 1
+		-printcommand lpr
+		-file print.ps
+		-scaledxy 1
+		-x 0
+		-y 0
+		-pagex 0
+		-pagey 0
+		-pageanchor nw
+	}
+	foreach {option value} $args {
+		switch -- $option {
+			-size {
+				set c [structlget [Classy::optionget $object paperSizes PaperSizes {
+User      "595p 842p"
+Letter    "612p 792p"
+Tabloid   "792p 1224p"
+Ledger    "1224p 792p"
+Legal     "612p 1008p"
+Statement "396p 612p"
+Executive "540p 720p"
+A0        "2380p 3368p"
+A1        "1684p 2380p"
+A2        "1190p 1684p"
+A3        "842p 1190p"
+A4        "595p 842p"
+A5        "420p 595p"
+B4        "729p 1032p"
+B5        "516p 729p"
+Folio     "612p 936p"
+Quarto    "610p 780p"}] $value]
+				set print(-width) [lindex $c 0]
+				set print(-height) [lindex $c 1]
+			}
+			default {
+				set print($option) $value
+			}
+		}
+	}
+	foreach {temp temp canvasw canvash} [$w coords $data(paper)] {}
+	set printw [winfo fpixels $object $print(-width)]
+	set printh [winfo fpixels $object $print(-height)]
+	if !$print(-portrait) {
+		set temp $printw
+		set printw $printh
+		set printh $temp
+		set rotate 1
+	} else {
+		set rotate 0
+	}
+	if $print(-autoscale) {
+		set paperw [winfo fpixels $object $canvasw]
+		set print(-scale) [expr {100.0*$printw/$paperw}]
+		set paperh [winfo fpixels $object $canvash]
+		set hs [expr {100.0*$printh/$paperh}]
+		if {$hs<$print(-scale)} {set print(-scale) $hs}
+		set paperw [winfo fpixels $object $canvasw]
+		set ws [expr {100.0*$printw/$paperw}]
+		if {$ws<$print(-scale)} {set print(-scale) $ws}
+	} else {
+		if ![info exists print(-scale)] {
+			set print(-scale) 100
+		}
+	}
+	set canvasw [expr {100.0*$printw/$print(-scale)}]
+	set canvash [expr {100.0*$printh/$print(-scale)}]
+	set pagey $print(-pagey)
+	if !$rotate {
+		set height $print(-height)
+		if [regexp {[0-9]$} $height] {append height p}
+		if [regexp {[0-9]$} $pagey] {append pagey p}
+		set pagey [expr {([winfo fpixels $object $height] - [winfo fpixels $object $pagey])/[winfo fpixels $object 1p]}]
+	}
+	set pagewidth [expr {$printw/[winfo fpixels $object 1p] - 0.5}]p
+	set x [winfo fpixels $object $print(-x)]
+	set y [winfo fpixels $object $print(-y)]
+	if $print(-scaledxy) {
+		set x [expr {100.0*$x/$print(-scale)}]
+		set y [expr {100.0*$y/$print(-scale)}]
+	}
+	set list [$w find withtag _sel]
+	if {"$list" != ""} {
+		catch {$w itemconfigure all -stipple {}}
+		catch {$w itemconfigure all -outlinestipple {}}
+		$w coords $data(cur) -1000 -1000 -1000 -1000
+		foreach name {nw n ne e se s sw w} {
+			$w coords $data($name) -1000 -1000
+		}
+		$w coords $data(sel) -1000 -1000 -1000 -1000
+		$w delete _ind
+	}
+	if $print(-tofile) {
+		set f [open $print(-file) w]
+	} else {
+		set f [open "| $print(-printcommand)" w]
+	}
+	$w postscript -channel $f \
+		-rotate $rotate -colormode $print(-colormode) \
+		-width $canvasw -height $canvash \
+		-pagewidth $pagewidth \
+		-x $x -y $y \
+		-pageanchor $print(-pageanchor) -pagex $print(-pagex) -pagey ${pagey}p
+	close $f
+	if {"$list" != ""} {
+		catch {$w itemconfigure all -stipple gray50}
+		catch {$w itemconfigure all -outlinestipple gray50}
+		catch {$w itemconfigure _sel -stipple {}}
+		catch {$w itemconfigure _sel -outlinestipple {}}
+		$w itemconfigure $data(paper) -stipple {}
+		Classy::todo $object selection redraw
+	}
+	return ""
 }
 
 Classy::Canvas method wincopy {{tag all}} {

@@ -40,9 +40,9 @@ Classy::NumEntry method init {args} {
 	super init
 	bindtags $object [lreplace [bindtags $object] 2 0 Classy::Entry]
 	bindtags $object.entry [lreplace [bindtags $object.entry] 3 0 Classy::Entry]
-	frame $object.controls
-	button $object.controls.incr -image [Classy::geticon incr.xbm]
-	button $object.controls.decr -image [Classy::geticon decr.xbm]
+	frame $object.controls -bd 0 -highlightthickness 0
+	button $object.controls.incr -image [Classy::geticon incr.xbm] -highlightthickness 0
+	button $object.controls.decr -image [Classy::geticon decr.xbm] -highlightthickness 0
 	pack $object.controls.incr -side top
 	pack $object.controls.decr -side bottom
 	pack $object.controls -in $object.frame.entry -after $object.entry -side left
@@ -93,6 +93,14 @@ Classy::NumEntry addoption -constraint {constraint Constraint {^(-?)[0-9]*(\.?)[
 		set value {^(-?)[0-9]*(\.?)[0-9]([Ee][-+][0-9]*(\.?)[0-9]*)?$}
 	}
 	return $value
+}
+
+#doc {NumEntry options -state} option {-state state State} descr {
+#}
+Classy::NumEntry addoption -state {state State {}} {
+	$object.entry configure -state $value
+	$object.controls.incr configure -state $value
+	$object.controls.decr configure -state $value
 }
 
 # ------------------------------------------------------------------

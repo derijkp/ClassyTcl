@@ -141,7 +141,7 @@ Classy::DynaTool addoption -type {type Type {}} {
 			set tempcmd [string_change $command [list %% % %W $cmdw]]
 			eval $object.$key configure $tempcmd
 			append data(checks) "$object.$key configure $command\n"
-			update idletasks
+#			update idletasks
 			lappend data(slaves) $object.$key
 		} elseif {"$type"=="tool"} {
 			set cmd [$id $object.$key]
@@ -149,7 +149,7 @@ Classy::DynaTool addoption -type {type Type {}} {
 				eval [string_change $cmd [list %% % %W $cmdw]]
 			}
 			append data(checks) "$cmd\n"
-			update idletasks
+#			update idletasks
 			lappend data(slaves) $object.$key
 		} elseif {"$type"=="label"} {
 			if ![catch {set image [Classy::geticon $id reload]}] {

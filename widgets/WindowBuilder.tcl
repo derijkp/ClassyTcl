@@ -59,7 +59,7 @@ Classy::WindowBuilder method init {args} {
 	frame $object.toolhold
 		Classy::DynaTool $object.tool -type Classy::WindowBuilder -cmdw $object
 		Classy::OptionMenu $object.children -list {Select {Select parent}} \
-			-command "$object select \[$object.children get\]"
+			-command "$object select"
 		$object.children set Select
 		Classy::Entry $object.current -label "Current window" -width 15 \
 			-command "$object rename"
@@ -1722,7 +1722,7 @@ Classy::WindowBuilder method _createattributes {w} {
 	frame $w
 	eval destroy [winfo children $w]
 	Classy::cleargrid $w
-	Classy::OptionMenu $w.type -list {Misc Colors Sizes} -command "$object attribute group \[$w.type get\]"
+	Classy::OptionMenu $w.type -list {Misc Colors Sizes} -command "$object attribute group"
 	listbox $w.list -yscrollcommand [list $w.scroll set] -takefocus 1 -width 10
 	scrollbar $w.scroll -orient vertical -command [list $w.list yview]
 	frame $w.edit

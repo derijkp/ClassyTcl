@@ -1210,7 +1210,7 @@ Classy::Editor method _grepdo {pattern {files {}}} {
 				if [llength $temp] {$object _grepdo $pattern $temp}
 			}
 		} else {
-			set f [open $file]
+			if [catch {set f [open $file]}] continue
 			set num 1
 			while {![eof $f]} {
 				set line [gets $f]

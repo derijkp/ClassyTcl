@@ -175,6 +175,20 @@ test Classy::Progress {basic} {
 	.try get
 } {1000}
 
+test Classy::Progress {run 2 times} {
+	classyclean
+	Classy::Progress .try -ticks 1000 -step 100
+	pack .try -fill x -expand yes
+	for {set i 0} {$i<1000} {incr i} {
+		.try incr
+	}
+	.try set 0
+	for {set i 0} {$i<1000} {incr i} {
+		.try incr
+	}
+	.try get
+} {1000}
+
 test Classy::ProgressDialog {basic} {
 	classyclean
 	Classy::ProgressDialog .try -message "Testing\n Please wait" -ticks 1000 -step 100
@@ -192,6 +206,53 @@ test Classy::OptionMenu {basic} {
 	.try set {try 2}
 	.try get
 } {try 2}
+
+test Classy::OptionMenu {command} {
+	classyclean
+	catch {unset ::try}
+	Classy::OptionMenu .try \
+		-command {set ::try} \
+		-list {try {try 1} {try 2} {try 3} dfgsd\\1dfg xdg&dfj cfdgdsgh\\gdsf}
+	pack .try -fill x
+	.try set {try 2}
+	set ::try
+} {try 2}
+
+test Classy::OptionMenu {images} {
+	classyclean
+	catch {unset ::try}
+	set ::try w
+	Classy::OptionMenu .try -textvariable try \
+		-images [list [Classy::geticon anchor_center] [Classy::geticon anchor_e] [Classy::geticon anchor_w]] \
+		-list [list center e w]
+	pack .try -fill x
+	.try set e
+	get ::try
+} {e}
+
+test Classy::OptionMenu {textvariable} {
+	classyclean
+	catch {unset ::try}
+	set ::try w
+	Classy::OptionMenu .try -textvariable try \
+		-list [list center e w] \
+		-images [list [Classy::geticon anchor_center] [Classy::geticon anchor_e] [Classy::geticon anchor_w]]
+	pack .try -fill x
+	set ::try e
+	.try get
+} {e}
+
+test Classy::OptionMenu {array textvariable} {
+	classyclean
+	catch {unset ::try}
+	set ::try(it) w
+	Classy::OptionMenu .try -textvariable try(it) \
+		-images [list [Classy::geticon anchor_center] [Classy::geticon anchor_e] [Classy::geticon anchor_w]] \
+		-list [list center e w]
+	pack .try -fill x
+	set ::try(it) e
+	.try get
+} {e}
 
 test Classy::MultiListBox {basic} {
 	classyclean

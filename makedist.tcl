@@ -15,7 +15,7 @@ if ![file exists [file join lib Class.tcl]] {
 # $Format: "\tset currentversion 0.$ProjectMajorVersion$"$
 	set currentversion 0.3
 # $Format: "\tset patchLevel $ProjectMinorVersion$"$
-	set patchLevel 6
+	set patchLevel 10
 
 lappend auto_path [pwd]
 package require Extral

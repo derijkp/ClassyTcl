@@ -25,6 +25,8 @@
 #	Progress specific methods
 #}
 
+bind Classy::Progress <Configure> {Classy::todo %W _redraw}
+
 # ------------------------------------------------------------------
 #  Widget creation
 # ------------------------------------------------------------------
@@ -32,14 +34,11 @@
 Widget subclass Classy::Progress
 
 Classy::Progress method init {args} {
-	super init
-	frame $object.frame -relief sunken -height 20
-	frame $object.frame.prog -relief raised -bg green -width 0 -height 20
-	label $object.frame.percent -text "0%" -anchor c -justify c
-
-	pack $object.frame -fill x
-	pack $object.frame.prog -side left
-	place $object.frame.percent -relx 0.5 -rely 0.5 -anchor c
+	private $object w
+	set w [super init canvas]
+	$w configure -width 100 -height 16 -relief sunken
+	$w create rectangle 0 0 0 16 -fill green -tags bar
+	$w create text 50 8 -text 0% -anchor c -tags percentage
 
 	# REM Initialise variables and options
 	# ------------------------------------
@@ -57,6 +56,8 @@ Classy::Progress method init {args} {
 #  Widget options
 # ------------------------------------------------------------------
 
+Classy::Progress chainoptions {$object}
+
 #doc {Progress options -ticks} option {-ticks ticks Ticks} descr {
 #}
 Classy::Progress addoption -ticks {ticks Ticks 100}
@@ -64,25 +65,6 @@ Classy::Progress addoption -ticks {ticks Ticks 100}
 #doc {Progress options -step} option {-step step Step} descr {
 #}
 Classy::Progress addoption -step {step Step 1}
-
-#doc {Progress options -width} option {-width width Width} descr {
-#}
-Classy::Progress addoption -width {width Width 200}
-
-#doc {Progress options -height} option {-height height Height} descr {
-#}
-Classy::Progress addoption -height {height Height 20} {
-	$object.frame configure -height $value
-	$object.frame.prog configure -height $value
-}
-
-#doc {Progress options -fg} option {-fg ? ?} descr {
-#}
-Classy::Progress chainoption -fg {$object.frame.prog} -bg
-
-#doc {Progress options -font} option {-font font Font} descr {
-#}
-Classy::Progress chainoption -font {$object.frame.percent} -font
 
 # ------------------------------------------------------------------
 #  Methods
@@ -93,17 +75,12 @@ Classy::Progress chainoption -font {$object.frame.percent} -font
 #} descr {
 #}
 Classy::Progress method incr {{value 1}} {
-	set step [getprivate $object options(-step)]
-	set ticks [getprivate $object options(-ticks)]
-	private $object current next
+	private $object current next options
+	set step $options(-step)
 	incr current $value
 	if {$current<$next} {return}
 	incr next $step
-	if {$value<0} {set value 0}
-	if {$value>$ticks} {set value $ticks}
-	set ratio [expr double($current)/$ticks]
-	$object.frame.percent configure -text "[expr int($ratio*100)]%"
-	$object.frame.prog configure -width [expr int($ratio*[winfo width $object.frame])]
+	$object _redraw
 	update idletasks
 }
 
@@ -112,14 +89,12 @@ Classy::Progress method incr {{value 1}} {
 #} descr {
 #}
 Classy::Progress method set {value} {
-	set ticks [getprivate $object options(-ticks)]
-	private $object current
+	private $object current next options
+	set step $options(-step)
 	set current $value
-	if {$value<0} {set value 0}
-	if {$value>$ticks} {set value $ticks}
-	set ratio [expr double($current)/$ticks]
-	$object.frame.percent configure -text "[expr int($ratio*100)]%"
-	$object.frame.prog configure -width [expr int($ratio*[winfo width $object.frame])]
+	set next [expr {$value+$step}]
+	$object _redraw
+	update idletasks
 }
 
 #doc {Progress command get} cmd {
@@ -131,4 +106,35 @@ Classy::Progress method get {} {
 	return $current
 }
 
+#doc {Progress command percentconfigure} cmd {
+#pathname percentconfigure ?option? ?value? ...
+#} descr {
+# change the properties of the text displaying the percentage
+#}
+Classy::Progress method percentconfigure {args} {
+	private $object w
+	eval $w itemconfigure percentage $args
+}
 
+#doc {Progress command barconfigure} cmd {
+#pathname barconfigure ?option? ?value? ...
+#} descr {
+# change the properties of the bar
+#}
+Classy::Progress method barconfigure {args} {
+	private $object w
+	eval $w itemconfigure bar $args
+}
+
+Classy::Progress method _redraw {} {
+	private $object w current options
+	set ticks $options(-ticks)
+	if {$current<0} {set current 0}
+	if {$current>$ticks} {set current $ticks}
+	set ratio [expr double($current)/$ticks]
+	set width [winfo width $object]
+	set height [winfo height $object]
+	$w coords bar 0 0 [expr {int($ratio*$width)}] $height
+	$w coords percentage [expr {$width/2.0}] [expr {$height/2.0}]
+	$w itemconfigure percentage -text "[expr int($ratio*100)]%"
+}

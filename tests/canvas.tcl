@@ -488,6 +488,22 @@ test Classy::Canvas {redo delete} {
 	.try mitemcget all -tags
 } {{t3 test}}
 
+test Classy::Canvas {redo delete with other actions} {
+	classyclean
+	Classy::Canvas .try
+	pack .try -fill both -expand yes
+	.try undo check start
+	set id [.try create text 10 10 -text "A" -tags {t1 try}]
+	.try undo check
+	.try delete $id
+	.try undo check
+	.try undo
+	.try delete $id
+	.try undo
+	.try undo
+	.try find withtag t1
+} {}
+
 test Classy::Canvas {undo addtag} {
 	classyclean
 	Classy::Canvas .try
@@ -766,6 +782,8 @@ test Classy::Canvas {print dialog} {
 	.try itemconfigure $id -text
 	.try print
 	manualtest
+
+Classy::Builder .classy__.builder -dir ~/dev/ClassyTcl/dialogs
 } {}
 
 test Classy::Canvas {float width} {

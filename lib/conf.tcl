@@ -295,7 +295,7 @@ proc Classy::Config {option args} {
 	switch $option {
 		dialog {
 			if ![winfo exists $window] {
-				eval Classy::config
+				eval Classy_config $window
 			}
 			raise $window
 			Classy::parseopt $args opt {
@@ -315,7 +315,7 @@ proc Classy::Config {option args} {
 		}
 		config {
 			if ![winfo exists $window] {
-				eval Classy::config
+				eval Classy_config $window
 			}
 			set name [lindex $args 1]
 			switch [lindex $args 0] {

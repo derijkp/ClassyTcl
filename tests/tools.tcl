@@ -61,6 +61,7 @@ proc classyclean {} {
 	catch {rename ::Test {}}
 	catch {rename ::try {}}
 	catch {rename ::.try {}}
+	catch {unset ::try}
 	Classy::initconf
 }
 
