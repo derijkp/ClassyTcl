@@ -1,6 +1,6 @@
 #!/bin/sh
 # the next line restarts using wish \
-exec wish8.3 "$0" "$@"
+exec wish "$0" "$@"
 
 source tools.tcl
 
@@ -167,6 +167,11 @@ test Classy::yorn {basic} {
 	classyclean
 	Classy::yorn "answer yes please"
 } {1}
+
+test Classy::yorn {basic} {
+	classyclean
+	Classy::yorn "Click on the close button please" -close 1
+} {close}
 
 test Classy::FileSelect {basic} {
 	classyclean

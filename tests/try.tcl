@@ -1,10 +1,16 @@
 source tools.tcl
 set object .try
 	classyclean
+button .b -text break -command {.try geturl file:[file join $::class::dir html_library-0.3 html help.html]}
+pack .b -side bottom
 	Classy::HTML .try -yscrollcommand {.vbar set}
 	scrollbar .vbar -command {.try yview}
 	pack .try -side left -fill both -expand yes
 	pack .vbar -side left -fill y
+	.try geturl file:[file join $::class::dir tkhtml tests page3 index.html]
+#	.try geturl file:[file join $::class::dir html_library-0.3 html help.html]
+
+
 set query {}
 set url http://rrna.uia.ac.be/lsu/query/index.html
 #	.try geturl http://rrna.uia.ac.be/lsu/query/index.html

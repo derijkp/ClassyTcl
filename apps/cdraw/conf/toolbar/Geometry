@@ -1,0 +1,11 @@
+
+action w "Left" {orient %W 180}
+action nw "Left Up" {orient %W 135}
+action sw "Left Down" {orient %W -135}
+action n "Up" {orient %W 90}
+action s "Down" {orient %W -90}
+action ne "Right Up" {orient %W 45}
+action se "Right Down" {orient %W -45}
+action e "Right" {orient %W 0}
+tool angleentry "Helix Orientation"
+		

@@ -1,6 +1,6 @@
 #!/bin/sh
 # the next line restarts using wish \
-exec wish8.3 "$0" "$@"
+exec wish "$0" "$@"
 
 source tools.tcl
 
@@ -19,8 +19,7 @@ test Classy::help {create and configure} {
 	classyclean
 	Classy::Help .try
 	.try gethelp ClassyTcl
-	.try cget -wrap
-} {word}
+} {}
 
 test Classy::HTML {tkhtml tests} {
 	classyclean
@@ -43,8 +42,7 @@ test Classy::HTML {create and configure} {
 	pack .try -side left -fill both -expand yes
 	pack .vbar -side left -fill y
 	.try geturl http://rrna.uia.ac.be/
-	.try cget -wrap
-} {word}
+} {}
 
 test Classy::HTML {create and configure} {
 	classyclean
@@ -52,6 +50,16 @@ test Classy::HTML {create and configure} {
 	scrollbar .vbar -command {.try yview}
 	pack .try -side left -fill both -expand yes
 	pack .vbar -side left -fill y
+	.try geturl http://rrna.uia.ac.be/lsu/query/index.html
+} {}
+
+test Classy::HTML {create and configure} {
+	classyclean
+	Classy::HTML .try -yscrollcommand {.vbar set}
+	scrollbar .vbar -command {.try yview}
+	pack .try -side left -fill both -expand yes
+	pack .vbar -side left -fill y
+	.try geturl http://www.slashdot.org/
 	.try geturl http://rrna.uia.ac.be/lsu/query/index.html
 } {}
 

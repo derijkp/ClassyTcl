@@ -6,11 +6,9 @@
 # ----------------------------------------------------------------------
 
 if ![string_equal [Classy::HTML private type] tkhtml] break
-if ![llength [info commands html]] {
-	load $::class::tkhtmllib
-}
-
-bind HtmlClip <<Action>> {[winfo parent %W] geturl [[winfo parent %W] linkat %x %y]}
+	bind Classy::HTML <<Action-ButtonPress>> {[winfo parent %W] _position %x %y}
+	bind Classy::HTML <<Action-Motion>> {[winfo parent %W] _motion %x %y}
+	bind Classy::HTML <<Action-ButtonRelease>> {[winfo parent %W] _release %x %y}
 
 # ------------------------------------------------------------------
 #  Widget creation
@@ -38,12 +36,14 @@ Classy::HTML method init {args} {
 	# REM Create bindings
 	# --------------------
 	$w configure \
+		-exportselection yes \
 		-hyperlinkcommand [list $object geturl] \
 		-imagecommand [list $object _getimage] \
 		-formcommand [list $object _form] \
 		-scriptcommand [list $object _script]
 	$w token handler BODY [list $object _body]
 	$object clearcache
+	bindtags $object.x [list $object.x Classy::HTML [winfo toplevel $object] all]
 
 	# REM Configure initial arguments
 	# -------------------------------
@@ -134,7 +134,7 @@ Classy::HTML chainallmethods {$object} text
 #} descr {
 #}
 Classy::HTML method geturl {url {query {}}} {
-	private $object control options currentquery html w source
+	private $object control options currentquery html w source loading
 	Classy::busy add $object
 	set url [$object fullurl $url]
 	# if it is the same url as the current, don't reload
@@ -173,6 +173,12 @@ Classy::HTML method geturl {url {query {}}} {
 	}
 	# get the html data according to protocol
 	# ---------------------------------------
+	if [info exists loading] {
+		$object stop
+		Classy::todo $object geturl $url $query
+		return
+	}
+	set loading 1
 	foreach {protocol host file fragment} [$object spliturl $url] break
 	if [string_equal $protocol http] {
 		set code [catch {
@@ -185,10 +191,12 @@ Classy::HTML method geturl {url {query {}}} {
 		private $object options
 		if {"$options(-errorcommand)" == ""} {
 			Classy::busy remove $object
+			unset loading
 			return -code $code $result
 		} else {
 			set code [catch {eval $options(-errorcommand) {$url $query $result}} result]
 			Classy::busy remove $object
+			unset loading
 			return -code $code $result
 		}
 	}
@@ -213,24 +221,29 @@ Classy::HTML method geturl {url {query {}}} {
 	# render
 	# ------
 	$w configure -base $url
-	foreach {option attr} {
-		-bg Background
-		-fg Foreground
-		-visitedcolor Foreground
-		-unvisitedcolor Foreground
-	} {
-		$w configure $option [option get $object Classy::HTML $attr]
-	}
 	$object _clear
 	if ![string_equal $protocol http] {
-		if {"$type" == "text/html"} {
-			$w parse $source
-		} else {
-			$w parse <pre>$source</pre>
+		if ![string_equal $type text/html] {
+			$w parse <pre>
+		}
+		set pos 0
+		set len [string length $source]
+		while {$pos < $len} {
+			$w parse [string range $source $pos [expr {$pos+19999}]]
+			incr pos 20000
+			update
+			if ![info exists loading] {
+				Classy::busy remove $object
+				return
+			}
+		}
+		if ![string_equal $type text/html] {
+			$w parse </pre>
 		}
 		if [string length $fragment] {
 			$w yview $fragment
 		}
+		unset loading
 	}
 	set currentquery $query
 	Classy::busy remove $object
@@ -454,6 +467,16 @@ Classy::HTML method clearcache {} {
 	catch {unset cachedata}
 }
 
+#doc {HTML command clearcache} cmd {
+#pathname stop
+#} descr {
+# stop loading current page
+#}
+Classy::HTML method stop {} {
+	private $object loading
+	catch {unset loading}
+}
+
 #doc {HTML command getdata} cmd {
 #pathname getdata ?options? url
 #} descr {
@@ -523,6 +546,14 @@ Classy::HTML method _clear {} {
 		image delete $image
 	}
 	set imgstoget {}
+	foreach {option attr} {
+		-bg Background
+		-fg Foreground
+		-visitedcolor Foreground
+		-unvisitedcolor Foreground
+	} {
+		$w configure $option [option get $object Classy::HTML $attr]
+	}
 }
 
 Classy::HTML method _getimage {args} {
@@ -619,8 +650,13 @@ Classy::HTML method _async_httpget {args} {
 }
 
 Classy::HTML method _async_httpget_handler {sock token} {
-	private $object w
+	private $object w loading
     upvar #0 $token state
+	if ![info exists loading] {
+		close $sock
+		catch {unset state}
+		return
+	}
     set html [read $sock $state(-blocksize)]
     $w parse $html
 	update idletasks
@@ -628,32 +664,75 @@ Classy::HTML method _async_httpget_handler {sock token} {
 }
 
 Classy::HTML method _async_httpget_done {token} {
-	private $object currenttype imgstoget cache cachedata
+	private $object currenttype imgstoget cache cachedata loading
 	if ![string_equal $currenttype text/html] {
 	    $w parse $html </pre>
 	}
+	if ![info exists loading] {return}
 	upvar #0 $token state
 	catch {unset state}
 	# get images
-	foreach image $imgstoget {
-		if [info exists cachedata($image)] {
-			set file $cachedata($image)
-		} else {
-			set file $cache(pos)
-			set cachedata($image) $file
-			incr cache(pos)
-		}
-		set f [open $file w]
-		http::geturl $image -channel $f -command [list $object _async_getimage_done $image $f]
+	if ![llength $imgstoget] {
+		unset loading
+		return
 	}
-	set imgstoget {}
+	set image [list_shift imgstoget]
+	if [info exists cachedata($image)] {
+		set file $cachedata($image)
+	} else {
+		set file $cache(pos)
+		set cachedata($image) $file
+		incr cache(pos)
+	}
+	set f [open $file w]
+	http::geturl $image -channel $f -command [list $object _async_getimage_done $image $f]
 	return
 }
 
 Classy::HTML method _async_getimage_done {image f token} {
-	private $object cachedata
+	private $object cache cachedata imgstoget loading
 	close $f
+	upvar #0 $token state
+	catch {unset state}
+	if ![info exists loading] {return}
 	set imagename ::class::${object}_${image}
 	$imagename	blank
-	$imagename	read $cachedata($image)
+	catch {$imagename	read $cachedata($image)}
+	if ![llength $imgstoget] {
+		unset loading
+		return
+	}
+	set image [list_shift imgstoget]
+	if [info exists cachedata($image)] {
+		set file $cachedata($image)
+	} else {
+		set file $cache(pos)
+		set cachedata($image) $file
+		incr cache(pos)
+	}
+	set f [open $file w]
+	http::geturl $image -channel $f -command [list $object _async_getimage_done $image $f]
+	return
 }
+
+Classy::HTML method _position {x y} {
+	private $object cpos w
+	set cpos(x) $x
+	set cpos(y) $y
+	set cpos(index) [$w index @$x,$y]
+	$w selection clear
+}
+
+Classy::HTML method _motion {x y} {
+	private $object cpos w
+	$w selection set $cpos(index) @$x,$y
+}
+
+Classy::HTML method _release {x y} {
+	set url [$object linkat $x $y]
+	if [string length $url] {
+		$object geturl $url
+	} else {
+	}
+}
+

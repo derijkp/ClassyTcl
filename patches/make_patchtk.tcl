@@ -1,6 +1,6 @@
 #!/bin/sh
 # the next line restarts using wish \
-exec wish8.0 "$0" ${1+"$@"}
+exec wish "$0" ${1+"$@"}
 package require Tk
 
 set f [open patchtk.tcl w]

@@ -1,6 +1,6 @@
 #!/bin/sh
 # the next line restarts using wish \
-exec wish8.0 "$0" ${1+"$@"}
+exec wish "$0" ${1+"$@"}
 # ClassyTcl Builder v0.2
 
 wm withdraw .

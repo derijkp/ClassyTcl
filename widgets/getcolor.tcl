@@ -44,18 +44,21 @@ proc Classy::getcolor {args} {
 		return [tk_chooseColor -initialcolor $opt(-initialcolor) -title $opt(-title)]
 	}
 	set ::Classy::temp $opt(-initialcolor)
+	catch {destroy .classy__.getcolor}
 	Classy::Dialog .classy__.getcolor -title $opt(-title) -resize {1 1} -closecommand {
 		set ::Classy::temp ""
 		destroy .classy__.getcolor
 	}
+	Classy::ColorSelect .classy__.getcolor.options.select
 	if [string length $opt(-command)] {
-		.classy__.getcolor add go "Select" "$opt(-command) \[.classy__.getcolor.options.select get\]" default
-		.classy__.getcolor persistent add go
+		.classy__.getcolor.options.select configure -command "$opt(-command)"
+		.classy__.getcolor add none "None" "$opt(-command) {}"
 	} else {
 		.classy__.getcolor add go "Select" {set ::Classy::temp [.classy__.getcolor.options.select get]} default
+		.classy__.getcolor add none "None" {set ::Classy::temp {}}
+		.classy__.getcolor persistent remove none
 	}
-	Classy::ColorSelect .classy__.getcolor.options.select
-	catch {.classy__.getcolor.options.select set $opt(-initialcolor)}
+	catch {.classy__.getcolor.options.select nocmdset $opt(-initialcolor)}
 	pack .classy__.getcolor.options.select -fill both -expand yes
 	.classy__.getcolor place
 	if ![string length $opt(-command)] {

@@ -1,0 +1,11 @@
+
+action 10% "Zoom to 10%" {zoom %W 10}
+action 25% "Zoom to 25%" {zoom %W 25}
+action 50% "Zoom to 50%" {zoom %W 50}
+action 75% "Zoom to 75%" {zoom %W 75}
+action 100% "Zoom to 100%" {zoom %W 100}
+action 200% "Zoom to 200%" {zoom %W 200}
+action 300% "Zoom to 300%" {zoom %W 300}
+action 400% "Zoom to 400%" {zoom %W 400}
+tool zoomentry "Zoom"
+		

@@ -1,22 +1,20 @@
-	action open "Open" {fileload %W}
-	action save "Save" {filesave %W}
-	action print "Print" {%W print}
-	action undo "Undo" {%W undo}
-	action redo "redo" {%W redo}
-	separator
-	action copy "Copy" {%W copy _sel}
-	action cut "Cut" {%W cut _sel}
-	action paste "Paste" {%W paste}
-	separator
-	tool selecttool "Select"
-	tool rotatetool "Rotate"
-	tool zoomtool "Set zoom"
-	tool texttool "Text"
-	tool linetool "Line"
-	tool polytool "Polygon"
-	tool recttool "Rectangle"
-	tool ovaltool "Oval"
-	tool arctool "Arc"
-	separator
-	action raiseobj "Raise objects" {raise_objects %W _sel}
-	action lowerobj "Lower objects" {lower_objects %W _sel}
+
+action open "Open" {fileload %W}
+action save "Save" {filesave %W}
+action print "Print" {print %W}
+action undo "Undo" {undo %W}
+action redo "redo" {redo %W}
+separator
+action copy "Copy" {copy %W}
+action cut "Cut" {cut %W}
+action paste "Paste" {paste %W}
+action raiseobj "Raise objects" {raise_objects %W _sel}
+action lowerobj "Lower objects" {lower_objects %W _sel}
+separator
+action objproperties "Properties toolbar" {extratool %W Properties}
+tool xtool "X coordinate"
+tool ytool "Y coordinate"
+tool locktool "lock aspect ratio"
+tool wtool "Selection width"
+tool htool "Selection height"
+tool zoomentry "Zoom"

@@ -151,7 +151,6 @@ Classy::HTML method geturl {url {query {}}} {
 	private $object control options currentquery html
 	Classy::busy add $object
 	set url [$object fullurl $url]
-
 	# if it is the same url as the current, don't reload
 	# --------------------------------------------------
 	set base $url
@@ -181,11 +180,11 @@ Classy::HTML method geturl {url {query {}}} {
 					set options(-url) $url
 				}
 				set currentquery $query
+				Classy::busy remove $object
 				return $url
 			}
 		}
 	}
-
 	# get the html data according to protocol
 	# ---------------------------------------
 	if ![regexp {^([^:]*)://([^/]+)(/.*)$} $url dummy protocol host file] {

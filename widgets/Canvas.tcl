@@ -27,6 +27,14 @@
 #  Widget creation
 # ------------------------------------------------------------------
 
+catch {destroy .classy__.temp}
+canvas .classy__.temp
+if ![catch {.classy__.temp create line 10 10 10 10 -activefill red}] {
+	set ::Classy::dashpatch 1
+} else {
+	set ::Classy::dashpatch 0
+}
+
 Widget subclass Classy::Canvas
 
 Classy::Canvas method init {args} {
@@ -276,7 +284,12 @@ Classy::Canvas method _undoone {current} {
 		create {
 			set item [lindex $current 0]
 			set del($item) [$w gettags $item]
-			$w itemconfigure $item -tags {_del} -state hidden
+			if $::Classy::dashpatch {
+				$w itemconfigure $item -tags {_del} -state hidden
+			} else {
+				$w itemconfigure $item -tags {_del}
+				$w move $item -10000 -10000
+			}
 			$w lower $item
 		}
 		delete {
@@ -286,7 +299,12 @@ Classy::Canvas method _undoone {current} {
 			incr i -1
 			for {} {$i > -1} {incr i -1} {
 				set item [lindex $items $i]
-				$w itemconfigure $item -tags $del($item) -state normal
+				if $::Classy::dashpatch {
+					$w itemconfigure $item -tags $del($item) -state normal
+				} else {
+					$w itemconfigure $item -tags $del($item)
+					$w move $item 10000 10000
+				}
 				set above [lindex $poss $i]
 				if [string length $above] {
 					$w lower $item $above
@@ -460,7 +478,12 @@ Classy::Canvas method _redoone {current} {
 		}
 		create {
 			set item [lindex $current 0]
-			$w itemconfigure $item -tags $del($item) -state normal
+			if $::Classy::dashpatch {
+				$w itemconfigure $item -tags $del($item) -state normal
+			} else {
+				$w itemconfigure $item -tags $del($item)
+				$w move $item 10000 10000
+			}
 			unset del($item)
 			$w raise $item
 		}
@@ -468,7 +491,12 @@ Classy::Canvas method _redoone {current} {
 			set items [lindex $current 0]
 			foreach item $items {
 				set del($item) [$w gettags $item]
-				$w itemconfigure $item -tags {_del} -state hidden
+				if $::Classy::dashpatch {
+					$w itemconfigure $item -tags {_del} -state hidden
+				} else {
+					$w itemconfigure $item -tags {_del}
+					$w move $item -10000 -10000
+				}
 			}
 		}
 		addtag {
@@ -628,6 +656,7 @@ proc Classy::scalefont {font scale} {
 	if {"$size" == ""} {return $font}
 	set size [expr {$size*$scale}]
 	if {$size==0} {set size 1}
+	set size [expr {round(100*$size)/100.0}]
 	return [lreplace $font 1 1 $size]
 }
 
@@ -760,6 +789,7 @@ Classy::Canvas method create {type args} {
 	return $item
 }
 
+if $::Classy::dashpatch {
 Classy::Canvas method delete {args} {
 	private $object w data del
 	if $data(changedcommand) {uplevel #0 [getprivate $object options(-changedcommand)]}
@@ -788,6 +818,38 @@ Classy::Canvas method delete {args} {
 	} else {
 		return [eval $w delete $args]
 	}
+}
+} else {
+Classy::Canvas method delete {args} {
+	private $object w data del
+	if $data(changedcommand) {uplevel #0 [getprivate $object options(-changedcommand)]}
+	Classy::todo $object selection redraw
+	if $data(undo) {
+		private $object itemw
+		set items [list]
+		foreach tagOrId $args {
+			if [isint $tagOrId] {
+				if ![info exists del($tagOrId)] {
+					lappend items $tagOrId
+				}
+			} else {
+				eval lappend items [Classy::tag2items $object $w $tagOrId]
+			}
+		}
+		if ![llength $items] {return ""}
+		set poss ""
+		foreach item $items {
+			lappend poss [$w find above $item]
+			set del($item) [$w gettags $item]
+			$w itemconfigure $item -tags {_del}
+			$w move $item -10000 -10000
+		}
+		$object addundo [list delete $items] [list delete $items $poss]
+		return ""
+	} else {
+		return [eval $w delete $args]
+	}
+}
 }
 
 Classy::Canvas method clear {} {

@@ -1,10 +1,12 @@
 proc group w {
-	global current
-	$w group withtag _sel
+	set object [getobj $w]
+	private $object canvas
+	$canvas group withtag _sel
 }
 
 proc ungroup w {
-	global current
-	$w dtag [$w findgroup $current(cur)]
+	set object [getobj $w]
+	private $object current canvas
+	$canvas dtag [$canvas findgroup $current(item)]
 }
 

@@ -15,10 +15,18 @@
 <h2>
 	Canvas specific methods
 </h2><dl><b><dt>
-pathname load data
+pathname undo ?action? ?args?
 </b><dd>
- restores a previously saved drawing. Its argument is a list as returned by
- the save method.
+ Without arguments, this method will undo the previous action
+ When action is provided, it can have the following values
+<dl>
+<dt>check<dd>insert a checkpoint
+<dt>clear<dd>clear undo buffer
+<dt>add<dd>add ?args? to undo buffer, they will be executed when undo is called
+<dt>off<dd>turn undo buffering of
+<dt>on<dd>turn undo buffering on
+<dt>status<dd>query state of undo
+</dl>
 <b><dt>
 pathname redo 
 </b><dd>

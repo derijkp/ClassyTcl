@@ -1,0 +1,69 @@
+<HEAD>
+<TITLE>DCSE</TITLE>
+</HEAD>
+<BODY>
+<h1>DCSE</h1>
+
+<h2>What is DCSE</h2>
+DCSE (Dedicated Comparative Sequence Editor) is a multiple alignment
+editor. It can be used to edit protein, DNA or RNA alignments. The
+structure of the molecules can be incorporated in the alignment. It is
+written in C, and it uses dynamic memory for most things. This means
+you can almost edit any size of alignment with it. It offers lots of
+features such as color display of characters and structure, automatic
+alignment relative to sequences already aligned with others, sequence
+grouping, sequence or pattern searching, marker system, checking of
+incorporated RNA structure, on-line hypertext help, macros, and a lot
+more.
+<p>
+More information on DCSE can be found on the DCSE Home page at
+http://rrna.uia.ac.be/~peter/dcse/index.html
+<h2>The DCSE alignment file</h2>
+DCSE v.3 stores alignment and structure information in plain ASCII files 
+in a certain format. These files are usually given the extension ".ali".
+The alignment in an alignment files can be edited Using DCSE. To create 
+an alignment file or append sequences to an existing alignment, the 
+complementary program Convers can be used.
+
+<h2>The DCSE alignment format</h2>
+
+An alignment file starts with four info lines followed by several 
+sequence lines. The first info line shows two numbers: the first position shown in the 
+alignment, and the last position. For DCSE, the difference between the two must 
+be equal to the number of positions in the alignment. RnaViz does not use these numbers,
+so for RnaViz any two numbers would do.
+The positions can be preceded by a 'P' for a 
+protein alignment, a 'D' for a DNA alignment or an 'R' for an RNA alignment. When none of 
+these are present, the alignment is supposed to be an RNA alignment. The other info lines 
+can contain any text. The second info line is usually empty. The third and fourth line 
+usually contain an indication of the position. A sequence line consists of the entire 
+sequence (including gaps), followed by a space, a number of five characters long, 
+another space, and the species name of maximum 40 characters. The number is not 
+essential, the number of characters between the sequence and its name however has to be 
+7. All sequences should have equal length. Each sequence line consists of symbols for 
+nucleotides or gaps, alternated with positions that are either blank or contain 
+special symbols, e.g. symbols delimiting secondary structure elements. 
+
+<h2>Symbols describing secondary structure</h2>
+The following symbols are used to indicate secondary structure elements.:
+<pre>
+ [ and ] : beginning and end of one strand of a helix.
+ ^     	 : symbolizes ][, a new helix starting immediately after the previous one.
+ { and } : beginning and end of an internal loop or bulge loop interrupting a helix strand.
+ ( and ) : enclose a base forming part of a non-standard pair (any pair other than G.C, A.U, or G.U).
+</pre>
+
+<h2>Helix numbering</h2>
+To allow the identification of secondary structure elements, "helix numbering lines" 
+are intercalated between the sequences. The name of such lines must begin with "Helix 
+numbering". These lines contains the helix names, but have otherwise an empty sequence 
+(only gap characters). The 5'- and 3'- strand of a helix name are indicated as 
+&lt;name&gt; and &lt;name&gt;'.
+<p>
+<b>RnaViz is more picky about the position of the helix names that DCSE</b>: the helix 
+name used is the first one on the helix numbering line after the postion where
+the strand of the helix is opened. (DCSE did check the strands before and after
+the helix name; this will also change in future versions of DCSE.)
+</body>
+
+

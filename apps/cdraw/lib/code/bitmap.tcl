@@ -1,9 +1,10 @@
 #Functions
 
 proc bitmap_insert {w {file {}}} {
-global current
-set x [$w canvasx [expr {[winfo width $w]/2.0}]]
-set y [$w canvasy [expr {[winfo height $w]/2.0}]]
-$w addbitmap $x $y $file
+	set object [getobj $w]
+	private $object current canvas
+	set x [$canvas canvasx [expr {[winfo width $canvas]/2.0}]]
+	set y [$canvas canvasy [expr {[winfo height $canvas]/2.0}]]
+	$canvas addbitmap $x $y $file
 }
 

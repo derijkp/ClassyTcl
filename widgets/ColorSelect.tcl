@@ -94,9 +94,12 @@ Classy::ColorSelect addoption -command {command Command {}}
 # set current color to $value, without executing -command
 #}
 Classy::ColorSelect method nocmdset {value} {
+	private $object nocmdset
+	set nocmdset 1
 	$object.entry nocmdset $value
 	$object.rgb nocmdset $value;
 	$object.hsv nocmdset $value;
+	unset nocmdset
 }
 
 #doc {ColorSelect command set} cmd {
@@ -108,12 +111,23 @@ Classy::ColorSelect method set {value} {
 	$object.entry nocmdset $value
 	$object.rgb nocmdset $value
 	$object.hsv nocmdset $value
+	set command [getprivate $object options(-command)]
+	if {"$command" != ""} {
+		uplevel #0 $command [list [$object get]]
+	}
 }
 
 Classy::ColorSelect method _set {src value} {
+	private $object nocmdset
 	if {"$src" != "hsv"} {$object.hsv nocmdset $value}
 	if {"$src" != "entry"} {$object.entry nocmdset $value}
 	if {"$src" != "rgb"} {$object.rgb nocmdset $value}
+	if ![info exists nocmdset] {
+		set command [getprivate $object options(-command)]
+		if {"$command" != ""} {
+			uplevel #0 $command [list [$object get]]
+		}
+	}
 }
 
 #doc {ColorSelect command get} cmd {

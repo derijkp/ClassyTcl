@@ -9,6 +9,4 @@
 
 # Addition of ClassyTcl classes defined in the directory
 set auto_index(mainw) [list source [file join $dir mainw.tcl]]
-set auto_index(configwindow) [list source [file join $dir configwindow.tcl]]
-set auto_index(zoomdialog) [list source [file join $dir zoomdialog.tcl]]
-set auto_index(printdialog) [list source [file join $dir printdialog.tcl]]
+set auto_index(pagedialog) [list source [file join $dir pagedialog.tcl]]

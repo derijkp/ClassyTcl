@@ -1,6 +1,6 @@
 #!/bin/sh
 # the next line restarts using wish \
-exec wish8.3 "$0" "$@"
+exec wish "$0" "$@"
 
 source tools.tcl
 set object .try
@@ -108,6 +108,7 @@ test Classy::Canvas {not found} {
 	.try find withtag try
 } {}
 
+if $Classy::dashpatch {
 test Classy::Canvas {find &&} {
 	classyclean
 	Classy::Canvas .try
@@ -118,6 +119,7 @@ test Classy::Canvas {find &&} {
 	set fid [.try find withtag txt && try]
 	expr {$id == $fid}
 } 1
+}
 
 test Classy::Canvas {zoom} {
 	classyclean
@@ -927,6 +929,7 @@ test Classy::Canvas {itemcget font} {
 	.try itemcget $id -font
 } {helvetica 10}
 
+if $::Classy::dashpatch {
 test Classy::Canvas {itemconfigure float width} {
 	classyclean
 	Classy::Canvas .try
@@ -935,6 +938,16 @@ test Classy::Canvas {itemconfigure float width} {
 	.try zoom 2
 	.try itemconfigure $id -width
 } {-width {} {} 1.0 2.2}
+} else {
+test Classy::Canvas {itemconfigure float width} {
+	classyclean
+	Classy::Canvas .try
+	pack .try -fill both -expand yes
+	set id [.try create line 20 10 60 50 -width 2.2]
+	.try zoom 2
+	.try itemconfigure $id -width
+} {-width {} {} 1 2.2}
+}
 
 test Classy::Canvas {itemconfigure font} {
 	classyclean
@@ -1021,6 +1034,7 @@ test Classy::Canvas {clear canvas} {
 	.try itemconfigure $id -width
 } {-width {} {} 0 10}
 
+if $::Classy::dashpatch {
 test Classy::Canvas {select deleted} {
 	classyclean
 	Classy::Canvas .try
@@ -1031,5 +1045,16 @@ test Classy::Canvas {select deleted} {
 	.try selection add [list $id $id2]
 	.try bbox _sel
 } {16 14 25 26}
-
+} else {
+test Classy::Canvas {select deleted} {
+	classyclean
+	Classy::Canvas .try
+	pack .try -fill both -expand yes
+	set id [.try create text 10 10 -text "A"]
+	set id2 [.try create text 20 20 -text "B"]
+	.try delete $id
+	.try selection add [list $id $id2]
+	.try bbox _sel
+} {-9993 -9995 25 26}
+}
 testsummarize

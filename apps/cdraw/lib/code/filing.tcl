@@ -1,41 +1,65 @@
 #Functions
 
-proc filesave w {
-global status
-if ![info exists status($w,file)] {
-	saveas $w
-} else {
-	file_write $status($w,file) [$w save]
-}
-}
-
-proc fileload w {
-global status
-if {(![info exists status($w,file)])||("$status($w,file)" == "")} {
-	set init new.cld
-} else {
-	set init $status($w,file)
-}
-set temp [Classy::selectfile -title Open -selectmode persistent \
-	-defaultextension .cld \
-	-initialfile $init]
-if {"$temp" == ""} return
-set status($w,file) [lindex $temp 0]
-$w load [file_read $status($w,file)]
+proc filesave {object} {
+	set object [getobj $object]
+	private $object canvas current
+	set w $object.canvas
+	if {![info exists current(file)]||("$current(file)" == "")||![string_equal [file extension $current(file)] .str]} {
+		saveas $object
+	}
+	file_write $current(file) [$canvas save]
+	wm title $object "cdraw: $current(file)"
+	changed $object 0
 }
 
-proc saveas w {
-global status
-if {(![info exists status($w,file)])||("$status($w,file)" == "")} {
-	set init new.cld
-} else {
-	set init $status($w,file)
-}
-set temp [Classy::savefile -title "Save as" \
-	-defaultextension .cld\
-	-initialfile $init]
-if {"$temp" == ""} return
-set status($w,file) $temp
-file_write $status($w,file) [$w save]
+proc saveas {object} {
+	set object [getobj $object]
+	private $object canvas current
+	global status
+	if {![info exists current(file)]||("$current(file)" == "")} {
+		set init new.str
+	} else {
+		set init $current(file)
+		if ![string_equal [file extension $init] .str] {
+			set init [file root $init].str
+		}
+	}
+	set file [Classy::savefile -title "Save as" \
+		-defaultextension .str\
+		-initialfile $init]
+	if {"$file" == ""} return
+	set current(file) $file
+	wm title $object "cdraw: $current(file)"
+	filesave $object
+	changed $object 0
 }
 
+proc fileload {args} {
+	checkargs fileload "object ?file?" $args
+	set object [getobj $object]
+	private $object canvas current
+	global status
+	if ![info exists file] {
+		set file [Classy::selectfile -title Open -selectmode persistent]
+		if ![string length $file] return
+	}
+	if ![info exists current(file)] {
+		set current(file) [file root $file].cdr
+		wm title $object "cdraw: $current(file)"
+		set changed 1
+	} else {
+		set changed 0
+	}
+	set f [open $file]
+	set line [read $f 100]
+	set line [lindex [split $line \n] 0]
+	switch -regexp -- $line {
+		{header Classy::Canvas} {
+			$canvas load [file_read $file]
+		}
+		default {
+			error "Format of file \"$file\" not recognised"
+		}
+	}
+	if $changed {changed $object 0}
+}

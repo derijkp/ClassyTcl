@@ -8,7 +8,7 @@
 #
 
 # set to yes to compile with debugging information
-DEBUG=yes
+DEBUG=no
 # set to no to compile without stubs support
 USE_STUBS=no
 
@@ -23,28 +23,28 @@ TCLEXE = classytcl
 WISHEXE = classywish
 
 ifeq ($(DEBUG),yes)
-	CFLAGS = -g -Wall -Wno-implicit-int 
+	CFLAGS = -g  
 else
-	CFLAGS = -O -D__NO_STRING_INLINES -D__NO_MATH_INLINES -Wall -Wno-implicit-int
+	CFLAGS = -O 
 endif
 
 ifeq ($(USE_STUBS),yes)
-	LD_LIBS = -L/opt/tcltk/lib -ltclstub8.3${TCL_DBGX} ${LIBS}
-	DEFS =  -DHAVE_UNISTD_H=1 -DHAVE_LIMITS_H=1 -DHAVE_GETCWD=1 -DHAVE_OPENDIR=1 -DHAVE_STRSTR=1 -DHAVE_STRTOL=1 -DHAVE_TMPNAM=1 -DHAVE_WAITPID=1 -DHAVE_UNISTD_H=1 -DHAVE_SYS_PARAM_H=1 -DUSE_TERMIOS=1 -DHAVE_SYS_TIME_H=1 -DTIME_WITH_SYS_TIME=1 -DHAVE_TM_ZONE=1 -DHAVE_TM_GMTOFF=1 -DHAVE_TIMEZONE_VAR=1 -DHAVE_ST_BLKSIZE=1 -DSTDC_HEADERS=1 -DNEED_MATHERR=1 -DHAVE_SIGNED_CHAR=1 -DHAVE_SYS_IOCTL_H=1  -DUSE_TCL_STUBS
+	LD_LIBS =  ${LIBS}
+	DEFS =  -DHAVE_GETCWD=1 -DHAVE_UNISTD_H=1 -DHAVE_SYS_TIME_H=1 -DTIME_WITH_SYS_TIME=1 -DHAVE_TM_ZONE=1 -DHAVE_TM_GMTOFF=1 -DHAVE_TIMEZONE_VAR=1 -DHAVE_ST_BLKSIZE=1 -DSTDC_HEADERS=1 -DNEED_MATHERR=1 -DRETSIGTYPE=void -DHAVE_SIGNED_CHAR=1 -DHAVE_SYS_IOCTL_H=1  -DUSE_TCL_STUBS
 else
-	LD_LIBS = -L/opt/tcltk/lib -ltcl8.3${TCL_DBGX} ${LIBS}
+	LD_LIBS = -L/usr/lib -ltcl8.0${TCL_DBGX} ${LIBS}
 	LD_LIBS = ${LIBS}
-	DEFS =  -DHAVE_UNISTD_H=1 -DHAVE_LIMITS_H=1 -DHAVE_GETCWD=1 -DHAVE_OPENDIR=1 -DHAVE_STRSTR=1 -DHAVE_STRTOL=1 -DHAVE_TMPNAM=1 -DHAVE_WAITPID=1 -DHAVE_UNISTD_H=1 -DHAVE_SYS_PARAM_H=1 -DUSE_TERMIOS=1 -DHAVE_SYS_TIME_H=1 -DTIME_WITH_SYS_TIME=1 -DHAVE_TM_ZONE=1 -DHAVE_TM_GMTOFF=1 -DHAVE_TIMEZONE_VAR=1 -DHAVE_ST_BLKSIZE=1 -DSTDC_HEADERS=1 -DNEED_MATHERR=1 -DHAVE_SIGNED_CHAR=1 -DHAVE_SYS_IOCTL_H=1 
+	DEFS =  -DHAVE_GETCWD=1 -DHAVE_UNISTD_H=1 -DHAVE_SYS_TIME_H=1 -DTIME_WITH_SYS_TIME=1 -DHAVE_TM_ZONE=1 -DHAVE_TM_GMTOFF=1 -DHAVE_TIMEZONE_VAR=1 -DHAVE_ST_BLKSIZE=1 -DSTDC_HEADERS=1 -DNEED_MATHERR=1 -DRETSIGTYPE=void -DHAVE_SIGNED_CHAR=1 -DHAVE_SYS_IOCTL_H=1 
 endif
 
-INCLUDES = -I/opt/tcltk/include
-CC = cc
-SHLIB_LD =		cc -shared
+INCLUDES = -I/usr/include
+CC = gcc -pipe
+SHLIB_LD =		gcc -pipe -shared
 SHLIB_SUFFIX =		.so
 
 CC_SWITCHES = $(INCLUDES) $(CFLAGS)	-fPIC $(DEFS)
-TCL_LD_LIBS = -L/opt/tcltk/lib -ltcl8.3${TCL_DBGX} ${LIBS} -ldl  -lieee -lm
-TK_LD_LIBS = -L/opt/tcltk/lib -ltcl8.3${TCL_DBGX} ${LIBS} -L/opt/tcltk/lib -ltk8.3 -L/usr/X11R6/lib -lX11 -ldl  -lieee -lm
+TCL_LD_LIBS = -L/usr/lib -ltcl8.0${TCL_DBGX} ${LIBS} -ldl  -lm
+TK_LD_LIBS = -L/usr/lib -ltcl8.0${TCL_DBGX} ${LIBS} -L/usr/lib -ltk8.0${TK_DBGX} -L/usr/X11R6/lib -lX11 -ldl  -lm
 
 OBJECTS= class.o private.o object.o method.o hash.o classyInit.o
 
@@ -56,14 +56,14 @@ $(PROJECT)${SHLIB_SUFFIX}: $(OBJECTS)
 	${SHLIB_LD} $(OBJECTS) -o ../$(PROJECT)$(SHLIB_SUFFIX) $(LD_LIBS)
 
 $(TCLEXE): tclAppInit.o $(OBJECTS)
-	${CC} $(CFLAGS) tclAppInit.o $(OBJECTS) -o $(TCLEXE) $(TCL_LD_LIBS)
+	${CC} tclAppInit.o $(OBJECTS) -o $(TCLEXE) $(TCL_LD_LIBS)
 
 $(WISHEXE): tkAppInit.o $(OBJECTS)
-	${CC} $(CFLAGS) tkAppInit.o $(OBJECTS) -o $(WISHEXE) $(TK_LD_LIBS)
+	${CC} tkAppInit.o $(OBJECTS) -o $(WISHEXE) $(TK_LD_LIBS)
 
 install: 
 	../makedoc.tcl
-	../makedist.tcl /opt/tcltk/lib /opt/tcltk/bin
+	../makedist.tcl /usr/lib /usr/bin
 
 clean:
 	rm -f *.o ../$(PROJECT)$(SHLIB_SUFFIX) ../win/*.csm ../win/tmp/* ../*.dll $(WISHEXE) $(TCLEXE)
