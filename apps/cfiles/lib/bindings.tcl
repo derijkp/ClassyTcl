@@ -1,10 +1,10 @@
 #Functions
-proc filer_action {window x y} {
-	if [catch {set name [$window name $x $y]}] return
-	set type [$window type $x $y]
-	$window active set $name
-	puts [list $x $y $name $type]
-	set curdir [file dirname [lindex [$window cget -list] 1]]
+
+proc filer_exec {w x y} {
+	if [catch {$w name $x $y} name] return
+	set type [$w type $x $y]
+	$w active set $name
+	set curdir [file dirname [lindex [$w cget -list] 1]]
 	if {"$name" == ".."} {
 		if {"$curdir" != "."} {
 			set name [file dirname $curdir]
@@ -13,12 +13,24 @@ proc filer_action {window x y} {
 		}
 	}
 	if [file isdir $name] {
-		$window configure -list [getdir $name]
+		setdir $w $name
 	} elseif {"$type"=="text"} {
-		$window selection add $name
+		$w selection add $name
 		puts $name
 	} else {
 		puts $name
+	}
+}
+
+proc filer_action {w x y} {
+	if [catch {$w name $x $y} name] return
+	if {"$name" == ".."} return
+	if {"$name" == ""} return
+	setfile $w $name
+	if ![$w selection includes $name] {
+		$w selection add $name
+	} else {
+		$w selection delete $name
 	}
 }
 
@@ -68,4 +80,20 @@ proc browser_data {window {value {}}} {
 	} else {
 		$window configure -data {}
 	}
+}
+
+proc filer_drag {w x y X Y} {
+	if [catch {$w name $x $y} name] return
+	if {"$name" == ""} return
+	set files [$w selection get]
+	if {[llength $files]>1} {
+		set image [Classy::geticon folder]
+	} else {
+		if {[file isdirectory [lindex $files 0]]} {
+			set image [Classy::geticon folder]
+		} else {
+			set image [Classy::geticon file]
+		}
+	}
+	DragDrop start $X $Y $files -types [list url/file $files] -image $image
 }

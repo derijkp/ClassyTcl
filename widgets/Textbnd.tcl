@@ -1,9 +1,7 @@
 #
-# ####  #####  ####   #### 
-# #   # #     #    # # 
-# ####  ####  #    #  #### 
-# #     #     #    #      # 
-# #     #####  ####   ####  Peter De Rijk
+# ClassyTcl Widgets 
+# ----------------- Peter De Rijk
+#
 #
 # default bindings for Classy text widgets
 # ----------------------------------------------------------------------
@@ -350,6 +348,13 @@ proc Classy::Text_SelectTo {w x y} {
 proc Classy::Text_AutoScan {w} {
 	global tkPriv
 	if {![winfo exists $w]} return
+	if ![catch {winfo class $w} class] {
+		if {"$class" == "Classy::Editor"} {
+			set w $w.edit
+		} elseif {"$class" == "Classy::ScrolledText"} {
+			set w $w.text
+		}
+	}
 	if {$tkPriv(y) >= [winfo height $w]} {
 		$w yview scroll 2 units
 	} elseif {$tkPriv(y) < 0} {

@@ -14,3 +14,31 @@ Classy::configtool MainTool {Application main toolbar} {
 }
 
 
+
+Classy::configtool DirTool {} {	action newdir "Create new dir" {error "new dir not implemented yet"}
+	action findfiles "Find files" {error "find not implemented yet"}
+
+}
+
+
+
+
+
+Classy::configtool FileTool {} {	action newfile "New File" {error "new file not implemented yet"}
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

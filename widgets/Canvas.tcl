@@ -1901,11 +1901,13 @@ Classy::Canvas method _getprint {var} {
 		set y [expr {100.0*$y/$print(scale)}]
 	}
 	set pagewidth [expr {$print(scale)*$print(pwidth)/[winfo fpixels $object 100p]}]
-	set height $print(height)
-	if [regexp {[0-9]$} $height] {append height p}
 	set pagey $print(pagey)
-	if [regexp {[0-9]$} $pagey] {append pagey p}
-	set pagey [expr {([winfo fpixels $object $height] - [winfo fpixels $object $pagey])/[winfo fpixels $object 1p]}]
+	if $print(portrait) {
+		set height $print(height)
+		if [regexp {[0-9]$} $height] {append height p}
+		if [regexp {[0-9]$} $pagey] {append pagey p}
+		set pagey [expr {([winfo fpixels $object $height] - [winfo fpixels $object $pagey])/[winfo fpixels $object 1p]}]
+	}
 	set list [$w find withtag _sel]
 	if {"$list" != ""} {
 		catch {$w itemconfigure all -stipple {}}
@@ -1948,3 +1950,14 @@ Classy::Canvas method print {} {
 	Classy::printdialog .classy__.printdialog -papersize [lrange $page 2 3] -getdata [list $object _getprint]
 	.classy__.printdialog configure -cache 1
 }
+
+Classy::Canvas method addbitmap {x y file} {
+	private $object load
+	set name $object:$file
+	while {"[info commands $name]" == ""} {
+		set load(image,$name) [image create photo $name -file $file]
+	}
+	$object create image $x $y -image $load(image,$name)
+	return $name
+}
+

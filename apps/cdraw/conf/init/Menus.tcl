@@ -43,6 +43,7 @@ Classy::configmenu MainMenu {Main application menu} {
 	menu "Mode" {
 		action "Select" {select_start %W} <<Select>>
 		check "Rotate" {-variable status(%W,rotate) -command {rotate_set %W}} <<Rotate>>
+		separator
 		action "Zoom" {zoom_start %W} <<Zoom>>
 		action "Text" {text_start %W} <<Text>>
 		action "Line" {line_start %W} <<Line>>
@@ -50,6 +51,7 @@ Classy::configmenu MainMenu {Main application menu} {
 		action "Rectangle" {rectangle_start %W} <<Rectangle>>
 		action "Oval" {oval_start %W} <<Oval>>
 		action "Arc" {arc_start %W} <<Arc>>
+		action "Insert bitmap" {bitmap_insert %W [Classy::selectfile]} <<BitMap>>
 	}
 	menu "Help" {
 		action "Application" {Classy::help application} <<Help>>
@@ -66,7 +68,16 @@ Classy::configmenu MainMenu {Main application menu} {
 
 
 
+
 }
+
+
+
+
+
+
+
+
 
 
 

@@ -474,11 +474,13 @@ Classy::BarChartDialog method _getprint {var} {
 		set y [expr {100.0*$y/$print(scale)}]
 	}
 	set pagewidth [expr {$print(scale)*$print(pwidth)/[winfo fpixels $object 100p]}]
-	set height $print(height)
-	if [regexp {[0-9]$} $height] {append height p}
 	set pagey $print(pagey)
-	if [regexp {[0-9]$} $pagey] {append pagey p}
-	set pagey [expr {([winfo fpixels $object $height] - [winfo fpixels $object $pagey])/[winfo fpixels $object 1p]}]
+	if $print(portrait) {
+		set height $print(height)
+		if [regexp {[0-9]$} $height] {append height p}
+		if [regexp {[0-9]$} $pagey] {append pagey p}
+		set pagey [expr {([winfo fpixels $object $height] - [winfo fpixels $object $pagey])/[winfo fpixels $object 1p]}]
+	}
 	set result [$w postscript \
 		-rotate $rotate -colormode $print(colormode) \
 		-width $print(pwidth) -height $print(pheight) \
