@@ -48,17 +48,17 @@ Classy::Configurator method dialog {} {
 	private $object w
 	# REM Create object
 	# -----------------
-	if [winfo exists .classy__config] {
-		raise .classy__config
+	if [winfo exists .classy__.config] {
+		raise .classy__.config
 		return
 	}
-	Classy::Dialog .classy__config -title "Configuration Dialog" \
-		-closecommand "if \[$object _checksaved\] {destroy .classy__config}" \
+	Classy::Dialog .classy__.config -title "Configuration Dialog" \
+		-closecommand "if \[$object _checksaved\] {destroy .classy__.config}" \
 		-help classy_configure
-	.classy__config add reconf "Reconfigure" [list $object _reconfigure .]
-	.classy__config persistent add recon
-	.classy__config persistent add close
-	set w [.classy__config component options]
+	.classy__.config add reconf "Reconfigure" [list $object _reconfigure .]
+	.classy__.config persistent add recon
+	.classy__.config persistent add close
+	set w [.classy__.config component options]
 
 	Classy::NoteBook $w.book
 	foreach {conftype confname} {
@@ -78,10 +78,10 @@ Classy::Configurator method dialog {} {
 	
 	pack $w.book -fill both -expand yes
 	$w.book select Keys
-	Classy::canceltodo .classy__config place
+	Classy::canceltodo .classy__.config place
 	update idletasks
 	$w.book propagate
-	.classy__config place
+	.classy__.config place
 }
 
 Classy::Configurator method _parseconffile {level file} {
@@ -613,7 +613,7 @@ Classy::Configurator method _reconf {args} {
 Classy::Configurator method _reconfigure {w} {
 	private $object noreconf
 	$object _activateconfall
-	set noreconf(.classy__config) 1
+	set noreconf(.classy__.config) 1
 	if [info exists noreconf($w)] return
 	if ![catch {$w _reconfigure}] return
 	foreach child [winfo children $w] {
@@ -665,10 +665,10 @@ Classy::Configurator method _selectconfdialog {} {
 	private $object data
 	set conftype $data(conftype)
 	set confname $data(confname)
-	if [winfo exists .classy__config.loadconfig] {.classy__config.loadconfig destroy}
+	if [winfo exists .classy__.config.loadconfig] {.classy__.config.loadconfig destroy}
 	set w [getprivate $object w].$conftype
 	set level [$w.manage.level get]
-	set w .classy__config.loadconfig
+	set w .classy__.config.loadconfig
 	Classy::Dialog $w -title "Select $level configuration"
 	set w [$w component options]
 	listbox $w.list -yscrollcommand [list $w.vbar set] \
@@ -680,15 +680,15 @@ Classy::Configurator method _selectconfdialog {} {
 	grid columnconfigure $w 0 -weight 1
 	grid rowconfigure $w 0 -weight 1
 
-	bind $w.list <<MExecute>> [list .classy__config.loadconfig invoke go]
-	.classy__config.loadconfig add go "Go" [list $object _selectconf $level] default
+	bind $w.list <<MExecute>> [list .classy__.config.loadconfig invoke go]
+	.classy__.config.loadconfig add go "Go" [list $object _selectconf $level] default
 	eval $w.list insert end [$object _getnamedconfigs $confname]
 }
 
 Classy::Configurator method _selectconf {level} {
 	private $object data notsaved
 	set conftype $data(conftype)
-	set w [.classy__config.loadconfig component options]
+	set w [.classy__.config.loadconfig component options]
 	set pos [$w.list curselection]
 	if {"$pos" == ""} return
 	set file [lindex $data(selectlist) $pos]
@@ -740,7 +740,7 @@ Classy::Configurator method _saveasconf {} {
 	set w [getprivate $object w].$conftype
 	set level [$w.manage.level get]
 
-	set w [.classy__config.saveasconfig component options]
+	set w [.classy__.config.saveasconfig component options]
 	set savelevel [$w.level get]
 	set name [$w.entry get]
 	set file [file join $::Classy::dir($savelevel) opt $name $confname.tcl]
@@ -755,12 +755,12 @@ Classy::Configurator method _saveasconf {} {
 Classy::Configurator method _saveasconfdialog {} {
 	private $object data
 	set conftype $data(conftype)
-	if [winfo exists .classy__config.saveasconfig] {
-		.classy__config.saveasconfig destroy
+	if [winfo exists .classy__.config.saveasconfig] {
+		.classy__.config.saveasconfig destroy
 	}
 	set w [getprivate $object w].$conftype
 	set level [$w.manage.level get]
-	set w .classy__config.saveasconfig
+	set w .classy__.config.saveasconfig
 	Classy::Dialog $w -title "Save $level configuration as" -resize {1 0}
 	$w add go "Save" [list $object _saveasconf] default
 	set w [$w component options]
@@ -798,7 +798,7 @@ Classy::Configurator method _clearconf {} {
 
 Classy::Configurator method _checksaved {} {
 	private $object notsaved
-	set w [.classy__config component options]
+	set w [.classy__.config component options]
 	foreach {conftype confname} {
 		key Keys
 		mouse Mouse

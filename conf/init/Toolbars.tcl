@@ -37,8 +37,8 @@ Classy::configtool Classy::Builder {toolbar used in the ClassyTcl Builder} {
 Classy::configtool Classy::WindowBuilder {toolbar used in the ClassyTcl WindowBuilder} {
 	action cut "Delete" {%W delete}
 	separator
-	action edit "Edit" {%W edit}
-	action test "Test" {%W restore}
+	action save "Save" {%W save}
+	action test "Test" {%W test}
 	action recreate "Recreate Dialog" {%W recreate}
 	separator
 	action close "Close" {destroy %W}

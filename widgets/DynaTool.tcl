@@ -164,10 +164,10 @@ Classy::DynaTool method define {tooltype {data {}}} {
 	if {"$data" != ""} {
 		set tooldata($tooltype) $data
 	} else {
-		catch {destroy .classy__temp}
-		frame .classy__temp -class $tooltype
-		set tooldata($tooltype) [option get .classy__temp toolbar Toolbar]
-		destroy .classy__temp
+		catch {destroy .classy__.temp}
+		frame .classy__.temp -class $tooltype
+		set tooldata($tooltype) [option get .classy__.temp toolbar Toolbar]
+		destroy .classy__.temp
 	}
 	$object redraw $tooltype
 }

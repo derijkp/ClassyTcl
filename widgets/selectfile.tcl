@@ -86,16 +86,16 @@ proc Classy::selectfile {args} {
 			return $temp
 		}
 	} else {
-		catch {destroy .classy__selectfile}
-		Classy::FileSelect .classy__selectfile -dir $dir \
+		catch {destroy .classy__.selectfile}
+		Classy::FileSelect .classy__.selectfile -dir $dir \
 			-title $opt(-title) -textvariable ::Classy::selectfile \
 			-filter $filter -default $opt(-default) -selectmode $opt(-selectmode) -help $opt(-help) \
 			-closecommand {set ::Classy::selectfile ""}
 		if {"$remain"!=""} {eval .clasy__selectfile configure $remain}
 		if {"$opt(-initialfile)" != ""} {
-			.classy__selectfile set $opt(-initialfile)
+			.classy__.selectfile set $opt(-initialfile)
 		}
-		tkwait window .classy__selectfile
+		tkwait window .classy__.selectfile
 		return $::Classy::selectfile
 	}
 }

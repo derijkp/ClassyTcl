@@ -34,7 +34,7 @@ Classy::Builder classmethod init {args} {
 	wm geometry $object +10000+10000
 
 	private $object browse
-	Classy::DynaMenu makemenu Classy::Builder .classy__Buildermenu $object Classy::BuilderMenu
+	Classy::DynaMenu makemenu Classy::Builder .classy__.buildermenu $object Classy::BuilderMenu
 	bindtags $object [list $object Classy::Builder all]
 	Classy::DynaTool maketool Classy::Builder $object.tool $object
 	grid $object.tool -row 0 -columnspan 3 -sticky ew
@@ -142,7 +142,8 @@ Classy::Builder method close {} {
 			$object _creatededit $object.dedit
 			return [$object.dedit close]
 		}
-		file - function {
+		file {}
+		function {
 			if [$object.fedit.edit textchanged] {
 				if ![Classy::yorn "Are you sure you want to abort the current editing session"] {
 					return 1
@@ -235,7 +236,7 @@ Classy::Builder method _creatededit {w} {
 }
 
 Classy::Builder method open {file function type} {
-putsvars file function type
+#putsvars file function type
 	global auto_index
 	private $object browse open
 	if [$object close] return
@@ -247,7 +248,8 @@ putsvars file function type
 			$object.dedit open $file $function
 		}
 		dir {}
-		file - function {
+		file {}
+		function {
 			$object fedit $object.fedit $file $function $type
 		}
 		default {
@@ -353,35 +355,7 @@ Classy::Builder method save {} {
 	set file $browse(file)
 	switch $browse(type) {
 		dialog - toplevel {
-			set function $browse(name)
-			set code [$object code]
-			uplevel #0 $code
-			if ![info complete $code] {
-				error "error: generated code not complete (contains unmatched braces, parentheses, ...)"
-			}
-			set result ""
-			set work ""
-			set done 0
-			foreach line [split [readfile $file] "\n"] {
-				append work "$line\n"
-				if [info complete $work] {
-					if [string match "proc $function args *" $work] {
-						append result "$code\n"
-						set done 1
-					} else {
-						append result $work
-					}
-					set work ""
-				}
-			}
-			if !$done {
-				append result "$code\n"
-			}
-			file copy -force $file $file~
-			writefile $file $result
-			catch {auto_mkindex [file dirname $file] *.tcl}
-			set auto_index($function) [list source $file]
-			set result $function
+			set result [$object.dedit save]
 		}
 		function {	
 			file copy -force $file $file~

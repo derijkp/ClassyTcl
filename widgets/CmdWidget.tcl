@@ -999,7 +999,7 @@ proc Classy__puts {args} {
 }
 
 proc Classy::cmd {args} {
-	set w .classy__cmd
+	set w .classy__.cmd
 	set num 1
 	while {[winfo exists $w$num] == 1} {incr num}
 	set w $w$num

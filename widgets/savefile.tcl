@@ -68,16 +68,16 @@ proc Classy::savefile {args} {
 					-filetypes $opt(-filetypes) -initialdir $dir \
 					-initialfile $opt(-initialfile) -title $opt(-title)] 0]
 	} else {
-		catch {destroy .classy__selectfile}
-		Classy::FileSelect .classy__selectfile -dir $dir \
-			-title $opt(-title) -command {set ::Classy::selectfile [.classy__selectfile get]} \
+		catch {destroy .classy__.selectfile}
+		Classy::FileSelect .classy__.selectfile -dir $dir \
+			-title $opt(-title) -command {set ::Classy::selectfile [.classy__.selectfile get]} \
 			-filter $filter -default $opt(-default) -help $opt(-help) \
 			-closecommand {set ::Classy::selectfile ""}
-		if {"$remain"!=""} {eval .classy__selectfile configure $remain}
+		if {"$remain"!=""} {eval .classy__.selectfile configure $remain}
 		if {"$opt(-initialfile)"!=""} {
-			.classy__selectfile set $opt(-initialfile)
+			.classy__.selectfile set $opt(-initialfile)
 		}
-		tkwait window .classy__selectfile
+		tkwait window .classy__.selectfile
 		return $::Classy::selectfile
 	}
 }

@@ -68,7 +68,7 @@ Classy::DragDrop method start {from value args} {
 	set data(bindtags) [bindtags $from]
 	set ftypes() {}
 	foreach event [bind Classy::DragDrop_extra] {bind Classy::DragDrop_extra $event {}}
-	set w .classy__dragdrop
+	set w .classy__.dragdrop
 	if ![winfo exists $w] {
 		toplevel $w -class Classy::DragDrop -width 10 -height 10
 		wm withdraw $w
@@ -82,7 +82,7 @@ Classy::DragDrop method start {from value args} {
 		$w.l configure -cursor hand2
 		bindtags $w Classy::DragDrop
 	}
-	lower .classy__dragdrop.small
+	lower .classy__.dragdrop.small
 	catch {unset data(remote)}
 	if {[string first $args {-image {}}] == -1} {
 	    wm geometry  $w +[expr {[winfo pointerx $w]+1}]+[expr {[winfo pointery $w]+1}]
@@ -138,7 +138,7 @@ Classy::DragDrop method _events {app x y} {
 #}
 Classy::DragDrop method move {} {
 	private $object data
-	set w .classy__dragdrop
+	set w .classy__.dragdrop
 	set x [winfo pointerx $w]
 	set y [winfo pointery $w]
 	if ![info exists data(withdrawn)] {
@@ -220,7 +220,7 @@ Classy::DragDrop method configure {args} {
 				}
 				-image {
 					if [info exists data(withdrawn)] {return {}}
-					return [.classy__dragdrop.l cget -image]
+					return [.classy__.dragdrop.l cget -image]
 				}
 				default {
 					return -code error "Unknown option $option"
@@ -233,19 +233,19 @@ Classy::DragDrop method configure {args} {
 					set data(transfer) $value
 					switch $value {
 						none {
-							lower .classy__dragdrop.small
+							lower .classy__.dragdrop.small
 						}
 						copy {
-							.classy__dragdrop.small configure -image [Classy::geticon drag_copy]
-							raise .classy__dragdrop.small
+							.classy__.dragdrop.small configure -image [Classy::geticon drag_copy]
+							raise .classy__.dragdrop.small
 						}
 						move {
-							.classy__dragdrop.small configure -image [Classy::geticon drag_move]
-							raise .classy__dragdrop.small
+							.classy__.dragdrop.small configure -image [Classy::geticon drag_move]
+							raise .classy__.dragdrop.small
 						}
 						link {
-							.classy__dragdrop.small configure -image [Classy::geticon drag_link]
-							raise .classy__dragdrop.small
+							.classy__.dragdrop.small configure -image [Classy::geticon drag_link]
+							raise .classy__.dragdrop.small
 						}
 					}
 				}
@@ -268,12 +268,12 @@ Classy::DragDrop method configure {args} {
 				}
 				-image {
 					if {"$value" == ""} {
-						wm withdraw .classy__dragdrop
+						wm withdraw .classy__.dragdrop
 						set data(withdrawn) 1
 					} else {
-						.classy__dragdrop.l configure -image $value
-						wm deiconify .classy__dragdrop
-						raise .classy__dragdrop
+						.classy__.dragdrop.l configure -image $value
+						wm deiconify .classy__.dragdrop
+						raise .classy__.dragdrop
 						catch {unset data(withdrawn)}
 					}
 				}
@@ -332,7 +332,7 @@ Classy::DragDrop method get {{type {}}} {
 #}
 Classy::DragDrop method abort {} {
 	private $object data
-	set w .classy__dragdrop
+	set w .classy__.dragdrop
 	wm withdraw $w
 	wm geometry $w +10000+10000
 	bindtags $data(from) $data(bindtags)
@@ -347,7 +347,7 @@ Classy::DragDrop method abort {} {
 #}
 Classy::DragDrop method drop {} {
 	private $object data
-	set w .classy__dragdrop
+	set w .classy__.dragdrop
 	set x [winfo pointerx $w]
 	set y [winfo pointery $w]
     wm geometry  $w +[expr {[winfo pointerx $w]+1}]+[expr {[winfo pointery $w]+1}]

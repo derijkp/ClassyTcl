@@ -4,6 +4,53 @@ namespace eval ::Classy::WindowBuilder::stop_Classy {}
 namespace eval ::Classy::WindowBuilder::edit_Classy {}
 namespace eval ::Classy::WindowBuilder::generate_Classy {}
 
+array set ::Classy::WindowBuilder::options {
+	-activebackground {Colors color}
+	-activeborderwidth {Sizes int}
+	-activeforeground {Colors color}
+	-anchor {Display anchor}
+	-background {Colors color}
+	-bitmap {Display bitmap}
+	-borderwidth {Display int}
+	-cursor {Display cursor}
+	-disabledforeground {Colors color}
+	-exportselection bool
+	-font {Display font}
+	-foreground {Colors color}
+	-highlightbackground {Colors color}
+	-highlightcolor {Colors color}
+	-highlightthickness {Sizes int}
+	-image {Display image}
+	-insertbackground {Colors color}
+	-insertborderwidth {Sizes int}
+	-insertofftime int
+	-insertontime int
+	-insertwidth {Sizes int}
+	-jump bool
+	-justify {Display justify}
+	-orient {Display orient}
+	-padx {Sizes int}
+	-pady {Sizes int}
+	-relief {Display relief}
+	-repeatdelay int
+	-repeatinterval int
+	-selectbackground {Colors color}
+	-selectborderwidth {Sizes int}
+	-setgrid bool
+	-takefocus int
+	-text {Display text}
+	-textvariable {Code string}
+	-troughcolor {Colors color}
+	-underline int
+	-wraplength {Sizes int}
+	-xscrollcommand {Code text}
+	-yscrollcommand {Code text}
+	-command {Code text}
+	-height {Sizes int}
+	-width {Sizes int}
+	-offset {Sizes string}
+	-selectforground {Colors color}
+}
 #
 # Toplevel
 #
@@ -31,7 +78,13 @@ proc ::Classy::WindowBuilder::generate_Toplevel {object base} {
 	set outw [$object outw $base]
 	append body "\ttoplevel $outw [$object getoptions $base]\n"
 	append body "\twm title $outw [wm title $base]\n"
-	append body [$object generate [winfo children $base]]
+	set children ""
+	foreach child [winfo children $base] {
+		if ![regexp "^$base.classy__\[a-z\]+\$" $child] {
+			lappend children $child
+		}
+	}
+	append body [$object generate $children]
 	append body [$object gridconf $base]
 	append body "\n"
 	return $body
@@ -120,8 +173,8 @@ proc ::Classy::WindowBuilder::edit_Classy::Dialog {object w} {
 	set row 0
 	foreach item {title closecommand autoraise keepgeometry} {
 		Classy::Entry $w.$item -label $item \
-			-command "$object setoption -$item \[$w.$item get\]" -labelwidth 15
-		$w.$item set [$object getoption -$item]
+			-command "$object attribute set -$item \[$w.$item get\]" -labelwidth 15
+		$w.$item set [$object attribute get -$item]
 		grid $w.$item -row $row -sticky we
 		incr row
 	}
@@ -140,17 +193,17 @@ proc ::Classy::WindowBuilder::edit_Classy::DialogButton {object w} {
 	set row 0
 	foreach item {text default} {
 		Classy::Entry $w.$item -label $item \
-			-command "$object setoption -$item \[$w.$item get\]" -labelwidth 15
-		$w.$item set [$object getoption -$item]
+			-command "$object attribute set -$item \[$w.$item get\]" -labelwidth 15
+		$w.$item set [$object attribute get -$item]
 		grid $w.$item - -row $row -sticky we
 		incr row
 	}
 	set ::Classy::WindowBuilder::error {}
 	label $w.error -textvariable ::Classy::WindowBuilder::error
 	button $w.setcommand -text "Set Command" \
-		-command "$object setoption -command \[string trimright \[$w.command get 1.0 end\]\]"
+		-command "$object attribute set -command \[string trimright \[$w.command get 1.0 end\]\]"
 	Classy::Text $w.command -width 10 -height 5 -xscrollcommand [list $w.hscroll set] -yscrollcommand [list $w.vscroll set]
-	$w.command insert end [$object getoption -command]
+	$w.command insert end [$object attribute get -command]
 	scrollbar $w.vscroll -command [list $w.command yview]
 	scrollbar $w.hscroll -orient horizontal -command [list $w.command xview]
 	grid $w.error - -row [incr row] -sticky we
@@ -190,8 +243,9 @@ proc ::Classy::WindowBuilder::stop_Frame {object base} {
 
 proc ::Classy::WindowBuilder::generate_Frame {object base} {
 	set body ""
-	append body "\tframe $base [$object getoptions $base]\n"
-	append body "\t[$object gridwconf $base\n"
+	set outw [$object outw $base]
+	append body "\tframe $outw [$object getoptions $base]\n"
+	append body "\t[$object gridwconf $base]\n"
 	append body [$object generate [winfo children $base]]
 	append body [$object gridconf $base]
 	return $body
@@ -210,11 +264,11 @@ proc ::Classy::WindowBuilder::edit_Button {object w} {
 	set ::Classy::WindowBuilder::error {}
 	label $w.error -textvariable ::Classy::WindowBuilder::error
 	grid $w.error -row [incr row] -sticky we
-	button $w.setcmd -text "Set Command" -command "$object setoption -command \[string trimleft \[string trimright \[$w.cmd get 1.0 end\]\]\]"
+	button $w.setcmd -text "Set Command" -command "$object attribute set -command \[string trimleft \[string trimright \[$w.cmd get 1.0 end\]\]\]"
 	grid $w.setcmd -row [incr row] -sticky we
 	Classy::Text $w.cmd
 	grid $w.cmd -row [incr row] -sticky we
-	$w.cmd insert end [$object getoption -command]
+	$w.cmd insert end [$object attribute get -command]
 	grid columnconfigure $w 0 -weight 1
 	grid rowconfigure $w $row -weight 1
 }
@@ -264,7 +318,7 @@ proc ::Classy::WindowBuilder::entry {w item label {labelwidth 10}} {
 			if [set ${var}(f,$item,$c)] {
 				$object setfoption -$item [$w.$item get]
 			} else {
-				$object setoption -$item [$w.$item get]
+				$object attribute set -$item [$w.$item get]
 			}
 		}]
 	checkbutton $w.$item.f -text function -variable ${var}(f,$item,$c)
@@ -272,7 +326,7 @@ proc ::Classy::WindowBuilder::entry {w item label {labelwidth 10}} {
 	pack forget $w.$item.frame
 	pack $w.$item.f -side left -expand no
 	pack $w.$item.frame -side left -fill x -expand yes
-	$w.$item nocmdset [$object getoption -$item]
+	$w.$item nocmdset [$object attribute get -$item]
 	grid $w.$item -row $row -sticky we
 	incr row
 }

@@ -207,21 +207,21 @@ proc Classy::loadfunction {file function {pattern {}}} {
 # For debugging purposes only
 
 proc ::Classy::msg {text} {
-	if [winfo exists .classy__message] {destroy .classy__message}
+	if [winfo exists .classy__.message] {destroy .classy__.message}
 	if {"$text"==""} {return}
-	toplevel .classy__message
-	wm positionfrom .classy__message user
-	wm title .classy__message "Message"
-	wm resizable .classy__message 0 0
-	message .classy__message.message -aspect 250\
+	toplevel .classy__.message
+	wm positionfrom .classy__.message user
+	wm title .classy__.message "Message"
+	wm resizable .classy__.message 0 0
+	message .classy__.message.message -aspect 250\
 		-justify center -text $text
-	pack .classy__message.message
+	pack .classy__.message.message
 	update idletasks
-	set xpos [expr [winfo pointerx .classy__message]-[winfo width .classy__message]/2]
+	set xpos [expr [winfo pointerx .classy__.message]-[winfo width .classy__.message]/2]
 	if {$xpos<0} {set xpos 0}
-	set ypos [expr [winfo pointery .classy__message]-[winfo height .classy__message]/2]
+	set ypos [expr [winfo pointery .classy__.message]-[winfo height .classy__.message]/2]
 	if {$ypos<0} {set ypos 0}
-	wm geometry .classy__message +$xpos+$ypos
+	wm geometry .classy__.message +$xpos+$ypos
 	update
 }
 

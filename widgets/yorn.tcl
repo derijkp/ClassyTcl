@@ -27,18 +27,18 @@ proc Classy::yorn {message args} {
 		-close {1 0 yes no true false} no
 	} remain
 	if {"$remain" != ""} {error "bad options \"$remain\""}
-	Classy::YornBox .classy__yorn -yescommand {set ::Classy::yorn 1} \
+	Classy::YornBox .classy__.yorn -yescommand {set ::Classy::yorn 1} \
 		  -nocommand {set ::Classy::yorn 0} \
 		  -closecommand {set ::Classy::yorn close} \
 		  -title "YorN" -message $message -keepgeometry no
 	if ![true $opt(-close)] {
-		destroy .classy__yorn.actions.close
-		bind .classy__yorn <Escape> {.classy__yorn invoke no}
+		destroy .classy__.yorn.actions.close
+		bind .classy__.yorn <Escape> {.classy__.yorn invoke no}
 	}
-	if [info exists opt(-help)] {.classy__yorn configure -help $opt(-help)}
+	if [info exists opt(-help)] {.classy__.yorn configure -help $opt(-help)}
 	update idletasks
-	grab set .classy__yorn
-	tkwait window .classy__yorn
+	grab set .classy__.yorn
+	tkwait window .classy__.yorn
 	update idletasks
 	return $::Classy::yorn
 }

@@ -42,3 +42,4 @@ if {[option get . patchTk PatchTk]==1} {
 # add lib in the appdir to the auto_path
 #----------------------------------------------------------------------
 lappend auto_path [file join ${::Classy::appdir} lib]
+frame .classy__

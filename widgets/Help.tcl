@@ -246,7 +246,7 @@ proc Classy::findhelp {w} {
 }
 
 proc Classy::newhelp {{subject {help}}} {
-	set w .classy__help
+	set w .classy__.help
 	set num 1
 	while {[winfo exists $w$num] == 1} {incr num}
 	set w $w$num
@@ -255,12 +255,12 @@ proc Classy::newhelp {{subject {help}}} {
 }
 
 proc Classy::help {{subject {classy_help}}} {
-	if ![winfo exists .classy__help] {
-		Classy::Help .classy__help
+	if ![winfo exists .classy__.help] {
+		Classy::Help .classy__.help
 	}
-	if ![winfo ismapped .classy__help] {wm deiconify .classy__help}
-	raise .classy__help
-	.classy__help gethelp $subject
+	if ![winfo ismapped .classy__.help] {wm deiconify .classy__.help}
+	raise .classy__.help
+	.classy__.help gethelp $subject
 }
 Classy::export {help newhelp} {}
 

@@ -50,11 +50,11 @@ Classy::Editor classmethod init {args} {
 	scrollbar $object.vbar -orient vertical -command "$object.edit yview"
 	scrollbar $object.hbar -orient horizontal -command "$object.edit xview"
 
-	set menu .classy__editormenu
-	Classy::DynaMenu makemenu Classy::Editor .classy__editormenu $object Classy::EditorMenu
+	set menu .classy__.editormenu
+	Classy::DynaMenu makemenu Classy::Editor .classy__.editormenu $object Classy::EditorMenu
 	# replace default cmdw commands to make Editor cmdw instead of Editor.edit
-	bind $object <FocusIn> "Classy::DynaMenu cmdw .classy__editormenu $object"
-	bind $object <Enter> "Classy::DynaMenu cmdw .classy__editormenu $object"
+	bind $object <FocusIn> "Classy::DynaMenu cmdw .classy__.editormenu $object"
+	bind $object <Enter> "Classy::DynaMenu cmdw .classy__.editormenu $object"
 	Classy::DynaTool maketool Classy::Editor $object.tool $object
 	grid $object.tool - -sticky we
 	grid rowconfigure $object 1 -weight 1
@@ -748,7 +748,7 @@ Classy::Editor method setmacro {name command {key {}}} {
 	laddnew macros $name
 	Classy::Default set app Classy::Editor_macros $macros
 	Classy::Default set app Classy::Editor_macro_$name [list $command $key]
-	eval [.classy__editormenu.macros cget -postcommand]
+	eval [.classy__.editormenu.macros cget -postcommand]
 }
 
 #doc {Editor command deletemacro} cmd {
@@ -761,7 +761,7 @@ Classy::Editor method deletemacro {name} {
 		return
 	}
 	Classy::Default unset app Classy::Editor_macro_$name
-	eval [.classy__editormenu.macros cget -postcommand]
+	eval [.classy__.editormenu.macros cget -postcommand]
 }
 
 #doc {Editor command getmacromenu} cmd {
@@ -1170,7 +1170,7 @@ proc Classy::title {w title} {
 
 proc edit {args} {
 	if {"$args"==""} {set args "Newfile"}
-	set w .classy__edit
+	set w .classy__.edit
 	set num 1
 	while {[winfo exists $w$num] == 1} {incr num}
 	set w $w$num

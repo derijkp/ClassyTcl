@@ -279,3 +279,7 @@ Classy::NoteBook method redraw {} {
 	}
 }
 
+Classy::NoteBook method get {} {
+	private $object current
+	return $current
+}

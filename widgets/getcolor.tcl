@@ -40,18 +40,18 @@ proc Classy::getcolor {args} {
 		return [tk_chooseColor -initialcolor $opt(-initialcolor) -title $opt(-title)]
 	}
 	set ::Classy::temp $opt(-initialcolor)
-	Classy::Dialog .classy__getcolor -title $opt(-title) -resize {1 1} -closecommand {
+	Classy::Dialog .classy__.getcolor -title $opt(-title) -resize {1 1} -closecommand {
 		set ::Classy::temp ""
-		destroy .classy__getcolor
+		destroy .classy__.getcolor
 	}
-	.classy__getcolor add go "Select" {
-		set ::Classy::temp [.classy__getcolor.options.select get]
+	.classy__.getcolor add go "Select" {
+		set ::Classy::temp [.classy__.getcolor.options.select get]
 	} default
-	Classy::ColorSelect .classy__getcolor.options.select
-	.classy__getcolor.options.select set $opt(-initialcolor)
-	pack .classy__getcolor.options.select -fill both -expand yes
-	.classy__getcolor place
-	tkwait window .classy__getcolor
+	Classy::ColorSelect .classy__.getcolor.options.select
+	.classy__.getcolor.options.select set $opt(-initialcolor)
+	pack .classy__.getcolor.options.select -fill both -expand yes
+	.classy__.getcolor place
+	tkwait window .classy__.getcolor
 	if {"$::Classy::temp"==""} {
 		return -code return ""
 	} else {

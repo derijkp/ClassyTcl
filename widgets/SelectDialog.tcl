@@ -167,11 +167,11 @@ Classy::SelectDialog method set {name} {
 
 proc Classy::select {title list} {
 	global Classytemp
-	Classy::SelectDialog .classy::select -title $title -command {
-		set Classytemp [.classy::select get]
+	Classy::SelectDialog .classy__.select -title $title -command {
+		set Classytemp [.classy__.select get]
 	} -closecommand {set Classytemp ""}
-	.classy::select fill $list
-	tkwait window .classy::select
+	.classy__.select fill $list
+	tkwait window .classy__.select
 	return $Classytemp
 }
 

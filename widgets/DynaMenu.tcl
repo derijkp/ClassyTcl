@@ -233,10 +233,10 @@ Classy::DynaMenu method makepopup {menu curmenu data cmdw bindtag} {
 Classy::DynaMenu method define {menutype {data {}}} {
 	private $object menudata menutypes mtype cmdws checks bindtags flag
 	if {"$data" == ""} {
-		catch {destroy .classy__temp}
-		frame .classy__temp -class $menutype
-		set data [option get .classy__temp menu Menu]
-		destroy .classy__temp
+		catch {destroy .classy__.temp}
+		frame .classy__.temp -class $menutype
+		set data [option get .classy__.temp menu Menu]
+		destroy .classy__.temp
 	}
 	foreach menu [$object menus $menutype] {
 		if ![winfo exists $menu] {
