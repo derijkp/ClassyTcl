@@ -16,7 +16,7 @@ if ![file exists [file join lib Class.tcl]] {
 # $Format: "\tset currentversion 0.$ProjectMajorVersion$"$
 	set currentversion 0.3
 # $Format: "\tset patchLevel $ProjectMinorVersion$"$
-	set patchLevel 13
+	set patchLevel 20
 
 lappend auto_path [pwd]
 package require Extral
@@ -74,14 +74,14 @@ proc clean {filemode dirmode dir} {
 		windows {
 			file mkdir [file join $targetdir visitors]
 			file copy visitors/visexport.dll visitors/visrotate.dll [file join $targetdir visitors]
-			eval file copy -force [glob [file join $targetdir conf themes Windows.conf]] \
-				[list [file join $targetdir conf init.conf]]
+			eval file copy -force [glob [file join $targetdir conf themes Windows]] \
+				[list [file join $targetdir conf conf.values]]
 		}
 		default {
 			file mkdir [file join $targetdir visitors]
 			file copy visitors/visrotate.so [file join $targetdir visitors]
-			eval file copy -force [glob [file join $targetdir conf themes Linux.conf]] \
-				[list [file join $targetdir conf init.conf]]
+			eval file copy -force [glob [file join $targetdir conf themes Linux]] \
+				[list [file join $targetdir conf conf.values]]
 			foreach file [glob [file join $targetdir bin *]] {
 				catch {file attributes $file -permissions 0755}
 			}

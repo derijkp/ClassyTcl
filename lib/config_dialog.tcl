@@ -368,7 +368,11 @@ proc Classy::config_saveas {level name} {
 	} else {
 		set file $name
 	}
-	file_write $file [array get configdata]
+	set f [open $file w]
+	foreach key [lsort [array names configdata]] {
+		puts $f [list $key $configdata($key)]
+	}
+	close $f
 	destroy .classy__.config.saveas
 }
 

@@ -343,11 +343,11 @@ menu,Classy_Test {
 	action "Test" {%W insert insert "Test: %W"} Alt-t
 }
 bool,*PatchTk 1
-{select Classy Tk *Bgerror} Classy
-{select popup top *MenuType} top
-{select left right *ScrollSide} right
-{select Classy Tk *GetColor} Classy
-{select Win Classy *SelectFile} Win
+{select Classy Tk,*Bgerror} Classy
+{select popup top,*MenuType} top
+{select left right,*ScrollSide} right
+{select Classy Tk,*GetColor} Classy
+{select Win Classy,*SelectFile} Win
 int,*Classy::OptionBox.BorderWidth 1
 relief,*Classy::OptionBox.Relief groove
 anchor,*Checkbutton.anchor w

@@ -23,11 +23,32 @@
  gives the number of possible undo steps. Default is 200.
 <b><dt>Command-Line Name: -papersize</b><b><dt>Database Name: paperSize</b><b><dt>Database Class: PaperSize</b><dd>
  determines the papersize
+<b><dt>Command-Line Name: -changedcommand</b><b><dt>Database Name: changedCommand</b><b><dt>Database Class: ChangedCommand</b><dd>
+ command to execute upon changes made to canvas
+<b><dt>Command-Line Name: -selectstipple</b><b><dt>Database Name: selectStipple</b><b><dt>Database Class: SelectStipple</b><dd>
 <b><dt>Command-Line Name: -progresswindow</b><b><dt>Database Name: progressWindow</b><b><dt>Database Class: ProgressWindow</b><dd>
  window in which progress of loading and saving can be shown; must be api compatible with
  Classy::Progress
+<b><dt>Command-Line Name: -state</b><b><dt>Database Name: state</b><b><dt>Database Class: State</b><dd>
+ Specifies  one of three states for the entry:  normal,
+ disabled or combo.  If the entry  is  disabled  then  the
+ value  may not be changed using widget commands and
+ no insertion cursor will be displayed, even if  the
+ input focus is in the widget. The combo state allows
+ changes using the combo list, but not by editing.
 <b><dt>Command-Line Name: -orient</b><b><dt>Database Name: orient</b><b><dt>Database Class: Orient</b><dd>
  determines the position of the label relative to the entry: horizontal or vertical
+<b><dt>Command-Line Name: -combosize</b><b><dt>Database Name: comboSize</b><b><dt>Database Class: ComboSize</b><dd>
+ max size of list to choose from (if larger use scrollbar)
+<b><dt>Command-Line Name: -combopreset</b><b><dt>Database Name: comboPreset</b><b><dt>Database Class: ComboPreset</b><dd>
+ if set, the value will be executed as a command, and the result will give a number of values
+ that will be added to the combo list if they are not present already.
+<b><dt>Command-Line Name: -combo</b><b><dt>Database Name: combo</b><b><dt>Database Class: Combo</b><dd>
+ make entry into a combo box, The value of -combo can be a number, in which case it gives
+ the number of previous values in the entry are kept as choice, or a Tcl command. If
+ the value is not a number, it will be used as a Tcl command that will be executed
+ upon invocation of the combo button. The resulting list will be offered as choice in
+ the combo list.
 <b><dt>Command-Line Name: -default</b><b><dt>Database Name: default</b><b><dt>Database Class: Default</b><dd>
  If not empty, a <a href="DefaultMenu.html">DefaultMenu</a> will be 
  added to store and reselecte values of the entry easily. These 
@@ -35,7 +56,7 @@
  as type app. The default option gives the key for getting and 
  setting values.
 <b><dt>Command-Line Name: -label</b><b><dt>Database Name: label</b><b><dt>Database Class: Label</b><dd>
-<b><dt>Command-Line Name: -labelbg</b><b><dt>Database Name: labelBg</b><b><dt>Database Class: LabelBg</b><dd>
+<b><dt>Command-Line Name: -labelbackground</b><b><dt>Database Name: labelBackground</b><b><dt>Database Class: LabelBackground</b><dd>
  background color of label
 <b><dt>Command-Line Name: -command</b><b><dt>Database Name: command</b><b><dt>Database Class: Command</b><dd>
  associate a command with the entry. When the Action key (usually Enter) is pressed 

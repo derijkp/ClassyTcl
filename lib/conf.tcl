@@ -368,7 +368,7 @@ proc Classy::Config {option args} {
 			return [array get result]
 		}
 		default {
-			error "Unknown option, should be one of dialog, config or new
+			error "Unknown option, should be one of dialog, config or new"
 		}
 	}
 }

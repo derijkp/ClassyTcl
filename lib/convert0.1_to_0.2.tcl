@@ -1,5 +1,5 @@
-set src tests/sbrowse/conf/init
-set file tests/sbrowse/sbrowse.tcl
+#set src tests/sbrowse/conf/init
+#set file tests/sbrowse/sbrowse.tcl
 
 proc class::convtool {src} {
 puts "Converting $src"

@@ -394,7 +394,7 @@ Fonts {
 		{Browser data font} {_font *Classy::Browser.dataFont {font used for data in the browser widget} Font}
 	}
 }
-Keys {
+{Basic Keys} {
 	Edit {
 		Cut {_key <<Cut>> {Cut key} <Alt-x>}
 		Copy {_key <<Copy>> {Copy key} <Alt-c>}

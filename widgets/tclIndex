@@ -20,7 +20,7 @@ set auto_index(::Classy::CmdWidget_SelectTo) [list source [file join $dir CmdWid
 set auto_index(::Classy::CmdWidget_AutoScan) [list source [file join $dir CmdWidgetbnd.tcl]]
 set auto_index(::Classy::CmdWidget_ResetAnchor) [list source [file join $dir CmdWidgetbnd.tcl]]
 set auto_index(::Classy::yorn) [list source [file join $dir yorn.tcl]]
-set auto_index(::Classy::trace) [list source [file join $dir Editor.tcl]]
+set auto_index(::Classy::Editor_trace) [list source [file join $dir Editor.tcl]]
 set auto_index(::Classy::title) [list source [file join $dir Editor.tcl]]
 set auto_index(::Classy::edit) [list source [file join $dir Editor.tcl]]
 set auto_index(edit) [list source [file join $dir Editor.tcl]]
@@ -86,6 +86,7 @@ set auto_index(::Classy::WindowBuilder::attredit_relief) [list source [file join
 set auto_index(::Classy::WindowBuilder::attredit_anchor) [list source [file join $dir WindowBuilderTypes.tcl]]
 set auto_index(::Classy::WindowBuilder::menuset) [list source [file join $dir WindowBuilderTypes.tcl]]
 set auto_index(::Classy::WindowBuilder::select_menu) [list source [file join $dir WindowBuilderTypes.tcl]]
+set auto_index(::Classy::WindowBuilder::new_menu) [list source [file join $dir WindowBuilderTypes.tcl]]
 set auto_index(::Classy::WindowBuilder::attredit_menu) [list source [file join $dir WindowBuilderTypes.tcl]]
 set auto_index(::Classy::WindowBuilder::defattredit) [list source [file join $dir WindowBuilderTypes.tcl]]
 

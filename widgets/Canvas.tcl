@@ -721,7 +721,7 @@ proc Classy::Canvas_create_text {object w arg extra} {
 	} else {
 		set arg [lreplace $arg end end $fonts($font)]
 	}
-	return [leval $w create text $arg $extra]
+	return [eval $w create text $arg $extra]
 }
 
 invoke {} {
@@ -740,7 +740,7 @@ foreach type {line polygon rectangle oval arc} {
 		} else {
 			set width 1
 		}
-		set item [leval $w create @type@ $arg $extra]
+		set item [eval $w create @type@ $arg $extra]
 		set itemw($item) $width
 		return $item
 	}
@@ -751,15 +751,15 @@ foreach type {line polygon rectangle oval arc} {
 }
 
 proc Classy::Canvas_create_bitmap {object w arg extra} {
-	return [leval $w create bitmap $arg]
+	return [eval $w create bitmap $arg]
 }
 
 proc Classy::Canvas_create_image {object w arg extra} {
-	return [leval $w create image $arg]
+	return [eval $w create image $arg]
 }
 
 proc Classy::Canvas_create_window {object w arg extra} {
-	return [leval $w create window $arg]
+	return [eval $w create window $arg]
 }
 
 if $::Classy::dashpatch {
@@ -815,7 +815,7 @@ Classy::Canvas method delete {args} {
 		$object addundo [list delete $items] [list delete $items $poss]
 		return ""
 	} else {
-		return [leval $w delete $args]
+		return [eval $w delete $args]
 	}
 }
 
@@ -924,7 +924,7 @@ Classy::Canvas method itemconfigure {tagOrId args} {
 						catch {lappend temp $option [$w itemcget $item $option]}
 					}
 					lappend optionslist $temp
-					catch {leval $w itemconfigure $item $args}
+					catch {eval $w itemconfigure $item $args}
 				}
 			} else {
 				foreach item $citems {
@@ -933,7 +933,7 @@ Classy::Canvas method itemconfigure {tagOrId args} {
 						catch {lappend temp $option [$w itemcget $item $option]}
 					}
 					lappend optionslist $temp
-					catch {leval $w itemconfigure $item $args}
+					catch {eval $w itemconfigure $item $args}
 				}
 			}
 			$object addundo [list itemconfigure $tagOrId $kargs] [list itemconfigure $citems $optionslist $ws]
@@ -952,11 +952,11 @@ Classy::Canvas method itemconfigure {tagOrId args} {
 				set ws ""
 				foreach item $citems {
 					set itemw($item) $width
-					catch {leval $w itemconfigure $item $args}
+					catch {eval $w itemconfigure $item $args}
 				}
 			} else {
 				foreach item $citems {
-					catch {leval $w itemconfigure $item $args}
+					catch {eval $w itemconfigure $item $args}
 				}
 			}
 		}
@@ -1243,7 +1243,7 @@ Classy::Canvas method addtag {tag searchcommand args} {
 				}
 			}
 			default {
-				set citems [leval $w find $searchcommand $args]
+				set citems [eval $w find $searchcommand $args]
 			}
 		}
 		set items ""
@@ -1284,7 +1284,7 @@ Classy::Canvas method addtag {tag searchcommand args} {
 				}
 			}
 			default {
-				leval $w addtag $tag $searchcommand $args
+				eval $w addtag $tag $searchcommand $args
 			}
 		}
 	}
@@ -1336,7 +1336,7 @@ Classy::Canvas method find {searchcommand args} {
 				}
 			}
 			default {
-				return [list_lremove [leval $w find $searchcommand $args] [array names del]]
+				return [list_lremove [eval $w find $searchcommand $args] [array names del]]
 			}
 		}
 	} else {
@@ -1356,7 +1356,7 @@ Classy::Canvas method find {searchcommand args} {
 				return $citems
 			}
 			default {
-				return [list_lremove [leval $w find $searchcommand $args] [array names del]]
+				return [list_lremove [eval $w find $searchcommand $args] [array names del]]
 			}
 		}
 	}
@@ -1734,7 +1734,7 @@ proc ::Classy::Canvas_load_text {object w idata tags} {
 	}
 	set args [list_merge {-anchor -fill -justify -stipple -text -width} \
 		[lrange $idata 3 8]]
-	leval $w create text $coords $args -font [list $fonts($font) -tags $tags]
+	eval $w create text $coords $args -font [list $fonts($font) -tags $tags]
 }
 
 invoke {} {
@@ -1770,7 +1770,7 @@ foreach {type opts} {
 		}
 		set args [list_merge {@opt@} \
 			[lrange $idata 3 @end@]]
-		set item [leval $w create @type@ $coords $args -width $widths($width) [list -tags $tags]]
+		set item [eval $w create @type@ $coords $args -width $widths($width) [list -tags $tags]]
 		set itemw($item) $width
 		return $item
 	}
@@ -1837,7 +1837,7 @@ proc ::Classy::Canvas_load_image {object w idata tags} {
 	}
 	set args [list_merge {-anchor} \
 		[lrange $idata 6 6]]
-	leval $w create image $coords $args [list -tags $tags -image $load(image,$name)]
+	eval $w create image $coords $args [list -tags $tags -image $load(image,$name)]
 }
 
 proc ::Classy::Canvas_save_bitmap {object w item} {
@@ -1875,7 +1875,7 @@ proc ::Classy::Canvas_load_bitmap {object w idata tags} {
 	}
 	set args [list_merge {-anchor -background -foreground} \
 		[lrange $idata 4 6]]
-	leval $w create bitmap $coords $args [list -tags $tags -bitmap $name]
+	eval $w create bitmap $coords $args [list -tags $tags -bitmap $name]
 }
 
 proc ::Classy::Canvas_save_window {object w item} {
@@ -1980,7 +1980,7 @@ Classy::Canvas method group {args} {
 	private $object w data
 	incr data(group)
 	set name _g$data(group)
-	leval $object addtag $name $args
+	eval $object addtag $name $args
 	return $name
 }
 

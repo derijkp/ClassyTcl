@@ -64,7 +64,7 @@ Classy::DynaMenu classmethod attachmainmenu {menutype cmdw {menuroot {}}} {
 	}
 	$class cmdw $menutype $cmdw
 	catch {bindtags [Classy::rebindw $cmdw] [lreplace [bindtags [Classy::rebindw $cmdw]] 1 0 Classy::Menu_$menutype]}
-	if {"[option get $root menuType MenuType]"!="top"} {
+	if [string_equal [option get $root menuType MenuType] popup] {
 		bind $cmdw <<MainMenu>> "$class popup $menutype %X %Y"
 	} else {
 		[Classy::window $root] configure -menu $menu
