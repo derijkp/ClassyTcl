@@ -25,7 +25,3 @@ package::init $Class::dir class Class lib/Class-tcl.tcl
 lappend auto_path [file join ${::Class::dir} lib]
 
 source [file join $::Class::dir lib Class.tcl]
-
-
-
-

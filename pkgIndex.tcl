@@ -14,11 +14,3 @@ package ifneeded Class 1.0 \
 	set ::Class::dir [list $dir]
 	source [file join [list $dir] lib init.tcl]
 }]
-
-
-
-
-
-
-
-
