@@ -4,6 +4,14 @@
 #
 # Classy::ColorEntry
 # ----------------------------------------------------------------------
+#doc ColorEntry title {
+#ColorEntry
+#} descr {
+# subclass of <a href="Entry.html">Entry</a><br>
+# has the same options and methods as <a href="Entry.html">Entry</a>,
+# but has a display to show the color in the entry when the Enter key
+# is pressed.
+#}
 # Next is to get the attention of auto_mkindex
 if 0 {
 proc ::Classy::ColorEntry {} {}

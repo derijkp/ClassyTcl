@@ -37,5 +37,16 @@ test Classy::DynaTool {pictures} {
 	set try 1
 } {1}
 
+test Classy::DynaTool {pictures} {
+	clean
+	eval destroy [winfo children .]
+	classyinit test
+	Classy::DynaTool maketool Classy::Editor .t .text
+	pack .t -fill x
+	text .text
+	pack .text -side bottom
+	set try 1
+} {1}
+
 testsummarize
 catch {unset errors}

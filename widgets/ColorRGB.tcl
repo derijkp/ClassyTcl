@@ -4,6 +4,18 @@
 #
 # Classy::ColorRGB
 # ----------------------------------------------------------------------
+#doc ColorRGB title {
+#ColorRGB
+#} descr {
+# subclass of <a href="../basic/Widget.html">Widget</a><br>
+# select a color by setting red green and blue values
+#}
+#doc {ColorRGB options} h2 {
+#	ColorRGB specific options
+#}
+#doc {ColorRGB command} h2 {
+#	ColorRGB specific methods
+#}
 # Next is to get the attention of auto_mkindex
 if 0 {
 proc ::Classy::ColorRGB {} {}
@@ -50,12 +62,22 @@ Classy::ColorRGB classmethod init {args} {
 
 Classy::ColorRGB chainoptions {$object}
 
+
+#doc {ColorRGB options -command} option {-command command Command} descr {
+# command to be executed when the color is changed
+#}
 Classy::ColorRGB addoption -command {command Command {}}
 
 # ------------------------------------------------------------------
 #  Methods
 # ------------------------------------------------------------------
 
+
+#doc {ColorRGB command set} cmd {
+#pathname set value
+#} descr {
+# set current color to $value
+#}
 Classy::ColorRGB method set {value} {
 	private $object nocmd
 	set rgb [winfo rgb $object $value]
@@ -68,11 +90,21 @@ Classy::ColorRGB method set {value} {
 	update idletasks
 }
 
+#doc {ColorRGB command get} cmd {
+#pathname get 
+#} descr {
+# get the current color
+#}
 Classy::ColorRGB method get {} {
 	return [format "#%02x%02x%02x" \
 		[$object.red.val get] [$object.green.val get] [$object.blue.val get]]
 }
 
+#doc {ColorRGB command getRGB} cmd {
+#pathname getRGB 
+#} descr {
+# get the current color as a list of red, green and blue
+#}
 Classy::ColorRGB method getRGB {} {
 	return "[$object.red.val get] [$object.green.val get] [$object.blue.val get]"
 }

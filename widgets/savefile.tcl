@@ -4,7 +4,31 @@
 #
 # Classy::savefile
 # ----------------------------------------------------------------------
-
+#doc savefile title {
+#savefile
+#}
+# Next is to get the attention of auto_mkindex
+if 0 {
+proc ::Classy::savefile {} {}
+proc savefile {} {}
+}
+#doc {savefile savefile} cmd {
+#savefile ?option value ...?
+#} descr {
+# returns a filename to save a file to selected by the user. The selection
+# method depends om the ClassyTcl configuration. Possible options are
+#<dl>
+#<dt>-defaultextension
+#<dt>-filetypes
+#<dt>-initialdir
+#<dt>-initialfile
+#<dt>-title
+#<dt>-filter
+#<dt>-default
+#<dt>-transfercommand
+#<dt>-help
+#</dl>
+#}
 proc Classy::savefile {args} {
 	global tcl_platform
 	Classy::parseopt $args opt {
@@ -12,7 +36,7 @@ proc Classy::savefile {args} {
 		-filetypes {} {}
 		-initialdir {} {}
 		-initialfile {} {}
-		-title {} {Select file}
+		-title {} {Save file}
 		-filter {} *
 		-default {} peos__fileselect
 		-transfercommand {} {}
@@ -48,3 +72,5 @@ proc Classy::savefile {args} {
 		return $peos__selectfile
 	}
 }
+
+Classy::export savefile {}

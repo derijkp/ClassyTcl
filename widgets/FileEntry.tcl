@@ -4,6 +4,15 @@
 #
 # Classy::FileEntry
 # ----------------------------------------------------------------------
+#doc FileEntry title {
+#FileEntry
+#} descr {
+# subclass of <a href="Entry.html">Entry</a><br>
+# provides nearly the same options and methods as Entry,
+# bit has a "Browse" button which upon invocation will open a
+# file selection dialog. When a file is selected in this dialog, it 
+# will be inserted in the entry.
+#}
 # Next is to get the attention of auto_mkindex
 if 0 {
 proc ::Classy::FileEntry {} {}
@@ -25,7 +34,7 @@ Classy::FileEntry classmethod init {args} {
 		set ::Classy::current [::Classy::selectfile -title "[$object cget -label]" \
 			-initialdir [file dirname $::Classy::current] -filter *[file extension $::Classy::current] \
 			]
-		if {"$Classycurrent"!=""} {$object set $Classycurrent}
+		if {"$::Classy::current"!=""} {$object set $::Classy::current}
 	}]
 	pack $object.browse -in $object.frame -side left
 

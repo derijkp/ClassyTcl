@@ -6,8 +6,8 @@ source tools.tcl
 
 test Classy::Editor {Editor and find} {
 	clean
-	eval destroy [winfo children .]
 	classyinit test
+	eval destroy [winfo children .]
 	Classy::Editor .try \
 		-loadcommand "wm title . "
 	pack .try -fill both -expand yes

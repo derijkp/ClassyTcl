@@ -4,6 +4,22 @@
 #
 # Classy::Progress
 # ----------------------------------------------------------------------
+#doc Progress title {
+#Progress
+#} descr {
+# subclass of <a href="Dialog.html">Dialog</a><br>
+# creates a dialog in which the progress of some action will be displayed.
+# The progress will be displayed as the fraction of ticks passed (
+# ticks are passed by invoking the incr method), compared to the number 
+# of ticks to go (-ticks options). The display will be updated every
+# -step ticks
+#}
+#doc {Progress options} h2 {
+#	Progress specific options
+#}
+#doc {Progress command} h2 {
+#	Progress specific methods
+#}
 # Next is to get the attention of auto_mkindex
 if 0 {
 proc ::Classy::Progress {} {}
@@ -49,34 +65,34 @@ Classy::Progress component message {$object.options.message}
 #  Widget options
 # ------------------------------------------------------------------
 
+#doc {Progress options -ticks} option {-ticks ticks Ticks} descr {
+#}
 Classy::Progress addoption -ticks {ticks Ticks 100}
+
+#doc {Progress options -step} option {-step step Step} descr {
+#}
 Classy::Progress addoption -step {step Step 1}
+
+#doc {Progress options -width} option {-width width Width} descr {
+#}
 Classy::Progress addoption -width {width Width 200}
+
+#doc {Progress options -fg} option {-fg ? ?} descr {
+#}
 Classy::Progress chainoption -fg {$object.options.frame.prog} -bg
+
+#doc {Progress options -message} option {-message ? ?} descr {
+#}
 Classy::Progress chainoption -message {$object.options.message} -text
 
 # ------------------------------------------------------------------
 #  Methods
 # ------------------------------------------------------------------
 
-#Classy::Progress chainallmethods {$object} toplevel
-
-Classy::Progress method set {value} {
-	set ticks [getprivate $object options(-ticks)]
-	private $object current
-	set current $value
-	if {$value<0} {set value 0}
-	if {$value>$ticks} {set value $ticks}
-	set ratio [expr double($current)/$ticks]
-	$object.options.percent configure -text "[expr int($ratio*100)]%"
-	$object.options.frame.prog configure -width [expr int($ratio*[winfo width $object.options.frame])]
-}
-
-Classy::Progress method get {} {
-	private $object current
-	return $current
-}
-
+#doc {Progress command incr} cmd {
+#pathname incr ?value?
+#} descr {
+#}
 Classy::Progress method incr {{value 1}} {
 	set step [getprivate $object options(-step)]
 	set ticks [getprivate $object options(-ticks)]
@@ -90,4 +106,28 @@ Classy::Progress method incr {{value 1}} {
 	$object.options.percent configure -text "[expr int($ratio*100)]%"
 	$object.options.frame.prog configure -width [expr int($ratio*[winfo width $object.options.frame])]
 	update idletasks
+}
+
+#doc {Progress command set} cmd {
+#pathname set value
+#} descr {
+#}
+Classy::Progress method set {value} {
+	set ticks [getprivate $object options(-ticks)]
+	private $object current
+	set current $value
+	if {$value<0} {set value 0}
+	if {$value>$ticks} {set value $ticks}
+	set ratio [expr double($current)/$ticks]
+	$object.options.percent configure -text "[expr int($ratio*100)]%"
+	$object.options.frame.prog configure -width [expr int($ratio*[winfo width $object.options.frame])]
+}
+
+#doc {Progress command get} cmd {
+#pathname get 
+#} descr {
+#}
+Classy::Progress method get {} {
+	private $object current
+	return $current
 }

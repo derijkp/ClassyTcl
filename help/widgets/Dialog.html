@@ -1,0 +1,96 @@
+<HEAD>
+<TITLE>
+Dialog
+</TITLE>
+</HEAD>
+<BODY>
+<h1>
+Dialog
+</h1>
+
+ subclass of <a href="../basic/Widget.html">Widget</a><br>
+ Dialog produces "intelligent" dialog. They have a simple option to
+make tehm resizable or not. They automatically assume a reasonable
+minimum size based on their content (The dialog will be placed on the
+screen and its size calculated at the first idle moment after dialog 
+creation. The dialog will place itself so that the mouse pointer is 
+is positioned over it, without being place partly out of the screen.
+If it is resized, it remembers its size for the next display.
+<p>
+By default, the dialog has a "Close" button that destroys the dialog
+on invocation. Other buttons can be added easily using the add method.
+Invoking a command by clicking on a button (or using a key shortcut)
+will close the dialog, unless the button is persistent, or was 
+invoked using the Adjust mouse button.
+The dialog has one component named options, which is a frame in
+which optionmenus, entries, etc. can be placed. 
+
+<h2>
+	Dialog specific options
+</h2><dl><dt>Command-Line Name: <b>-closecommand</b><dt>Database Name: <b>?</b><dt>Database Class: <b>?</b><dd>
+commands invoked when invoking the "Close" button
+</ul>
+<dl><dt>Command-Line Name: <b>-keepgeometry</b><dt>Database Name: <b>keepGeometry</b><dt>Database Class: <b>KeepGeometry</b><dd>
+remember size of dialog for next creation
+</ul>
+<dl><dt>Command-Line Name: <b>-cache</b><dt>Database Name: <b>cache</b><dt>Database Class: <b>Cache</b><dd>
+hide the dialog instead of destroying it when it is closed
+</ul>
+<dl><dt>Command-Line Name: <b>-title</b><dt>Database Name: <b>dialog</b><dt>Database Class: <b>Dialog</b><dd>
+</ul>
+<dl><dt>Command-Line Name: <b>-help</b><dt>Database Name: <b>help</b><dt>Database Class: <b>Help</b><dd>
+ add a help button. A file with the name helpvalue.html will
+ be shown in a help window whein the button is invoked
+</ul>
+<dl><dt>Command-Line Name: <b>-resize</b><dt>Database Name: <b>resize</b><dt>Database Class: <b>Resize</b><dd>
+list of 2 values determining whether the dialog is resizable in x
+and y direction
+</ul>
+<dl><dt>Command-Line Name: <b>-autoraise</b><dt>Database Name: <b>autoRaise</b><dt>Database Class: <b>AutoRaise</b><dd>
+</ul>
+
+<h2>
+	Dialog specific methods
+</h2><dl><dt><b>
+pathname add button text command ?default?
+</b><dd>
+ add a button with name $button to the dialog. The button will display
+ the $text. When it is invoked, $command will be executed.
+ If the word default is added, the button will be displayed differently
+ and invoked by default (eg. when presseng Enter).
+</ul>
+<dl><dt><b>
+pathname persistent ?option button ...?
+</b><dd>
+Without arguments, the method returns a list of all persistent buttons
+Option can be:
+<dl>
+<dt>set<dt>make only the given buttons persistent
+<dt>add<dt>make the given buttons persistent
+<dt>remove<dt>make the given buttons not persistent
+</dl>
+</ul>
+<dl><dt><b>
+pathname invoke button ?Action/Adjust?
+</b><dd>
+</ul>
+<dl><dt><b>
+pathname close 
+</b><dd>
+</ul>
+<dl><dt><b>
+pathname hide 
+</b><dd>
+hide the dialog
+</ul>
+<dl><dt><b>
+pathname place 
+</b><dd>
+display the dialog in a proper position, size, ...
+</ul>
+<dl><dt><b>
+pathname destroy 
+</b><dd>
+</ul>
+
+</body>

@@ -786,7 +786,7 @@ test class {trace object} {
 	clean
 	Class new try
 	set ::try ""
-	class::traceobject try ::try 3
+	class::traceobject try {append ::try} 3
 	try class
 	class::untraceobject try
 	try class

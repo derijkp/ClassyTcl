@@ -4,6 +4,19 @@
 #
 # Classy::OptionMenu
 # ----------------------------------------------------------------------
+#doc OptionMenu title {
+#OptionMenu
+#} descr {
+# subclass of <a href="../basic/Widget.html">Widget</a><br>
+# creates an optionmenu, a widget in which the user can select between
+# different values using a menu.
+#}
+#doc {OptionMenu options} h2 {
+#	OptionMenu specific options
+#}
+#doc {OptionMenu command} h2 {
+#	OptionMenu specific methods
+#}
 # Next is to get the attention of auto_mkindex
 if 0 {
 proc ::Classy::OptionMenu {} {}
@@ -40,7 +53,12 @@ Classy::OptionMenu classmethod init {args} {
 #  Widget options
 # ------------------------------------------------------------------
 
+#doc {OptionMenu options -command} option {-command command Command} descr {
+#}
 Classy::OptionMenu addoption -command {command Command {}}
+
+#doc {OptionMenu options -list} option {-list list List} descr {
+#}
 Classy::OptionMenu addoption -list {list List {}} {
 	$object.menu delete 0 end
 	foreach val $value {
@@ -58,18 +76,30 @@ Classy::OptionMenu addoption -list {list List {}} {
 
 Classy::OptionMenu chainallmethods {$object} menubutton
 
+#doc {OptionMenu command get} cmd {
+#pathname get 
+#} descr {
+#}
 Classy::OptionMenu method get {} {
 	return [[Classy::widget $object] cget -text]
 }
 
-Classy::OptionMenu method command {} {
-	uplevel #0 [getprivate $object options(-command)]
-}
-
+#doc {OptionMenu command set} cmd {
+#pathname set value
+#} descr {
+#}
 Classy::OptionMenu method set {value} {
 	set list [getprivate $object options(-list)]
 	if {[lsearch $list $value]!=-1} {
 		set [[Classy::widget $object] cget -textvariable] $value
 	}
+}
+
+#doc {OptionMenu command command} cmd {
+#pathname command 
+#} descr {
+#}
+Classy::OptionMenu method command {} {
+	uplevel #0 [getprivate $object options(-command)]
 }
 

@@ -17,6 +17,15 @@ test Classy::HTML {create and configure} {
 	.try cget -wrap
 } {char}
 
+test Classy::help {create and configure} {
+	clean
+	destroy .try
+	classyinit test
+	Classy::Help .try
+	.try gethelp ClassyTcl
+	.try cget -wrap
+} {word}
+
 testsummarize
 catch {unset errors}
 

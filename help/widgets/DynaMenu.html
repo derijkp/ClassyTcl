@@ -1,0 +1,135 @@
+<HEAD>
+<TITLE>
+DynaMenu
+</TITLE>
+</HEAD>
+<BODY>
+<h1>
+DynaMenu
+</h1>
+
+ subclass of <a href="../basic/Class.html">Class</a><br>
+ DynaMenu is not a widget and is not intended to produce instances. 
+ It is a class that manages menus in an easy and dynamic way.
+ Dynamenu can handle several menutypes.
+<p>
+ Each menutype is defined by a definition in a simple format. 
+ Dynamenu can create one or more popup or top menus for each
+ menutype. When the definition of the menutype is redefined
+ all menus of that type will be changed accordingly.
+<p>
+ Menu definitions for menutype are usually controlled from the
+ Menus part of the <a href="../classy_configure.html">configuration 
+ system</a>. Creation of a menu of a certain type, will get the menu
+ definition from the option database by creating a dummy frame with 
+ class menutype and getting its option value for menu (class Menu).
+ you can add a menutype in the configuration system by adding
+<pre>
+## Somemenu {this is an example menu} menu
+option add *Somemenu.Menu definition widgetDefault
+</pre>
+ to the Menus configuration file. You will usually only need this 
+ configuration and the makemenu method to get working menus.
+<p>
+ A menu managed by DynaMenu can control several widgets: The commands 
+ associated with the menu can include a %W, that on invocation is
+ changed to the current cmdw (command widget). The cmdw of a menu can be
+ changed at any time. DynaMenu also handles key shortcuts.
+
+<dl><dt><b>
+DynaMenu makemenu menutype menu cmdw bindtag
+</b><dd>
+ This is usually the only method you need to create menus. It
+ creates a menu named $menu of type $menutype if $menu does not exist yet.
+ $cmdw determines the initial command widget. All key bindings 
+ from key shortcuts
+ are bound to $bindtag. Adding $bindtag to the bindtags of a widget
+ will make all shortcuts available from that widget.
+ The menu created will be a popup or top menu depending
+ on the <a href="../classy_configure.html">ClassyTcl configuration</a>.
+</ul>
+
+<dl><dt><b>
+DynaMenu makepopup menutype menu cmdw bindtag
+</b><dd>
+ create a popup menu of type $menutype. $cmdw
+ determines the initial cmdw. All key bindings for key shortcuts
+ are bound to $bindtag. Adding $bindtag to the bindtags of a widget
+ will make all shortcuts available from that widget.
+</ul>
+
+<dl><dt><b>
+DynaMenu maketop menutype menu cmdw bindtag
+</b><dd>
+ create a top menu of type $menutype. $cmdw
+ determines the initial cmdw. All key bindings for key shortcuts
+ are bound to $bindtag. Adding $bindtag to the bindtags of a widget
+ will make all shortcuts available from that widget.
+</ul>
+
+<dl><dt><b>
+DynaMenu define menutype ?data?
+</b><dd>
+ set the definition describing the menus that will be generated 
+ for menutype to $data.
+ If data is not given, the menu definition for menutype is obtained 
+ from the option database. A dummy frame with class $menutype is created,
+ and the its option value for menu (class Menu) obtained. This option
+ will usually be set in the Menus part 
+ <a href="../classy_configure.html">configuration system</a>.
+ You will usually not invoke this method, as the maketop and 
+ makepopup methods will automatically define a menutype
+ that isn't managed yet.
+</ul>
+
+<dl><dt><b>
+DynaMenu names 
+</b><dd>
+ returns a list of menutypes managed by Dynamenu
+</ul>
+
+<dl><dt><b>
+DynaMenu redraw menutype
+</b><dd>
+ redraw menus of type $menutype
+</ul>
+
+<dl><dt><b>
+DynaMenu get menutype
+</b><dd>
+ returns the definition of $menutype
+</ul>
+
+<dl><dt><b>
+DynaMenu delete menutype
+</b><dd>
+ delete the definition and all menus of $menutype
+</ul>
+
+<dl><dt><b>
+DynaMenu cmdw menu ?cmdw?
+</b><dd>
+ change the current cmdw for menu to $cmdw. If the cmdw argument is
+ not given, the method returns the current cmdw for menu.
+ This method is automatically called when a widget which has bindtags
+ defined by DynaMenu recieves the focus.
+</ul>
+
+<dl><dt><b>
+DynaMenu post menu ?x y?
+</b><dd>
+ post menu
+</ul>
+
+<dl><dt><b>
+DynaMenu invoke curmenu index
+</b><dd>
+ invoke the item given by $index in $curmenu
+</ul>
+
+<dl><dt><b>
+DynaMenu confmenu menutype
+</b><dd>
+</ul>
+
+</body>

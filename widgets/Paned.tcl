@@ -4,6 +4,16 @@
 #
 # Classy::Paned
 # ----------------------------------------------------------------------
+#doc Paned title {
+#Paned
+#} descr {
+# subclass of <a href="../basic/Widget.html">Widget</a><br>
+# creates a paned widget, which can be used to control the size
+# of other widgets in a grid
+#}
+#doc {Paned options} h2 {
+#	Paned specific options
+#}
 # Next is to get the attention of auto_mkindex
 if 0 {
 proc ::Classy::Paned {} {}
@@ -17,8 +27,8 @@ option add *Classy::Paned.background [option get . foreground Foreground] widget
 option add *Classy::Paned.relief raised widgetDefault
 option add *Classy::Paned.highlightThickness 0 widgetDefault
 
-bind Classy::Paned <<Action>> {%W start %X %Y}
-bind Classy::Paned <<Action-Motion>> {%W drag %X %Y}
+bind Classy::Paned <<Action>> {%W _start %X %Y}
+bind Classy::Paned <<Action-Motion>> {%W _drag %X %Y}
 
 # ------------------------------------------------------------------
 #  Widget creation
@@ -40,17 +50,33 @@ Classy::Paned classmethod init {args} {
 # ------------------------------------------------------------------
 #  Widget options
 # ------------------------------------------------------------------
+
+#doc {Paned options -orient} option {-orient orient Orient} descr {
+#}
 Classy::Paned addoption -orient {orient Orient vertical}
+
+#doc {Paned options -window} option {-window window Window} descr {
+#}
 Classy::Paned addoption -window {window Window {}}
+
+#doc {Paned options -command} option {-command command Command} descr {
+#}
 Classy::Paned addoption -command {command Command {}}
+
+#doc {Paned options -minsize} option {-minsize minsize MinSize} descr {
+#}
 Classy::Paned addoption -minsize {minsize MinSize 0}
+
+#doc {Paned options -maxsize} option {-maxsize maxsize MaxSize} descr {
+#}
 Classy::Paned addoption -maxsize {maxsize MaxSize {}}
 
 # ------------------------------------------------------------------
 #  Methods
 # ------------------------------------------------------------------
 
-Classy::Paned method start {x y} {
+
+Classy::Paned method _start {x y} {
 	private $object data options
 	set window $options(-window)
 	set orient $options(-orient)
@@ -72,7 +98,7 @@ Classy::Paned method start {x y} {
 	}
 }
 
-Classy::Paned method drag {x y} {
+Classy::Paned method _drag {x y} {
 	private $object data options
 	if {"$options(-orient)"=="vertical"} {
 		set size [expr $data(size)+$x-$data(pos)]

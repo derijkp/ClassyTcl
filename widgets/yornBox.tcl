@@ -2,23 +2,32 @@
 # ClassyTcl Widgets 
 # ----------------- Peter De Rijk
 #
-# yornBox
+# YornBox
 # ----------------------------------------------------------------------
+#doc YornBox title {
+#YornBox
+#} descr {
+# subclass of <a href="Dialog.html">Dialog</a><br>
+# creates a dialog which presents the user with a yes or no choice.
+#}
+#doc {YornBox options} h2 {
+#	YornBox specific options
+#}
 # Next is to get the attention of auto_mkindex
 if 0 {
-proc ::Classy::yornBox {} {}
-proc yornBox {} {}
+proc ::Classy::YornBox {} {}
+proc YornBox {} {}
 }
-catch {Classy::yornBox destroy}
+catch {Classy::YornBox destroy}
 
 # ------------------------------------------------------------------
 #  Widget creation
 # ------------------------------------------------------------------
 
-Classy::Dialog subclass Classy::yornBox
-Classy::export yornBox {}
+Classy::Dialog subclass Classy::YornBox
+Classy::export YornBox {}
 
-Classy::yornBox classmethod init {args} {
+Classy::YornBox classmethod init {args} {
 	super
 	message $object.options.message -width 200 -justify center
 	pack $object.options.message
@@ -42,28 +51,15 @@ Classy::yornBox classmethod init {args} {
 #  Widget options
 # ------------------------------------------------------------------
 
-Classy::yornBox chainoption -message {$object.options.message} -text
-Classy::yornBox chainoption -yescommand {$object.actions.yes} -command
-Classy::yornBox chainoption -nocommand {$object.actions.no} -command
 
-proc Classy::yorn {message args} {
-	Classy::parseopt $args opt {
-		-close {1 0 yes no} no
-	} remain
-	if {"$remain" != ""} {error "bad options \"$remain\""}
-	Classy::yornBox .peos__yorn -yescommand {set ::Classy::yorn 1} \
-		  -nocommand {set ::Classy::yorn 0} \
-		  -closecommand {set ::Classy::yorn close} \
-		  -title "YorN" -message $message -keepgeometry no
-	if ![true $opt(-close)] {
-		destroy .peos__yorn.actions.close
-		bind .peos__yorn <Escape> {.peos__yorn invoke no}
-	}
-	if [info exists opt(-help)] {.peos__yorn configure -help $opt(-help)}
-	grab set .peos__yorn
-	tkwait window .peos__yorn
-	update idletasks
-	return $::Classy::yorn
-}
+#doc {YornBox options -message} option {-message ? ?} descr {
+#}
+Classy::YornBox chainoption -message {$object.options.message} -text
 
+#doc {YornBox options -yescommand} option {-yescommand ? ?} descr {
+#}
+Classy::YornBox chainoption -yescommand {$object.actions.yes} -command
 
+#doc {YornBox options -nocommand} option {-nocommand ? ?} descr {
+#}
+Classy::YornBox chainoption -nocommand {$object.actions.no} -command

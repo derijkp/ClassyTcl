@@ -1,0 +1,44 @@
+<HEAD>
+<TITLE>
+Canvas
+</TITLE>
+</HEAD>
+<BODY>
+<h1>
+Canvas
+</h1>
+
+ subclass of <a href="../basic/Widget.html">Widget</a><br>
+ Classy::Canvas creates a canvas widget with undo and redo. All options
+ and commands are the same as for canvas, with those for undo and redo
+ added.
+
+<h2>
+	Canvas specific methods
+</h2><dl><dt><b>
+pathname undo ?action? ?args?
+</b><dd>
+ Without arguments, this method will undo the actions
+ until the previous checkpoint is reached<br>
+ When action is provided, it can have the following values
+<dl>
+<dt>check<dd>insert a checkpoint
+<dt>clear<dd>clear undo buffer
+<dt>add<dd>add ?args? to undo buffer, they will be executed when undo is called
+<dt>off<dd>turn undo buffering of
+<dt>on<dd>turn undo buffering on
+<dt>status<dd>query state of undo
+</dl>
+</ul>
+<dl><dt><b>
+pathname redo 
+</b><dd>
+ redo undone actions
+</ul>
+<dl><dt><b>
+pathname noundo ?args?
+</b><dd>
+ execute command without storing in undo buffer
+</ul>
+
+</body>

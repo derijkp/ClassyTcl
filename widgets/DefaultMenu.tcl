@@ -4,6 +4,22 @@
 #
 # Classy::DefaultMenu
 # ----------------------------------------------------------------------
+#doc DefaultMenu title {
+#DefaultMenu
+#} descr {
+# subclass of <a href="../basic/Widget.html">Widget</a><br>
+# creates a button which pops up a <a href="SelectDialog.html">selection 
+# dialog</a> from which the user can choose between different
+# default values, or add new ones.
+#}
+#doc {DefaultMenu options} h2 {
+#	DefaultMenu specific options
+#} descr {
+#}
+#doc {DefaultMenu command} h2 {
+#	DefaultMenu specific methods
+#} descr {
+#}
 # Next is to get the attention of auto_mkindex
 if 0 {
 proc ::Classy::DefaultMenu {} {}
@@ -30,9 +46,24 @@ Classy::DefaultMenu classmethod init {args} {
 # ------------------------------------------------------------------
 #  Widget options
 # ------------------------------------------------------------------
+
+#doc {DefaultMenu options -command} option {-command command Command} descr {
+# This command will be executed when the user selects a value from
+# the DefaultMenu.
+#}
 Classy::DefaultMenu addoption -command {command Command {}}
+
+#doc {DefaultMenu options -getcommand} option {-getcommand getCommand GetCommand} descr {
+# This command will be executed upon invoking the menu. The return value 
+# will be placed in the Add entry. This value can be added easily to
+# the list of default values to choose from
+#}
 Classy::DefaultMenu addoption -getcommand {getCommand GetCommand {}}
-Classy::DefaultMenu addoption -reference {reference Reference {}}
+
+#doc {DefaultMenu options -key} option {-key key Key} descr {
+# key by which the default system will be queried and changed
+#}
+Classy::DefaultMenu addoption -key {key Key {}}
 
 
 # ------------------------------------------------------------------
@@ -41,6 +72,12 @@ Classy::DefaultMenu addoption -reference {reference Reference {}}
 
 Classy::DefaultMenu chainallmethods {$object} button
 
+
+#doc {DefaultMenu command get} cmd {
+#pathname get 
+#} descr {
+# get the currently selected value.
+#}
 Classy::DefaultMenu method get {} {
 	.classy__defaultmenu get
 }
@@ -70,6 +107,12 @@ Classy::DefaultMenu method _action {} {
 	}
 }
 
+
+#doc {DefaultMenu command menu} cmd {
+#pathname menu 
+#} descr {
+# invoke the DefaultMenu menu
+#}
 Classy::DefaultMenu method menu {} {
 	private $object posted focus add options
 	set w .classy__defaultmenu
@@ -82,7 +125,7 @@ Classy::DefaultMenu method menu {} {
 		-addcommand "$object add \[setglobal [privatevar $object add]\]" \
 		-deletecommand "$object remove \[$w get\]" \
 		-closecommand "$object removemenu"
-	$w fill [Classy::Default get app $options(-reference)]
+	$w fill [Classy::Default get app $options(-key)]
 	set add [eval $options(-getcommand)]
 
 	set posted 0
@@ -92,13 +135,25 @@ Classy::DefaultMenu method menu {} {
 	after idle "$object place"
 }
 
+
+#doc {DefaultMenu command add} cmd {
+#pathname add value
+#} descr {
+# add $value to the associated defaults list
+#}
 Classy::DefaultMenu method add {val} {
-	Classy::Default add app [getprivate $object options(-reference)] $val
+	Classy::Default add app [getprivate $object options(-key)] $val
 	return [list $val 0]
 }
 
+
+#doc {DefaultMenu command remove} cmd {
+#pathname remove value
+#} descr {
+# remove $value from the associated defaults list
+#}
 Classy::DefaultMenu method remove {val} {
-	Classy::Default remove app [getprivate $object options(-reference)] $val
+	Classy::Default remove app [getprivate $object options(-key)] $val
 }
 
 Classy::DefaultMenu method _motion {X Y} {
@@ -112,6 +167,12 @@ Classy::DefaultMenu method _motion {X Y} {
 	}
 }
 
+
+#doc {DefaultMenu command removemenu} cmd {
+#pathname removemenu 
+#} descr {
+# remove the DefaultMenu menu from the screen
+#}
 Classy::DefaultMenu method removemenu {} {
 	private $object focus
 	focus $focus
@@ -121,6 +182,11 @@ Classy::DefaultMenu method removemenu {} {
 	Classy::Default set geometry $object [Classy::Default get geometry .classy__defaultmenu]
 }
 
+
+#doc {DefaultMenu command place} cmd {
+#pathname place 
+#} descr {
+#}
 Classy::DefaultMenu method place {} {
 	update idletasks
 	set w [winfo reqwidth .classy__defaultmenu]
@@ -146,4 +212,3 @@ Classy::DefaultMenu method place {} {
 	wm deiconify .classy__defaultmenu
 	raise .classy__defaultmenu
 }
-

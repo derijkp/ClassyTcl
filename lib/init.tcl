@@ -35,7 +35,7 @@ namespace eval ::Classy {
 if [file exists [file join ${::class::dir} class[info sharedlibextension]]] {
 	load [file join ${::class::dir} class[info sharedlibextension]]
 } else {
-	source [file join ${::class::dir} lib class.tcl]
+	source [file join ${::class::dir} lib Class.tcl]
 }
 
 #

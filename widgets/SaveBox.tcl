@@ -4,6 +4,18 @@
 #
 # Classy::SaveBox
 # ----------------------------------------------------------------------
+#doc SaveBox title {
+#SaveBox
+#} descr {
+# subclass of <a href="Dialog.html">Dialog</a><br>
+#<b>experimental work</b>
+#}
+#doc {SaveBox options} h2 {
+#	SaveBox specific options
+#}
+#doc {SaveBox command} h2 {
+#	SaveBox specific methods
+#}
 # Next is to get the attention of auto_mkindex
 if 0 {
 proc ::Classy::SaveBox {} {}
@@ -62,15 +74,48 @@ Classy::SaveBox classmethod init {args} {
 #  Widget options
 # ------------------------------------------------------------------
 Classy::SaveBox addoption -transfercommand {}
+
+#doc {SaveBox options -default} option {-default ? ?} descr {
+#}
 Classy::SaveBox chainoption -default {$object.options.entry} -default
+
+#doc {SaveBox options -buttontext} option {-buttontext ? ?} descr {
+#}
 Classy::SaveBox chainoption -buttontext {$object.actions.save} -text
+
+#doc {SaveBox options -textvariable} option {-textvariable ? ?} descr {
+#}
 Classy::SaveBox chainoption -textvariable {$object.options.entry} -textvariable
+
+#doc {SaveBox options -command} option {-command ? ?} descr {
+#}
 Classy::SaveBox chainoption -command {$object.actions.save} -command
 
 # ------------------------------------------------------------------
 #  Methods
 # ------------------------------------------------------------------
 
+#doc {SaveBox command get} cmd {
+#pathname get 
+#} descr {
+#}
+Classy::SaveBox method get {} {
+	return [$object.options.entry get]
+}
+
+#doc {SaveBox command set} cmd {
+#pathname set value
+#} descr {
+#}
+Classy::SaveBox method set {value} {
+	$object.options.entry set $value
+}
+}
+
+#doc {SaveBox command startdrag} cmd {
+#pathname startdrag 
+#} descr {
+#}
 Classy::SaveBox method startdrag {} {
 	set transfercommand [getprivate $object options(-transfercommand)]
 	set file [$object.options.entry get]
@@ -78,13 +123,3 @@ Classy::SaveBox method startdrag {} {
 			savebox \{$object $file\} \
 			mem_indirect [list [concat $object [eval $transfercommand]]]"
 }
-
-Classy::SaveBox method get {} {
-	return [$object.options.entry get]
-}
-
-Classy::SaveBox method set {value} {
-	$object.options.entry set $value
-}
-}
-

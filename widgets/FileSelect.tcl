@@ -4,6 +4,18 @@
 #
 # Classy::FileSelect
 # ----------------------------------------------------------------------
+#doc FileSelect title {
+#FileSelect
+#} descr {
+# subclass of <a href="Dialog.html">Dialog</a><br>
+# Offers a Motif type of file selection box
+#}
+#doc {FileSelect options} h2 {
+#	FileSelect specific options
+#}
+#doc {FileSelect command} h2 {
+#	FileSelect specific methods
+#}
 # Next is to get the attention of auto_mkindex
 if 0 {
 proc ::Classy::FileSelect {} {}
@@ -130,16 +142,36 @@ Classy::FileSelect addoption	-hidden {hidden Hidden 0} {
 	Classy::todo $object refresh
 }
 Classy::FileSelect addoption	-transfercommand {transferCommand TransferCommand {}}
+
+#doc {FileSelect options -command} option {-command command Command} descr {
+#}
 Classy::FileSelect chainoption -command {$object.actions.go} -command
+
+#doc {FileSelect options -default} option {-default default Default} descr {
+#}
 Classy::FileSelect chainoption -default {$object.options.file} -default
+
+#doc {FileSelect options -defaultfilter} option {-defaultfilter default Default} descr {
+#}
 Classy::FileSelect chainoption -defaultfilter {$object.options.filter} -default
+
+#doc {FileSelect options -textvariable} option {-textvariable textVariable Variable} descr {
+#}
 Classy::FileSelect chainoption -textvariable {$object.options.file} -textvariable
+
+#doc {FileSelect options -selectmode} option {-selectmode selectMode SelectMode} descr {
+#}
 Classy::FileSelect chainoption -selectmode {$object.options.files} -selectmode
 
 # ------------------------------------------------------------------
 #  Methods
 # ------------------------------------------------------------------
 
+
+#doc {FileSelect command refresh} cmd {
+#pathname refresh 
+#} descr {
+#}
 Classy::FileSelect method refresh {} {
 	private $object options
 	set w $object.options
@@ -179,6 +211,11 @@ Classy::FileSelect method refresh {} {
 	$w.file nocmdset [string trimright $file]
 }
 
+
+#doc {FileSelect command get} cmd {
+#pathname get 
+#} descr {
+#}
 Classy::FileSelect method get {} {
 	set file [$object.options.file get]
 	if {"[file pathtype $file]"=="absolute"} {
@@ -190,6 +227,11 @@ Classy::FileSelect method get {} {
 	}
 }
 
+
+#doc {FileSelect command set} cmd {
+#pathname set file
+#} descr {
+#}
 Classy::FileSelect method set {file} {
 	private $object options
 	if {"[file pathtype $file]"=="relative"} {
@@ -201,6 +243,11 @@ Classy::FileSelect method set {file} {
 	$object.options.file nocmdset $file
 }
 
+
+#doc {FileSelect command dirset} cmd {
+#pathname dirset ?file?
+#} descr {
+#}
 Classy::FileSelect method dirset {{file {}}} {
 	private $object options
 	if {"$file"!=""} {
@@ -215,6 +262,11 @@ Classy::FileSelect method dirset {{file {}}} {
 	$object.options.file nocmdset $temp
 }
 
+
+#doc {FileSelect command movedir} cmd {
+#pathname movedir movedir
+#} descr {
+#}
 Classy::FileSelect method movedir {movedir} {
 	private $object options
 	if {"$movedir"==".."} {
@@ -228,5 +280,3 @@ Classy::FileSelect method movedir {movedir} {
 		set new [file join $options(-dir) $movedir]
 	}
 }
-
-

@@ -4,9 +4,22 @@
 #
 # Classy::ColorHSV
 # ----------------------------------------------------------------------
+#doc ColorHSV title {
+#ColorHSV
+#} descr {
+# subclass of <a href="../basic/Widget.html">Widget</a><br>
 # An HSV color selector for composing color values.
 # A large part of this code has been inspired by the colorselect widget
 # in the [Incr Tcl] 1.5 distribution
+#}
+#doc {ColorHSV options} h2 {
+#	ColorHSV specific options
+#} descr {
+#}
+#doc {ColorHSV command} h2 {
+#	ColorHSV specific methods
+#} descr {
+#}
 # Next is to get the attention of auto_mkindex
 if 0 {
 proc ::Classy::ColorHSV {} {}
@@ -59,18 +72,32 @@ Classy::ColorHSV classmethod init {args} {
 
 Classy::ColorHSV chainoptions {$object}
 
+
+#doc {ColorHSV options -size} option {-size size Size} descr {
+# gives the desired size of the widget. (it is square, so no width and height.)
+#}
 Classy::ColorHSV addoption -size {size Size 400} {
 	if {[winfo exists $object]} {
 			$object.valHS configure -width $value -height $value
 			$object _drawHS
 	}
 }
+
+#doc {ColorHSV options -command} option {-command command Command} descr {
+# command to be executed upon changing the color
+#}
 Classy::ColorHSV addoption -command {command Command {}}
 
 # ------------------------------------------------------------------
 #  Methods
 # ------------------------------------------------------------------
 
+
+#doc {ColorHSV command set} cmd {
+#pathname set value
+#} descr {
+# set the current color to $value
+#}
 Classy::ColorHSV method set {value} {
 	private $object valV nocmd
 	eval $object _set_rgb [winfo rgb $object $value]
@@ -86,6 +113,12 @@ Classy::ColorHSV method set {value} {
 #
 #  Returns the current color value.
 # ------------------------------------------------------------------
+
+#doc {ColorHSV command get} cmd {
+#pathname get 
+#} descr {
+# get the current color
+#}
 Classy::ColorHSV method get {} {
 	private $object valH valS valV
 	return [$object _hsv2color $valH $valS $valV]
@@ -96,6 +129,12 @@ Classy::ColorHSV method get {} {
 #
 #  Returns the current color value.
 # ------------------------------------------------------------------
+
+#doc {ColorHSV command getHSV} cmd {
+#pathname getHSV 
+#} descr {
+# get the current color as a list of hue, saturation and value
+#}
 Classy::ColorHSV method getHSV {} {
 	private $object valH valS valV
 	return [list $valH $valS $valV]

@@ -1,0 +1,86 @@
+<HEAD>
+<TITLE>Customise item dialog</TITLE>
+</HEAD>
+<BODY>
+<h1>Customise item dialog</h1>
+
+<h2>Description</h2>
+The customise dialog can usually be called from the File menu, by invoking
+an entry labeled "Customise <something>".
+It can be used to edit, delete or create configuration files in Peos. 
+<p>
+Editing configuration files allows customisation of the way the
+application works. Things such as key-shortcuts, colors and fonts can be 
+easily changed. At startup, a Peos application will search 
+several places for configuration files, making it possible to eg. to change the 
+configuration for either all Peos applications or for one specific application, 
+for all users (global) or just one specific user (personal), or even one startup 
+directory (local).  The configuration dialog box lists a button for each possible 
+configuration file in the order they will be checked (Application specific configuration
+options will only show the application specific configurations):
+ 
+<dl>
+<dt>Local application specific configuration
+<dd>This is the most specific configuration file. If this configuration file is 
+created, it will only be used if the current application is started 
+in the current directory. Another application started in the same directory or the 
+same application started in another directory will not see or use this file.
+The file is stored in the directory .peosconf/&lt;application name&gt; (or 
+equivalent depending on OS) in the startup directory.
+<dt>Personal application specific configuration
+<dd>This configuration file is specific to the current user (Unix) and application.
+This will be used if present, and if no local configuration is found (see above). 
+Other users will not find this configuration. The file is stored in the 
+directory .peosconf/&lt;application name&gt; (or equivalent depending on OS) in 
+the home directory of the user.
+<dt>Global application specific configuration
+<dd>application specific configuration stored in the conf sub directory of the 
+application directory.
+<dt>Local configuration
+<dd>This configuration file will be seen by any Peos application starting up in
+the current directory. (Whether it will be used depends on whether more specific
+configurations are present.)
+The file is stored in the directory .peosconf/peos (or equivalent depending on OS) 
+in the startup directory.
+<dt>Personal configuration
+<dd>personal configuration for any Peos application. The file is stored in the 
+directory .peosconf/peos (or equivalent depending on OS) in the home directory of 
+the user.
+<dt>Global configuration
+<dd>This is the most generic configuration file. If no other is found, this one is used.
+It should never be deleted.
+</dl>
+<p>
+If a configuration file actually exists, the mark before the button is checked. 
+A possible configuration can be selected (indicated by a pressed in and differently 
+colored button) for editing or creation by clicking it. 
+
+<h2>Named configurations</h2>
+Configuration can be named. Named configurations are never seen by a Peos application
+at startup, but can be used to store several possible configurations, wich can be 
+restored easily afterwards by using the "Create" button.
+<p>
+The <a href="peos_entry.html">entry</a> labeled "Named" gives access to create, 
+edit or delete named configuration files. Typing the name in the entry, en pressing 
+enter, will list the different possibilities for the configurations with this name.
+The name can also be selected out of all currently available names using the default
+mechanism (click the arrow button).
+
+<h2>Action buttons</h2>
+<dl>
+<dt><a href="peos_button.html">Action</a> Edit
+<dd>edit the currently selected configuration file
+<dt><a href="peos_button.html">Action</a> Use
+<dd>Use the currently selected configuration file
+<dt><a href="peos_button.html">Action</a> Delete
+<dd>Delete the currently selected configuration file
+<dt><a href="peos_button.html">Action</a> Create
+<dd>Create a new configuration file in the currently selected position by selecting 
+one of the existing configuration files and copying it.
+<dt><a href="peos_button.html">Action</a> Help
+<dd>What do you think?
+<dt><a href="peos_button.html">Action</a> Close
+<dd>Close the dialog box without selecting a file.
+</dl>
+</body>
+

@@ -1,0 +1,92 @@
+<HTML>
+<HEAD>
+   <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+   <META NAME="GENERATOR" CONTENT="Mozilla/4.04 [en] (X11; I; Linux 2.0.32 i586) [Netscape]">
+   <TITLE>ClassyTcl</TITLE>
+</HEAD>
+<BODY>
+
+<H1>
+ClassyTcl</H1>
+<I>Object system for Tcl</I>
+<BR><I>by Peter De Rijk (Universiteit Antwerpen)</I>
+<H2>
+What is ClassyTcl</H2>
+ClassyTcl is an object system for <A HREF="tcltk.html">Tcl</A>, written
+enirely in Tcl. This means it doesn't require patches to the Tcl core,
+making keeping up with new releases easier. Performance is very adequate.
+Included in the distribution is a large set of new widgets, written using
+the object system. While the object system itself only requires Tcl (>8.0),
+the widgets that come with it require Tk (of course), and another freely
+available extension called <A HREF="Extral.html">ExtraL</A>. ExtraL also
+does not require compiled code, but can be speeded up by having it available.
+
+<P>Documentation is limited unfortunately. If I get the time, I will write
+more. Until then I can only say: "Use the source, Luke"
+<H2>
+Use</H2>
+You should be able to obtain the latest versions of ClassyTcl and ExtraL
+on our server rrna.uia.ac.be via WWW or anonymous ftp (directory /pub/tcl).
+Both Extral and ClassyTcl are implemented as loadable packages. ClassyTcl
+can be used by&nbsp; putting the directories (after unpacking) somewhere
+appropriate and using the command
+<BR>package require Class
+
+<P>To use the widgets that come with the distribution, first use the command
+<BR>classyinit &lt;program name>
+<H2>
+Implementation</H2>
+Loading the package will create on class named Class. This wil be the parent
+of all other classes and objects
+<H2>
+Widgets</H2>
+There are a lot of interesting widgets in ClassyTcl, but unfortunately
+with no description of how to use them. If you take a look at the sources,
+things should be reasonably obvious though. Be sure to check out the file
+'widgets/Editor.tcl' as an example. The Editor widget uses a lot of the
+other widgets.
+<H2>
+How to contact me</H2>
+I will do my best to reply as fast as I can to any problems, etc. However,
+the development of ClassyTcl is not my only task, which is why my response
+might not be always as fast as you would like (although I get a good average).
+<ADDRESS>
+Peter De Rijk</ADDRESS>
+
+<BR>University of Antwerp (UIA)
+<BR>Department of Biochemistry
+<BR>Universiteitsplein 1
+<BR>B-2610 Antwerp
+
+<P>tel.: 32-03-820.23.16
+<BR>fax: 32-03-820.22.48
+<BR>E-mail: derijkp@uia.ua.ac.be
+<BR>web: http://rrna.uia.ac.be/~peter/personal/peter.html
+<H2>
+Legalities</H2>
+ClassyTcl is Copyright Peter De Rijk, University of Antwerp (UIA), 1995
+The following terms apply to all files associated with the software unless
+explicitly disclaimed in individual files.
+
+<P>The author hereby grant permission to use, copy, modify, distribute,
+and license this software and its documentation for any purpose, provided
+that existing copyright notices are retained in all copies and that this
+notice is included verbatim in any distributions. No written agreement,
+license, or royalty fee is required for any of the authorized uses. Modifications
+to this software may be copyrighted by their authors and need not follow
+the licensing terms described here, provided that the new terms are clearly
+indicated on the first page of each file where they apply.
+
+<P>IN NO EVENT SHALL THE AUTHORS OR DISTRIBUTORS BE LIABLE TO ANY PARTY
+FOR DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING
+OUT OF THE USE OF THIS SOFTWARE, ITS DOCUMENTATION, OR ANY DERIVATIVES
+THEREOF, EVEN IF THE AUTHORS HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH
+DAMAGE.
+
+<P>THE AUTHORS AND DISTRIBUTORS SPECIFICALLY DISCLAIM ANY WARRANTIES, INCLUDING,
+BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT. THIS SOFTWARE IS PROVIDED
+ON AN "AS IS" BASIS, AND THE AUTHORS AND DISTRIBUTORS HAVE NO OBLIGATION
+TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
+</BODY>
+</HTML>

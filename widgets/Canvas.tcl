@@ -4,6 +4,17 @@
 #
 # Canvas
 # ----------------------------------------------------------------------
+#doc Canvas title {
+#Canvas
+#} descr {
+# subclass of <a href="../basic/Widget.html">Widget</a><br>
+# Classy::Canvas creates a canvas widget with undo and redo. All options
+# and commands are the same as for canvas, with those for undo and redo
+# added.
+#}
+#doc {Canvas command} h2 {
+#	Canvas specific methods
+#}
 # Next is to get the attention of auto_mkindex
 if 0 {
 proc ::Classy::Canvas {} {}
@@ -63,114 +74,21 @@ Classy::Canvas	addoption -undosteps {undoSteps UndoSteps 40} {
 
 Classy::Canvas chainallmethods {$object} canvas
 
-Classy::Canvas method redo {} {
-	private $object w undo
-	if {"$undo(redo)"==""} return
-	if {"[lindex $undo(redo) end]"==""} {lpop undo(redo)}
-	if {"[lindex $undo(list) end]"!=""} {lappend undo(list) {}}
-	while 1 {
-		set list [lpop undo(redo)]
-		if {"$list"==""} break
-		set action [lshift list]
-		switch $action {
-			coords {
-				set templist ""
-				foreach {item coords} $list {
-					set ritem [$object _realitems $item]
-					lappend undo(list) [list coords $item [$w coords $ritem]]
-					eval $w coords $ritem $coords
-				}
-			}
-			move {
-				foreach {tagOrId xAmount yAmount} $list {
-					$w move [$object _realitems $tagOrId] $xAmount $yAmount
-					lappend undo(list) [list move $tagOrId $xAmount $yAmount]
-				}
-			}
-			scale {
-				foreach {tagOrId xOrigin yOrigin xScale yScale} $list {
-					$w scale [$object _realitems $tagOrId] $xOrigin $yOrigin $xScale $yScale
-					lappend undo(list) [list scale $tagOrId \
-						$xOrigin $yOrigin $xScale $yScale]
-				}
-			}
-			rotate {
-				foreach {tagOrId x y a} $list {
-					$w visitor rotate [$object _realitems $tagOrId] \
-						-xcenter $x -ycenter $y -angle [expr -$a]
-					lappend undo(list) [list rotate $tagOrId $x $y [expr -$a]]
-				}
-			}
-			create {
-				foreach {item type args} $list {
-					$object _translate $item [eval $w create $type $args]
-					lappend undo(list) [list create $item $type $args]
-				}
-			}
-			delete {
-				foreach {item type args pos} $list {
-					set ritem [$object _realitems $item]
-					lappend undo(list) [list delete $item $type $args $pos]
-					$w delete $ritem
-					$object _rmtranslate $item
-				}
-			}
-			addtag {
-				foreach {tag items} $list {
-					foreach item [$object _realitems $items] {
-						$w addtag $tag withtag $item
-					}
-					lappend undo(list) [list addtag $tag $items]
-				}
-			}
-			dtag {
-				foreach {items tag} $list {
-					foreach item [$object _realitems $items] {
-						$w dtag $item $tag
-					}
-					lappend undo(list) [list dtag $items $tag]
-				}
-			}
-			itemconfigure {
-				foreach {tagOrId args} $list {
-					set options ""
-					set rtagOrId [$object _realitems $tagOrId]
-					foreach {option value} $args {
-						lappend options $option [$w itemcget $rtagOrId $option]
-					}
-					lappend undo(list) [list itemconfigure $tagOrId $options]
-					eval $w itemconfigure $rtagOrId $args
-				}
-			}
-			raise {
-				foreach {items poss} $list {
-					set prevposs ""
-					set ritems [$object _realitems $items]
-					foreach item $items ritem $ritems {
-						lappend prevposs [$w find below $ritem]
-					}
-					foreach ritem $ritems pos [$object _realitems $poss] {
-						if {"$pos"==""} {
-							$w raise $ritem
-						} else {
-							$w raise $ritem $pos
-						}
-					}
-					lappend undo(list) [list raise $items [$object _virtualitems $prevposs]]
-				}
-			}
-			a {
-				set undo(busy) 1
-				uplevel #0 [lindex $list 1]
-				lappend undo(undo) [concat a $list]
-				unset undo(busy)
-			}
-		}
-	}
-	if {"[lindex $undo(list) end]"!=""} {lappend undo(list) {}}
-	incr undo(num)
-}
-
+#doc {Canvas command undo} cmd {
+#pathname undo ?action? ?args?
+#} descr {
+# Without arguments, this method will undo the actions
+# until the previous checkpoint is reached<br>
+# When action is provided, it can have the following values
+#<dl>
+#<dt>check<dd>insert a checkpoint
+#<dt>clear<dd>clear undo buffer
+#<dt>add<dd>add ?args? to undo buffer, they will be executed when undo is called
+#<dt>off<dd>turn undo buffering of
+#<dt>on<dd>turn undo buffering on
+#<dt>status<dd>query state of undo
+#</dl>
+#}
 Classy::Canvas method undo {{action {}} args} {
 	private $object w undo
 	switch $action {
@@ -338,9 +256,128 @@ Classy::Canvas method undo {{action {}} args} {
 	}
 }
 
+#doc {Canvas command redo} cmd {
+#pathname redo 
+#} descr {
+# redo undone actions
+#}
+Classy::Canvas method redo {} {
+	private $object w undo
+	if {"$undo(redo)"==""} return
+	if {"[lindex $undo(redo) end]"==""} {lpop undo(redo)}
+	if {"[lindex $undo(list) end]"!=""} {lappend undo(list) {}}
+	while 1 {
+		set list [lpop undo(redo)]
+		if {"$list"==""} break
+		set action [lshift list]
+		switch $action {
+			coords {
+				set templist ""
+				foreach {item coords} $list {
+					set ritem [$object _realitems $item]
+					lappend undo(list) [list coords $item [$w coords $ritem]]
+					eval $w coords $ritem $coords
+				}
+			}
+			move {
+				foreach {tagOrId xAmount yAmount} $list {
+					$w move [$object _realitems $tagOrId] $xAmount $yAmount
+					lappend undo(list) [list move $tagOrId $xAmount $yAmount]
+				}
+			}
+			scale {
+				foreach {tagOrId xOrigin yOrigin xScale yScale} $list {
+					$w scale [$object _realitems $tagOrId] $xOrigin $yOrigin $xScale $yScale
+					lappend undo(list) [list scale $tagOrId \
+						$xOrigin $yOrigin $xScale $yScale]
+				}
+			}
+			rotate {
+				foreach {tagOrId x y a} $list {
+					$w visitor rotate [$object _realitems $tagOrId] \
+						-xcenter $x -ycenter $y -angle [expr -$a]
+					lappend undo(list) [list rotate $tagOrId $x $y [expr -$a]]
+				}
+			}
+			create {
+				foreach {item type args} $list {
+					$object _translate $item [eval $w create $type $args]
+					lappend undo(list) [list create $item $type $args]
+				}
+			}
+			delete {
+				foreach {item type args pos} $list {
+					set ritem [$object _realitems $item]
+					lappend undo(list) [list delete $item $type $args $pos]
+					$w delete $ritem
+					$object _rmtranslate $item
+				}
+			}
+			addtag {
+				foreach {tag items} $list {
+					foreach item [$object _realitems $items] {
+						$w addtag $tag withtag $item
+					}
+					lappend undo(list) [list addtag $tag $items]
+				}
+			}
+			dtag {
+				foreach {items tag} $list {
+					foreach item [$object _realitems $items] {
+						$w dtag $item $tag
+					}
+					lappend undo(list) [list dtag $items $tag]
+				}
+			}
+			itemconfigure {
+				foreach {tagOrId args} $list {
+					set options ""
+					set rtagOrId [$object _realitems $tagOrId]
+					foreach {option value} $args {
+						lappend options $option [$w itemcget $rtagOrId $option]
+					}
+					lappend undo(list) [list itemconfigure $tagOrId $options]
+					eval $w itemconfigure $rtagOrId $args
+				}
+			}
+			raise {
+				foreach {items poss} $list {
+					set prevposs ""
+					set ritems [$object _realitems $items]
+					foreach item $items ritem $ritems {
+						lappend prevposs [$w find below $ritem]
+					}
+					foreach ritem $ritems pos [$object _realitems $poss] {
+						if {"$pos"==""} {
+							$w raise $ritem
+						} else {
+							$w raise $ritem $pos
+						}
+					}
+					lappend undo(list) [list raise $items [$object _virtualitems $prevposs]]
+				}
+			}
+			a {
+				set undo(busy) 1
+				uplevel #0 [lindex $list 1]
+				lappend undo(undo) [concat a $list]
+				unset undo(busy)
+			}
+		}
+	}
+	if {"[lindex $undo(list) end]"!=""} {lappend undo(list) {}}
+	incr undo(num)
+}
+
+#doc {Canvas command noundo} cmd {
+#pathname noundo ?args?
+#} descr {
+# execute command without storing in undo buffer
+#}
 Classy::Canvas method noundo {args} {
 	eval [getprivate $object w] $args
 }
+
 
 Classy::Canvas method raise {tagOrId {aboveThis all}} {
 	private $object w undo
@@ -360,6 +397,7 @@ Classy::Canvas method raise {tagOrId {aboveThis all}} {
 	$w raise $tagOrId $aboveThis
 }
 
+
 Classy::Canvas method lower {tagOrId {belowThis all}} {
 	private $object w undo
 	if [info exists undo(off)] {
@@ -377,6 +415,7 @@ Classy::Canvas method lower {tagOrId {belowThis all}} {
 	set undo(prevact) ""
 	$w lower $tagOrId $belowThis
 }
+
 
 Classy::Canvas method itemconfigure {tagOrId args} {
 	private $object w
@@ -403,6 +442,7 @@ Classy::Canvas method itemconfigure {tagOrId args} {
 	}
 }
 
+
 Classy::Canvas method move {tagOrId xAmount yAmount} {
 	private $object w undo
 	if [info exists undo(off)] {
@@ -423,6 +463,7 @@ Classy::Canvas method move {tagOrId xAmount yAmount} {
 	set undo(prevargs) $tagOrId
 }
 
+
 Classy::Canvas method scale {tagOrId xOrigin yOrigin xScale yScale} {
 	private $object w undo
 	if [info exists undo(off)] {
@@ -435,6 +476,7 @@ Classy::Canvas method scale {tagOrId xOrigin yOrigin xScale yScale} {
 	set undo(prevact) ""
 	$w scale $tagOrId $xOrigin $yOrigin $xScale $yScale
 }
+
 
 Classy::Canvas method visitor {type tagOrId args} {
 	private $object w undo
@@ -455,6 +497,7 @@ Classy::Canvas method visitor {type tagOrId args} {
 		return [eval $w visitor $type $tagOrId $args]
 	}
 }
+
 
 Classy::Canvas method coords {tagOrId args} {
 	private $object w
@@ -479,6 +522,7 @@ Classy::Canvas method coords {tagOrId args} {
 	}
 }
 
+
 Classy::Canvas method addtag {tag searchCommand args} {
 	private $object w undo
 	set undo(prevact) ""
@@ -493,6 +537,7 @@ Classy::Canvas method addtag {tag searchCommand args} {
 		eval $w addtag $tag $searchCommand $args
 	}
 }
+
 
 Classy::Canvas method dtag {tagOrId {tagToDelete {}}} {
 	private $object w undo
@@ -509,6 +554,7 @@ Classy::Canvas method dtag {tagOrId {tagToDelete {}}} {
 		$w dtag $tagOrId $tagToDelete
 	}
 }
+
 
 Classy::Canvas method create {type args} {
 	private $object w undo

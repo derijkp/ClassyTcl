@@ -4,6 +4,20 @@
 #
 # Classy::ColorSample
 # ----------------------------------------------------------------------
+#doc ColorSample title {
+#ColorSample
+#} descr {
+# subclass of <a href="../basic/Widget.html">Widget</a><br>
+# select color from a number of sample colors
+#}
+#doc {ColorSample options} h2 {
+#	ColorSample specific options
+#} descr {
+#}
+#doc {ColorSample command} h2 {
+#	ColorSample specific methods
+#} descr {
+#}
 # Next is to get the attention of auto_mkindex
 if 0 {
 proc ::Classy::ColorSample {} {}
@@ -57,18 +71,31 @@ Classy::ColorSample classmethod init {args} {
 #  Widget options
 # ------------------------------------------------------------------
 
+#doc {ColorSample options -command} option {-command command Command} descr {
+# command to be executed when the color is changed
+#}
 Classy::ColorSample addoption -command {command Command {}}
 
 # ------------------------------------------------------------------
 #  Methods
 # ------------------------------------------------------------------
 
+#doc {ColorSample command set} cmd {
+#pathname set value
+#} descr {
+# set current color to $value
+#}
 Classy::ColorSample method set {value} {
 	private $object color
 	set color $value
 	uplevel #0 [getprivate $object options(-command)]
 }
 
+#doc {ColorSample command get} cmd {
+#pathname get 
+#} descr {
+# get current color
+#}
 Classy::ColorSample method get {} {
 	private $object color
 	return $color

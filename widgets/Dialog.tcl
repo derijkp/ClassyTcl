@@ -4,6 +4,32 @@
 #
 # Dialog
 # ----------------------------------------------------------------------
+#doc Dialog title {
+#Dialog
+#} descr {
+# subclass of <a href="../basic/Widget.html">Widget</a><br>
+# Dialog produces "intelligent" dialog. They have a simple option to
+#make tehm resizable or not. They automatically assume a reasonable
+#minimum size based on their content (The dialog will be placed on the
+#screen and its size calculated at the first idle moment after dialog 
+#creation. The dialog will place itself so that the mouse pointer is 
+#is positioned over it, without being place partly out of the screen.
+#If it is resized, it remembers its size for the next display.
+#<p>
+#By default, the dialog has a "Close" button that destroys the dialog
+#on invocation. Other buttons can be added easily using the add method.
+#Invoking a command by clicking on a button (or using a key shortcut)
+#will close the dialog, unless the button is persistent, or was 
+#invoked using the Adjust mouse button.
+#The dialog has one component named options, which is a frame in
+#which optionmenus, entries, etc. can be placed. 
+#}
+#doc {Dialog options} h2 {
+#	Dialog specific options
+#}
+#doc {Dialog command} h2 {
+#	Dialog specific methods
+#}
 # Next is to get the attention of auto_mkindex
 if 0 {
 proc ::Classy::Dialog {} {}
@@ -88,15 +114,35 @@ Classy::Dialog component options {$object.options}
 # ------------------------------------------------------------------
 # REM Adding options
 
+
+#doc {Dialog options -closecommand} option {-closecommand ? ?} descr {
+#commands invoked when invoking the "Close" button
+#}
 Classy::Dialog chainoption -closecommand {$object.actions.close} -command
+
+#doc {Dialog options -keepgeometry} option {-keepgeometry keepGeometry KeepGeometry} descr {
+#remember size of dialog for next creation
+#}
 Classy::Dialog addoption -keepgeometry {keepGeometry KeepGeometry yes}
+
+#doc {Dialog options -cache} option {-cache cache Cache} descr {
+#hide the dialog instead of destroying it when it is closed
+#}
 Classy::Dialog addoption -cache {cache Cache 0} {
 	set value [true $value]
 }
+
+#doc {Dialog options -title} option {-title dialog Dialog} descr {
+#}
 Classy::Dialog addoption -title {dialog Dialog "Dialog"} {
 	wm title $object $value
 	return $value
 }
+
+#doc {Dialog options -help} option {-help help Help} descr {
+# add a help button. A file with the name helpvalue.html will
+# be shown in a help window whein the button is invoked
+#}
 Classy::Dialog addoption -help {help Help {}} {
 	if [string match $value ""] {
 		catch {destroy $object.actions.help}
@@ -109,6 +155,11 @@ Classy::Dialog addoption -help {help Help {}} {
 	}
 	return $value
 }
+
+#doc {Dialog options -resize} option {-resize resize Resize} descr {
+#list of 2 values determining whether the dialog is resizable in x
+#and y direction
+#}
 Classy::Dialog addoption -resize {resize Resize {1 1}} {
 	set x [lindex $value 0]
 	set y [lindex $value 1]
@@ -117,6 +168,9 @@ Classy::Dialog addoption -resize {resize Resize {1 1}} {
 	wm resizable $object $x $y
 	return $value
 }
+
+#doc {Dialog options -autoraise} option {-autoraise autoRaise AutoRaise} descr {
+#}
 Classy::Dialog addoption -autoraise {autoRaise AutoRaise 0} {
 	if $value {
 		raise $object
@@ -125,25 +179,17 @@ Classy::Dialog addoption -autoraise {autoRaise AutoRaise 0} {
 }
 
 # ------------------------------------------------------------------
-#  destructor
-# ------------------------------------------------------------------
-
-Classy::Dialog classmethod destroy {} {
-	rename ::Classy::DialogButtonInvoke {}
-	rename ::Classy::DialogButtonUp {}
-	rename ::Classy::DialogButtonDown {}
-}
-
-Classy::Dialog method destroy {} {
-	if [true [getprivate $object options(-keepgeometry)]] {
-		Classy::Default set geometry $object [winfo geometry $object]
-	}
-}
-
-# ------------------------------------------------------------------
 #  Methods
 # ------------------------------------------------------------------
 
+#doc {Dialog command add} cmd {
+#pathname add button text command ?default?
+#} descr {
+# add a button with name $button to the dialog. The button will display
+# the $text. When it is invoked, $command will be executed.
+# If the word default is added, the button will be displayed differently
+# and invoked by default (eg. when presseng Enter).
+#}
 Classy::Dialog method add {button text command args} {
 	if {"$args" == "default"} {
 		button $object.actions.$button -default active -text $text -command $command
@@ -177,37 +223,17 @@ Classy::Dialog method add {button text command args} {
 	return $object.actions.$button
 }
 
-Classy::Dialog method invoke {item {button Action}} {
-	private $object persistent
-	set autoraise [getprivate $object options(-autoraise)]
-	if {("$item"!="help")&&("$button"!="Adjust")} {
-		if [info exists persistent] {
-			if {[lsearch -exact $persistent $item]==-1} {
-				Classy::todo $object close
-			}
-		} else {
-			Classy::todo $object close
-		}
-	}
-
-	$object.actions.$item invoke
-	if {"$item"!="help"} {
-		if [info exists autoraise] {
-			if $autoraise [list after 100 "raise $object"]
-		}
-	}
-}
-
-Classy::Dialog method close {} {
-	if [winfo exists $object] {
-		if ![getprivate $object options(-cache)] {
-			catch {destroy $object}
-		} else {
-			$object hide
-		}
-	}
-}
-
+#doc {Dialog command persistent} cmd {
+#pathname persistent ?option button ...?
+#} descr {
+#Without arguments, the method returns a list of all persistent buttons
+#Option can be:
+#<dl>
+#<dt>set<dt>make only the given buttons persistent
+#<dt>add<dt>make the given buttons persistent
+#<dt>remove<dt>make the given buttons not persistent
+#</dl>
+#}
 Classy::Dialog method persistent {{option {}} args} {
 	private $object persistent
 	if ![info exists persistent] {set persistent ""}
@@ -236,11 +262,60 @@ Classy::Dialog method persistent {{option {}} args} {
 	return $persistent
 }
 
+#doc {Dialog command invoke} cmd {
+#pathname invoke button ?Action/Adjust?
+#} descr {
+#}
+Classy::Dialog method invoke {item {button Action}} {
+	private $object persistent
+	set autoraise [getprivate $object options(-autoraise)]
+	if {("$item"!="help")&&("$button"!="Adjust")} {
+		if [info exists persistent] {
+			if {[lsearch -exact $persistent $item]==-1} {
+				Classy::todo $object close
+			}
+		} else {
+			Classy::todo $object close
+		}
+	}
+
+	$object.actions.$item invoke
+	if {"$item"!="help"} {
+		if [info exists autoraise] {
+			if $autoraise [list after 100 "raise $object"]
+		}
+	}
+}
+
+#doc {Dialog command close} cmd {
+#pathname close 
+#} descr {
+#}
+Classy::Dialog method close {} {
+	if [winfo exists $object] {
+		if ![getprivate $object options(-cache)] {
+			catch {destroy $object}
+		} else {
+			$object hide
+		}
+	}
+}
+
+#doc {Dialog command hide} cmd {
+#pathname hide 
+#} descr {
+#hide the dialog
+#}
 Classy::Dialog method hide {} {
 	Classy::Default set geometry $object [winfo geometry $object]
 	wm withdraw $object
 }
 
+#doc {Dialog command place} cmd {
+#pathname place 
+#} descr {
+#display the dialog in a proper position, size, ...
+#}
 Classy::Dialog method place {} {
 	set resize [getprivate $object options(-resize)]
 	update idletasks
@@ -327,6 +402,26 @@ proc Classy::DialogButtonInvoke w {
 		$w configure -state $oldState -relief $oldRelief
 		regexp {\.([^.]*)$} $w temp leaf
 		uplevel #0 [list [winfo toplevel $w] invoke $leaf]
+	}
+}
+
+# ------------------------------------------------------------------
+#  destructor
+# ------------------------------------------------------------------
+
+Classy::Dialog classmethod destroy {} {
+	rename ::Classy::DialogButtonInvoke {}
+	rename ::Classy::DialogButtonUp {}
+	rename ::Classy::DialogButtonDown {}
+}
+
+#doc {Dialog command destroy} cmd {
+#pathname destroy 
+#} descr {
+#}
+Classy::Dialog method destroy {} {
+	if [true [getprivate $object options(-keepgeometry)]] {
+		Classy::Default set geometry $object [winfo geometry $object]
 	}
 }
 

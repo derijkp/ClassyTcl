@@ -1,5 +1,5 @@
 ## Editor {menu used in the ClassyTcl Editor} menu
-option add *Classy::Editor*Menu {
+option add *Classy::Editor.Menu {
 menu file "File" {
 	action Load "Open file" {eval %W load [Classy::selectfile -title Open -selectmode persistent]}
 	action LoadNext "Open next" "%W loadnext"
@@ -57,8 +57,31 @@ menu tools "Tools" {
 }
 } widgetDefault
 
+## Help {menu used in the ClassyTcl help system} menu
+option add *Classy::Help.Menu {
+menu file "File" {
+	action Edit "Edit" {%W edit}
+	action Close "Close" {%W close}
+}
+menu contents "Contents" {
+	action TopHelp "Top" {%W see 1.0}
+}
+menu go "Go" {
+	action Reload "Reload" {%W reload}
+	action Back "Back" {%W back}
+	action Forward "Forward" {%W forward} C-r
+	action History "History" {%W histroymenu}
+	action HelpWord "search in helptext" "%W search word"
+	action HelpGrep "search through all helpfiles" "%W search grep"
+	action HelpFile "search a named Helpfile" "%W search file"
+}
+menu general "General" {
+	action HelpHelp "Help on Help" {%W load help}
+}
+} widgetDefault
+
 ## Filer {menu used in the ClassyTcl Filer} menu
-option add *Classy::Filer*Menu {
+option add *Classy::Filer.Menu {
 menu sel "Selection" {
 	action Delete "Delete" {%W deletefiles sel}
 	action Rename "Rename" {%W renamebox} C-r

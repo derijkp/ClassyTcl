@@ -4,6 +4,21 @@
 #
 # ColorSelect
 # ----------------------------------------------------------------------
+#doc ColorSelect title {
+#ColorSelect
+#} descr {
+# subclass of <a href="../basic/Widget.html">Widget</a><br>
+# A colorselector where the user can select a color using
+# different methods: sample, HSV, RGB or colorname
+#}
+#doc {ColorSelect options} h2 {
+#	ColorSelect specific options
+#} descr {
+#}
+#doc {ColorSelect command} h2 {
+#	ColorSelect specific methods
+#} descr {
+#}
 # Next is to get the attention of auto_mkindex
 if 0 {
 proc ::Classy::ColorSelect {} {}
@@ -81,7 +96,15 @@ Classy::ColorSelect classmethod init {args} {
 #  Widget options
 # ------------------------------------------------------------------
 Classy::ColorSelect chainoptions {$object}
+
+#doc {ColorSelect options -label} option {-label ? ?} descr {
+# text on the label of the colorselector
+#}
 Classy::ColorSelect chainoption -label {$object.chooser} -label
+
+#doc {ColorSelect options -command} option {-command command Command} descr {
+# command to be executed when the color is changed
+#}
 Classy::ColorSelect addoption -command {command Command {}}
 
 
@@ -89,16 +112,31 @@ Classy::ColorSelect addoption -command {command Command {}}
 #  Methods
 # ------------------------------------------------------------------
 
+#doc {ColorSelect command set} cmd {
+#pathname set value
+#} descr {
+# set current color to $value
+#}
 Classy::ColorSelect method set {value} {
 	$object.entry set $value
 	$object.rgb set $value;
 	$object.hsv set $value;
 }
 
+#doc {ColorSelect command get} cmd {
+#pathname get 
+#} descr {
+# set current color
+#}
 Classy::ColorSelect method get {} {
 	return [$object.entry get]
 }
 
+#doc {ColorSelect command select} cmd {
+#pathname select type
+#} descr {
+# set the current type of selector
+#}
 Classy::ColorSelect method select {type} {
 	$object.chooser select $type
 }
@@ -106,5 +144,3 @@ Classy::ColorSelect method select {type} {
 Classy::ColorSelect method _update {from} {
 	uplevel #0 [getprivate $object options(-command)]
 }
-
-

@@ -7,6 +7,20 @@
 #
 # Classy::NumEntry
 # ----------------------------------------------------------------------
+#doc NumEntry title {
+#NumEntry
+#} descr {
+# subclass of <a href="../basic/Widget.html">Widget</a><br>
+# provides nearly the same options and methods as Entry,
+# but constrains the value to different types of numbers,
+# and has increment and decrement buttons.
+#}
+#doc {NumEntry options} h2 {
+#	NumEntry specific options
+#}
+#doc {NumEntry command} h2 {
+#	NumEntry specific methods
+#}
 # Next is to get the attention of auto_mkindex
 if 0 {
 proc ::Classy::NumEntry {} {}
@@ -46,6 +60,9 @@ Classy::NumEntry classmethod init {args} {
 #  Options
 # ------------------------------------------------------------------
 
+
+#doc {NumEntry options -increment} option {-increment increment Increment} descr {
+#}
 Classy::NumEntry addoption -increment {increment Increment 1} {
 	$object.controls.incr configure -command "$object incr $value"
 	$object.controls.decr configure -command "$object incr -$value"
@@ -53,8 +70,17 @@ Classy::NumEntry addoption -increment {increment Increment 1} {
 	bind $object.entry <<Down>> "$object incr -$value; update idletasks"
 	return $value
 }
+
+#doc {NumEntry options -min} option {-min min Min} descr {
+#}
 Classy::NumEntry addoption -min {min Min {}}
+
+#doc {NumEntry options -max} option {-max max Max} descr {
+#}
 Classy::NumEntry addoption -max {max Max {}}
+
+#doc {NumEntry options -constraint} option {-constraint constraint Constraint} descr {
+#}
 Classy::NumEntry addoption -constraint {constraint Constraint ^(-?)[0-9]*(\.?)[0-9]*$} {
 	if [string match $value int] {
 		set value {^(-?)[0-9]*$}
@@ -70,10 +96,26 @@ Classy::NumEntry addoption -constraint {constraint Constraint ^(-?)[0-9]*(\.?)[0
 #  Methods
 # ------------------------------------------------------------------
 
+
+#doc {NumEntry command incr} cmd {
+#pathname incr number
+#} descr {
+# increment the current value of the entry with $number. $number does not
+# have to be an integer
+#}
 Classy::NumEntry method incr {number} {
 	$object set [expr [$object get]+$number]
 }
 
+
+#doc {NumEntry command constrain} cmd {
+#pathname constrain ?warn?
+#} descr {
+# check whether the value matches the regular expression given by the -constraint option
+# The optional parameter warn can be either 1 or 0. If it is 0, the entry will
+# never contain a value not matching the constraint. It warn is 1, it is possible
+# to enter a value not matching the constraint, but there will be visual warning.
+#}
 Classy::NumEntry method constrain {{warn 0}} {
 	set constraint [getprivate $object options(-constraint)]
 	set min [getprivate $object options(-min)]

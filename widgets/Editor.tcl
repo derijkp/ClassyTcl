@@ -4,6 +4,19 @@
 #
 # Editor
 # ----------------------------------------------------------------------
+#doc Editor title {
+#Editor
+#} descr {
+# subclass of <a href="../basic/Widget.html">Widget</a><br>
+# The Editor widget provides a fairly complete editor with undo redo
+# search, menus and toolbar, invoke Tcl commands, macros, etc. ...
+#}
+#doc {Editor options} h2 {
+#	Editor specific options
+#}
+#doc {Editor command} h2 {
+#	Editor specific methods
+#}
 # Next is to get the attention of auto_mkindex
 if 0 {
 proc ::Classy::Editor {} {}
@@ -17,9 +30,6 @@ option add *Classy::Editor.KeyIndentCr Control-j widgetDefault
 option add *Classy::Editor.KeyComment "Alt-numbersign" widgetDefault
 option add *Classy::Editor.KeyDelComment "Control-Alt-numbersign" widgetDefault
 bind Classy::Editor <FocusIn> {focus %W.edit}
-
-#Classy::Default load Classy::EditorMacro
-#Classy::DynaMenu loadmenu Classy::Editor
 
 # ------------------------------------------------------------------
 #  Widget creation
@@ -43,16 +53,10 @@ Classy::Editor classmethod init {args} {
 
 	set menu .classy__editormenu
 	set bindtag Classy::EditorMenu
-	if ![winfo exists .classy__editormenu] {
-		Classy::DynaMenu makepopup Classy::Editor .classy__editormenu $object Classy::EditorMenu
-	}
-	if {"[option get $object menuType MenuType]"=="top"} {
-		.classy__editormenu configure -type menubar
-		[winfo toplevel $object] configure -menu .classy__editormenu
-	}
+	Classy::DynaMenu makemenu Classy::Editor .classy__editormenu $object Classy::EditorMenu
 	grid rowconfigure $object 0 -weight 1
-	bind $object <FocusIn> "Classy::DynaMenu cmdw .classy__editormenu $object"
-	bind $object <Enter> "Classy::DynaMenu cmdw .classy__editormenu $object"
+#	bind $object <FocusIn> "Classy::DynaMenu cmdw .classy__editormenu $object"
+#	bind $object <Enter> "Classy::DynaMenu cmdw .classy__editormenu $object"
 	if {"[option get $object scrollSide ScrollSide]"=="left"} {
 		grid $object.vbar $object.edit -sticky nswe
 		grid $object.hbar -column 1 -sticky nswe
@@ -99,14 +103,38 @@ Classy::Editor classmethod init {args} {
 #  Widget options
 # ------------------------------------------------------------------
 Classy::Editor chainoptions {$object.edit}
+
+#doc {Editor options -loadcommand} option {-loadcommand loadCommand LoadCommand} descr {
+#}
 Classy::Editor addoption -loadcommand {loadCommand LoadCommand {}}
+
+#doc {Editor options -icon} option {-icon icon Icon} descr {
+#}
 Classy::Editor addoption -icon {icon Icon blank}
+
+#doc {Editor options -searchtype} option {-searchtype searchType SearchType} descr {
+#}
 Classy::Editor addoption -searchtype {searchType SearchType exact}
+
+#doc {Editor options -searchdir} option {-searchdir searchDir SearchDir} descr {
+#}
 Classy::Editor addoption -searchdir {searchDir SearchDir forward}
+
+#doc {Editor options -searchcase} option {-searchcase searchCase SearchCase} descr {
+#}
 Classy::Editor addoption -searchcase {searchCase SearchCase nocase}
+
+#doc {Editor options -searchreopen} option {-searchreopen SearchReopen searchReopen} descr {
+#}
 Classy::Editor addoption -searchreopen {SearchReopen searchReopen 0}
 Classy::Editor addoption -connection [list connection Connection [tk appname]]
+
+#doc {Editor options -menu} option {-menu menu Menu} descr {
+#}
 Classy::Editor addoption -menu {menu Menu popup}
+
+#doc {Editor options -closecommand} option {-closecommand closeCommand CloseCommand} descr {
+#}
 Classy::Editor addoption -closecommand {closeCommand CloseCommand {}}
 
 Classy::Editor private replace {}
@@ -115,6 +143,11 @@ Classy::Editor private replace {}
 #  destroy
 # ------------------------------------------------------------------
 
+
+#doc {Editor command destroy} cmd {
+#pathname destroy 
+#} descr {
+#}
 Classy::Editor method destroy {} {
 	private $object curfile
 	private $class editing
@@ -131,6 +164,11 @@ Classy::Editor method destroy {} {
 
 Classy::Editor chainallmethods {$object.edit} Classy::Text
 
+
+#doc {Editor command cut} cmd {
+#pathname cut 
+#} descr {
+#}
 Classy::Editor method cut {} {
 	private $class replace
 	clipboard clear -displayof $object			  
@@ -141,6 +179,11 @@ Classy::Editor method cut {} {
 	}
 }
 
+
+#doc {Editor command copy} cmd {
+#pathname copy 
+#} descr {
+#}
 Classy::Editor method copy {} {
 	private $class replace
 	clipboard clear -displayof $object			  
@@ -150,6 +193,11 @@ Classy::Editor method copy {} {
 	}										  
 }
 
+
+#doc {Editor command connectto} cmd {
+#pathname connectto 
+#} descr {
+#}
 Classy::Editor method connectto {} {
 	set w $object.connectto
 	Classy::SelectDialog $w -title "Connect execution to" \
@@ -158,6 +206,11 @@ Classy::Editor method connectto {} {
 	$w set [getprivate $object options(-connection)]
 }
 
+
+#doc {Editor command execute} cmd {
+#pathname execute 
+#} descr {
+#}
 Classy::Editor method execute {} {
 	if {"[$object tag ranges sel]" != ""} {
 		set command [$object get sel.first sel.last]
@@ -165,6 +218,14 @@ Classy::Editor method execute {} {
 	}
 }
 
+
+#doc {Editor command findfunction} cmd {
+#pathname findfunction ?function?
+#} descr {
+#load the file containing function $function (must be auto loadable),
+#and find the function definition.
+#if function is not given, the current selection will be searched.
+#}
 Classy::Editor method findfunction {args} {
 	if {"$args"!=""} {
 		set function $args
@@ -179,6 +240,11 @@ Classy::Editor method findfunction {args} {
 	$object find "proc $function"
 }
 
+
+#doc {Editor command save} cmd {
+#pathname save 
+#} descr {
+#}
 Classy::Editor method save {} {
 	private $object curfile
 	set temp [$object get 1.0 "end-1c"]
@@ -192,6 +258,11 @@ Classy::Editor method save {} {
 	}
 }
 
+
+#doc {Editor command saveas} cmd {
+#pathname saveas file
+#} descr {
+#}
 Classy::Editor method saveas {file} {
 	if ![Classyoverwriteyn $file 0] return
 	private $object curfile reopenlist
@@ -203,17 +274,32 @@ Classy::Editor method saveas {file} {
 	catch {wm title [winfo toplevel $object] "$curfile"}
 }
 
+
+#doc {Editor command savebox} cmd {
+#pathname savebox 
+#} descr {
+#}
 Classy::Editor method savebox {} {
 	private $object curfile
 	$object saveas [Classysavefile -title "Save as" \
 		-transfercommand "$object transfercommand" -initialfile $curfile]
 }
 
+
+#doc {Editor command transfercommand} cmd {
+#pathname transfercommand 
+#} descr {
+#}
 Classy::Editor method transfercommand {} {
 	set type [string trimleft [file extension [$object.savebox get]] "."]
 	return [varsubst {type object} {$type {$object get 1.0 end}}]
 }
 
+
+#doc {Editor command loadnext} cmd {
+#pathname loadnext 
+#} descr {
+#}
 Classy::Editor method loadnext {} {
 	private $object curfile reopenlist
 	set pos [lsearch $reopenlist $curfile]
@@ -223,6 +309,11 @@ Classy::Editor method loadnext {} {
 	$object load $file
 }
 
+
+#doc {Editor command loadprev} cmd {
+#pathname loadprev 
+#} descr {
+#}
 Classy::Editor method loadprev {} {
 	private $object curfile reopenlist
 	set pos [lsearch $reopenlist $curfile]
@@ -232,12 +323,22 @@ Classy::Editor method loadprev {} {
 	$object load $file
 }
 
+
+#doc {Editor command close} cmd {
+#pathname close 
+#} descr {
+#}
 Classy::Editor method close {} {
 	if [true [$object closefile]] {
 		eval [getprivate $object options(-closecommand)]
 	}
 }
 
+
+#doc {Editor command closefile} cmd {
+#pathname closefile 
+#} descr {
+#}
 Classy::Editor method closefile {} {
 	private $object curfile curmarkers curmarker prevmarker cur
 	private $class editing
@@ -263,6 +364,11 @@ Classy::Editor method closefile {} {
 	return true
 }
 
+
+#doc {Editor command load} cmd {
+#pathname load ?filename? ?filename ...?
+#} descr {
+#}
 Classy::Editor method load {{file {}} args} {
 	if {"$file"==""} return
 	private $object curfile curmarkers curmarker prevmarker reopenlist cur
@@ -315,6 +421,11 @@ Classy::Editor method load {{file {}} args} {
 	return $file
 }
 
+
+#doc {Editor command set} cmd {
+#pathname set data
+#} descr {
+#}
 Classy::Editor method set {data} {
 	private $object curfile curmarkers curmarker prevmarker
 	private $object reopenlist cur
@@ -326,11 +437,21 @@ Classy::Editor method set {data} {
 	$object textchanged 0
 }
 
+
+#doc {Editor command forget} cmd {
+#pathname forget filename ?filename ...?
+#} descr {
+#}
 Classy::Editor method forget {args} {
 	private $object reopenlist
 	set reopenlist [llremove $reopenlist $args]
 }
 
+
+#doc {Editor command reopenlist} cmd {
+#pathname reopenlist 
+#} descr {
+#}
 Classy::Editor method reopenlist {} {
 	private $object curfile reopenlist
 
@@ -343,6 +464,12 @@ Classy::Editor method reopenlist {} {
 	$w set $curfile
 }
 
+
+#doc {Editor command findsel} cmd {
+#pathname findsel direction
+#} descr {
+# direction can be -forwards or -backwards
+#}
 Classy::Editor method findsel {dir} {
 	private $object findwhat
 	if {"[$object tag ranges sel]" != ""} {
@@ -364,6 +491,11 @@ Classy::Editor method replace-find {dir} {
 	$object find $findwhat $dir -exact
 }
 
+
+#doc {Editor command find} cmd {
+#pathname find what ?option? ?value? ?option value?
+#} descr {
+#}
 Classy::Editor method find {what args} {
 	private $object options
 	if ![regexp -- {-case|-nocase} $args] {
@@ -416,16 +548,31 @@ Classy::Editor method find {what args} {
 	$object see insert
 }
 
+
+#doc {Editor command gotoline} cmd {
+#pathname gotoline line
+#} descr {
+#}
 Classy::Editor method gotoline {line} {
 	$object mark set insert $line.0
 	catch {$object tag remove sel sel.first sel.last}
 	$object see insert
 }
 
+
+#doc {Editor command command} cmd {
+#pathname command command
+#} descr {
+#}
 Classy::Editor method command {command} {
 	eval $command
 }
 
+
+#doc {Editor command replace} cmd {
+#pathname replace ?all?
+#} descr {
+#}
 Classy::Editor method replace {args} {
 	private $class options replace searchdir findwhat
 	if {"$args" == "all"} {
@@ -453,6 +600,11 @@ Classy::Editor method replace {args} {
 	}
 }
 
+
+#doc {Editor command finddialog} cmd {
+#pathname finddialog 
+#} descr {
+#}
 Classy::Editor method finddialog {} {
 	private $object searchdir
 	set searchdir forwards
@@ -494,6 +646,11 @@ Classy::Editor method finddialog {} {
 	$w.options.find.entry select range 0 end
 }
 
+
+#doc {Editor command indentedcr} cmd {
+#pathname indentedcr 
+#} descr {
+#}
 Classy::Editor method indentedcr {} {
 	set line [$object get "insert linestart" "insert lineend"]
 	$object insert insert "\n"
@@ -502,6 +659,11 @@ Classy::Editor method indentedcr {} {
 	}
 }
 
+
+#doc {Editor command indent} cmd {
+#pathname indent number
+#} descr {
+#}
 Classy::Editor method indent {number} {
 	if {[$object tag ranges sel] == ""} return
 	regexp {^([0-9]+)\.} [$object index sel.first] temp begin
@@ -525,6 +687,11 @@ Classy::Editor method indent {number} {
 	}
 }
 
+
+#doc {Editor command macro} cmd {
+#pathname macro 
+#} descr {
+#}
 Classy::Editor method macro {} {
 	set obj $object
 	Classy::Dialog $object.macro -title "Make macro" -closecommand [varsubst object {
@@ -602,6 +769,11 @@ Classy::Editor method macro {} {
 	pack $object.macro.options.text -fill both -expand yes
 }
 
+
+#doc {Editor command getmacro} cmd {
+#pathname getmacro 
+#} descr {
+#}
 Classy::Editor method getmacro {} {
 	private $object macrocache
 	set name [$object.macro.options.name get]
@@ -620,6 +792,11 @@ Classy::Editor method getmacro {} {
 	}
 }
 
+
+#doc {Editor command savemacro} cmd {
+#pathname savemacro 
+#} descr {
+#}
 Classy::Editor method savemacro {} {
 	set name [$object.macro.options.name get]
 	if {"$name"==""} {
@@ -641,6 +818,11 @@ Classy::Editor method savemacro {} {
 	catch {unset macrocache($name)}
 }
 
+
+#doc {Editor command runmacro} cmd {
+#pathname runmacro name
+#} descr {
+#}
 Classy::Editor method runmacro {name} {
 	private $object macrocache
 	if ![info exists macrocache($name)] {
@@ -656,6 +838,11 @@ Classy::Editor method runmacro {name} {
 	eval $macrocache($name)
 }
 
+
+#doc {Editor command comment} cmd {
+#pathname comment add/remove
+#} descr {
+#}
 Classy::Editor method comment {command} {
 	set w $object
 	switch $command {
@@ -690,6 +877,11 @@ Classy::Editor method comment {command} {
 	}
 }
 
+
+#doc {Editor command format} cmd {
+#pathname format length
+#} descr {
+#}
 Classy::Editor method format {length} {
 	set w $object
 	
@@ -714,6 +906,11 @@ Classy::Editor method format {length} {
 	$w insert insert $result
 }
 
+
+#doc {Editor command transpose} cmd {
+#pathname transpose pos
+#} descr {
+#}
 Classy::Editor method transpose {pos} {
 	if [$object compare $pos != "$pos lineend"] {
 	set pos [$object index "$pos + 1 char"]
@@ -727,6 +924,11 @@ Classy::Editor method transpose {pos} {
 	$object see insert
 }
 
+
+#doc {Editor command matchingbrackets} cmd {
+#pathname matchingbrackets 
+#} descr {
+#}
 Classy::Editor method matchingbrackets {} {
 	set w $object
 	set startpattern "\{|\\\(|\\\["
@@ -773,6 +975,23 @@ Classy::Editor method matchingbrackets {} {
 	$w tag add sel $start "$end +1 c"
 }
 
+
+#doc {Editor command marker} cmd {
+#pathname marker command ?args?
+#} descr {
+#command must be one of
+#<dl>
+#<dt>set
+#<dt>delete
+#<dt>goto
+#<dt>current
+#<dt>previous
+#<dt>select
+#<dt>refresh
+#<dt>lset
+#<dt>lget
+#</dl>
+#}
 Classy::Editor method marker {command args} {
 	private $object marker
 	set we [::Classy::widget $object.edit]

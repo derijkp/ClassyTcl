@@ -4,6 +4,19 @@
 #
 # Classy::Fold
 # ----------------------------------------------------------------------
+#doc Fold title {
+#Fold
+#} descr {
+# subclass of <a href="../basic/Widget.html">Widget</a><br>
+# creates a foldable frame. The actual frame is available as component 
+# content.
+#}
+#doc {Fold options} h2 {
+#	Fold specific options
+#}
+#doc {Fold command} h2 {
+#	Fold specific methods
+#}
 # Next is to get the attention of auto_mkindex
 if 0 {
 proc ::Classy::Fold {} {}
@@ -45,18 +58,38 @@ Classy::Fold component content {$object.content}
 # ------------------------------------------------------------------
 #  Widget options
 # ------------------------------------------------------------------
+
+#doc {Fold options -closecommand} option {-closecommand closeCommand Command} descr {
+#}
 Classy::Fold addoption -closecommand {closeCommand Command {}}
+
+#doc {Fold options -opencommand} option {-opencommand openCommand Command} descr {
+#}
 Classy::Fold addoption -opencommand {openCommand Command {}}
+
+#doc {Fold options -title} option {-title title Title} descr {
+#}
 Classy::Fold addoption -title {title Title {}} {
 	$object.title configure -text $value
 }
+
+#doc {Fold options -command} option {-command ? ?} descr {
+#}
 Classy::Fold chainoption -command {$object.title} -command
+
+#doc {Fold options -space} option {-space ? ?} descr {
+#}
 Classy::Fold chainoption -space {$object.spacer} -width
 
 # ------------------------------------------------------------------
 #  Methods
 # ------------------------------------------------------------------
 
+
+#doc {Fold command open} cmd {
+#pathname open 
+#} descr {
+#}
 Classy::Fold method open {} {
 	private $object options
 	$object.knob configure -bitmap @[Classy::geticon foldopen] -command [list $object close]
@@ -65,6 +98,11 @@ Classy::Fold method open {} {
 	uplevel #0 $options(-opencommand)
 }
 
+
+#doc {Fold command close} cmd {
+#pathname close 
+#} descr {
+#}
 Classy::Fold method close {} {
 	private $object options
 	$object.knob configure -bitmap @[Classy::geticon foldclosed] -command [list $object open]

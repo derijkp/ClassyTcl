@@ -4,6 +4,19 @@
 #
 # ::Classy::LineChartBox
 # ----------------------------------------------------------------------
+#doc LineChartBox title {
+#LineChartBox
+#} descr {
+# subclass of <a href="Dialog.html">Dialog</a><br>
+# Creates a <a href="Dialog.html">Dialog</a> which displays a 
+# linechart.
+#}
+#doc {LineChartBox options} h2 {
+#	LineChartBox specific options
+#}
+#doc {LineChartBox command} h2 {
+#	LineChartBox specific methods
+#}
 # Next is to get the attention of auto_mkindex
 if 0 {
 proc ::Classy::LineChartBox {} {}
@@ -61,7 +74,9 @@ Classy::export LineChartBox {}
 #  Widget options
 # ------------------------------------------------------------------
 
-::Classy::LineChartBox addoption -xrange {xRange XRange {0 20}} {
+#doc {LineChartBox options -xrange} option {-xrange xRange XRange} descr {
+#}
+Classy::LineChartBox addoption -xrange {xRange XRange {0 20}} {
 	set range [$object.options.chart configure -xrange]
 	set min [lindex $range 0]
 	set max [lindex $range 1]
@@ -76,7 +91,9 @@ Classy::export LineChartBox {}
 	$object _setscroll
 }
 
-::Classy::LineChartBox addoption -yrange {yRange YRange {0 100}} {
+#doc {LineChartBox options -yrange} option {-yrange yRange YRange} descr {
+#}
+Classy::LineChartBox addoption -yrange {yRange YRange {0 100}} {
 	set range [$object.options.chart configure -yrange]
 	set min [lindex $range 0]
 	set max [lindex $range 1]
@@ -95,7 +112,11 @@ Classy::export LineChartBox {}
 #  Methods
 # ------------------------------------------------------------------
 
-::Classy::LineChartBox method newvalues {} {
+#doc {LineChartBox command newvalues} cmd {
+#pathname newvalues 
+#} descr {
+#}
+Classy::LineChartBox method newvalues {} {
 	private $object keepyrange keepchartheight
 	set w $object.options
 	if {[$w.chart configure -percentages] == 1} {
@@ -105,19 +126,35 @@ Classy::export LineChartBox {}
 	$w.chart redraw
 }
 
-::Classy::LineChartBox method dataset {name data} {
+#doc {LineChartBox command dataset} cmd {
+#pathname dataset name data
+#} descr {
+#}
+Classy::LineChartBox method dataset {name data} {
 	$object.options.chart dataset $name $data
 }
 
-::Classy::LineChartBox method dataget {name} {
+#doc {LineChartBox command dataget} cmd {
+#pathname dataget name
+#} descr {
+#}
+Classy::LineChartBox method dataget {name} {
 	$object.options.chart dataget $name
 }
 
-::Classy::LineChartBox method datadelete {name} {
+#doc {LineChartBox command datadelete} cmd {
+#pathname datadelete name
+#} descr {
+#}
+Classy::LineChartBox method datadelete {name} {
 	$object.options.chart datadelete $name
 }
 
-::Classy::LineChartBox method switchdata {item} {
+#doc {LineChartBox command switchdata} cmd {
+#pathname switchdata item
+#} descr {
+#}
+Classy::LineChartBox method switchdata {item} {
 	private $object data config
 	set chart $object.options.chart
 	if [info exists data($item)] {
@@ -133,7 +170,11 @@ Classy::export LineChartBox {}
 	}
 }
 
-::Classy::LineChartBox method dataconfigure {} {
+#doc {LineChartBox command dataconfigure} cmd {
+#pathname dataconfigure
+#} descr {
+#}
+Classy::LineChartBox method dataconfigure {} {
 	private $object width data
 	set chart $object.options.chart
 	Classy::Dialog $object.configure -title "Data configure" -keepgeometry no
@@ -172,7 +213,11 @@ Classy::export LineChartBox {}
 	}
 }
 
-::Classy::LineChartBox method rangeconfigure {} {
+#doc {LineChartBox command rangeconfigure} cmd {
+#pathname rangeconfigure 
+#} descr {
+#}
+Classy::LineChartBox method rangeconfigure {} {
 	private $object options
 	set w $object.options
 	set chart $object.options.chart
@@ -247,7 +292,7 @@ Classy::export LineChartBox {}
 		-onvalue vertical -offvalue horizontal \
 		-variable [privatevar $object.options.chart options(-labelorient)] \
 		-command "$chart redraw"
-	button $w.fill -text "Fill drawing" -command [varsubst w {
+	button $w.fill -text "Fill drawing" -command [varsubst {w object} {
 		$w.area.xmax nocmdset [expr [winfo width [$object component canvas]]-10]
 		$w.area.ymax nocmdset [expr [winfo height [$object component canvas]]-25]
 		$object chartconfigure -area [list [$w.area.xmin get] [$w.area.ymin get] [$w.area.xmax get] [$w.area.ymax get]]
@@ -265,7 +310,12 @@ Classy::export LineChartBox {}
 	grid columnconfigure $w 1 -weight 1
 }
 
-::Classy::LineChartBox method chartconfigure {args} {
+#doc {LineChartBox command chartconfigure} cmd {
+#pathname chartconfigure ?option? ?value? ?option value ...?
+#} descr {
+# change the <a href="LineChart.html">options of the displayed linechart</a>
+#}
+Classy::LineChartBox method chartconfigure {args} {
 	set len [llength $args]
 	if {$len==0} {
 		return [concat [$object.options.chart configure] -axisfont [$object.options.grid configure -font]]
@@ -308,7 +358,11 @@ Classy::export LineChartBox {}
 	}
 }
 
-::Classy::LineChartBox method xview {args} {
+#doc {LineChartBox command xview} cmd {
+#pathname xview ?args?
+#} descr {
+#}
+Classy::LineChartBox method xview {args} {
 	private $object options
 	set chartxrange [$object.options.chart configure -xrange]
 	set xrange $options(-xrange)
@@ -344,7 +398,11 @@ Classy::export LineChartBox {}
 	$object _setscroll
 }
 
-::Classy::LineChartBox method yview {args} {
+#doc {LineChartBox command yview} cmd {
+#pathname yview ?args?
+#} descr {
+#}
+Classy::LineChartBox method yview {args} {
 	private $object options
 	set chartyrange [$object.options.chart configure -yrange]
 	set yrange $options(-yrange)

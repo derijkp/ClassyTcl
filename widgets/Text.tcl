@@ -4,8 +4,25 @@
 #
 # Text
 # ----------------------------------------------------------------------
-
-# This is to get the attention of auto_mkindex
+#doc Text title {
+#Text
+#} descr {
+# subclass of <a href="../basic/Widget.html">Widget</a><br>
+# creates a widgets which acts nearly like a text widget but
+# has several extra capabilities:
+#<ul>
+#<li>undo and redo
+#<li>linking to other text widgets
+#<li>textchanged state
+#</ul>
+#}
+#doc {Text options} h2 {
+#	Text specific options
+#}
+#doc {Text command} h2 {
+#	Text specific methods
+#}
+# Next is to get the attention of auto_mkindex
 if 0 {
 proc ::Classy::Text {} {}
 proc Text {} {}
@@ -63,6 +80,8 @@ Classy::Text classmethod init {args} {
 
 Classy::Text chainoptions {$object}
 
+#doc {Text options -changedcommand} option {-changedcommand changedcommand Changedcommand} descr {
+#}
 Classy::Text addoption -changedcommand {changedcommand Changedcommand {}}
 
 # ------------------------------------------------------------------
@@ -71,6 +90,54 @@ Classy::Text addoption -changedcommand {changedcommand Changedcommand {}}
 
 Classy::Text chainallmethods {$object} text
 
+#doc {Text command link} cmd {
+#pathname link ?linkedwindow?
+#} descr {
+# returns the current linked window if linkedwindow is not given.
+# Otherwise $linkedwindow is linked
+#}
+Classy::Text method link {{lw {}}} {
+	private $object undobuffer redobuffer linked
+	set w [Classy::widget $object]
+	if {"$lw"==""} {return $linked}
+	if {[lsearch -exact $linked $lw]!=-1} {return $linked}
+	if ![winfo exists $lw] {error "Couldn't link: $lw does not exists"}
+	upvar #0 [privatevar $lw linked] flinked
+	upvar #0 [privatevar $lw undobuffer] fundobuffer
+	upvar #0 [privatevar $lw redobuffer] fredobuffer
+	upvar #0 [privatevar $lw textchanged] ftextchanged
+	set undobuffer $fundobuffer
+	set redobuffer $redobuffer
+#	set textchanged $ftextchanged
+	if $ftextchanged {$object _changed}
+	$w delete 1.0 end
+	$w insert end [$lw get 1.0 end]
+	$w delete "end-1c"
+
+	set linked $flinked
+	lappend linked $lw
+	foreach link $linked {
+		uplevel #0 lappend [privatevar $link linked] $object
+	}
+	return $linked
+}
+
+#doc {Text command unlink} cmd {
+#pathname unlink 
+#} descr {
+#}
+Classy::Text method unlink {} {
+	private $object linked
+	foreach link $linked {
+		uplevel #0 [concat set [privatevar $link linked] \[lremove \$\{[privatevar $link linked]\} $object\]]
+	}
+	set linked ""
+}
+
+#doc {Text command textinsert} cmd {
+#pathname textinsert string
+#} descr {
+#}
 Classy::Text method textinsert {s} {
 	set w [Classy::widget $object]
 	if {($s == "") || ([$w cget -state] == "disabled")} {
@@ -86,6 +153,10 @@ Classy::Text method textinsert {s} {
 	$w see insert
 }
 
+#doc {Text command insert} cmd {
+#pathname insert index chars ?tag ...?
+#} descr {
+#}
 Classy::Text method insert {index chars args} {
 	private $object undobuffer redobuffer linked textchanged
 	set w [Classy::widget $object]
@@ -113,6 +184,11 @@ Classy::Text method _linkinsert {index chars args} {
 	if {$textchanged != 1} {$object _changed}
 }
 
+#doc {Text command textchanged} cmd {
+#pathname textchanged ?1/0?
+#} descr {
+#query or set the textchanged state
+#}
 Classy::Text method textchanged {{bool {}}} {
 	private $object textchanged linked
 	if {"$bool"==""} {
@@ -139,6 +215,10 @@ Classy::Text method _changed {} {
 	eval [getprivate $object options(-changedcommand)]
 }
 
+#doc {Text command delete} cmd {
+#pathname delete args ?startindex endindex?
+#} descr {
+#}
 Classy::Text method delete {args} {
 	private $object undobuffer redobuffer linked textchanged
 	set w [Classy::widget $object]
@@ -172,6 +252,10 @@ Classy::Text method _linkdelete {index1 index2 args} {
 	if {$textchanged != 1} {$object _changed}
 }
 
+#doc {Text command undo} cmd {
+#pathname undo ?nolink?
+#} descr {
+#}
 Classy::Text method undo {{link {}}} {
 	private $object undobuffer redobuffer
 	set w [Classy::widget $object]
@@ -199,6 +283,10 @@ Classy::Text method undo {{link {}}} {
 	}
 }
 
+#doc {Text command redo} cmd {
+#pathname redo ?nolink?
+#} descr {
+#}
 Classy::Text method redo {{link {}}} {
 	private $object undobuffer redobuffer
 	set w [Classy::widget $object]
@@ -226,6 +314,10 @@ Classy::Text method redo {{link {}}} {
 	}
 }
 
+#doc {Text command clearundo} cmd {
+#pathname clearundo ?nolink?
+#} descr {
+#}
 Classy::Text method clearundo {{link {}}} {
 	private $object undobuffer redobuffer
 	set undobuffer ""
@@ -238,6 +330,10 @@ Classy::Text method clearundo {{link {}}} {
 	}
 }
 
+#doc {Text command cut} cmd {
+#pathname cut 
+#} descr {
+#}
 Classy::Text method cut {} {
 	if {[selection own -displayof $object] == "$object"} {   
 		clipboard clear -displayof $object			  
@@ -248,6 +344,10 @@ Classy::Text method cut {} {
 	}
 }
 
+#doc {Text command copy} cmd {
+#pathname copy 
+#} descr {
+#}
 Classy::Text method copy {} {
 	if {[selection own -displayof $object] == "$object"} {   
 		clipboard clear -displayof $object			  
@@ -257,6 +357,10 @@ Classy::Text method copy {} {
 	}											  
 }
 
+#doc {Text command paste} cmd {
+#pathname paste 
+#} descr {
+#}
 Classy::Text method paste {} {
 	catch {
 		$object insert insert [selection get -displayof $object \
@@ -264,6 +368,10 @@ Classy::Text method paste {} {
 	}
 }
 
+#doc {Text command findsel} cmd {
+#pathname findsel dir
+#} descr {
+#}
 Classy::Text method findsel {dir} {
 	if {"[$object tag ranges sel]" != ""} {
 		if {"$dir" == "-forwards"} {set index sel.last} else {set index sel.first}
@@ -275,6 +383,10 @@ Classy::Text method findsel {dir} {
 # REM Moving methods
 #-------------------
 
+#doc {Text command select} cmd {
+#pathname select mode
+#} descr {
+#}
 Classy::Text method select {mode} {
 	set w [Classy::widget $object]
 	global tkPriv
@@ -345,6 +457,10 @@ Classy::Text method select {mode} {
 	}
 }
 
+#doc {Text command move} cmd {
+#pathname move mode
+#} descr {
+#}
 Classy::Text method move {mode} {
 	set w [Classy::widget $object]
 	global tkPriv
@@ -397,6 +513,10 @@ Classy::Text method move {mode} {
 	}
 }
 
+#doc {Text command backspace} cmd {
+#pathname backspace 
+#} descr {
+#}
 Classy::Text method backspace {} {
 	set w [Classy::widget $object]
 	if {[$object tag nextrange sel 1.0 end] != ""} {
@@ -407,6 +527,10 @@ Classy::Text method backspace {} {
 	}
 }
 
+#doc {Text command textdelete} cmd {
+#pathname textdelete 
+#} descr {
+#}
 Classy::Text method textdelete {} {
 	if {[$object tag nextrange sel 1.0 end] != ""} {
 	$object delete sel.first sel.last
@@ -416,6 +540,10 @@ Classy::Text method textdelete {} {
 	}
 }
 
+#doc {Text command position} cmd {
+#pathname position index
+#} descr {
+#}
 Classy::Text method position {index} {
 	set w [Classy::widget $object]
 	global tkPriv
@@ -624,38 +752,3 @@ proc Classy::Text_KeyExtend {w index} {
 	::class::Tk_$w tag add sel $first $last
 	::class::Tk_$w tag remove sel $last end
 }
-
-Classy::Text method link {{lw {}}} {
-	private $object undobuffer redobuffer linked
-	set w [Classy::widget $object]
-	if {"$lw"==""} {return $linked}
-	if {[lsearch -exact $linked $lw]!=-1} {return $linked}
-	if ![winfo exists $lw] {error "Couldn't link: $lw does not exists"}
-	upvar #0 [privatevar $lw linked] flinked
-	upvar #0 [privatevar $lw undobuffer] fundobuffer
-	upvar #0 [privatevar $lw redobuffer] fredobuffer
-	upvar #0 [privatevar $lw textchanged] ftextchanged
-	set undobuffer $fundobuffer
-	set redobuffer $redobuffer
-#	set textchanged $ftextchanged
-	if $ftextchanged {$object _changed}
-	$w delete 1.0 end
-	$w insert end [$lw get 1.0 end]
-	$w delete "end-1c"
-
-	set linked $flinked
-	lappend linked $lw
-	foreach link $linked {
-		uplevel #0 lappend [privatevar $link linked] $object
-	}
-	return $linked
-}
-
-Classy::Text method unlink {} {
-	private $object linked
-	foreach link $linked {
-		uplevel #0 [concat set [privatevar $link linked] \[lremove \$\{[privatevar $link linked]\} $object\]]
-	}
-	set linked ""
-}
-

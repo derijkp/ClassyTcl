@@ -4,6 +4,18 @@
 #
 # Classy::ScrolledFrame
 # ----------------------------------------------------------------------
+#doc ScrolledFrame title {
+#ScrolledFrame
+#} descr {
+# subclass of <a href="../basic/Widget.html">Widget</a><br>
+# creates a view frame in which a component frame is displayed.
+# If the component frame is larger than the view frame, scrollbars
+# are automatically added.
+# The component frame is available as component frame
+#}
+#doc {ScrolledFrame command} h2 {
+#	ScrolledFrame specific methods
+#}
 # Next is to get the attention of auto_mkindex
 if 0 {
 proc ::Classy::ScrolledFrame {} {}
@@ -45,6 +57,11 @@ Classy::ScrolledFrame component frame {$object.view.frame}
 #  Methods
 # ------------------------------------------------------------------
 
+
+#doc {ScrolledFrame command redraw} cmd {
+#pathname redraw 
+#} descr {
+#}
 Classy::ScrolledFrame method redraw {} {
 	private $object options x y
 	set w $object.view.frame
@@ -86,6 +103,11 @@ Classy::ScrolledFrame method redraw {} {
 	$object _setvbar
 }
 
+
+#doc {ScrolledFrame command xview} cmd {
+#pathname xview args
+#} descr {
+#}
 Classy::ScrolledFrame method xview {args} {
 	if ![winfo exists $object.hbar] return
 	private $object options x
@@ -118,6 +140,11 @@ Classy::ScrolledFrame method xview {args} {
 	$object.hbar set [expr double($x)/$realw] [expr ($x+double($vieww))/$realw]
 }
 
+
+#doc {ScrolledFrame command yview} cmd {
+#pathname yview args
+#} descr {
+#}
 Classy::ScrolledFrame method yview {args} {
 	if ![winfo exists $object.vbar] return
 	private $object options y

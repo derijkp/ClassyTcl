@@ -1,5 +1,5 @@
 ## Editor {menu used in the ClassyTcl Editor} menu
-option add *Classy::Editor*Menu {
+option add *Classy::Editor.Menu {
 menu file "File" {
 	action Load "Open file" {eval %W load [Classy::selectfile -title Open -selectmode persistent]}
 	action LoadNext "Open next" "%W loadnext"
@@ -58,7 +58,7 @@ menu tools "Tools" {
 } widgetDefault
 
 ## Filer {menu used in the ClassyTcl Filer} menu
-option add *Classy::Filer*Menu {
+option add *Classy::Filer.Menu {
 menu sel "Selection" {
 	action Delete "Delete" {%W deletefiles sel}
 	action Rename "Rename" {%W renamebox} C-r

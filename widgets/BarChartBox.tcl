@@ -4,6 +4,17 @@
 #
 # ::Classy::BarChartBox
 # ----------------------------------------------------------------------
+#doc BarChartBox title {
+#BarChartBox
+#} descr {
+# subclass of <a href="Dialog.html">Dialog</a><br>
+#}
+#doc {BarChartBox options} h2 {
+#	BarChartBox specific options
+#}
+#doc {BarChartBox command} h2 {
+#	BarChartBox specific methods
+#}
 # Next is to get the attention of auto_mkindex
 if 0 {
 proc ::Classy::BarChartBox {} {}
@@ -18,7 +29,7 @@ catch {Classy::BarChartBox destroy}
 Classy::Dialog subclass ::Classy::BarChartBox
 Classy::export BarChartBox {}
 
-::Classy::BarChartBox classmethod init {args} {
+Classy::BarChartBox classmethod init {args} {
 	super -resize {1 1}
 	set w $object.options
 	$object add print "Postscript" "printcanvas $w.chart"
@@ -66,15 +77,17 @@ Classy::export BarChartBox {}
 	$object _setscroll
 }
 
-::Classy::BarChartBox component canvas {$object.options.canvas}
-::Classy::BarChartBox component chart {$object.options.chart}
-::Classy::BarChartBox component grid {$object.options.grid}
+Classy::BarChartBox component canvas {$object.options.canvas}
+Classy::BarChartBox component chart {$object.options.chart}
+Classy::BarChartBox component grid {$object.options.grid}
 
 # ------------------------------------------------------------------
 #  Widget options
 # ------------------------------------------------------------------
 
-::Classy::BarChartBox addoption -xrange {xRange XRange {0 20}} {
+#doc {BarChartBox options -xrange} option {-xrange xRange XRange} descr {
+#}
+Classy::BarChartBox addoption -xrange {xRange XRange {0 20}} {
 	set range [$object.options.chart configure -xrange]
 	set min [lindex $range 0]
 	set max [lindex $range 1]
@@ -89,7 +102,9 @@ Classy::export BarChartBox {}
 	$object _setscroll
 }
 
-::Classy::BarChartBox addoption -yrange {yRange YRange {0 100}} {
+#doc {BarChartBox options -yrange} option {-yrange yRange YRange} descr {
+#}
+Classy::BarChartBox addoption -yrange {yRange YRange {0 100}} {
 	set range [$object.options.chart configure -yrange]
 	set min [lindex $range 0]
 	set max [lindex $range 1]
@@ -108,7 +123,11 @@ Classy::export BarChartBox {}
 #  Methods
 # ------------------------------------------------------------------
 
-::Classy::BarChartBox method newvalues {} {
+#doc {BarChartBox command newvalues} cmd {
+#pathname newvalues 
+#} descr {
+#}
+Classy::BarChartBox method newvalues {} {
 	private $object keepyrange keepchartheight
 	set w $object.options
 	if {[$w.chart configure -percentages] == 1} {
@@ -118,19 +137,35 @@ Classy::export BarChartBox {}
 	$w.chart redraw
 }
 
-::Classy::BarChartBox method dataset {name data} {
+#doc {BarChartBox command dataset} cmd {
+#pathname dataset name data
+#} descr {
+#}
+Classy::BarChartBox method dataset {name data} {
 	$object.options.chart dataset $name $data
 }
 
-::Classy::BarChartBox method dataget {name} {
+#doc {BarChartBox command dataget} cmd {
+#pathname dataget name
+#} descr {
+#}
+Classy::BarChartBox method dataget {name} {
 	$object.options.chart dataget $name
 }
 
-::Classy::BarChartBox method datadelete {name} {
+#doc {BarChartBox command datadelete} cmd {
+#pathname datadelete name
+#} descr {
+#}
+Classy::BarChartBox method datadelete {name} {
 	$object.options.chart datadelete $name
 }
 
-::Classy::BarChartBox method switchdata {item} {
+#doc {BarChartBox command switchdata} cmd {
+#pathname switchdata name
+#} descr {
+#}
+Classy::BarChartBox method switchdata {item} {
 	private $object data config
 	set chart $object.options.chart
 	if [info exists data($item)] {
@@ -146,7 +181,11 @@ Classy::export BarChartBox {}
 	}
 }
 
-::Classy::BarChartBox method dataconfigure {} {
+#doc {BarChartBox command dataconfigure} cmd {
+#pathname dataconfigure
+#} descr {
+#}
+Classy::BarChartBox method dataconfigure {} {
 	private $object width data
 	set chart $object.options.chart
 	Classy::Dialog $object.configure -title "Data configure" -keepgeometry no
@@ -185,7 +224,11 @@ Classy::export BarChartBox {}
 	}
 }
 
-::Classy::BarChartBox method rangeconfigure {} {
+#doc {BarChartBox command rangeconfigure} cmd {
+#pathname rangeconfigure 
+#} descr {
+#}
+Classy::BarChartBox method rangeconfigure {} {
 	private $object options
 	set w $object.options
 	set chart $object.options.chart
@@ -278,7 +321,12 @@ Classy::export BarChartBox {}
 	grid columnconfigure $w 1 -weight 1
 }
 
-::Classy::BarChartBox method chartconfigure {args} {
+#doc {BarChartBox command chartconfigure} cmd {
+#pathname chartconfigure ?option? ?value? ?options value ...?
+#} descr {
+# change the <a href="BarChart.html">options of the displayed barchart</a>
+#}
+Classy::BarChartBox method chartconfigure {args} {
 	set len [llength $args]
 	if {$len==0} {
 		return [concat [$object.options.chart configure] -axisfont [$object.options.grid configure -font]]
@@ -321,7 +369,11 @@ Classy::export BarChartBox {}
 	}
 }
 
-::Classy::BarChartBox method xview {args} {
+#doc {BarChartBox command xview} cmd {
+#pathname xview ?args?
+#} descr {
+#}
+Classy::BarChartBox method xview {args} {
 	private $object options
 	set chartxrange [$object.options.chart configure -xrange]
 	set xrange $options(-xrange)
@@ -357,7 +409,11 @@ Classy::export BarChartBox {}
 	$object _setscroll
 }
 
-::Classy::BarChartBox method yview {args} {
+#doc {BarChartBox command yview} cmd {
+#pathname yview ?args?
+#} descr {
+#}
+Classy::BarChartBox method yview {args} {
 	private $object options
 	set chartyrange [$object.options.chart configure -yrange]
 	set yrange $options(-yrange)

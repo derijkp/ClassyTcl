@@ -4,6 +4,23 @@
 #
 # Classy::getfont
 # ----------------------------------------------------------------------
+#doc getfont title {
+#getfont
+#}
+# Next is to get the attention of auto_mkindex
+if 0 {
+proc ::Classy::getfont {} {}
+proc getfont {} {}
+}
+#doc {getfont getfont} cmd {
+#getfont ?option value ...?
+#} descr {
+# returns a font selected by the user. The select method depends om the
+# ClassyTcl configuration. Possible options are
+#<dl>
+#<dt>-font
+#</dl>
+#}
 proc Classy::getfont {args} {
 	global tcl_platform
 	if {("$tcl_platform(platform)"=="windows")&&("[option get . getFont GetFont]"=="Win")} {
@@ -18,7 +35,7 @@ proc Classy::getfont {args} {
 			}
 			set font [lindex $args 1]
 		} else {
-			error "Wrong # arguments, format is \"Classygetfont ?-font font?\""
+			error "Wrong # arguments, format is \"getfont ?-font font?\""
 		}
 		set family [lindex $font 0]
 		if {"$family"==""} {set family Arial}
@@ -32,7 +49,7 @@ proc Classy::getfont {args} {
 		::Classy::Dialog .classy__fontselect -help classy_font_select
 		set w [.classy__fontselect component options]
 		.classy__fontselect add go "Select" "set ::Classy::temp \[$w.fontselect get\]" default
-		::Classy::FontSelector $w.fontselect -command "$w.fontselect.font nocmdset \[$w.fontselect get\]"
+		::Classy::FontSelect $w.fontselect -command "$w.fontselect.font nocmdset \[$w.fontselect get\]"
 		if [catch {
 			if {"$args"!=""} {eval $w.fontselect configure $args}
 		} error] {
@@ -71,5 +88,4 @@ proc Classy::createfont {fontname font} {
 	}
 }
 
-
-
+Classy::export getfont {}

@@ -4,12 +4,13 @@ catch {tk appname test}
 
 catch {
 wm geometry . +[expr [winfo screenwidth .]/2 - [winfo width .]/2]+[expr [winfo screenheight .]/2 - [winfo height .]/2]
+raise .
 }
 
 proc clean {} {
 	catch {Class destroy}
-	eval destroy [winfo children .]
-	. configure -menu {}
+	catch {eval destroy [winfo children .]}
+	catch {. configure -menu {}}
 }
 
 proc test {name description script expected {causeerror 0}} {

@@ -2,25 +2,37 @@
 # ClassyTcl Widgets 
 # ----------------- Peter De Rijk
 #
-# Classy::FontSelector
+# Classy::FontSelect
 # ----------------------------------------------------------------------
+#doc FontSelect title {
+#FontSelect
+#} descr {
+# subclass of <a href="../basic/Widget.html">Widget</a><br>
+# creates a font selection widget
+#}
+#doc {FontSelect options} h2 {
+#	FontSelect specific options
+#}
+#doc {FontSelect command} h2 {
+#	FontSelect specific methods
+#}
 # Next is to get the attention of auto_mkindex
 if 0 {
-proc ::Classy::FontSelector {} {}
-proc FontSelector {} {}
+proc ::Classy::FontSelect {} {}
+proc FontSelect {} {}
 }
-catch {Classy::FontSelector destroy}
+catch {Classy::FontSelect destroy}
 
-option add *Classy::FontSelector.relief raised widgetDefault
+option add *Classy::FontSelect.relief raised widgetDefault
 
 # ------------------------------------------------------------------
 #  Widget creation
 # ------------------------------------------------------------------
 
-Widget subclass Classy::FontSelector
-Classy::export FontSelector {}
+Widget subclass Classy::FontSelect
+Classy::export FontSelect {}
 
-Classy::FontSelector classmethod init {args} {
+Classy::FontSelect classmethod init {args} {
 	# REM Create object
 	# -----------------
 	super
@@ -94,8 +106,11 @@ set ::Classy::families [lsort [font families]]
 set ::Classy::pos [lsearch $::Classy::families helvetica]
 if {$::Classy::pos==-1} {set ::Classy::pos 0}
 
-Classy::FontSelector addoption -command {command Command {}}
-Classy::FontSelector addoption -font [list font Font "[lindex $::Classy::families $::Classy::pos] 12 {normal roman}"] {
+
+#doc {FontSelect options -command} option {-command command Command} descr {
+#}
+Classy::FontSelect addoption -command {command Command {}}
+Classy::FontSelect addoption -font [list font Font "[lindex $::Classy::families $::Classy::pos] 12 {normal roman}"] {
 	$object set $value
 }
 unset ::Classy::families
@@ -104,7 +119,11 @@ unset ::Classy::pos
 #  Methods
 # ------------------------------------------------------------------
 
-Classy::FontSelector method get {} {
+#doc {FontSelect command get} cmd {
+#pathname get 
+#} descr {
+#}
+Classy::FontSelect method get {} {
 	private $object font underline overstrike
 	set font ""
 	lappend font [$object.family get active]
@@ -117,16 +136,11 @@ Classy::FontSelector method get {} {
 	return $font
 }
 
-Classy::FontSelector method display {} {
-	if ![winfo exists $object.example] {
-		return
-		Classy::todo $object display
-	}
-	$object.example configure -font [$object get]
-	uplevel #0 [getprivate $object options(-command)]
-}
-
-Classy::FontSelector method set {{newfont {}}} {
+#doc {FontSelect command set} cmd {
+#pathname set ?newfont?
+#} descr {
+#}
+Classy::FontSelect method set {{newfont {}}} {
 	private $object options size weight slant overstrike underline
 	if {"$newfont"==""} {
 		set newfont $options(-font)
@@ -148,4 +162,15 @@ Classy::FontSelector method set {{newfont {}}} {
 	Classy::todo $object display
 }
 
-
+#doc {FontSelect command display} cmd {
+#pathname display 
+#} descr {
+#}
+Classy::FontSelect method display {} {
+	if ![winfo exists $object.example] {
+		return
+		Classy::todo $object display
+	}
+	$object.example configure -font [$object get]
+	uplevel #0 [getprivate $object options(-command)]
+}

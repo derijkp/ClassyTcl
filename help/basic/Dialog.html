@@ -1,0 +1,35 @@
+<HEAD>
+<TITLE>
+Widget
+</TITLE>
+</HEAD>
+<BODY>
+<h1>
+Widget
+</h1>
+
+ The Widget class forms the basis of all widgets in ClassyTcl.
+ 
+
+<h2>
+	Widget methods
+</h2>
+ If SomeWidgetClass is a subclass of Widget, and pathName starts with a .,
+ the command
+ <pre>SomeWidgetClass pathName</pre>
+ command creates an object (a widget) and a new Tcl command 
+ whose name is pathName. This command may be used 
+ to invoke various operations on the widget by using commands of the form:
+ <pre>pathName method ?...?</pre>
+ The Widget methods are available to all instances of Widget or one
+ of its subclasses.
+
+<h2>
+	Widget classmethods
+</h2>
+ The Widget classmethods are only available to Widget or one
+ of its subclasses, not to its instances. they can be invoked
+ by using a comman of the form:
+ <pre>SomeWidgetClass classmethod ?...?</pre>
+
+</body>

@@ -4,6 +4,37 @@
 #
 # Classy::DynaMenu
 # ----------------------------------------------------------------------
+#doc DynaMenu title {
+#DynaMenu
+#} descr {
+# subclass of <a href="../basic/Class.html">Class</a><br>
+# DynaMenu is not a widget and is not intended to produce instances. 
+# It is a class that manages menus in an easy and dynamic way.
+# Dynamenu can handle several menutypes.
+#<p>
+# Each menutype is defined by a definition in a simple format. 
+# Dynamenu can create one or more popup or top menus for each
+# menutype. When the definition of the menutype is redefined
+# all menus of that type will be changed accordingly.
+#<p>
+# Menu definitions for menutype are usually controlled from the
+# Menus part of the <a href="../classy_configure.html">configuration 
+# system</a>. Creation of a menu of a certain type, will get the menu
+# definition from the option database by creating a dummy frame with 
+# class menutype and getting its option value for menu (class Menu).
+# you can add a menutype in the configuration system by adding
+#<pre>
+### Somemenu {this is an example menu} menu
+#option add *Somemenu.Menu definition widgetDefault
+#</pre>
+# to the Menus configuration file. You will usually only need this 
+# configuration and the makemenu method to get working menus.
+#<p>
+# A menu managed by DynaMenu can control several widgets: The commands 
+# associated with the menu can include a %W, that on invocation is
+# changed to the current cmdw (command widget). The cmdw of a menu can be
+# changed at any time. DynaMenu also handles key shortcuts.
+#}
 # Next is to get the attention of auto_mkindex
 if 0 {
 proc ::Classy::DynaMenu {} {}
@@ -26,138 +57,35 @@ Classy::export DynaMenu {}
 #  Methods
 # ------------------------------------------------------------------
 
-Classy::DynaMenu method define {menutype {data {}}} {
-	private $object menudata keep
-	if [info exists menudata($menutype)] {set keep $menudata($menutype)}
-	if {"$data" != ""} {
-		set menudata($menutype) $data
-	} else {
-		catch {destroy .classy__temp}
-		frame .classy__temp -class $menutype
-		set menudata($menutype) [option get .classy__temp menu Menu]
-		destroy .classy__temp
-	}
-	$object redraw $menutype
-}
-
-Classy::DynaMenu method names {} {
-	private $object menudata
-	return [array names menudata]
-}
-
-#Classy::DynaMenu method add {menutype data} {
-#	private $object menudata keep
-#	set data [split $data "\n"]
-#	set data [lremove $data {}]
-#	
-#	if ![info exists menudata($menutype)] {
-#		$object define $menutype $data
-#		return
-#	}
-#	set mdata $menudata($menutype)
-#
-#	set pos end
-#	foreach line $data {
-#		if [regexp {^menu} $line] {
-#			set menus [lsub $mdata [lfind -regexp $mdata {^menu}]]
-#			set search [lsearch -exact $menus $line]
-#			if {$search==-1} {
-#				lappend mdata $line
-#				set pos end
-#			} else {
-#				set len [llength [lfind -regexp $mdata {^menu}]]
-#				incr search
-#				if {$search==$len} {
-#					set pos end
-#				} else {
-#					set pos [lindex [lfind -regexp $mdata {^menu}] $search]
-#				}
-#			}
-#		} else {
-#			set item [lindex $line 1]
-#			set temp [lsearch -regexp $mdata "\[ \t\]*\[a-z\]* $item "]
-#			if {$temp==-1} {
-#				set mdata [linsert $mdata $pos $line]
-#			} else {
-#				set mdata [lreplace $mdata $temp $temp $line]
-#			}
-#		}
-#	}
-#
-#	set keep $menudata($menutype)
-#	set menudata($menutype) $mdata
-#	after cancel "$object redraw $menutype"
-#	after idle "$object redraw $menutype"
+#doc {DynaMenu makemenu} cmd {
+#DynaMenu makemenu menutype menu cmdw bindtag
+#} descr {
+# This is usually the only method you need to create menus. It
+# creates a menu named $menu of type $menutype if $menu does not exist yet.
+# $cmdw determines the initial command widget. All key bindings 
+# from key shortcuts
+# are bound to $bindtag. Adding $bindtag to the bindtags of a widget
+# will make all shortcuts available from that widget.
+# The menu created will be a popup or top menu depending
+# on the <a href="../classy_configure.html">ClassyTcl configuration</a>.
 #}
-
-Classy::DynaMenu method redraw {menutype} {
-	private $object keep
-	if [catch {$object _refresh $menutype} result] {
-		global errorInfo
-		set error $errorInfo
-		if [info exists keep] {
-			set menudata($menutype) $keep
-			$object _refresh $menutype
-			append result "\nRestored old menu"
-		}
-		error $result $error
+Classy::DynaMenu method makemenu {menutype menu cmdw bindtag} {
+	if ![winfo exists .classy__editormenu] {
+		$object makepopup $menutype $menu $cmdw $bindtag
+	}
+	if {"[option get $cmdw menuType MenuType]"=="top"} {
+		$menu configure -type menubar
+		[winfo toplevel $cmdw] configure -menu $menu
 	}
 }
-
-Classy::DynaMenu method get {menutype} {
-	private $object menudata
-	return $menudata($menutype)
-}
-
-Classy::DynaMenu method delete {menutype} {
-	private $object menudata menutypes mtype cmdws checks bindtags
-	unset menudata($menutype)
-	if [info exists menutypes] {
-		set menulist [array get menutypes]
-		set poss [lfind -exact $menulist $menutype]
-		foreach pos $poss {
-			set menu [lindex $menulist [expr $pos-1]]
-			if [winfo exists $menu] {destroy $menu}
-			unset menutypes($menu)
-			unset mtype($menu)
-			unset cmdws($menu)
-			unset checks($menu)
-			unset bindtags($menu)
-		}
-	}
-}
-
-Classy::DynaMenu method _refresh {menutype} {
-	private $object menutypes mtype cmdws checks bindtags notop
-	if [info exists menutypes] {
-		set menulist [array get menutypes]
-		set poss [lfind -exact $menulist $menutype]
-		foreach pos $poss {
-			set menu [lindex $menulist [expr $pos-1]]
-			if ![winfo exists $menu] {
-				catch {unset menutypes($menu)}
-				catch {unset mtype($menu)}
-				catch {unset cmdws($menu)}
-				catch {unset bindtags($menu)}
-				catch {unset checks($menu)}
-			} else {
-				set tag $bindtags($menu)
-				foreach binding [bind $tag] {
-					bind $tag $binding {}
-				}
-				if {"$mtype($menu)"=="top"} {
-					eval destroy [winfo children $menu]
-				} else {
-					destroy $menu
-				}
-				set notop 1
-				$object make$mtype($menu) $menutype $menu $cmdws($menu) $tag
-				unset notop
-			}
-		}
-	}
-}
-
+#doc {DynaMenu makepopup} cmd {
+#DynaMenu makepopup menutype menu cmdw bindtag
+#} descr {
+# create a popup menu of type $menutype. $cmdw
+# determines the initial cmdw. All key bindings for key shortcuts
+# are bound to $bindtag. Adding $bindtag to the bindtags of a widget
+# will make all shortcuts available from that widget.
+#}
 Classy::DynaMenu method makepopup {menutype menu cmdw bindtag} {
 	private $object mtype cmdws menudata menutypes checks bindtags
 	if ![info exists menudata($menutype)] {
@@ -247,7 +175,14 @@ Classy::DynaMenu method makepopup {menutype menu cmdw bindtag} {
 	}
 }
 
-#new
+#doc {DynaMenu maketop} cmd {
+#DynaMenu maketop menutype menu cmdw bindtag
+#} descr {
+# create a top menu of type $menutype. $cmdw
+# determines the initial cmdw. All key bindings for key shortcuts
+# are bound to $bindtag. Adding $bindtag to the bindtags of a widget
+# will make all shortcuts available from that widget.
+#}
 Classy::DynaMenu method maketop {menutype menu cmdw bindtag} {
 	private $object mtype cmdws menudata menutypes checks bindtags
 	if ![info exists menudata($menutype)] {
@@ -420,6 +355,180 @@ Classy::DynaMenu method maketop {menutype menu cmdw bindtag} {
 	$object _placetopfirst $menu
 }
 
+#doc {DynaMenu define} cmd {
+#DynaMenu define menutype ?data?
+#} descr {
+# set the definition describing the menus that will be generated 
+# for menutype to $data.
+# If data is not given, the menu definition for menutype is obtained 
+# from the option database. A dummy frame with class $menutype is created,
+# and the its option value for menu (class Menu) obtained. This option
+# will usually be set in the Menus part 
+# <a href="../classy_configure.html">configuration system</a>.
+# You will usually not invoke this method, as the maketop and 
+# makepopup methods will automatically define a menutype
+# that isn't managed yet.
+#}
+Classy::DynaMenu method define {menutype {data {}}} {
+	private $object menudata keep
+	if [info exists menudata($menutype)] {set keep $menudata($menutype)}
+	if {"$data" != ""} {
+		set menudata($menutype) $data
+	} else {
+		catch {destroy .classy__temp}
+		frame .classy__temp -class $menutype
+		set menudata($menutype) [option get .classy__temp menu Menu]
+		destroy .classy__temp
+	}
+	$object redraw $menutype
+}
+
+#doc {DynaMenu names} cmd {
+#DynaMenu names 
+#} descr {
+# returns a list of menutypes managed by Dynamenu
+#}
+Classy::DynaMenu method names {} {
+	private $object menudata
+	return [array names menudata]
+}
+
+Classy::DynaMenu method add {menutype data} {
+#	private $object menudata keep
+#	set data [split $data "\n"]
+#	set data [lremove $data {}]
+#	
+#	if ![info exists menudata($menutype)] {
+#		$object define $menutype $data
+#		return
+#	}
+#	set mdata $menudata($menutype)
+#
+#	set pos end
+#	foreach line $data {
+#		if [regexp {^menu} $line] {
+#			set menus [lsub $mdata [lfind -regexp $mdata {^menu}]]
+#			set search [lsearch -exact $menus $line]
+#			if {$search==-1} {
+#				lappend mdata $line
+#				set pos end
+#			} else {
+#				set len [llength [lfind -regexp $mdata {^menu}]]
+#				incr search
+#				if {$search==$len} {
+#					set pos end
+#				} else {
+#					set pos [lindex [lfind -regexp $mdata {^menu}] $search]
+#				}
+#			}
+#		} else {
+#			set item [lindex $line 1]
+#			set temp [lsearch -regexp $mdata "\[ \t\]*\[a-z\]* $item "]
+#			if {$temp==-1} {
+#				set mdata [linsert $mdata $pos $line]
+#			} else {
+#				set mdata [lreplace $mdata $temp $temp $line]
+#			}
+#		}
+#	}
+#
+#	set keep $menudata($menutype)
+#	set menudata($menutype) $mdata
+#	after cancel "$object redraw $menutype"
+#	after idle "$object redraw $menutype"
+#}
+
+#doc {DynaMenu redraw} cmd {
+#DynaMenu redraw menutype
+#} descr {
+# redraw menus of type $menutype
+#}
+Classy::DynaMenu method redraw {menutype} {
+	private $object keep
+	if [catch {$object _refresh $menutype} result] {
+		global errorInfo
+		set error $errorInfo
+		if [info exists keep] {
+			set menudata($menutype) $keep
+			$object _refresh $menutype
+			append result "\nRestored old menu"
+		}
+		error $result $error
+	}
+}
+
+#doc {DynaMenu get} cmd {
+#DynaMenu get menutype
+#} descr {
+# returns the definition of $menutype
+#}
+Classy::DynaMenu method get {menutype} {
+	private $object menudata
+	return $menudata($menutype)
+}
+
+#doc {DynaMenu delete} cmd {
+#DynaMenu delete menutype
+#} descr {
+# delete the definition and all menus of $menutype
+#}
+Classy::DynaMenu method delete {menutype} {
+	private $object menudata menutypes mtype cmdws checks bindtags
+	unset menudata($menutype)
+	if [info exists menutypes] {
+		set menulist [array get menutypes]
+		set poss [lfind -exact $menulist $menutype]
+		foreach pos $poss {
+			set menu [lindex $menulist [expr $pos-1]]
+			if [winfo exists $menu] {destroy $menu}
+			unset menutypes($menu)
+			unset mtype($menu)
+			unset cmdws($menu)
+			unset checks($menu)
+			unset bindtags($menu)
+		}
+	}
+}
+
+Classy::DynaMenu method _refresh {menutype} {
+	private $object menutypes mtype cmdws checks bindtags notop
+	if [info exists menutypes] {
+		set menulist [array get menutypes]
+		set poss [lfind -exact $menulist $menutype]
+		foreach pos $poss {
+			set menu [lindex $menulist [expr $pos-1]]
+			if ![winfo exists $menu] {
+				catch {unset menutypes($menu)}
+				catch {unset mtype($menu)}
+				catch {unset cmdws($menu)}
+				catch {unset bindtags($menu)}
+				catch {unset checks($menu)}
+			} else {
+				set tag $bindtags($menu)
+				foreach binding [bind $tag] {
+					bind $tag $binding {}
+				}
+				if {"$mtype($menu)"=="top"} {
+					eval destroy [winfo children $menu]
+				} else {
+					destroy $menu
+				}
+				set notop 1
+				$object make$mtype($menu) $menutype $menu $cmdws($menu) $tag
+				unset notop
+			}
+		}
+	}
+}
+
+#doc {DynaMenu cmdw} cmd {
+#DynaMenu cmdw menu ?cmdw?
+#} descr {
+# change the current cmdw for menu to $cmdw. If the cmdw argument is
+# not given, the method returns the current cmdw for menu.
+# This method is automatically called when a widget which has bindtags
+# defined by DynaMenu recieves the focus.
+#}
 Classy::DynaMenu method cmdw {menu {cmdw {}}} {
 	private $object cmdws
 	if {"$cmdw"==""} {
@@ -437,6 +546,11 @@ Classy::DynaMenu method cmdw {menu {cmdw {}}} {
 	}
 }
 
+#doc {DynaMenu post} cmd {
+#DynaMenu post menu ?x y?
+#} descr {
+# post menu
+#}
 Classy::DynaMenu method post {menu {x {}} {y {}}} {
 	private $object mtype
 	if {"$mtype($menu)"=="popup"} {
@@ -450,28 +564,37 @@ Classy::DynaMenu method post {menu {x {}} {y {}}} {
 	}
 }
 
+#doc {DynaMenu invoke} cmd {
+#DynaMenu invoke curmenu index
+#} descr {
+# invoke the item given by $index in $curmenu
+#}
 Classy::DynaMenu method invoke {curmenu index} {
 	$curmenu invoke $index
 }
 
-Classy::DynaMenu method confmenu {menutype {options {*}}} {
-	Classycustomise__item "Configure menu" $menutype.mnu [list $object loadmenu $menutype %F] $options
+#doc {DynaMenu confmenu} cmd {
+#DynaMenu confmenu menutype
+#} descr {
+#}
+Classy::DynaMenu method confmenu {menutype} {
+	Classy::Configurator confmenu $menutype
 }
 
-Classy::DynaMenu method loadmenu {menutype {file {}}} {
-	if {"$file"==""} {
-		set file [Classygetconffile $menutype.mnu]
-	}
-	if [file exists $file] {
-		set f [open $file]
-		set c [read $f]
-		close $f
-		$object define $menutype $c
-		return $file
-	} else {
-		error "Menu file $menutype.mnu not found in search path"
-	}
-}
+#Classy::DynaMenu method loadmenu {menutype {file {}}} {
+#	if {"$file"==""} {
+#		set file [Classygetconffile $menutype.mnu]
+#	}
+#	if [file exists $file] {
+#		set f [open $file]
+#		set c [read $f]
+#		close $f
+#		$object define $menutype $c
+#		return $file
+#	} else {
+#		error "Menu file $menutype.mnu not found in search path"
+#	}
+#}
 
 Classy::DynaMenu method reqwidth {menu} {
 	set slaves [place slaves $menu]
@@ -481,6 +604,7 @@ Classy::DynaMenu method reqwidth {menu} {
 	}
 	return $x
 }
+
 
 Classy::DynaMenu method reqheight {menu} {
 	set slaves [place slaves $menu]

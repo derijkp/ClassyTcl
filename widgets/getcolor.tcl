@@ -4,7 +4,25 @@
 #
 # Classy::getcolor
 # ----------------------------------------------------------------------
+#doc getcolor title {
+#getcolor
+#}
 # Next is to get the attention of auto_mkindex
+if 0 {
+proc ::Classy::getcolor {} {}
+proc getcolor {} {}
+}
+
+#doc {getcolor getcolor} cmd {
+#getcolor ?option value ...?
+#} descr {
+# returns a color selected by the user. The selectmethod depends om the
+# ClassyTcl configuration. Possible options are
+#<dl>
+#<dt>-initialcolor
+#<dt>-title
+#</dl>
+#}
 proc Classy::getcolor {args} {
 	Classy::parseopt $args opt {
 		-initialcolor {} white
@@ -40,5 +58,5 @@ proc Classy::getcolor {args} {
 		return $::Classy::temp
 	}
 }
-
+Classy::export getcolor {}
 

@@ -168,5 +168,5 @@ proc Classy::initconf {} {
 	::Classy::loadKeys
 	::Classy::loadMouse
 	::Classy::loadconf Menus
-	::Classy::loadconf Toolsbars
+	::Classy::loadconf Toolbars
 }

@@ -1,0 +1,103 @@
+<HEAD>
+<TITLE>
+Text
+</TITLE>
+</HEAD>
+<BODY>
+<h1>
+Text
+</h1>
+
+ subclass of <a href="../basic/Widget.html">Widget</a><br>
+ creates a widgets which acts nearly like a text widget but
+ has several extra capabilities:
+<ul>
+<li>undo and redo
+<li>linking to other text widgets
+<li>textchanged state
+</ul>
+
+<h2>
+	Text specific options
+</h2><dl><dt>Command-Line Name: <b>-changedcommand</b><dt>Database Name: <b>changedcommand</b><dt>Database Class: <b>Changedcommand</b><dd>
+</ul>
+
+<h2>
+	Text specific methods
+</h2><dl><dt><b>
+pathname link ?linkedwindow?
+</b><dd>
+ returns the current linked window if linkedwindow is not given.
+ Otherwise $linkedwindow is linked
+</ul>
+<dl><dt><b>
+pathname unlink 
+</b><dd>
+</ul>
+<dl><dt><b>
+pathname textinsert string
+</b><dd>
+</ul>
+<dl><dt><b>
+pathname insert index chars ?tag ...?
+</b><dd>
+</ul>
+<dl><dt><b>
+pathname textchanged ?1/0?
+</b><dd>
+query or set the textchanged state
+</ul>
+<dl><dt><b>
+pathname delete args ?startindex endindex?
+</b><dd>
+</ul>
+<dl><dt><b>
+pathname undo ?nolink?
+</b><dd>
+</ul>
+<dl><dt><b>
+pathname redo ?nolink?
+</b><dd>
+</ul>
+<dl><dt><b>
+pathname clearundo ?nolink?
+</b><dd>
+</ul>
+<dl><dt><b>
+pathname cut 
+</b><dd>
+</ul>
+<dl><dt><b>
+pathname copy 
+</b><dd>
+</ul>
+<dl><dt><b>
+pathname paste 
+</b><dd>
+</ul>
+<dl><dt><b>
+pathname findsel dir
+</b><dd>
+</ul>
+<dl><dt><b>
+pathname select mode
+</b><dd>
+</ul>
+<dl><dt><b>
+pathname move mode
+</b><dd>
+</ul>
+<dl><dt><b>
+pathname backspace 
+</b><dd>
+</ul>
+<dl><dt><b>
+pathname textdelete 
+</b><dd>
+</ul>
+<dl><dt><b>
+pathname position index
+</b><dd>
+</ul>
+
+</body>

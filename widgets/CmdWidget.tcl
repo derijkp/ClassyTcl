@@ -4,6 +4,28 @@
 #
 # Classy::CmdWidget
 # ----------------------------------------------------------------------
+#doc CmdWidget title {
+#CmdWidget
+#} descr {
+# subclass of <a href="../basic/Widget.html">Widget</a><br>
+# CmdWidget creates a window in which Tcl commands can be typed.
+# The command will be executed when the Enter key is pressed
+# with the cursor positioned at the end of the command currently 
+# being edited, and the command is complete Tcl command.
+# The output of the commands will be redirected to the cmd widget.
+# Previous commands can be gotten and edited before execution using
+# Alt-Up (default keypress, can be changed).
+#<p>
+# <b>Classy::cmd</b><br>
+# is a convience function that pops up a toplevel containing a 
+# CmdWidget with a scroll bar.
+#}
+#doc {CmdWidget options} h2 {
+#	CmdWidget specific options
+#}
+#doc {CmdWidget command} h2 {
+#	CmdWidget specific methods
+#}
 # Next is to get the attention of auto_mkindex
 if 0 {
 proc ::Classy::CmdWidget {} {}
@@ -12,7 +34,7 @@ proc CmdWidget {} {}
 catch {Classy::CmdWidget destroy}
 
 source [file join $::class::dir widgets CmdWidgetbnd.tcl]
-#auto_load varsubst
+auto_load varsubst
 # ------------------------------------------------------------------
 #  Widget creation
 # ------------------------------------------------------------------
@@ -28,7 +50,7 @@ Classy::CmdWidget classmethod init {args} {
 	# REM Initialise options and variables
 	# ------------------------------------
 	private $object curfile reopenlist findwhat undobuffer redobuffer
-	private $object cmdnum
+	private $object cmdnum options
 	set cmdnum 1
 	set curfile {}
 	set reopenlist {}
@@ -57,7 +79,7 @@ Classy::CmdWidget classmethod init {args} {
 	# -------------------------------
 	$object connect [tk appname]
 	if {"$args" != ""} {eval $object configure $args}
-	eval $object insert end [getprivate $object options(-prompt)] prompt
+	$object insert end [subst $options(-prompt)] prompt
 	$object mark set cmdstart "end-1c"
 	$object mark gravity cmdstart left
 }
@@ -66,6 +88,11 @@ Classy::CmdWidget classmethod init {args} {
 #  Widget options
 # ------------------------------------------------------------------
 Classy::CmdWidget chainoptions {$object}
+
+#doc {CmdWidget options -prompt} option {-prompt prompt Prompt} descr {
+# This is the prompt that wil be displayed. It is run through subst
+# first, so you can use something like {[pwd] % } as prompt.
+#}
 Classy::CmdWidget addoption -prompt {prompt Prompt {[pwd] % }} {}
 
 # ------------------------------------------------------------------
@@ -74,6 +101,11 @@ Classy::CmdWidget addoption -prompt {prompt Prompt {[pwd] % }} {}
 
 Classy::CmdWidget chainallmethods {$object} text
 
+#doc {CmdWidget command do} cmd {
+#pathname do 
+#} descr {
+# execute the command currently being edited
+#}
 Classy::CmdWidget method do {} {
 	private $object w options
 	private $object connection cmdnum histnum
@@ -96,6 +128,11 @@ Classy::CmdWidget method do {} {
 	$w see insert
 }
 
+#doc {CmdWidget command display} cmd {
+#pathname display args
+#} descr {
+# insert args into CmdWidget
+#}
 Classy::CmdWidget method display {args} {
 	private $object w
 	if {"$args"!=""} {
@@ -106,13 +143,23 @@ Classy::CmdWidget method display {args} {
 	}
 }
 
-Classy::CmdWidget method complete {what} {
+#doc {CmdWidget command complete} cmd {
+#pathname complete ?what?
+#} descr {
+# If what (default is file) is set to
+#<dl>
+#<dt>file<dd>try to complete the word at the cursor to a complete available file
+#<dt>var<dd>try to complete the word at the cursor to a complete available variable
+#<dt>cmd<dd>try to complete the word at the cursor to a complete available command
+#</dl>
+#}
+Classy::CmdWidget method complete {{what file}} {
 	private $object w connection
 	set start [$object search -backwards -exact " " insert 1.0]
 	set start [$object get "$start+1c" insert]
 	if {"$what"=="var"} {
 		set flist [send $connection info vars $start*]
-	} elseif {"$what"=="cmnd"} {
+	} elseif {"$what"=="cmd"} {
 		set flist [send $connection info commands $start*]
 	} else {
 		set flist [glob $start*]
@@ -150,6 +197,7 @@ Classy::CmdWidget method complete {what} {
 	$object see insert
 }
 
+
 Classy::CmdWidget method textinsert {s} {
 	private $object w
 	if {($s == "") || ([$w cget -state] == "disabled")} {
@@ -165,6 +213,10 @@ Classy::CmdWidget method textinsert {s} {
 	$w see insert
 }
 
+#doc {CmdWidget command insert} cmd {
+#pathname insert index chars ?tags?
+#} descr {
+#}
 Classy::CmdWidget method insert {index chars args} {
 	private $object w undobuffer redobuffer textchanged
 	set redobuffer ""
@@ -182,6 +234,10 @@ Classy::CmdWidget method insert {index chars args} {
 	$w see insert
 }
 
+#doc {CmdWidget command delete} cmd {
+#pathname delete ?index? ?index?
+#} descr {
+#}
 Classy::CmdWidget method delete {args} {
 	private $object w undobuffer redobuffer
 	set redobuffer ""
@@ -201,6 +257,10 @@ Classy::CmdWidget method delete {args} {
 	$w delete $index1 $index2
 }
 
+#doc {CmdWidget command undo} cmd {
+#pathname undo 
+#} descr {
+#}
 Classy::CmdWidget method undo {} {
 	private $object w undobuffer redobuffer
 	if {$undobuffer == ""} {
@@ -221,6 +281,10 @@ Classy::CmdWidget method undo {} {
 	lappend redobuffer $undo
 }
 
+#doc {CmdWidget command redo} cmd {
+#pathname redo 
+#} descr {
+#}
 Classy::CmdWidget method redo {} {
 	private $object w undobuffer redobuffer
 	if {$redobuffer == ""} {
@@ -241,11 +305,19 @@ Classy::CmdWidget method redo {} {
 	lappend undobuffer $redo
 }
 
+#doc {CmdWidget command clearundo} cmd {
+#pathname clearundo 
+#} descr {
+#}
 Classy::CmdWidget method clearundo {} {
 	private $object undobuffer
 	set undobuffer ""
 }
 
+#doc {CmdWidget command cut} cmd {
+#pathname cut 
+#} descr {
+#}
 Classy::CmdWidget method cut {} {
 	clipboard clear -displayof $object			  
 	catch {									
@@ -254,6 +326,10 @@ Classy::CmdWidget method cut {} {
 	}
 }
 
+#doc {CmdWidget command copy} cmd {
+#pathname copy 
+#} descr {
+#}
 Classy::CmdWidget method copy {} {
 	clipboard clear -displayof $object			  
 	catch {									
@@ -261,6 +337,10 @@ Classy::CmdWidget method copy {} {
 	}										  
 }
 
+#doc {CmdWidget command paste} cmd {
+#pathname paste 
+#} descr {
+#}
 Classy::CmdWidget method paste {} {
 	catch {
 		$object insert insert [selection get -displayof $object \
@@ -268,6 +348,19 @@ Classy::CmdWidget method paste {} {
 	}
 }
 
+#doc {CmdWidget command clear} cmd {
+#pathname clear 
+#} descr {
+# remove command being edited
+#}
+Classy::CmdWidget method clear {} {
+	$object delete cmdstart end
+}
+
+#doc {CmdWidget command historyup} cmd {
+#pathname historyup 
+#} descr {
+#}
 Classy::CmdWidget method historyup {} {
 	private $object histnum
 	if {$histnum == 1} {return}
@@ -276,10 +369,10 @@ Classy::CmdWidget method historyup {} {
 	$object insert end [$object get cmdstart$histnum cmdend$histnum]
 }
 
-Classy::CmdWidget method clear {} {
-	$object delete cmdstart end
-}
-
+#doc {CmdWidget command historydown} cmd {
+#pathname historydown 
+#} descr {
+#}
 Classy::CmdWidget method historydown {} {
 	private $object cmdnum histnum
 	$object delete cmdstart end
@@ -288,14 +381,11 @@ Classy::CmdWidget method historydown {} {
 	$object insert end [$object get cmdstart$histnum cmdend$histnum]
 }
 
-Classy::CmdWidget method execute {} {
-	private $object connection
-	if {"[$object tag ranges sel]" != ""} {
-		set command [$object get sel.first sel.last]
-		send -- $connection $command
-	}
-}
-
+#doc {CmdWidget command save} cmd {
+#pathname save file
+#} descr {
+# save the contents of the CmdWidget to file
+#}
 Classy::CmdWidget method save {file} {
 	set temp [$object get 1.0 end]
 	set f [open $file w]
@@ -303,6 +393,10 @@ Classy::CmdWidget method save {file} {
 	close $f
 }
 
+#doc {CmdWidget command select} cmd {
+#pathname select mode
+#} descr {
+#}
 Classy::CmdWidget method select {mode} {
 	private $object w
 	global tkPriv
@@ -377,6 +471,10 @@ Classy::CmdWidget method select {mode} {
 	}
 }
 
+#doc {CmdWidget command move} cmd {
+#pathname move mode
+#} descr {
+#}
 Classy::CmdWidget method move {mode} {
 	private $object w
 	global tkPriv
@@ -433,6 +531,10 @@ Classy::CmdWidget method move {mode} {
 	}
 }
 
+#doc {CmdWidget command backspace} cmd {
+#pathname backspace 
+#} descr {
+#}
 Classy::CmdWidget method backspace {} {
 	private $object w
 	if [$w compare insert == cmdstart] {
@@ -446,6 +548,10 @@ Classy::CmdWidget method backspace {} {
 #	}
 }
 
+#doc {CmdWidget command textdelete} cmd {
+#pathname textdelete 
+#} descr {
+#}
 Classy::CmdWidget method textdelete {} {
 	if {[$object tag nextrange sel cmdstart end] != ""} {
 		$object delete sel.first sel.last
@@ -455,6 +561,10 @@ Classy::CmdWidget method textdelete {} {
 	}
 }
 
+#doc {CmdWidget command position} cmd {
+#pathname position index
+#} descr {
+#}
 Classy::CmdWidget method position {index} {
 	private $object w
 	global tkPriv
@@ -677,6 +787,12 @@ proc Classy::CmdWidget_KeyExtend {w index} {
 	$w tag remove sel $last end
 }
 
+#doc {CmdWidget command connect} cmd {
+#pathname connect ?name?
+#} descr {
+# connect to a different Tk application with name name using send.
+# if name is not given, returns the current connected application
+#}
 Classy::CmdWidget method connect {args} {
 	private $object connection interactive
 	global Classy__unknowntempf

@@ -4,8 +4,20 @@
 #
 # HTML
 # ----------------------------------------------------------------------
-
-# This is to get the attention of auto_mkindex
+#doc HTML title {
+#HTML
+#} descr {
+# subclass of <a href="../basic/Widget.html">Widget</a><br>
+# creates a HTML display widget. The widget is based on the
+# html_library by Stephan Uhler, with a few modifications.
+#}
+#doc {HTML options} h2 {
+#	HTML specific options
+#}
+#doc {HTML command} h2 {
+#	HTML specific methods
+#}
+# Next is to get the attention of auto_mkindex
 if 0 {
 proc ::Classy::HTML {} {}
 proc HTML {} {}
@@ -17,7 +29,7 @@ proc ::html::link_callback {win href} {
 	$win geturl $href
 }
 proc ::html::set_image {win handle src} {
-	$win setimage $handle $src
+	$win _setimage $handle $src
 }
 array set ::html::events {
 	Enter	{-borderwidth 2 -relief raised }
@@ -44,8 +56,7 @@ Classy::HTML classmethod init {args} {
 	setprivate $object tempfile [tempfile]
 	set control(history) ""
 	set control(forward) ""
-	set control(backward) ""
-puts [array get html::$object]
+	set control(back) ""
 	set options(-update) [set html::${object}(S_update)]
 	set options(-tab) [set html::${object}(S_tab)]
 	set options(-unknown) [set html::${object}(S_unknown)]
@@ -66,21 +77,39 @@ puts [array get html::$object]
 # ------------------------------------------------------------------
 
 Classy::HTML chainoptions {$object}
+
+#doc {HTML options -indent} option {-indent indent Indent} descr {
+#}
 Classy::HTML addoption -indent {indent Indent {}} {
 	html::set_indent $object $value
 }
+
+#doc {HTML options -update} option {-update update Update} descr {
+#}
 Classy::HTML addoption -update {update Update {}} {
 	html::set_state $object -update $value
 }
+
+#doc {HTML options -tab} option {-tab tab Tab} descr {
+#}
 Classy::HTML addoption -tab {tab Tab {}} {
 	html::set_state $object -tab $value
 }
+
+#doc {HTML options -unknown} option {-unknown unknown Unknown} descr {
+#}
 Classy::HTML addoption -unknown {unknown Unknown {}} {
 	html::set_state $object -unknown $value
 }
+
+#doc {HTML options -size} option {-size size Size} descr {
+#}
 Classy::HTML addoption -size {size Size {}} {
 	html::set_state $object -size $value
 }
+
+#doc {HTML options -symbols} option {-symbols symbols Symbols} descr {
+#}
 Classy::HTML addoption -symbols {symbols Symbols {}} {
 	html::set_state $object -symbols $value
 }
@@ -91,80 +120,10 @@ Classy::HTML addoption -symbols {symbols Symbols {}} {
 
 Classy::HTML chainallmethods {$object} text
 
-Classy::HTML method setimage {handle url} {
-	private $object currenturl tempfile
-
-	set url [$object fullurl $url]
-
-	# if doesn't exists yet, load
-	# ---------------------------
-	set image ::html::image_$url
-	if {"[info commands $image]" == ""} {
-		# get the html data according to protocol
-		# ---------------------------------------
-		if ![regexp {^([^:]*)://([^/]+)(/.*)$} $url dummy protocol host file] {
-			error "error in url format of \"$url\""
-		}
-		set type photo
-		if {[file extension $image] == ".bmp"} {set type bitmap}
-		switch $protocol {
-			http {
-				package require http
-				set id [http::geturl $url]
-				set data [http::data $id]
-				unset $id
-				set f [open $tempfile w]
-				puts -nonewline $f $data
-				close $f
-				image create $type $image -file $tempfile
-				file delete $tempfile
-			}
-			file {
-				image create $type $image -file $file
-			}
-			ftp {
-				error "not yet"
-			}
-			default {
-				error "unsupported protocol"
-			}
-		}
-	}
-	::html::got_image $handle $image
-}
-
-Classy::HTML method load {file} {
-	if {"[file pathtype $file]" != "absolute"} {
-		set file [file join [pwd] $file]
-	}
-	$object geturl file:$file
-}
-
-Classy::HTML method fullurl {url} {
-	private $object currenturl
-
-	# make url fully specified
-	# ------------------------
-	regsub {/[^/]*$} $currenturl {} dir
-	switch -regexp $url {
-		^# {
-			set url $currenturl$url
-		}
-		{^(http|ftp|file)://} {
-		}
-		{^(http|ftp|file):/} {
-			regsub {^(http|ftp|file):/} $url {\0/localhost/} url
-		}
-		^/ {
-			set url $dir$url
-		}
-		default {
-			set url $dir/$url
-		}
-	}
-	return $url
-}
-
+#doc {HTML command geturl} cmd {
+#pathname geturl url
+#} descr {
+#}
 Classy::HTML method geturl {url} {
 	private $object currenturl control
 
@@ -185,7 +144,7 @@ Classy::HTML method geturl {url} {
 				if [info exists control(direction)] {
 					unset control(direction)
 				} else {
-					lappend control(backward) $currenturl
+					lappend control(back) $currenturl
 					set control(forward) ""
 					lunshift control(history) $currenturl
 					set control(history) [lrange $control(history) 0 50]
@@ -227,7 +186,7 @@ Classy::HTML method geturl {url} {
 	} elseif [info exists control(direction)] {
 		unset control(direction)
 	} else {
-		lappend control(backward) $currenturl
+		lappend control(back) $currenturl
 		set control(forward) ""
 		lunshift control(history) $currenturl
 		set control(history) [lrange $control(history) 0 50]
@@ -244,26 +203,123 @@ Classy::HTML method geturl {url} {
 	::html::parse_html $html [list ::html::render $object]
 }
 
+
+#doc {HTML command reload} cmd {
+#pathname reload 
+#} descr {
+#}
 Classy::HTML method reload {} {
 	private $object currenturl control
 	set control(reload) 1
 	$object geturl $currenturl
 }
 
-Classy::HTML method backward {} {
+
+#doc {HTML command back} cmd {
+#pathname back 
+#} descr {
+#}
+Classy::HTML method back {} {
 	private $object currenturl control
-	if {"$control(backward)" == ""} return
-	set url [lpop control(backward)]
+	if {"$control(back)" == ""} return
+	set url [lpop control(back)]
 	lappend control(forward) $currenturl
 	set control(direction) 1
 	$object geturl $url
 }
 
+
+#doc {HTML command forward} cmd {
+#pathname forward 
+#} descr {
+#}
 Classy::HTML method forward {} {
 	private $object currenturl control
 	if {"$control(forward)" == ""} return
 	set url [lpop control(forward)]
-	lappend control(backward) $currenturl
+	lappend control(back) $currenturl
 	set control(direction) 1
 	$object geturl $url
+}
+
+Classy::HTML method _setimage {handle url} {
+	private $object currenturl tempfile
+
+	set url [$object fullurl $url]
+
+	# if doesn't exists yet, load
+	# ---------------------------
+	set image ::html::image_$url
+	if {"[info commands $image]" == ""} {
+		# get the html data according to protocol
+		# ---------------------------------------
+		if ![regexp {^([^:]*)://([^/]+)(/.*)$} $url dummy protocol host file] {
+			error "error in url format of \"$url\""
+		}
+		set type photo
+		if {[file extension $image] == ".bmp"} {set type bitmap}
+		switch $protocol {
+			http {
+				package require http
+				set id [http::geturl $url]
+				set data [http::data $id]
+				unset $id
+				set f [open $tempfile w]
+				puts -nonewline $f $data
+				close $f
+				image create $type $image -file $tempfile
+				file delete $tempfile
+			}
+			file {
+				image create $type $image -file $file
+			}
+			ftp {
+				error "not yet"
+			}
+			default {
+				error "unsupported protocol"
+			}
+		}
+	}
+	::html::got_image $handle $image
+}
+
+#doc {HTML command fullurl} cmd {
+#pathname fullurl url
+#} descr {
+#}
+Classy::HTML method fullurl {url} {
+	private $object currenturl
+
+	# make url fully specified
+	# ------------------------
+	regsub {/[^/]*$} $currenturl {} dir
+	switch -regexp $url {
+		^# {
+			set url $currenturl$url
+		}
+		{^(http|ftp|file)://} {
+		}
+		{^(http|ftp|file):/} {
+			regsub {^(http|ftp|file):/} $url {\0/localhost/} url
+		}
+		^/ {
+			set url $dir$url
+		}
+		default {
+			set url $dir/$url
+		}
+	}
+	return $url
+}
+
+#doc {HTML command load} cmd {
+#pathname load file
+#} descr {
+#}
+Classy::HTML method load {file} {
+	if {"[file pathtype $file]" != "absolute"} {
+		set file [file join [pwd] $file]
+	}
+	$object geturl file:$file
 }

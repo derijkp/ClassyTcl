@@ -4,6 +4,19 @@
 #
 # Classy::OptionBox
 # ----------------------------------------------------------------------
+#doc OptionBox title {
+#OptionBox
+#} descr {
+# subclass of <a href="../basic/Widget.html">Widget</a><br>
+# creates an optionbox, a widget in which the user can select between
+# different values using radiobuttons.
+#}
+#doc {OptionBox options} h2 {
+#	OptionBox specific options
+#}
+#doc {OptionBox command} h2 {
+#	OptionBox specific methods
+#}
 # Next is to get the attention of auto_mkindex
 if 0 {
 proc ::Classy::OptionBox {} {}
@@ -47,9 +60,16 @@ Classy::OptionBox classmethod init {args} {
 # ------------------------------------------------------------------
 #  Widget options
 # ------------------------------------------------------------------
+
+#doc {OptionBox options -label} option {-label label Label} descr {
+#}
 Classy::OptionBox addoption -label {label Label {}} {
 	$object.label configure -text $value
 }
+
+#doc {OptionBox options -orient} option {-orient orient Orient} descr {
+# must be vertical or horizontal
+#}
 Classy::OptionBox addoption -orient {orient Orient horizontal} {
 	if {"$value" == "vertical"} {
 		set children [winfo children $object.box]
@@ -74,6 +94,9 @@ Classy::OptionBox addoption -orient {orient Orient horizontal} {
 		}
 	}
 }
+
+#doc {OptionBox options -variable} option {-variable variable Variable} descr {
+#}
 Classy::OptionBox addoption -variable {variable Variable {}} {
 	if {"$value" == ""} {
 		set newval [privatevar $object var]
@@ -90,6 +113,10 @@ Classy::OptionBox addoption -variable {variable Variable {}} {
 #  Methods
 # ------------------------------------------------------------------
 
+#doc {OptionBox command add} cmd {
+#pathname add item text ?option value ...?
+#} descr {
+#}
 Classy::OptionBox method add {item text args} {
 	radiobutton $object.box.b$item -relief flat -anchor w\
 		-variable [getprivate $object options(-variable)] -text $text -value $item
@@ -102,14 +129,26 @@ Classy::OptionBox method add {item text args} {
 	return $object.box.b$item
 }
 
+#doc {OptionBox command set} cmd {
+#pathname set item
+#} descr {
+#}
 Classy::OptionBox method set {item} {
 	$object.box.b$item select
 }
 
+#doc {OptionBox command get} cmd {
+#pathname get 
+#} descr {
+#}
 Classy::OptionBox method get {} {
 	return [uplevel #0 set [getprivate $object options(-variable)]]
 }
 
+#doc {OptionBox command items} cmd {
+#pathname items 
+#} descr {
+#}
 Classy::OptionBox method items {} {
 	set list [winfo children $object.box]
 	regsub -all $object.box.b $list {} list

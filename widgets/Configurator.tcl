@@ -4,6 +4,19 @@
 #
 # Classy::Configurator
 # ----------------------------------------------------------------------
+#doc Configurator title {
+#Configurator
+#} descr {
+# subclass of <a href="../basic/Class.html">Class</a><br>
+# is used for the configuration of ClassyTcl applications.
+# This class is not meant to be instanciated.
+# The only use should be
+# <pre>Classy::Configurator dialog</pre>
+#}
+#doc {Configurator command} h2 {
+#	Configurator specific methods
+#} descr {
+#}
 # Next is to get the attention of auto_mkindex
 if 0 {
 proc ::Classy::Configurator {} {}
@@ -26,6 +39,12 @@ Classy::export Configurator {}
 #  Methods
 # ------------------------------------------------------------------
 
+
+#doc {Configurator command dialog} cmd {
+#pathname dialog 
+#} descr {
+# pop up a dialog for the configuration of ClassyTcl applications
+#}
 Classy::Configurator method dialog {} {
 	private $object w
 	# REM Create object
@@ -517,7 +536,8 @@ Classy::Configurator method _activateconf {} {
 	$w.current configure -text $current
 }
 
-Classy::Configurator method getnamedconfigs {{conf {}}} {
+
+Classy::Configurator method _getnamedconfigs {{conf {}}} {
 	private $object data
 	set result ""
 	set data(selectlist) ""
@@ -560,7 +580,7 @@ Classy::Configurator method _selectconfdialog {} {
 
 	bind $w.list <<MExecute>> [list .classy__config.loadconfig invoke go]
 	.classy__config.loadconfig add go "Go" [list $object _selectconf $level] default
-	eval $w.list insert end [$object getnamedconfigs $confname]
+	eval $w.list insert end [$object _getnamedconfigs $confname]
 }
 
 Classy::Configurator method _selectconf {level} {
@@ -765,4 +785,3 @@ Classy::Configurator method _configuredefault {{name {}}} {
 		$w.defaults.edit insert end "$item\n"
 	}
 }
-

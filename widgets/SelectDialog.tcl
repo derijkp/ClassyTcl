@@ -4,6 +4,25 @@
 #
 # Classy::SelectDialog
 # ----------------------------------------------------------------------
+#doc SelectDialog title {
+#SelectDialog
+#} descr {
+# subclass of <a href="Dialog.html">Dialog</a><br>
+# creates a selection dialog. It allows selection out of a list of
+# values. It also optionally allows adding or removing values from 
+# the list.
+#<p>
+# The command<br>
+#<b>Classy::select title list</b><br>
+# can be used to easily pop op a dialog for simply selecting a value
+# out of a list.
+#}
+#doc {SelectDialog options} h2 {
+#	SelectDialog specific options
+#}
+#doc {SelectDialog command} h2 {
+#	SelectDialog specific methods
+#}
 # Next is to get the attention of auto_mkindex
 if 0 {
 proc ::Classy::SelectDialog {} {}
@@ -53,7 +72,13 @@ Classy::SelectDialog component renameentry {$object.options.rename}
 # ------------------------------------------------------------------
 #  Widget options
 # ------------------------------------------------------------------
+
+#doc {SelectDialog options -command} option {-command ? ?} descr {
+#}
 Classy::SelectDialog chainoption -command {$object.actions.go} -command
+
+#doc {SelectDialog options -default} option {-default default Default} descr {
+#}
 Classy::SelectDialog addoption -default {default Default {}} {
 	if [winfo exists $object.options.add] {
 		$object.options.add configure -default $value
@@ -61,6 +86,8 @@ Classy::SelectDialog addoption -default {default Default {}} {
 	return $value
 }
 
+#doc {SelectDialog options -addvariable} option {-addvariable addVariable AddVariable} descr {
+#}
 Classy::SelectDialog addoption -addvariable {addVariable AddVariable {}} {
 	if [winfo exists $object.options.add] {destroy $object.options.add}
 	if {"$value" != ""} {
@@ -70,6 +97,9 @@ Classy::SelectDialog addoption -addvariable {addVariable AddVariable {}} {
 	}
 	return $value
 }
+
+#doc {SelectDialog options -addcommand} option {-addcommand addCommand AddCommand} descr {
+#}
 Classy::SelectDialog addoption -addcommand {addCommand AddCommand {}} {
 	catch {destroy $object.actions.add}
 	if {"$value" != ""} {
@@ -77,6 +107,9 @@ Classy::SelectDialog addoption -addcommand {addCommand AddCommand {}} {
 	}
 	return $value
 } 
+
+#doc {SelectDialog options -deletecommand} option {-deletecommand deleteCommand DeleteCommand} descr {
+#}
 Classy::SelectDialog addoption -deletecommand {deleteCommand DeleteCommand {}} {
 	catch {destroy $object.actions.delete}
 	if {"$value" != ""} {
@@ -84,6 +117,9 @@ Classy::SelectDialog addoption -deletecommand {deleteCommand DeleteCommand {}} {
 	}
 	return $value
 }
+
+#doc {SelectDialog options -renamecommand} option {-renamecommand renameCommand RenameCommand} descr {
+#}
 Classy::SelectDialog addoption -renamecommand {renameCommand RenameCommand {}} {
 	catch {destroy $object.actions.rename}
 	catch {destroy $object.options.rename}
@@ -101,21 +137,33 @@ Classy::SelectDialog addoption -renamecommand {renameCommand RenameCommand {}} {
 
 Classy::SelectDialog chainallmethods {$object.options.list} listbox
 
+#doc {SelectDialog command fill} cmd {
+#pathname fill names
+#} descr {
+#}
+Classy::SelectDialog method fill {names} {
+	$object.options.list delete 0 end
+	eval $object.options.list insert end $names
+}
+
+#doc {SelectDialog command get} cmd {
+#pathname get 
+#} descr {
+#}
 Classy::SelectDialog method get {} {
 	return [$object.options.list get active]
 }
 
+#doc {SelectDialog command set} cmd {
+#pathname set name
+#} descr {
+#}
 Classy::SelectDialog method set {name} {
 	set pos [lsearch -exact [$object.options.list get 0 end] $name]
 	if {$pos != -1} {
 		$object.options.list activate $pos
 		$object.options.list see $pos
 	}
-}
-
-Classy::SelectDialog method fill {names} {
-	$object.options.list delete 0 end
-	eval $object.options.list insert end $names
 }
 
 proc Classy::select {title list} {

@@ -5,6 +5,37 @@
 #
 # ChartGrid
 # ----------------------------------------------------------------------
+#doc ChartGrid title {
+#ChartGrid
+#} descr {
+# subclass of <a href="../basic/Widget.html">Widget</a><br>
+# <b>ChartGrid is not a widget type</b>. It is a class whose objects can 
+# be associated with a canvas widget. When a ChartGrid instance is 
+# associated with a canvas, it will draw a grid on this canvas. 
+# Several ChartGrid, LineChart and BarChart objects can be associated
+# with the same canvas.
+#}
+#doc {ChartGrid options} h2 {
+#	ChartGrid specific options
+#} descr {
+# BarcHart objects support the following options in its configure method
+#<dl>
+#<dt>-canvas<dd>name of canvas to draw the barchart
+#<dt>-tag<dd>unique tag for all canvas items of the chart
+#<dt>-area<dd>area in which to diplay the chart (a list of four numbers)
+#<dt>-xrange<dd>xrange to display
+#<dt>-yrange<dd>xrange to display
+#<dt>-xstep<dd>numbers and gridlines are shown at startx+x*stepx
+#<dt>-ystep<dd>numbers and gridlines are shown at starty+y*stepy
+#<dt>-font<dd>font used for numbers
+#<dt>-showx<dd>show numbers on x axis
+#<dt>-showy<dd>show numbers on y axis
+#</dl>
+#}
+#doc {ChartGrid command} h2 {
+#	ChartGrid specific methods
+#} descr {
+#}
 # Next is to get the attention of auto_mkindex
 if 0 {
 proc ::Classy::ChartGrid {} {}
@@ -32,6 +63,11 @@ Classy::ChartGrid classmethod init {args} {
 	eval $object configure $args
 }
 
+
+#doc {ChartGrid command destroy} cmd {
+#pathname destroy 
+#} descr {
+#}
 Classy::ChartGrid method destroy {} {
 	private $object options
 	::Classy::busy
@@ -44,6 +80,11 @@ Classy::ChartGrid method destroy {} {
 #  Methods
 # ------------------------------------------------------------------
 
+
+#doc {ChartGrid command configure} cmd {
+#pathname configure ?option? ?value? ?option value ...?
+#} descr {
+#}
 Classy::ChartGrid method configure {args} {
 	private $object options
 	set len [llength $args]
@@ -170,6 +211,11 @@ Classy::ChartGrid method _drawgrid {} {
 	set drawable 1
 }
 
+
+#doc {ChartGrid command redraw} cmd {
+#pathname redraw
+#} descr {
+#}
 Classy::ChartGrid method redraw {args} {
 	::Classy::busy
 	$object _drawgrid

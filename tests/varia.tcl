@@ -34,7 +34,7 @@ test Classy::FontSelector {basic} {
 	clean
 	eval destroy [winfo children .]
 	classyinit test
-	Classy::FontSelector .try
+	Classy::FontSelect .try
 	pack .try -fill both -expand yes
 	.try set {helvetica 16 {bold}}
 	.try get

@@ -1,0 +1,124 @@
+<HEAD>
+<TITLE>
+DynaTool
+</TITLE>
+</HEAD>
+<BODY>
+<h1>
+DynaTool
+</h1>
+
+ subclass of <a href="../basic/Class.html">Class</a><br>
+ DynaTool is not a widget and is not intended to produce instances. 
+ It is a class that manages toolbars in an easy and dynamic way.
+ DynaTool can handle several tooltypes.
+<p>
+ Each tooltype is defined by a definition in a simple format. 
+ DynaTool can create one or more toolbars for each
+ tooltype. When the definition of the tooltype is changed
+ all toolbars of that type will be changed accordingly.
+<p>
+ Toolbar definitions for tooltype are usually controlled from the
+ Toolbars part of the <a href="../classy_configure.html">configuration 
+ system</a>. Creation of a toolbar of a certain type, will get the toolbar
+ definition from the option database by creating a dummy frame with 
+ class $tooltype and getting its option value for toolbar (class Toolbar).
+ you can add a tooltype in the configuration system by adding
+<pre>
+## Sometool {this is an example toolbar} tool
+option add *Sometool.Toolbar definition widgetDefault
+</pre>
+ to the Toolbars configuration file. You will usually only need this 
+ configuration and the maketool method to get working toolbars.
+<p>
+ A toolbar managed by DynaTool can control several widgets: The commands 
+ associated with the toolbar can include a %W, that on invocation is
+ changed to the current cmdw (command widget). The cmdw of a toolbar can be
+ changed at any time.
+
+<dl><dt><b>
+pathname maketool tooltype tool cmdw
+</b><dd>
+ create a toolbar of type $tooltype. $cmdw
+ determines the initial commmand widget.
+</ul>
+
+<dl><dt><b>
+pathname define tooltype ?data?
+</b><dd>
+ set the definition describing the tools that will be generated 
+ for $tooltype.
+ If data is not given, the toolbar definition for $tooltype is obtained 
+ from the option database. A dummy frame with class $tooltype is created,
+ and the its option value for toolbar (class Toolbar) obtained. This option
+ will usually be set in the Toolbars part 
+ <a href="../classy_configure.html">configuration system</a>.
+ You will usually not invoke this method, as the maketool
+ method will automatically define a tooltype that isn't managed yet.
+</ul>
+
+<dl><dt><b>
+pathname names 
+</b><dd>
+</ul>
+
+<dl><dt><b>
+pathname redraw tooltype
+</b><dd>
+ redraw toolbars of type $tooltype
+</ul>
+
+<dl><dt><b>
+pathname get tooltype
+</b><dd>
+ returns the definition of $tooltype
+</ul>
+
+<dl><dt><b>
+pathname deletetool tool
+</b><dd>
+ delete $tool managed by DynaTool
+</ul>
+
+<dl><dt><b>
+pathname delete tooltype
+</b><dd>
+ delete the definition and all toolbars of $tooltype
+</ul>
+
+<dl><dt><b>
+pathname cmdw tool {cmdw {}}
+</b><dd>
+ change the current cmdw for $tool to $cmdw. If the cmdw argument is
+ not given, the method returns the current cmdw for $tool.
+ This method is automatically called when a widget which has bindtags
+ defined by DynaTool recieves the focus.
+</ul>
+
+<dl><dt><b>
+pathname invoke curtool index
+</b><dd>
+ invoke the item given by $index in $curtool
+</ul>
+
+<dl><dt><b>
+pathname conftool tooltype
+</b><dd>
+</ul>
+
+<dl><dt><b>
+pathname reqwidth tool
+</b><dd>
+</ul>
+
+<dl><dt><b>
+pathname reqheight tool
+</b><dd>
+</ul>
+
+<dl><dt><b>
+pathname image tool image
+</b><dd>
+</ul>
+
+</body>

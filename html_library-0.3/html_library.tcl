@@ -382,8 +382,10 @@ proc ::html::tag_hr {win param text} {
 	upvar #0 ::html::$win var
 #	$win insert $var(S_insert) "\n" space "\n" thin "\t" "thin hr" "\n" thin
 	$win insert $var(S_insert) "\n" space
-	$win window create $var(S_insert) \
-		-create [list frame $win.hr$::html::hrcount -height 3 -relief sunken]
+	if ![winfo exists $win.hr$::html::hrcount] {
+		frame $win.hr$::html::hrcount -height 3 -relief sunken
+	}
+	$win window create $var(S_insert) -window $win.hr$::html::hrcount
 	$win insert $var(S_insert) "\n" space
 	$win.hr$::html::hrcount configure -width [winfo width $win]
 	incr ::html::hrcount

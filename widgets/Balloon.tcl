@@ -4,6 +4,15 @@
 #
 # Balloon
 # ----------------------------------------------------------------------
+#doc Balloon title {
+#Balloon
+#} descr {
+# subclass of <a href="../basic/Class.html">Class</a><br>
+# associate help with a widget such as a button. A box with the help text in it
+# will popup after staying for some time over the widget without doing anything.
+# Balloon is not meant to be instanciated; the command can can rather be used
+# directly from the class.
+#}
 # Next is to get the attention of auto_mkindex
 if 0 {
 proc ::Classy::Balloon {} {}
@@ -16,7 +25,7 @@ option add *Balloon.text.background yellow widgetDefault
 option add *Balloon.background black widgetDefault
 option add *Balloon.borderWidth 0 widgetDefault
 
-bind all <Enter> {set Balloon__current %W;Balloon schedule %W}
+bind all <Enter> {set Balloon__current %W;Balloon _schedule %W}
 bind all <Leave> {if [info exists Balloon__current] {unset Balloon__current};Balloon revoke}
 
 # ------------------------------------------------------------------
@@ -35,6 +44,11 @@ wm overrideredirect .classy::balloon 1
 
 # REM Initialise variables and options
 # ------------------------------------
+#doc {Balloon time} cmd {
+#Balloon private time ms
+#} descr {
+# set the time (in miliseconds) to wait before the helptext gets displayed
+#}
 ::Classy::Balloon private time 500
 
 # ------------------------------------------------------------------
@@ -47,6 +61,12 @@ Classy::Balloon classmethod destroy {} {
 	bind all <Leave> {}
 }
 
+
+#doc {Balloon add} cmd {
+#Balloon add widget text
+#} descr {
+# add $text as help to the given widget
+#}
 Classy::Balloon method add {widget text} {
 	private $object help
 	if {"$text"==""} {
@@ -58,6 +78,12 @@ Classy::Balloon method add {widget text} {
 	}
 }
 
+
+#doc {Balloon display} cmd {
+#Balloon display widget
+#} descr {
+# display the helptext associated with $widget
+#}
 Classy::Balloon method display {widget} {
 	private $object help
 	if ![info exists help($widget)] return
@@ -68,12 +94,12 @@ Classy::Balloon method display {widget} {
 	raise .classy::balloon
 }
 
-Classy::Balloon method schedule {widget} {
-	private $object time
-	private $object id
-	set id [after $time "$object display $widget"]
-}
 
+#doc {Balloon revoke} cmd {
+#Balloon revoke 
+#} descr {
+# remove the currently displayed helptext
+#}
 Classy::Balloon method revoke {} {
 	private $object id
 	if [info exists id] {
@@ -81,4 +107,10 @@ Classy::Balloon method revoke {} {
 		unset id
 	}
 	wm withdraw .classy::balloon
+}
+
+Classy::Balloon method _schedule {widget} {
+	private $object time
+	private $object id
+	set id [after $time "$object display $widget"]
 }

@@ -4,6 +4,26 @@
 #
 # Classy::Entry
 # ----------------------------------------------------------------------
+#doc Entry title {
+#Entry
+#} descr {
+# subclass of <a href="../basic/Widget.html">Widget</a><br>
+# The ClassyTcl entry has all the options and commands of the Tk entry, but
+# with a few extras
+#<ul>
+#<li>optional label
+#<li>constraints
+#<li>a <a href="DefaultMenu.html">DefaultMenu</a> can be added to
+# store and reselecte values easily. These default values are stored
+# by the <a href="Default.html">Default</a> system as type app.
+#</ul>
+#}
+#doc {Entry options} h2 {
+#	Entry specific options
+#}
+#doc {Entry command} h2 {
+#	Entry specific methods
+#}
 # Next is to get the attention of auto_mkindex
 if 0 {
 proc ::Classy::Entry {} {}
@@ -70,6 +90,10 @@ Classy::Entry classmethod init {args} {
 
 Classy::Entry chainoptions {$object.entry}
 
+
+#doc {Entry options -orient} option {-orient orient Orient} descr {
+# determines the position of the label relative to the entry: horizontal or vertical
+#}
 Classy::Entry addoption -orient {orient Orient horizontal} {
 	if [string match "hor*" "$value"] {
 		if [winfo exists $object.label] {pack $object.label -side left}
@@ -82,21 +106,33 @@ Classy::Entry addoption -orient {orient Orient horizontal} {
 	}
 }
 
+
+#doc {Entry options -default} option {-default default Default} descr {
+# If not empty, a <a href="DefaultMenu.html">DefaultMenu</a> will be 
+# added to store and reselecte values of the entry easily. These 
+# default values are stored by the <a href="Defaults.html">Defaults</a> system 
+# as type app. The default option gives the key for getting and 
+# setting values.
+#}
 Classy::Entry addoption -default {default Default {}} {
 	set w $object.defaults
 	if {("$value"=="")&&([winfo exists $w])} {
 		destroy $w
 	} elseif ![winfo exists $w] {
-		Classy::DefaultMenu $w -reference $value \
+		Classy::DefaultMenu $w -key $value \
 			-command "$object set \[$w get\]" \
 			-getcommand "$object get"
 		pack $object.defaults -in $object.frame.entry -side right
 	} else {
-		$w configure -reference $value
+		$w configure -key $value
 	}
 	return $value
 }
 
+
+#doc {Entry options -label} option {-label label Label} descr {
+# text to be displayed in the entry label. If this is empty, no label will bne displayed.
+#}
 Classy::Entry addoption -label {label Label {}} {
 	private $object options
 #puts "set to $value"
@@ -114,7 +150,17 @@ Classy::Entry addoption -label {label Label {}} {
 	}
 	return $value
 }
+
+#doc {Entry options -command} option {-command command Command} descr {
+# associate a command with the entry. This
+# command will be executed when the Action key is pressed in the entry.
+#}
 Classy::Entry addoption -command {command Command {}}
+
+#doc {Entry options -constraint} option {-constraint constraint Constraint} descr {
+# the value in the entry must match the regular expression given here.
+# No constraint is applied when it is set to the empty string.
+#}
 Classy::Entry addoption -constraint {constraint Constraint {}}
 
 
@@ -124,6 +170,11 @@ Classy::Entry addoption -constraint {constraint Constraint {}}
 
 Classy::Entry chainallmethods {$object.entry} entry
 
+#doc {Entry command nocmdset} cmd {
+#pathname nocmdset value
+#} descr {
+# set the entry to value without invoking the command associated with the entry
+#}
 Classy::Entry method nocmdset {val} {
 	private $object previous
 	$object.entry delete 0 end
@@ -132,15 +183,30 @@ Classy::Entry method nocmdset {val} {
 	$object.entry xview end
 }
 
+#doc {Entry command set} cmd {
+#pathname set value
+#} descr {
+# set the entry to value.
+#}
 Classy::Entry method set {val} {
 	$object nocmdset $val
 	uplevel #0 [getprivate $object options(-command)]
 }
 
+#doc {Entry command get} cmd {
+#pathname get 
+#} descr {
+# get the current contents of the entry
+#}
 Classy::Entry method get {} {
 	return [$object.entry get]
 }
 
+#doc {Entry command command} cmd {
+#pathname command 
+#} descr {
+# invoke the command associated with the entry
+#}
 Classy::Entry method command {} {
 	set command [getprivate $object options(-command)]
 	if {"$command"==""} {
@@ -150,6 +216,14 @@ Classy::Entry method command {} {
 	return 1
 }	
 
+#doc {Entry command constrain} cmd {
+#pathname constrain ?warn?
+#} descr {
+# check whether the value matches the regular expression given by the -constraint option
+# The optional parameter warn can be either 1 or 0. If it is 0, the entry will
+# never contain a value not matching the constraint. It warn is 1, it is possible
+# to enter a value not matching the constraint, but there will be visual warning.
+#}
 Classy::Entry method constrain {{warn 0}} {
 	set constraint [getprivate $object options(-constraint)]
 	if {"$constraint" == ""} {
@@ -171,4 +245,3 @@ Classy::Entry method constrain {{warn 0}} {
 		}
 	}
 }	
-

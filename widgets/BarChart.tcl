@@ -5,6 +5,44 @@
 #
 # BarChart
 # ----------------------------------------------------------------------
+#doc BarChart title {
+#BarChart
+#} descr {
+# subclass of <a href="../basic/Widget.html">Widget</a><br>
+# <b>BarChart is not a widget type</b>. It is a class whose objects can 
+# be associated with a canvas widget. When a BarChart instance is 
+# associated with a canvas, it will draw a barchart on this canvas. 
+# Several BarChart (and LineChart and ChartGrid) objects can be associated
+# with the same canvas.
+#}
+#doc {BarChart options} h2 {
+#	BarChart options
+#} descr {
+# BarcHart objects support the following options in its configure method
+#<dl>
+#<dt>-canvas<dd>name of canvas to draw the barchart
+#<dt>-tag<dd>unique tag for all canvas items of the chart
+#<dt>-area<dd>area in which to diplay the chart (a list of four numbers)
+#<dt>-datastart<dd>start position of data display
+#<dt>-xrange<dd>xrange to display
+#<dt>-yrange<dd>xrange to display
+#<dt>-barwidth<dd>width of the bars, expressed as a fraction of the size available between 2 bars
+#<dt>-displace<dd>when several dataranges are available, they wil be shifted by the value given here
+#<dt>-percentages<dd>show data as percentages
+#<dt>-stacked<dd>stack dataranges
+#<dt>-legend<dd>display a legend
+#<dt>-legendpos<dd>position to display the legend
+#<dt>-legendfont<dd>font used for the legend
+#<dt>-labels<dd>a list of labels that can be associated with the data
+#<dt>-labelorient<dd>orient the labels: horizontal or vertical
+#<dt>-labelfont<dd>font used for the labels
+#<dt>-labelgap<dd>only show labels for every labelgap bar
+#</dl>
+#}
+#doc {BarChart command} h2 {
+#	BarChart methods
+#} descr {
+#}
 # Next is to get the attention of auto_mkindex
 if 0 {
 proc ::Classy::BarChart {} {}
@@ -24,7 +62,7 @@ Classy::BarChart classmethod init {args} {
 	private $object options
 	array set options {
 		-canvas {} -tag {} -area {}
-		-ystep 1 -xstep 1 -datastart 0
+		-datastart 0
 		-xrange {1 20} -yrange {0 20}
 		-barwidth 1 -displace 0
 		-percentages no -stacked no
@@ -36,6 +74,11 @@ Classy::BarChart classmethod init {args} {
 	eval $object configure $args
 }
 
+
+#doc {BarChart command destroy} cmd {
+#pathname destroy 
+#} descr {
+#}
 Classy::BarChart method destroy {} {
 	private $object options
 	::Classy::busy
@@ -48,6 +91,11 @@ Classy::BarChart method destroy {} {
 #  Methods
 # ------------------------------------------------------------------
 
+
+#doc {BarChart command configure} cmd {
+#pathname configure ?option? ?value? ?option value ...?
+#} descr {
+#}
 Classy::BarChart method configure {args} {
 	private $object options
 	set len [llength $args]
@@ -90,12 +138,6 @@ Classy::BarChart method configure {args} {
 				-xrange {
 					::Classy::todo $object redraw
 				}
-				-ystep {
-					::Classy::todo $object redraw
-				}
-				-xstep {
-					::Classy::todo $object redraw
-				}
 				-yrange {
 					::Classy::todo $object redraw
 				}
@@ -133,6 +175,11 @@ Classy::BarChart method configure {args} {
 	}
 }
 
+
+#doc {BarChart command dataset} cmd {
+#pathname dataset name values
+#} descr {
+#}
 Classy::BarChart method dataset {name values} {
 	private $object data tag options order
 	if ![info exists data($name)] {
@@ -161,11 +208,21 @@ Classy::BarChart method _create {name num} {
 		-tags [list $options(-tag) classy::barchart data]]
 }
 
+
+#doc {BarChart command dataget} cmd {
+#pathname dataget name
+#} descr {
+#}
 Classy::BarChart method dataget {name} {
 	private $object data tag
 	return $data($name)
 }
 
+
+#doc {BarChart command labelset} cmd {
+#pathname labelset labels
+#} descr {
+#}
 Classy::BarChart method labelset {values} {
 	private $object labels
 	if {"$values"==""} {
@@ -175,6 +232,11 @@ Classy::BarChart method labelset {values} {
 	::Classy::todo $object redraw
 }
 
+
+#doc {BarChart command delete} cmd {
+#pathname delete name
+#} descr {
+#}
 Classy::BarChart method delete {name} {
 	private $object data tag options order
 	$options(-canvas) delete $options(-tag)
@@ -184,6 +246,12 @@ Classy::BarChart method delete {name} {
 	::Classy::todo $object redraw
 }
 
+
+#doc {BarChart command hidden} cmd {
+#pathname hidden name ?value?
+#} descr {
+# query or set hidden state of datarange name
+#}
 Classy::BarChart method hidden {name {value {}}} {
 	private $object data tag options order hidden
 	switch $value {
@@ -208,11 +276,21 @@ Classy::BarChart method hidden {name {value {}}} {
 	}
 }
 
+
+#doc {BarChart command ranges} cmd {
+#pathname ranges
+#} descr {
+#}
 Classy::BarChart method ranges {} {
 	private $object order
 	return $order
 }
 
+
+#doc {BarChart command barconfigure} cmd {
+#pathname barconfigure name ?option? ?value? ?option value ...?
+#} descr {
+#}
 Classy::BarChart method barconfigure {name args} {
 	private $object tag options
 	set canvas $options(-canvas)
@@ -390,6 +468,11 @@ Classy::BarChart method _drawdata {} {
 	}
 }
 
+
+#doc {BarChart command redraw} cmd {
+#pathname redraw
+#} descr {
+#}
 Classy::BarChart method redraw {args} {
 	private $object options
 	if {"$options(-canvas)" == ""} return

@@ -4,8 +4,31 @@
 #
 # Classy::selectfile
 # ----------------------------------------------------------------------
+#doc selectfile title {
+#selectfile
+#}
 # Next is to get the attention of auto_mkindex
-
+if 0 {
+proc ::Classy::selectfile {} {}
+proc selectfile {} {}
+}
+#doc {selectfile selectfile} cmd {
+#selectfile ?option value ...?
+#} descr {
+# returns a filename selected by the user. The selection
+# method depends om the ClassyTcl configuration. Possible options are
+#<dl>
+#<dt>-defaultextension
+#<dt>-filetypes
+#<dt>-initialdir
+#<dt>-initialfile
+#<dt>-title
+#<dt>-filter
+#<dt>-selectmode<dd>single, browse, multiple, extended or persistent
+#<dt>-default
+#<dt>-help
+#</dl>
+#}
 proc Classy::selectfile {args} {
 	global tcl_platform
 	Classy::parseopt $args opt {
@@ -68,3 +91,4 @@ proc Classy::selectfile {args} {
 		return $::Classy::selectfile
 	}
 }
+Classy::export selectfile {}

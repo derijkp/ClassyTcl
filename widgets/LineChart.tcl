@@ -5,6 +5,39 @@
 #
 # LineChart
 # ----------------------------------------------------------------------
+#doc LineChart title {
+#LineChart
+#} descr {
+# subclass of <a href="../basic/Class.html">Class</a><br>
+# <b>LineChart is not a widget type</b>. It is a class whose objects can 
+# be associated with a canvas widget. When a LineChart instance is 
+# associated with a canvas, it will draw a linechart on this canvas. 
+# Several LineChart (and BarChart and ChartGrid) objects can be associated
+# with the same canvas.
+#}
+#doc {LineChart options} h2 {
+#	LineChart options
+#} descr {
+# LineChart objects support the following options in its configure method
+#<dl>
+#<dt>-canvas<dd>name of canvas to draw the chart
+#<dt>-tag<dd>unique tag for all canvas items of the chart
+#<dt>-area<dd>area in which to diplay the chart (a list of four numbers)
+#<dt>-xrange<dd>xrange to display
+#<dt>-yrange<dd>xrange to display
+#<dt>-legend<dd>display a legend
+#<dt>-legendpos<dd>position to display the legend
+#<dt>-legendfont<dd>font used for the legend
+#<dt>-labels<dd>a list of labels that can be associated with the data
+#<dt>-labelorient<dd>orient the labels: horizontal or vertical
+#<dt>-labelfont<dd>font used for the labels
+#<dt>-labelgap<dd>only show labels for every labelgap bar
+#</dl>
+#}
+#doc {LineChart command} h2 {
+#	LineChart specific methods
+#} descr {
+#}
 # Next is to get the attention of auto_mkindex
 if 0 {
 proc ::Classy::LineChart {} {}
@@ -34,6 +67,11 @@ Classy::LineChart classmethod init {args} {
 	eval $object configure $args
 }
 
+
+#doc {LineChart command destroy} cmd {
+#pathname destroy 
+#} descr {
+#}
 Classy::LineChart method destroy {} {
 	private $object options
 	::Classy::busy
@@ -46,6 +84,11 @@ Classy::LineChart method destroy {} {
 #  Methods
 # ------------------------------------------------------------------
 
+
+#doc {LineChart command configure} cmd {
+#pathname configure ?option? ?value? ?option value ...?
+#} descr {
+#}
 Classy::LineChart method configure {args} {
 	private $object options
 	set len [llength $args]
@@ -114,6 +157,11 @@ Classy::LineChart method configure {args} {
 	}
 }
 
+
+#doc {LineChart command dataset} cmd {
+#pathname dataset name values
+#} descr {
+#}
 Classy::LineChart method dataset {name values} {
 	private $object data tag options order
 	if ![info exists data($name)] {
@@ -139,11 +187,21 @@ Classy::LineChart method _create {name num} {
 		-tags [list $options(-tag) classy::LineChart data]]
 }
 
+
+#doc {LineChart command dataget} cmd {
+#pathname dataget name
+#} descr {
+#}
 Classy::LineChart method dataget {name} {
 	private $object data tag
 	return $data($name)
 }
 
+
+#doc {LineChart command labelset} cmd {
+#pathname labelset labels
+#} descr {
+#}
 Classy::LineChart method labelset {values} {
 	private $object labels
 	if {"$values"==""} {
@@ -153,6 +211,11 @@ Classy::LineChart method labelset {values} {
 	::Classy::todo $object redraw
 }
 
+
+#doc {LineChart command delete} cmd {
+#pathname delete name
+#} descr {
+#}
 Classy::LineChart method delete {name} {
 	private $object data tag options order
 	$options(-canvas) delete $options(-tag)
@@ -162,6 +225,12 @@ Classy::LineChart method delete {name} {
 	::Classy::todo $object redraw
 }
 
+
+#doc {LineChart command hidden} cmd {
+#pathname hidden name ?value?
+#} descr {
+# query or set the hidden state of the datarange name
+#}
 Classy::LineChart method hidden {name {value {}}} {
 	private $object data tag options order hidden
 	switch $value {
@@ -186,11 +255,21 @@ Classy::LineChart method hidden {name {value {}}} {
 	}
 }
 
+
+#doc {LineChart command ranges} cmd {
+#pathname ranges 
+#} descr {
+#}
 Classy::LineChart method ranges {} {
 	private $object order
 	return $order
 }
 
+
+#doc {LineChart command lineconfigure} cmd {
+#pathname lineconfigure name ?option? ?value? ?option value ...?
+#} descr {
+#}
 Classy::LineChart method lineconfigure {name args} {
 	private $object tag options
 	set canvas $options(-canvas)
@@ -233,12 +312,14 @@ Classy::LineChart method _drawlegend {} {
 	set bbox [$canvas bbox $options(-tag)::legend]
 	set h [expr ([lindex $bbox 3]-[lindex $bbox 1])/[llength $names]]
 	set y [expr $legendy+1]
-	set hs [expr $h-2]
+	set hs [expr $h/2.0]
 	foreach name $names {
 		set conf [$canvas itemconfigure $tag($name)]
 		set conf [lmerge [lmanip subindex $conf 0] [lmanip subindex $conf 4]]
 		set temp [expr $legendx+10]
-		eval $options(-canvas) create polygon $legendx $y $temp $y $temp [expr $y+$hs] $legendx [expr $y+$hs] $conf {-tags [list $options(-tag) $options(-tag)::legend classy::LineChart]}
+		eval $options(-canvas) create line \
+			$legendx [expr $y+$hs] $temp [expr $y+$hs] \
+			$conf {-tags [list $options(-tag) $options(-tag)::legend classy::LineChart]}
 		set y [expr $y+$h]
 	}
 	set temp [eval $canvas create rectangle [$canvas bbox $options(-tag)::legend] {-fill white -tags [list $options(-tag) $options(-tag)::legend classy::LineChart]}]
@@ -351,7 +432,6 @@ Classy::LineChart method _drawdata {} {
 			lappend d $xp $yp
 		}
 
-puts [list range $name $range]
 		foreach {xc yc} $range {
 			if {$xc>$maxx} {
 				set yc [expr ((double($yc)-$yp)/($xc-$xp))*($maxx-$xp) + $yp]
@@ -389,7 +469,6 @@ puts [list range $name $range]
 			set xp $xc
 			set yp $yc
 		}
-puts [list d $name $d]
 		eval $canvas coords $tag($name) $d
 		$canvas scale $tag($name) 0 0 $xscale -$yscale
 		$canvas move $tag($name) [expr $xstart-$minx*$xscale] [expr $ystart+$height+$miny*$yscale]
@@ -400,6 +479,11 @@ puts [list d $name $d]
 	}
 }
 
+
+#doc {LineChart command redraw} cmd {
+#pathname redraw
+#} descr {
+#}
 Classy::LineChart method redraw {args} {
 	private $object options
 	if {"$options(-canvas)" == ""} return
