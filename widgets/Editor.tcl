@@ -39,10 +39,7 @@ Classy::Editor method init {args} {
 	set w [::Classy::window $object]
 	$w configure -highlightthickness 0 -borderwidth 0
 	Classy::Text $object.edit -wrap none -tabs 24 -yscrollcommand [list $object.vbar set] \
-		-xscrollcommand [list $object.hbar set] -changedcommand [varsubst object {
-			set top [winfo toplevel $object]
-			if ![regexp {\*$} [wm title $top]] {catch [wm title $top "[wm title $top] *"]}
-		}]
+		-xscrollcommand [list $object.hbar set] -changedcommand [list $object editchanged]
 	bindtags $object [list $object Classy::Menu_macro Classy::Menu_pattern Classy::Editor Classy::Text all]
 	Classy::DynaMenu attachmainmenu Classy_Editor $object
 	Classy::rebind $object.edit $object
@@ -141,6 +138,7 @@ Classy::Editor method destroy {} {
 # ------------------------------------------------------------------
 
 Classy::Editor chainallmethods {$object.edit} Classy::Text
+
 #doc {Editor command cut} cmd {
 #pathname cut 
 #} descr {
@@ -225,7 +223,7 @@ Classy::Editor method save {} {
 		set f [open $curfile w]
 		puts -nonewline $f $temp
 		close $f
-		$object textchanged 0
+		$object editchanged 0
 		catch {wm title [winfo toplevel $object] "$curfile"}
 		foreach w [$object.edit link] {
 			catch {wm title [winfo toplevel $w] "$curfile"}
@@ -250,7 +248,7 @@ Classy::Editor method saveas {file} {
 	lappend reopenlist $file
 	set reopenlist [lsort $reopenlist]
 	$object save
-	$object textchanged 0
+	$object editchanged 0
 	catch {wm title [winfo toplevel $object] "$curfile"}
 }
 
@@ -316,7 +314,7 @@ Classy::Editor method close {} {
 Classy::Editor method closefile {} {
 	private $object curfile curmarkers curmarker prevmarker cur
 	private $class editing
-	if [true [$object textchanged]] {
+	if [true [$object editchanged]] {
 		set temp [Classy::yorn "File not saved!\nSave file first?" -close yes]
 		switch $temp {
 			1 {$object save}
@@ -349,9 +347,9 @@ Classy::Editor method load {{file {}} args} {
 	set options(-savecommand) ""
 	if {"[$object closefile]" != "true"} {return}
 	set curfile [::Classy::fullpath $file]
-	::Classy::busy add $object
+#	::Classy::busy add $object
 	if [info exists editing($curfile)] {
-		$object textchanged 0
+		$object editchanged 0
 		set w [lindex $editing($curfile) 0]
 		$object.edit link $w.edit
 	} else {
@@ -364,7 +362,7 @@ Classy::Editor method load {{file {}} args} {
 			close $f
 		}
 		$object clearundo
-		$object textchanged 0
+		$object editchanged 0
 	}
 	if [info exists cur(pos,$curfile)] {
 		$object mark set insert $cur(pos,$curfile)
@@ -395,7 +393,8 @@ Classy::Editor method load {{file {}} args} {
 		 eval $loadcommand [list $curfile]
 	}
 	lappend editing($curfile) $object
-	::Classy::busy remove $object
+#	::Classy::busy remove $object
+	$object editchanged 0
 	return $curfile
 }
 
@@ -410,7 +409,7 @@ Classy::Editor method set {data} {
 	set curfile ""
 	$object insert 0.0 $data
 	$object clearundo
-	$object textchanged 0
+	$object editchanged 0
 }
 
 #doc {Editor command forget} cmd {
@@ -1256,6 +1255,29 @@ Classy::Editor method grep {} {
 		focus $w.options.pattern
 	}
 	focus $w.options.pattern
+}
+
+#doc {Editor command editchanged} cmd {
+#pathname editchanged
+#} descr {
+#}
+Classy::Editor method editchanged {{bool {}}} {
+	if ![llength $bool] {
+		return [$object.edit textchanged]
+	}
+	if $bool {
+		set top [winfo toplevel $object]
+		set title [wm title $top]
+		if ![regexp { \*$} $title] {catch [wm title $top "$title *"]}
+		$object.edit configure -changedcommand {}
+		$object.edit textchanged $bool
+	} else {
+		set top [winfo toplevel $object]
+		regsub { *$} [wm title $top] {} title
+		catch {wm title $top $title}
+		$object.edit configure -changedcommand [list $object editchanged]
+		$object.edit textchanged 0
+	}
 }
 
 proc Classy::title {w title} {

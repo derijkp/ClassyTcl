@@ -6,6 +6,7 @@
 # element name is the name of a command and the value is
 # a script that loads the command.
 
+set auto_index(::Classy::menu_edit) [list source [file join $dir Classy_menueditor.tcl]]
 
 # Addition of ClassyTcl classes defined in the directory
 set auto_index(Classy_printdialog) [list source [file join $dir Classy_printdialog.tcl]]

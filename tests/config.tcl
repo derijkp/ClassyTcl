@@ -3,8 +3,10 @@
 exec wish8.0 "$0" "$@"
 
 source tools.tcl
+if 0 {
 Classy::Builder .classy__.builder
 .classy__.builder configure -dir ../dialogs
+}
 
 test Classy::Config {basic} {
 	classyclean

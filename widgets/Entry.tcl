@@ -127,19 +127,19 @@ Classy::Entry addoption -state {state State normal} {
 	}
 	switch $value {
 		combo {
-			if [string_equal $options(-combo) ""] {
-				return -code error "state \"combo\" not allowed on entry without combo"
+			if {[string_equal $options(-combo) ""]&&[string_equal $options(-combopreset) ""]} {
+				return -code error "state \"combo\" not allowed on entry without -combo or -combopreset option"
 			}
 			$object.entry configure -state disabled
-			catch {$object.defaults configure -state normal}
+			if [winfo exists $object.defaults] {$object.defaults configure -state normal}
 		}
 		default {
 			$object.entry configure -state $value
-			catch {$object.defaults configure -state $value}
+			if [winfo exists $object.defaults] {$object.defaults configure -state $value}
 			if [string_equal $value disabled] {
-				catch {$object.label configure -fg [Classy::realcolor disabledForeground]}
+				if [winfo exists $object.label] {$object.label configure -fg [Classy::realcolor disabledForeground]}
 			} else {
-				catch {$object.label configure -fg [Classy::realcolor Foreground]}
+				if [winfo exists $object.label] {$object.label configure -fg [Classy::realcolor Foreground]}
 			}
 		}
 	}
@@ -188,26 +188,28 @@ Classy::Entry addoption -combo {combo Combo {}} {
 	}
 	$w configure -command [list $object combo_draw]
 	set w $object.defaults.combo
-	toplevel $w
-	listbox $w.list \
-		-selectmode browse \
-		-background [$object cget -bg] \
-		-yscrollcommand [list $w.vsb set] \
-		-exportselection false \
-		-borderwidth 0 \
-		-width 1
-	scrollbar $w.vsb \
-		-highlightthickness 0 \
-		-command [list $w.list yview]
-	pack $w.list -side left -fill both -expand yes
-	pack $w.vsb -side left -fill y
-	wm overrideredirect $w 1
-	wm transient $w [winfo toplevel $object]
-	wm group $w [winfo parent $object]
-	wm resizable $w 0 0
-	wm withdraw $w
-	bind $w.list <FocusOut> [list $object _combo_remove]
-	bind $w.list <<Escape>> [list $object _combo_remove]
+	if ![winfo exists $w] {
+		toplevel $w
+		listbox $w.list \
+			-selectmode browse \
+			-background [$object cget -bg] \
+			-yscrollcommand [list $w.vsb set] \
+			-exportselection false \
+			-borderwidth 0 \
+			-width 1
+		scrollbar $w.vsb \
+			-highlightthickness 0 \
+			-command [list $w.list yview]
+		pack $w.list -side left -fill both -expand yes
+		pack $w.vsb -side left -fill y
+		wm overrideredirect $w 1
+		wm transient $w [winfo toplevel $object]
+		wm group $w [winfo parent $object]
+		wm resizable $w 0 0
+		wm withdraw $w
+		bind $w.list <FocusOut> [list $object _combo_remove]
+		bind $w.list <<Escape>> [list $object _combo_remove]
+	}
 }
 
 #doc {Entry options -default} option {-default default Default} descr {
@@ -245,7 +247,7 @@ Classy::Entry addoption -default {default Default {}} {
 #}
 Classy::Entry addoption -label {label Label {}} {
 	private $object options
-	catch {destroy $object.label}
+	if [winfo exists $object.label] {destroy $object.label}
 	if {"$value" != ""} {
 		label $object.label -bg $options(-labelbackground)
 		pack $object.label -before $object.frame -side left -fill both
@@ -255,7 +257,7 @@ Classy::Entry addoption -label {label Label {}} {
 			pack $object.frame -side bottom -expand yes -fill both
 		}
 	} else {
-		catch {destroy $object.label}
+		if [winfo exists $object.label] {destroy $object.label}
 	}
 	return $value
 }
@@ -264,7 +266,7 @@ Classy::Entry addoption -label {label Label {}} {
 # background color of label
 #}
 Classy::Entry addoption -labelbackground {labelBackground LabelBackground gray} {
-	catch {$object.label configure -bg $value}
+	if [winfo exists $object.label] {$object.label configure -bg $value}
 }
 
 #doc {Entry options -command} option {-command command Command} descr {
@@ -420,7 +422,7 @@ Classy::Entry method constrain {} {
 Classy::Entry method _redrawentry {} {
 	private $object options
 	if {"$options(-labelwidth)" != ""} {
-		catch {$object.label configure -width $options(-labelwidth)}
+		if [winfo exists $object.label] {$object.label configure -width $options(-labelwidth)}
 	}
 	if [string match "hor*" "$options(-orient)"] {
 		if [winfo exists $object.label] {pack $object.label -side left}

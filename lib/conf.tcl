@@ -227,7 +227,7 @@ proc Classy::initconf {} {
 	set cachefile [file join $::Classy::dir(appuser) config.cache]
 	set files ""
 	foreach dir [set ::Classy::dirs] {
-		lappend files [file join $dir conf.values]
+		lappend files [file join $dir conf]
 	}
 	if ![file exists $cachefile] {
 		set makecache 1

@@ -1,0 +1,214 @@
+key,<<LoadNext>> <Control-Alt-o>
+font,*Menubutton.font BoldItalicFont
+key,<<Up>> <Up>
+color,*Scrollbar.background lightBackground
+key,<<SelectNone>> <Alt-z>
+int,*Menu.BorderWidth 1
+int,*Classy::OptionBox.BorderWidth 1
+key,<<mTableDown>> <Control-Down>
+key,<<IndentIn>> <Alt-i>
+mouse,<<MainMenu>> <Control-3>
+mouse,<<MAddWord>> <Double-Control-1>
+key,<<Invoke>> <space>
+text,*ColorList {
+			{blue cyan green yellow orange red magenta}
+			{blue3 cyan3 green3 yellow3 orange3 red3 magenta3}
+			{black gray20 gray40 gray50 gray60 gray80 white}
+		}
+key,<<Return>> <Return>
+{select Win Classy,*SaveFile} Win
+key,<<SaveAs>> <Alt-S>
+color,*Background #d9d9d9
+color,*Scale.foreground black
+key,<<SelectTableRight>> <Shift-Control-Right>
+mouse,<<AdjustDrag>> <ButtonPress-3><B3-Motion>
+key,<<Redo>> <Alt-U>
+key,<<PageRight>> <Alt-Next>
+anchor,*Checkbutton.anchor w
+key,<<Right>> <Right>
+key,<<SelectEnd>> {<Shift-End> <Shift-Alt-Right>}
+key,<<SelectPageTop>> <Shift-Alt-Up>
+bool,*PatchTk 1
+color,*Scrollbar.foreground Background
+mouse,<<MPosition>> {<Control-1> <Control-2>}
+font,*treeFont Font
+key,<<ReplaceFindNext>> <Alt-g>
+mouse,<<Menu>> <3>
+int,*Frame.HighlightThickness 0
+key,<<TableRight>> <Control-Right>
+font,*Classy::Browser.font BoldFont
+key,<<CompleteTab>> <Control-Shift-v>
+key,<<SelectTableDown>> <Shift-Down>
+mouse,<<MExecute>> <Double-1>
+font,*BoldItalicFont {helvetica 10 bold italic}
+color,*disabledForeground #7f7f7f
+key,<<HistoryUp>> <Alt-Up>
+key,<<SelectHome>> {<Shift-Home> <Shift-Alt-Left>}
+{select left right,*ScrollSide} right
+key,<<SelectTop>> <Shift-Control-Home>
+key,<<TableLeft>> <Control-Left>
+int,*MenuButton.padX 1
+key,<<SelectPageDown>> <Shift-Next>
+int,*MenuButton.padY 1
+color,*darkBackground #cacaca
+color,*Foreground black
+font,*ItalicFont {helvetica 10 italic}
+key,<<Transpose>> <Control-t>
+key,<<Home>> {<Home> <Alt-Left>}
+{select Win Classy,*GetFont} Win
+key,<<SelectPageBottom>> <Shift-Alt-Down>
+int,*Scrollbar.width 10
+key,<<PageDown>> <Next>
+key,<<TableUp>> <Up>
+key,<<SelectmTableRight>> <Control-Shift-Right>
+{select popup top,*MenuType} top
+color,*Scale.sliderBackground lightBackground
+{select Classy Tk,*Bgerror} Classy
+key,<<PageBottom>> <Alt-Down>
+key,<<Connect>> <Control-c>
+color,*selectColor orange
+key,<<Quit>> <Alt-Q>
+font,*Menu.font BoldItalicFont
+key,<<Save>> <Alt-s>
+key,<<TableReturn>> <Control-Return>
+key,<<SelectLeft>> <Shift-Left>
+key,<<SelectBottom>> <Shift-Control-End>
+font,*NonPropFont {courier 10}
+mouse,<<MExecuteAjust>> <Double-2>
+key,<<WordRight>> <Control-Right>
+key,<<MarkerSelect>> <Alt-Shift-w>
+key,<<MarkerPrev>> <Control-Shift-w>
+color,*activeBackground white
+key,<<Load>> <Alt-o>
+color,*Scale.activeForeground Background
+key,<<Left>> <Left>
+key,<<Cut>> <Alt-x>
+key,<<ScrollPageDown>> {<Control-Next> <Control-Alt-Down>}
+key,<<Bottom>> <Control-End>
+key,<<Default>> <Alt-d>
+color,*Scale.sliderForeground Background
+key,<<SelectmTableLeft>> <Control-Shift-Left>
+key,<<SelectParaUp>> <Shift-Control-Up>
+key,<<SelectAll>> <Alt-a>
+font,*Classy::Browser.dataFont Font
+key,<<SelectmTableUp>> <Control-Shift-Up>
+color,*highlightColor black
+color,*Entry.background Background
+key,<<Insert>> <Insert>
+color,*lightBackground #dfdfdf
+key,<<PasteSpecial>> {Paste special key}
+key,<<SelectWordLeft>> <Shift-Control-Left>
+key,<<mTableLeft>> <Control-Left>
+key,<<ParaUp>> <Control-Up>
+key,<<Macro>> <Alt-m>
+key,<<mTableUp>> <Control-Up>
+key,<<Print>> <Control-p>
+mouse,<<MExtendLine>> <Triple-Shift-1>
+mouse,<<Action>> <1>
+key,<<FocusNext>> {<Tab> <Control-Tab>}
+key,<<SpecialFocusNext>> <Control-Tab>
+color,*activeForeground black
+key,<<SelectPageRight>> <Shift-Alt-Next>
+int,*HighlightThickness 1
+key,<<FocusPrev>> <ISO_Left_Tab>
+key,<<SelectRight>> <Shift-Right>
+key,<<SpecialFocusPrev>> <ISO_Left_Tab>
+key,<<WordLeft>> <Control-Left>
+key,<<FindFunction>> <Control-Alt-f>
+key,<<StartSelect>> <Control-space>
+key,<<Close>> <Alt-q>
+key,<<Reopen>> <Alt-r>
+key,<<Help>> <F1>
+mouse,<<MExtendWord>> <Double-Shift-1>
+key,<<IndentOut>> <Alt-I>
+key,<<SelectTableLeft>> <Shift-Control-Left>
+color,*selectBackground #bfdfff
+key,<<SelectParaDown>> <Shift-Control-Down>
+int,*Toplevel.HighlightThickness 0
+mouse,<<MAdd>> <Control-1>
+font,*Font {helvetica 10}
+font,*BoldFont {helvetica 10 bold}
+key,<<End>> {<End> <Alt-Right>}
+key,<<EndSelect>> <Control-Shift-space>
+key,<<PageTop>> <Alt-Up>
+key,<<SelectPageLeft>> <Shift-Alt-Prior>
+key,<<Goto>> <Alt-j>
+key,<<Find>> <Alt-F>
+key,<<SelectPageUp>> <Shift-Prior>
+{select Classy Tk,*GetColor} Classy
+mouse,<<Adjust>> <2>
+key,<<ParaDown>> <Control-Down>
+color,*Scrollbar.activeForeground Background
+key,<<SelectTableUp>> <Shift-Up>
+mouse,<<MSelectLine>> <Triple-1>
+key,<<TableDown>> <Down>
+key,<<ScrollPageUp>> {<Control-Prior> <Control-Alt-Up>}
+key,<<DeleteEnd>> <Control-k>
+key,<<New>> <Alt-n>
+key,<<Undo>> <Alt-u>
+key,<<MarkerSet>> <Alt-w>
+key,<<ExecuteCmd>> <Alt-e>
+key,<<PageLeft>> <Alt-Prior>
+key,<<Escape>> <Escape>
+key,<<PageUp>> <Prior>
+key,<<HistoryDown>> <Alt-Down>
+key,<<Top>> <Control-Home>
+color,*highlightBackground Background
+mouse,<<Drag-Copy>> {<KeyPress-Control_L> <KeyPress-Control_R>}
+relief,*Classy::OptionBox.Relief groove
+color,*selectForeground black
+{select Win Classy,*SelectFile} Win
+key,<<BackSpace>> <BackSpace>
+int,*borderWidth 1
+int,*BorderX 0
+int,*Button.padX 1
+int,*BorderY 0
+int,*Button.padY 1
+mouse,<<MSelectWord>> <Double-1>
+mouse,<<Drag-Link>> {<KeyPress-Shift_L> <KeyPress-Shift_R>}
+key,<<SelectWordRight>> <Shift-Control-Right>
+key,<<Copy>> <Alt-c>
+mouse,<<MIcursor>> <Control-1>
+key,<<KeyMenu>> <Alt-m>
+color,*Text.background Background
+mouse,<<MXPaste>> <2>
+key,<<mTableRight>> <Control-Right>
+color,*LabelBackground darkBackground
+mouse,<<MExtend>> <Shift-1>
+font,*Text.font NonPropFont
+color,*Listbox.background lightBackground
+key,<<SelectDown>> <Shift-Down>
+key,<<FindNext>> <Alt-f>
+key,<<FindPrev>> <Alt-b>
+text,*PaperSizes {
+			User      "595p 842p"
+			Letter    "612p 792p"
+			Tabloid   "792p 1224p"
+			Ledger    "1224p 792p"
+			Legal     "612p 1008p"
+			Statement "396p 612p"
+			Executive "540p 720p"
+			A0        "2380p 3368p"
+			A1        "1684p 2380p"
+			A2        "1190p 1684p"
+			A3        "842p 1190p"
+			A4        "595p 842p"
+			A5        "420p 595p"
+			B4        "729p 1032p"
+			B5        "516p 729p"
+			Folio     "612p 936p"
+			Quarto    "610p 780p"
+		}
+font,*Scale.font BoldItalicFont
+key,<<Paste>> <Alt-v>
+key,<<SelectUp>> <Shift-Up>
+mouse,<<MAddLine>> <Triple-Control-1>
+mouse,<<Drag>> <ButtonPress-1><B1-Motion>
+key,<<Empty>> <Control-u>
+key,<<Down>> <Down>
+key,<<Format>> <Control-Alt-j>
+color,*Scale.background Background
+key,<<Delete>> <Delete>
+font,*Button.font Font
+key,<<MarkerCurrent>> <Control-w>
+key,<<SelectmTableDown>> <Control-Shift-Down>

@@ -1,0 +1,16 @@
+action save "Save" {%W save}
+separator
+action up "move entry up" {%W move up}
+action down "move entry down" {%W move down}
+separator
+action newmenu "New submenu" {%W new menu}
+action newaction "New action" {%W new action}
+action newradio "New radio" {%W new radio}
+action newcheck "New check" {%W new check}
+action newseparator "New separator" {%W new separator}
+action newactivemenu "New activemenu" {%W new activemenu}
+separator
+action copy "Copy" {%W copy}
+action cut "Cut" {%W cut}
+action paste "Paste" {%W paste}
+action delete "Delete" {%W delete}

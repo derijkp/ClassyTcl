@@ -187,5 +187,14 @@ test Classy::Entry {-default} {
 	pack .try -fill x -expand yes
 } {vertical}
 
+test Classy::FileEntry {redefine combo} {
+	classyclean
+	Classy::FileEntry .try
+	pack .try
+	.try configure -label test -combo 10
+	.try configure -combo 15
+	.try cget -combo
+} 15
+
 testsummarize
 

@@ -298,6 +298,7 @@ Classy::Tree method _redraw {} {
 # <li>-window
 # <li>-length
 # <li>-type
+# <li>-pos
 # </ul>
 #}
 Classy::Tree method addnode {parent node args} {
@@ -312,15 +313,15 @@ Classy::Tree method addnode {parent node args} {
 	if {("$pa(t)" != "f")&&("$pa(t)" != "c")} {
 		error "parent node \"$parent\" is an endnode"
 	}
-	set pa(t) f
-	lappend pa(l) $node
-	Classy::parseopt $args opt {
-		-text {} {}
-		-image {} {}
-		-window {} {}
-		-length {} 0
-		-type {folder end} folder
-	} args
+	array set opt {-text {} -image {} -window {} -length 0 -type folder -pos {}}
+	cmd_args "$object addnode parent node" {
+		-text {any "text displayed on node"}
+		-image {any "image displayed on node"}
+		-window {any "window displayed on node"}
+		-length {double "length of line leading to node"}
+		-type {{oneof folder end} "folder or end"}
+		-pos {int "position in list to insert new node"}
+	} {} $args
 	if {"$opt(-type)" == "folder"} {
 		set im [Classy::geticon sm_folder]
 		set type c
@@ -330,6 +331,12 @@ Classy::Tree method addnode {parent node args} {
 	}
 	if {"$opt(-image)" != ""} {
 		set im $opt(-image)
+	}
+	set pa(t) f
+	if ![llength $opt(-pos)] {
+		lappend pa(l) $node
+	} else {
+		set pa(l) [lreplace $pa(l) $opt(-pos) -1 $node]
 	}
 	set data($parent) [array get pa]
 	set data($node) [list t $type p $parent txt $opt(-text) im $im len $opt(-length)]

@@ -14,6 +14,7 @@ proc Classy::config_edit_new {} {
 }
 
 proc Classy::config_edit_pos {pos} {
+putsvars pos
 	upvar #0 Classy::configedit configedit
 	set w .classy__.configedit.options
 	set tpos $pos
@@ -23,19 +24,16 @@ proc Classy::config_edit_pos {pos} {
 	$w.edit.type configure -state normal
 	$w.edit.key configure -state normal
 	$w.edit.descr configure -state normal
-	$w.edit.value configure -state normal
 	if ![llength $data] {
 		$w.list delete 0 end
 		$w.edit.name nocmdset {}
 		$w.edit.type nocmdset {}
 		$w.edit.key nocmdset {}
 		$w.edit.descr set {}
-		$w.edit.value set {}
 		$w.edit.name configure -state disabled
 		$w.edit.type configure -state disabled
 		$w.edit.key configure -state disabled
 		$w.edit.descr configure -state disabled
-		$w.edit.value configure -state disabled
 	}
 	if [regexp ^_ [lindex $data 0]] {
 		list_pop pos
@@ -53,6 +51,7 @@ proc Classy::config_edit_pos {pos} {
 		lappend pos $tail
 	}
 	set configedit(current) $pos
+	if ![llength $tail] return
 	set tdata [structlist_get $configedit(data) $pos]
 	$w.label configure -text "Current Position: $tpos"
 	set fields [structlist_fields $data]
@@ -65,30 +64,20 @@ proc Classy::config_edit_pos {pos} {
 		$w.edit.type nocmdset submenu
 		$w.edit.key nocmdset {}
 		$w.edit.descr set {}
-		$w.edit.value set {}
 		$w.edit.type configure -state disabled
 		$w.edit.key configure -state disabled
 		$w.edit.descr configure -state disabled
-		$w.edit.value configure -state disabled
 	} else {
-		foreach {type key descr def} $tdata break
+		foreach {type key descr} $tdata break
 		regsub ^_ $type {} type
 		$w.edit.name nocmdset $tail
 		$w.edit.type nocmdset $type
 		$w.edit.key nocmdset $key
 		$w.edit.descr set $descr
-		switch $type {
-			menu - toolbar {
-				set type text
-			}
-		}
-		$w.edit.value configure -type $type
-		$w.edit.value set $def
 	}
 }
 
 proc Classy::config_edit_item {args} {
-puts config_edit_item
 	upvar #0 Classy::configedit configedit
 	set w .classy__.configedit.options
 	set pos $configedit(current)
@@ -97,7 +86,6 @@ puts config_edit_item
 }
 
 proc Classy::config_edit_browse {args} {
-puts config_edit_browse
 	upvar #0 Classy::configedit configedit
 	set w .classy__.configedit.options
 	set tail [$w.list get active]
@@ -128,7 +116,13 @@ proc Classy::config_edit_add {name} {
 	set tail [list_pop tpos]
 	set data [structlist_get $configedit(data) $tpos]
 	if ![llength $data] {
-		if [Classy::yorn "Add sublist? (value if no)"] {
+		if ![catch {structlist_get $configedit(classydata) $tpos} temp] {
+			if [regexp ^_ [lindex $temp 1]] {
+				set sublist 0
+			} else {
+				set sublist 1
+			}
+		} elseif [Classy::yorn "Add as sublist? (value if no)"] {
 			set sublist 1
 		} else {
 			set sublist 0
@@ -242,15 +236,6 @@ proc Classy::config_edit_redescr {value} {
 	Classy::config_edit_pos $pos
 }
 
-proc Classy::config_edit_redef {value} {
-	upvar #0 Classy::configedit configedit
-	set pos $configedit(current)
-	set data [structlist_get $configedit(data) $pos]
-	set data [lreplace $data 3 3 $value]
-	set configedit(data) [structlist_set $configedit(data) $pos $data]
-	Classy::config_edit_pos $pos
-}
-
 proc Classy::config_edit_save {} {
 	upvar #0 Classy::configedit configedit
 	set file $configedit(file)
@@ -267,51 +252,6 @@ proc Classy::config_edit_save {} {
 	}
 }
 
-proc Classy::config_edit_getdef {dir pos} {
-	upvar #0 Classy::configedit configedit
-	set result {}
-	set data [structlist_get $configedit(data) $pos]
-	foreach {field value} $data {
-		if [regexp ^_ [lindex $value 0]] {
-			foreach {type key descr def} $value break
-			regsub ^_ $type {} type
-			switch $type {
-				menu {
-					file_write [file join $dir menu $key] $def
-				}
-				toolbar {
-					file_write [file join $dir toolbar $key] $def
-				}
-				default {
-					lappend result $type,$key $def
-				}
-			}
-		} else {
-			set tpos $pos
-			lappend tpos $field
-			eval lappend result [Classy::config_edit_getdef $dir $tpos]
-		}
-	}
-	return $result
-}
-
-proc Classy::config_edit_create {} {
-	upvar #0 Classy::configedit configedit
-	set dir [file dir $configedit(file)]
-	catch {file mkdir [file join $dir menu]}
-	catch {file mkdir [file join $dir toolbar]}
-	set file [file join $dir conf.values]
-	if [file exists $file] {
-		if ![Classy::yorn "Overwrite file \"$file\"?"] return
-	}
-	set result [Classy::config_edit_getdef $dir {}]
-	set f [open $file w]
-	foreach {key value} $result {
-		puts $f [list $key $value]
-	}
-	close $f
-}
-
 proc Classy::config_edit {{file {}} {cmd {}}} {
 	upvar #0 Classy::configedit configedit
 	if ![string length $file] {
@@ -324,7 +264,6 @@ proc Classy::config_edit {{file {}} {cmd {}}} {
 	Classy::Dialog $w -title $file -help classy_configedit
 	$w configure -closecommand {}
 	$w add save Save [list Classy::config_edit_save]
-	$w add create Create [list Classy::config_edit_create]
 	set w .classy__.configedit.options
 	label $w.label -text "Current Position:" -anchor w -justify left
 	frame $w.buttons
@@ -355,13 +294,10 @@ proc Classy::config_edit {{file {}} {cmd {}}} {
 		-command [list Classy::config_edit_rekey]
 	Classy::Selector $w.edit.descr -label "Description" -type text \
 		-command [list Classy::config_edit_redescr]
-	Classy::Selector $w.edit.value -label "Default value" -type text \
-		-command [list Classy::config_edit_redef]
 	pack $w.edit.name -fill x
 	pack $w.edit.type -fill x
 	pack $w.edit.key -fill x
 	pack $w.edit.descr -fill x
-	pack $w.edit.value -fill both -expand yes
 	# Data
 	if [file exists $file] {
 		set data [file_read $file]
@@ -380,5 +316,6 @@ proc Classy::config_edit {{file {}} {cmd {}}} {
 		}
 	}
 	set configedit(data) $data
+	set configedit(classydata) [file_read [file join $::Classy::dir(def) conf.descr]]
 	Classy::config_edit_pos {{}}
 }

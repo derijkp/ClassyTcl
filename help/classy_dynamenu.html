@@ -7,7 +7,7 @@
 <H1>ClassyTcl menu definition</H1>
 The contents of the menus managed by <a href="widgets/DynaMenu.html">DynaMenu</a> in
 <a href="ClassyTcl.html">ClassyTcl</a> are determined by a menu definition. Which
-definition is used for a type of toolbar is determined in the the 
+definition is used for a type of menu is determined in the the 
 <a href="../classy_configure.html">configuration system</a>.
 <p>
 A menu definition consists of a number of lines. Each line specifies one menu item, 
@@ -49,7 +49,7 @@ A typical example would be:<br>
 This tool takes no parameters, and just creates a separator in a menu.
 
 <h2>check</h2>
-check creates a checkbutton. This is typically used to change a variable to
+check creates a check entry. This is typically used to change a variable to
 an on or off value. It can also execute a command. It has the following parameters:
 <ol>
 <li><b>text</b>: This text will be displayed in the menu item
@@ -61,7 +61,7 @@ A typical example would be:<br>
 <code>check "Checked" {-variable checked -command {puts %W:$checked}}</code>
 
 <h2>radio</h2>
-radio creates a checkbutton. This is typically used to change a variable to
+radio creates a radio entry. This is typically used to change a variable to
 one of several values. It can also execute a command. It has the following parameters:
 <ol>
 <li><b>text</b>: This text will be displayed in the menu item

@@ -49,6 +49,7 @@ set auto_index(::Classy::bgstop) [list source [file join $dir tools.tcl]]
 set auto_index(::Classy::orient) [list source [file join $dir tools.tcl]]
 set auto_index(::Classy::auto_mkindex) [list source [file join $dir tools.tcl]]
 set auto_index(::Classy::pclass) [list source [file join $dir tools.tcl]]
+set auto_index(scatch) [list source [file join $dir tools.tcl]]
 set auto_index(::class::correctcmd) [list source [file join $dir Class-tcl.tcl]]
 set auto_index(::class::classerror) [list source [file join $dir Class-tcl.tcl]]
 set auto_index(::class::new) [list source [file join $dir Class-tcl.tcl]]
@@ -137,10 +138,7 @@ set auto_index(::Classy::config_edit_rename) [list source [file join $dir config
 set auto_index(::Classy::config_edit_retype) [list source [file join $dir config_edit.tcl]]
 set auto_index(::Classy::config_edit_rekey) [list source [file join $dir config_edit.tcl]]
 set auto_index(::Classy::config_edit_redescr) [list source [file join $dir config_edit.tcl]]
-set auto_index(::Classy::config_edit_redef) [list source [file join $dir config_edit.tcl]]
 set auto_index(::Classy::config_edit_save) [list source [file join $dir config_edit.tcl]]
-set auto_index(::Classy::config_edit_getdef) [list source [file join $dir config_edit.tcl]]
-set auto_index(::Classy::config_edit_create) [list source [file join $dir config_edit.tcl]]
 set auto_index(::Classy::config_edit) [list source [file join $dir config_edit.tcl]]
 
 # Addition of ClassyTcl classes defined in the directory

@@ -21,7 +21,7 @@ menu "Add" {
 	action "New method" {%W new method} <<newmethod>>
 }
 menu "Edit" {
-	action "Edit" {%W openendnode [lindex [%W.browse selection] 0]} <<Edit>> <e>
+	action "Edit" {%W openendnode [lindex [%W.browse selection] 0]} <e>
 	action "Rename" {%W rename} <<Rename>>
 	separator
 	action "Copy" {%W copy} <<Copy>>

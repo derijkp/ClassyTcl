@@ -1,0 +1,30 @@
+
+menu "File" {
+	action "Save" {[winfo toplevel %W] save} <<Save>>
+	separator
+	action "Close" {[winfo toplevel %W] close} <<Close>>
+}
+menu "Add" {
+	action "New menu" {[winfo toplevel %W] new menu}
+	action "New action" {[winfo toplevel %W] new action}
+	action "New radio" {[winfo toplevel %W] new radio}
+	action "New check" {[winfo toplevel %W] new check}
+	action "New separator" {[winfo toplevel %W] new separator}
+	action "New activemenu" {[winfo toplevel %W] new activemenu}
+}
+menu "Edit" {
+	action "Move up" {[winfo toplevel %W] move up} <<Up>>
+	action "Move down" {[winfo toplevel %W] move down} <<Down>>
+	separator
+	action "Copy" {[winfo toplevel %W] copy} <<Copy>>
+	action "Cut" {[winfo toplevel %W] cut} <<Cut>>
+	action "Paste" {[winfo toplevel %W] paste} <<Paste>>
+	action "Delete" {[winfo toplevel %W] delete} <Delete>
+}
+menu "Help" {
+	action "MenuEditor" {Classy::help classy_menueditor} <<Help>>
+	separator
+	action "ClassyTcl" {Classy::help ClassyTcl} <<HelpClassyTcl>>
+	action "Help" {Classy::help classy_help} <<HelpHelp>>
+}
+		

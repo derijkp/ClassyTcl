@@ -34,6 +34,7 @@ pack .try -expand yes -fill both -side left
 .try configure -endnodecommand puts
 .try configure -closecommand ".try clearnode"
 .try configure -opencommand browse
+.try configure -rootcommand {puts root}
 
 .try addnode {} .. -text ..
 browse ..

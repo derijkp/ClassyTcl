@@ -1,3 +1,8 @@
+if 0 {
+	set args [list [lindex $descrlist 1]]
+	set data [lindex $args 0]
+	set descr [lindex $descrlist 0]
+}
 proc Classy::config_join {descr args} {
 	set clist [structlist_fields $descr]
 	if [regexp ^_ [lindex $clist 1]] {
@@ -11,7 +16,7 @@ proc Classy::config_join {descr args} {
 				set ndata [structlist_get $data $el]
 				set descr [structlist_set $descr $el [Classy::config_join $cdata $ndata]]
 			} else {
-				lappend descr $el [structlist_get $data $el]
+				lappend descr $el [structlist_get $data [list $el]]
 			}
 		}
 	}
@@ -331,7 +336,7 @@ proc Classy::config_save {} {
 	if ![file writable $dir] {
 		error "No permission to write to directory \"$dir\" that contains this configuration level"
 	}
-	set file [file join $dir conf.values]
+	set file [file join $dir conf]
 	set f [open $file w]
 	foreach file [glob -nocomplain [file join $dir menu *]] {
 		file delete $file
@@ -361,7 +366,6 @@ proc Classy::config_save {} {
 
 proc Classy::config_saveas {level name} {
 	upvar #0 Classy::configdata configdata
-	putsvars level name
 	if ![string_equal $level file] {
 		set file [file join $Classy::dir($level) themes $name]
 	} else {
@@ -432,7 +436,7 @@ proc Classy::config_level {level} {
 			set var configdefault
 		}
 		set dir $::Classy::dir($clevel)
-		set file [file join $dir conf.values]
+		set file [file join $dir conf]
 		if [file readable $file] {
 			array set $var [file_read $file]
 		}
@@ -511,14 +515,14 @@ proc Classy::config_dialog {{start {}}} {
 	catch {destroy .classy__.config}
 	catch {unset config}
 	catch {unset configdata}
-	set descr {}
+	set descrlist {}
 	foreach dir [list_reverse [set ::Classy::dirs]] {
 		set file [file join $dir conf.descr]
 		if [file readable $file] {
-			lappend descr [file_read $file]
+			lappend descrlist [file_read $file]
 		}
 	}
-	set descr [eval Classy::config_join $descr]
+	set descr [eval Classy::config_join $descrlist]
 	set w .classy__.config
 	Classy::Dialog $w -title "User Configuration for application" -help classy_configure
 	$w configure -help 

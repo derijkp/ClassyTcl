@@ -1,0 +1,14 @@
+Menus {
+	Application {
+		Editor {
+			_menu Classy_Editor {menu used in the ClassyTcl Editor}
+		}
+	}
+}
+Toolbars {
+	Application {
+		Maintool {
+			_toolbar MainTool {Main toolbar}
+		}
+	}
+}

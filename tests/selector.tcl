@@ -3,10 +3,18 @@
 exec wish8.0 "$0" "$@"
 
 source tools.tcl
+set object .try
+	classyclean
+	Classy::Selector .try -type text -label try -variable ::try -command puts
+	pack .try -fill both -expand yes
+	.try configure -state disabled
+	.try configure -state normal
+	.try set try
+	set ::try
 
 test Classy::Selector {text} {
 	classyclean
-	Classy::Selector .try -type text -label try -variable ::try
+	Classy::Selector .try -type text -label try -variable ::try -command puts
 	pack .try -fill both -expand yes
 	.try configure -state disabled
 	.try configure -state normal
@@ -111,6 +119,39 @@ test Classy::Selector {sticky} {
 	.try set n
 	.try get
 } {n}
+
+test Classy::Selector {menu} {
+	classyclean
+	Classy::Selector .try -type menu -label try -variable ::try
+	pack .try -fill both -expand yes
+	.try configure -state disabled
+	.try configure -state normal
+	.try set {menu File {}}
+	set ::try
+} {menu File {}}
+
+test Classy::Selector {key} {
+	classyclean
+	Classy::Selector .try -type key -label try -variable ::try -command puts
+	pack .try -fill both -expand yes
+	.try configure -state disabled
+	.try configure -state normal -orient vertical
+	.try nocmdset <a>
+	.try set <a>
+	set ::try
+} <a>
+
+test Classy::Selector {two} {
+	classyclean
+	Classy::Selector .try -type key -label try -variable ::try
+	Classy::Selector .try2 -type text -label try -variable ::try2 -command puts
+	.try set <a>
+	.try2 set try
+	.try configure -label test
+	pack .try -fill x
+	pack .try2 -fill both -expand yes
+	set ::try
+} <a>
 
 testsummarize
 

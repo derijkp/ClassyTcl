@@ -1,6 +1,3 @@
-# Menus Classy::Editor
-# menu used in the ClassyTcl Editor
-menu Classy::Editor {
 menu "File" {
 	action "Open file" {eval %W load [Classy::selectfile -title Open -selectmode persistent]} <<Load>>
 	action "Open next" {%W loadnext} <<LoadNext>>
@@ -66,18 +63,3 @@ menu "Help" {
 	action "ClassyTcl" {Classy::help ClassyTcl} <<HelpClassyTcl>>
 	action "Help" {Classy::help classy_help} <<HelpHelp>>
 }
-}
-
-# Toolbars Classy::Editor
-# Editor toolbar
-toolbar Classy::Editor {
-	nodisplay
-	action save "Save" {%W save}
-	action open "Open" {eval %W load [Classy::selectfile -title Open -selectmode persistent]}
-	action undo "Undo" {%W undo}
-	action redo "redo" {%W redo}
-	separator
-	action print "Print" {%W insert insert "Print: %W"}
-	action open "Open next" {%W next}
-}
-

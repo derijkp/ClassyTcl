@@ -97,7 +97,7 @@ Classy::Text method link {{lw {}}} {
 	}
 	set undobuffer $fundobuffer
 	set redobuffer $redobuffer
-	if $ftextchanged {$object _changed}
+	$object _changed
 	$w delete 1.0 end
 	$w insert end [$lw get 1.0 end]
 	$w delete "end-1c"
@@ -163,7 +163,7 @@ Classy::Text method insert {index chars args} {
 	eval {$w insert insert $chars} $args
 	lappend undobuffer [list Insert $chars $index [$w index insert]]
 	$w mark set insert "$ins + [string length $chars] c"
-	if {$textchanged != 1} {$object _changed}
+	$object _changed
 }
 
 Classy::Text method _linkinsert {index chars args} {
@@ -173,7 +173,7 @@ Classy::Text method _linkinsert {index chars args} {
 	$w mark set insert $index
 	eval {$w insert insert $chars} $args
 	lappend undobuffer [list Insert $chars $index [$w index insert]]
-	if {$textchanged != 1} {$object _changed}
+	$object _changed
 }
 
 #doc {Text command textchanged} cmd {
@@ -183,7 +183,7 @@ Classy::Text method _linkinsert {index chars args} {
 #}
 Classy::Text method textchanged {{bool {}}} {
 	private $object textchanged linked
-	if {"$bool"==""} {
+	if ![llength $bool] {
 		return $textchanged
 	} else {
 		if $bool {
@@ -202,9 +202,11 @@ Classy::Text method textchanged {{bool {}}} {
 }
 
 Classy::Text method _changed {} {
+	set cmd [getprivate $object options(-changedcommand)]
+	if ![string length $cmd] return
 	private $object textchanged
-	set textchanged 1
-	uplevel #0 [getprivate $object options(-changedcommand)]
+	incr textchanged
+	uplevel #0 $cmd $textchanged
 }
 
 #doc {Text command delete} cmd {
@@ -232,7 +234,7 @@ Classy::Text method delete {args} {
 	}
 	lappend undobuffer [list Delete [$w get $index1 $index2] $index1 $index2]
 	$w delete $index1 $index2
-	if {$textchanged != 1} {$object _changed}
+	$object _changed
 }
 
 Classy::Text method _linkdelete {index1 index2 args} {
@@ -241,7 +243,7 @@ Classy::Text method _linkdelete {index1 index2 args} {
 	set redobuffer ""
 	lappend undobuffer [list Delete [$w get $index1 $index2] $index1 $index2]
 	$w delete $index1 $index2
-	if {$textchanged != 1} {$object _changed}
+	$object _changed
 }
 
 #doc {Text command undo} cmd {

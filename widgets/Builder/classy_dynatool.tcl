@@ -9,8 +9,8 @@ proc ::Classy::WindowBuilder::add_Classy::DynaTool {object base args} {
 	} else {
 		set toolwin $current(w)
 	}
-	Classy::DynaTool $base -type Classy::Dummy -cmdw $toolwin
-	set data(opt-type,$base) Classy::Dummy
+	Classy::DynaTool $base -type Classy_Dummy -cmdw $toolwin
+	set data(opt-type,$base) Classy_Dummy
 	set data(opt-cmdw,$base) [$object outw $toolwin]
 	return $base
 }

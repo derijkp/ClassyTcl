@@ -423,7 +423,7 @@ Classy::WindowBuilder method add {type args} {
 		set base $data(base)
 		if {"$data(opt-mainmenu,$base)" != ""} return
 		$base configure -menu [eval Classy::DynaMenu menu Classy_Dummy $base]
-		set data(opt-mainmenu,$base) Classy::Dummy
+		set data(opt-mainmenu,$base) Classy_Dummy
 		set data(opt-menuwin,$base) $base
 		Classy::todo $object select $base
 		return {}
@@ -2345,8 +2345,12 @@ Classy::WindowBuilder method _createcode {window} {
 
 proc Classy::WindowBuilder_win {w} {
 	if ![winfo exists $w] return
-	if {"[winfo class $w]" == "Classy::WindowBuilder"} {return $w}
-	return [winfo parent [winfo toplevel $w]]
+	while 1 {
+		if [string_equal [winfo class $w] Classy::WindowBuilder] break
+		if [string_equal $w .] break
+		set w [winfo parent [winfo toplevel $w]]
+	}
+	return $w
 }
 
 Classy::WindowBuilder method _configure {window} {

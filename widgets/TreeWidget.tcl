@@ -28,7 +28,7 @@
 
 Widget subclass Classy::TreeWidget
 
-bind Classy::TreeWidget <Configure> {[Classy::mainw %W] redraw}
+bind Classy::TreeWidget <Configure> {catch {[Classy::mainw %W] redraw}}
 bind Classy::TreeWidget <<Action>> {[Classy::mainw %W] _action %x %y}
 bind Classy::TreeWidget <<MExecute>> {[Classy::mainw %W] _execute %x %y}
 
@@ -113,6 +113,9 @@ Classy::TreeWidget addoption -closecommand {closeCommand CloseCommand {}} {
 Classy::TreeWidget addoption -endnodecommand {endnodeCommand EndnodeCommand {}} {
 }
 
+Classy::TreeWidget addoption -rootcommand {rootCommand RootCommand {}} {
+}
+
 Classy::TreeWidget addoption -executecommand {executeCommand ExecuteCommand {}} {
 }
 
@@ -151,7 +154,7 @@ Classy::TreeWidget method _action {x y} {
 	set node [$object.tree node $x $y]
 	if {"$node" == ""} {
 		if {"$options(-endnodecommand)" == ""} return
-		uplevel #0 $options(-endnodecommand) [list $node]
+		uplevel #0 $options(-rootcommand)
 		return
 	}
 	switch [$object.tree type $node] {
