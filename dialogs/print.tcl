@@ -2,7 +2,7 @@
 
 proc Classy::printdialog args {# ClassyTcl generated Dialog
 	if [regexp {^\.} $args] {
-		set window [lshift args]
+		set window [list_shift args]
 	} else {
 		set window .printdialog
 	}
@@ -181,7 +181,7 @@ $window.options.paper.width nocmdset [lindex $papersize 0]
 $window.options.paper.height nocmdset [lindex $papersize 1]
 Classy::print_autoscale $window
 } $window}] \
-		-list [lunmerge [option get $window paperSizes PaperSizes]]
+		-list [list_unmerge [option get $window paperSizes PaperSizes]]
 	$window.options.paper.autoscale1 configure \
 		-background [Classy::realcolor darkBackground] \
 		-command [varsubst window {invoke {} {

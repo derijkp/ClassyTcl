@@ -198,12 +198,12 @@ Classy::LineChart method dataget {name} {
 }
 
 
-#doc {LineChart command labelset} cmd {
-#pathname labelset labels
+#doc {LineChart command labelist_set} cmd {
+#pathname labelist_set labels
 #} descr {
 # sets the labels associated with the linechart
 #}
-Classy::LineChart method labelset {values} {
+Classy::LineChart method labelist_set {values} {
 	private $object labels
 	if {"$values"==""} {
 		unset labels
@@ -223,7 +223,7 @@ Classy::LineChart method delete {name} {
 	$options(-canvas) delete $options(-tag)
 	unset data($name)
 	unset tag($name)
-	set order [lremove $order $name]
+	set order [list_remove $order $name]
 	::Classy::todo $object redraw
 }
 
@@ -320,7 +320,7 @@ Classy::LineChart method _drawlegend {} {
 	set hs [expr $h/2.0]
 	foreach name $names {
 		set conf [$canvas itemconfigure $tag($name)]
-		set conf [lmerge [lmanip subindex $conf 0] [lmanip subindex $conf 4]]
+		set conf [list_merge [list_subindex $conf 0] [list_subindex $conf 4]]
 		set temp [expr $legendx+10]
 		eval $options(-canvas) create line \
 			$legendx [expr $y+$hs] $temp [expr $y+$hs] \
@@ -370,10 +370,10 @@ Classy::LineChart method _drawlabels {} {
 		set gap $options(-labelgap)
 	}
 	if {$gap>1} {
-		set labels [lunmerge $labels [expr $gap-1]]
+		set labels [list_unmerge $labels [expr $gap-1]]
 	}
 	if {"$options(-labelorient)" == "vertical"} {
-		set labels [lregsub -all {(.)} $labels "\\1\n"]
+		set labels [list_regsub -all {(.)} $labels "\\1\n"]
 	}
 	foreach label $labels {
 		$canvas create text $x $y -anchor nw -text $label -font $options(-labelfont) \

@@ -188,12 +188,12 @@ Classy::DynaMenu classmethod types {{pattern *}} {
 	set list ""
 	foreach tool [array names ::Classy::configmenu] {
 		if [string match $pattern $tool] {
-			laddnew list $tool
+			list_addnew list $tool
 		}
 	}
 	foreach tool [array names menudata] {
 		if [string match $pattern $tool] {
-			laddnew list $tool
+			list_addnew list $tool
 		}
 	}
 	return $list
@@ -329,7 +329,7 @@ Classy::DynaMenu classmethod makepopup {menutype menu curmenu data cmdw bindtag}
 	$curmenu delete 0 end
 	set bindings($curmenu) ""
 	set num 1
-	foreach current [splitcomplete $data] {
+	foreach current [cmd_split $data] {
 		set type [lindex $current 0]
 		set text [lindex $current 1]
 		if {"$type"=="menu"} {

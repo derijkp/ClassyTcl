@@ -22,7 +22,7 @@ puts "Converting $src"
 	}
 	set f [open $src]
 	while {![eof $f]} {
-		set line [getcomplete $f]
+		set line [cmd_get $f]
 		if [regexp ^Classy::config $line] {
 			foreach {type name descr value} $line {}
 			regsub -all \n\n\n* $value \n value
@@ -55,7 +55,7 @@ puts "Converting $src"
 	set f [open $src]
 	set result ""
 	while {![eof $f]} {
-		set line [getcomplete $f]
+		set line [cmd_get $f]
 		if [regexp ^Classy::configmisc $line] {
 			foreach {type title cmd} $line {}
 			foreach {name key value type descr} $cmd {
@@ -118,12 +118,12 @@ proc convrec {src} {
 			switch $file {
 				Toolbars.tcl - Menus.tcl {
 					set c [convtool [file join $src $file]]
-					writefile [file join $src [file root $file].conf] $c
+					file_write [file join $src [file root $file].conf] $c
 					file delete [file join $src $file]
 				}
 				Keys.tcl - Mouse.tcl - Colors.tcl - Fonts.tcl - Misc.tcl {
 					set c [convother [file join $src $file]]
-					writefile [file join $src [file root $file].conf] $c
+					file_write [file join $src [file root $file].conf] $c
 					file delete [file join $src $file]
 				}
 			}
@@ -134,15 +134,15 @@ proc convrec {src} {
 proc convcode {dir} {
 	set files [glob [file join $dir *.tcl]]
 	foreach file $files {
-		set c [splitcomplete [readfile $file]]
+		set c [cmd_split [file_read $file]]
 		set newc ""
 		foreach line $c {
 			if [regexp "^proc \[^ \]+ args \{# ClassyTcl generated (\[^ \n\]+)" $line temp type] {
 				set newcode ""
 				set function [lindex $line 1]
 				set code [lindex $line 3]
-				set code [string::change $code {$window $object {varsubst window} {varsubst object}}]
-				set code [splitcomplete $code]
+				set code [string_change $code {$window $object {varsubst window} {varsubst object}}]
+				set code [cmd_split $code]
 				set opt [lindex $code 2]
 				set code [lreplace $code 0 2 "\tsuper init"]
 				set code [lreplace $code 2 2]
@@ -224,7 +224,7 @@ invoke {file} {
 	if [file exists [file join $dir conf init]] {
 		puts "file $dir in older format: converting"
 		set c [convfiles [glob [file join $dir conf init *.tcl]]]
-		writefile [file join $dir conf init.conf] $c
+		file_write [file join $dir conf init.conf] $c
 		catch {file delete -force [file join $dir conf init]}
 	}
 	convrec [file join $dir conf]

@@ -62,7 +62,7 @@ proc bgerror {err} {
 proc Classy::stacktrace {} {
 	if [catch {
 		set w [edit $::Classy::error(file)]
-		$w.editor.edit set [readfile $::Classy::error(file)]
+		$w.editor.edit set [file_read $::Classy::error(file)]
 		$w.editor.edit textchanged 0
 		wm title $w "Stack Trace"
 	}] {

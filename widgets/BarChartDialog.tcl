@@ -188,7 +188,7 @@ Classy::BarChartDialog method switchdata {item} {
 	} else {
 		set data($item) [$chart dataget $item]
 		set temp [$chart barconfigure $item]
-		set config($item) [lmerge [lmanip subindex $temp 0] [lmanip subindex $temp 4]]
+		set config($item) [list_merge [list_subindex $temp 0] [list_subindex $temp 4]]
 		$chart datadelete $item
 	}
 }

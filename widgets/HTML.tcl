@@ -193,7 +193,7 @@ Classy::HTML method geturl {url {query {}}} {
 						}
 						lappend control(back) $keep
 						set control(forward) ""
-						lunshift control(history) $keep
+						list_unshift control(history) $keep
 						set control(history) [lrange $control(history) 0 50]
 					}
 					set options(-url) $url
@@ -234,7 +234,7 @@ Classy::HTML method geturl {url {query {}}} {
 				if {"$::tcl_platform(platform)" == "windows"} {
 					regsub {^/([A-Za-z]:/)} $file {\1} file
 				}
-				set html [readfile $file]
+				set html [file_read $file]
 				if [regexp {html?$} $file] {
 					set type text/html
 				} else {
@@ -277,7 +277,7 @@ Classy::HTML method geturl {url {query {}}} {
 		}
 		lappend control(back) $keep
 		set control(forward) ""
-		lunshift control(history) $keep
+		list_unshift control(history) $keep
 		set control(history) [lrange $control(history) 0 50]
 	}
 	set options(-url) $url
@@ -383,7 +383,7 @@ Classy::HTML method reload {} {
 Classy::HTML method back {} {
 	private $object options control
 	if {"$control(back)" == ""} return
-	set url [lpop control(back)]
+	set url [list_pop control(back)]
 	lappend control(forward) $options(-url)
 	set control(direction) 1
 	if ![regexp ^data: $url] {
@@ -402,7 +402,7 @@ Classy::HTML method back {} {
 Classy::HTML method forward {} {
 	private $object options control
 	if {"$control(forward)" == ""} return
-	set url [lpop control(forward)]
+	set url [list_pop control(forward)]
 	lappend control(back) $options(-url)
 	set control(direction) 1
 	if ![regexp ^data: $url] {

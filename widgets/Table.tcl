@@ -294,7 +294,7 @@ Classy::Table addoption -font {font Font {}} {
 	} else {
 		set data(font) [option get $object font Font]
 	}
-	set data(style,default) [structlset $data(style,default) -font $data(font)]
+	set data(style,default) [structlist_set $data(style,default) -font $data(font)]
 	if ![string length $options(-rowsize)] {
 		catch {destroy $object.temp}
 		entry $object.temp -font $value
@@ -321,7 +321,7 @@ Classy::Table addoption -background {background Background {}} {
 	} else {
 		set data(bg) [option get $object background Background]
 	}
-	set data(style,default) [structlset $data(style,default) -bg $data(bg)]
+	set data(style,default) [structlist_set $data(style,default) -bg $data(bg)]
 	Classy::todo $object _redraw
 }
 
@@ -342,7 +342,7 @@ Classy::Table addoption -foreground {foreground Foreground {}} {
 	} else {
 		set data(fg) [option get $object foreground Foreground]
 	}
-	set data(style,default) [structlset $data(style,default) -fg $data(fg)]
+	set data(style,default) [structlist_set $data(style,default) -fg $data(fg)]
 	Classy::todo $object _redraw
 }
 
@@ -451,7 +451,7 @@ Classy::Table addoption -yscrollcommand {yScrollCommand ScrollCommand {}} {
 Classy::Table method set {index value} {
 	private $object options data undo
 	set table_x [$object index $index]
-	set table_y [lpop table_x]
+	set table_y [list_pop table_x]
 	set undo(redo) ""
 	if [string length $options(-command)] {
 		set code [catch {uplevel #0 $options(-command) $object $table_x $table_y} prev]
@@ -479,7 +479,7 @@ Classy::Table method set {index value} {
 Classy::Table method get {index} {
 	private $object options data canvas
 	set table_x [$object index $index]
-	set table_y [lpop table_x]
+	set table_y [list_pop table_x]
 	if [string length $options(-command)] {
 		set code [catch {uplevel #0 $options(-command) $object $table_x $table_y} new]
 		if {$code == 1} {
@@ -498,7 +498,7 @@ Classy::Table method undo {} {
 	if ![llength $undo(undo)] {
 		error "Nothing to undo"
 	}
-	set current [lpop undo(undo)]
+	set current [list_pop undo(undo)]
 	foreach {table_x table_y value} $current {}
 	if [string length $options(-command)] {
 		set code [catch {uplevel #0 $options(-command) $object $table_x $table_y} prev]
@@ -510,7 +510,7 @@ Classy::Table method undo {} {
 		if ![string length $value] {
 			set sv {{}}
 		} else {
-			set sv [string::change $value [list { } {\ } \{ \\\{ \} \\\} \$ \\\$ \[ \\\[ \] \\\]]]
+			set sv [string_change $value [list { } {\ } \{ \\\{ \} \\\} \$ \\\$ \[ \\\[ \] \\\]]]
 		}
 		set error [catch {uplevel #0 $options(-command) $object $table_x $table_y [list $value]} res]
 		$object refreshcell $table_x $table_y
@@ -532,7 +532,7 @@ Classy::Table method redo {} {
 	if ![llength $undo(redo)] {
 		error "Nothing to redo"
 	}
-	set current [lpop undo(redo)]
+	set current [list_pop undo(redo)]
 	foreach {table_x table_y value} $current {}
 	if [string length $options(-command)] {
 		set code [catch {uplevel #0 $options(-command) $object $table_x $table_y} prev]
@@ -544,7 +544,7 @@ Classy::Table method redo {} {
 		if ![string length $value] {
 			set sv {{}}
 		} else {
-			set sv [string::change $value [list { } {\ } \{ \\\{ \} \\\} \$ \\\$ \[ \\\[ \] \\\]]]
+			set sv [string_change $value [list { } {\ } \{ \\\{ \} \\\} \$ \\\$ \[ \\\[ \] \\\]]]
 		}
 		set error [catch {uplevel #0 $options(-command) $object $table_x $table_y [list $value]} res]
 		$object refreshcell $table_x $table_y
@@ -575,7 +575,7 @@ Classy::Table method refreshcell {table_x table_y} {
 	}
 	set index [list $table_x $table_y]
 	if ![catch {$object _table2canvas $index} x] {
-		set y [lpop x]
+		set y [list_pop x]
 		if {($x >= 0)&&($y >= 0)} {
 			$canvas itemconfigure $data(fg,$x,$y) -text $new
 		}
@@ -589,10 +589,10 @@ Classy::Table method refreshcell {table_x table_y} {
 Classy::Table method _redrawcell {cell} {
 	private $object data canvas selection options
 	set table_x $cell
-	set table_y [lpop table_x]
+	set table_y [list_pop table_x]
 	set pos [$object _table2canvas $cell]
 	set x $pos
-	set y [lpop x]
+	set y [list_pop x]
 	if {($x < 0)||($y < 0)} return
 	if {($x >= $data(x,num))||($y >= $data(y,num))} return
 	set style(-bg) $data(bg)
@@ -692,7 +692,7 @@ Classy::Table method pastespecial {args} {
 	if ![llength $cells] {lappend cells $data(active)}
 	foreach cell $cells {
 		set tx $cell
-		set y [lpop tx]
+		set y [list_pop tx]
 		foreach line $pasted {
 			set x $tx
 			foreach value $line {
@@ -718,14 +718,14 @@ Classy::Table method movex {step args} {
 		$object selection anchor
 	}
 	set x $data(active)
-	set y [lpop x]
+	set y [list_pop x]
 	incr x $step
 	set min $data(xmin)
 	set max $data(xmax)
 	if {$x < $data(xmin)} {set x $data(xmin)}
 	if {$x >= $data(xmax)} {set x [expr {$data(xmax)-1}]}
 	set pos [$object _table2canvas [list $x 0]]
-	lpop pos
+	list_pop pos
 	incr pos
 	if {$pos > [expr {$data(x,num)-1}]} {
 		set left [expr {$pos - $data(x,num)+1}]
@@ -758,14 +758,14 @@ Classy::Table method movey {step args} {
 		$object selection anchor
 	}
 	set x $data(active)
-	set y [lpop x]
+	set y [list_pop x]
 	incr y $step
 	set min $data(ymin)
 	set max $data(ymax)
 	if {$y < $min} {set y $min}
 	if {$y >= $max} {set y [expr {$max-1}]}
 	set pos [$object _table2canvas [list 0 $y]]
-	lshift pos
+	list_shift pos
 	incr pos
 	if {$pos > [expr {$data(y,num)-1}]} {
 		set left [expr {$pos - $data(y,num)+1}]
@@ -814,7 +814,7 @@ Classy::Table method see {{index {}}} {
 	set active $data(active)
 	set index [$object index $index]
 	set cx [$object _table2canvas $index]
-	set cy [lpop cx]
+	set cy [list_pop cx]
 	set pos [lindex $index 1]
 	if {$pos < $data(ymin)} {set pos $data(ymin)}
 	if {$pos >= $data(ymax)} {set pos [expr {$data(ymax)-1}]}
@@ -1050,7 +1050,7 @@ Classy::Table method index {index} {
 	switch -regexp -- $index {
 		{^@(-?[0-9]+),(-?[0-9]+)$} {
 			set canvas_x [split [string range $index 1 end] ,]
-			set canvas_y [lpop canvas_x]
+			set canvas_y [list_pop canvas_x]
 			set table_x 1
 			while {[info exists data(rx,$table_x)]} {
 				if {$canvas_x < $data(rx,$table_x)} break
@@ -1085,7 +1085,7 @@ Classy::Table method index {index} {
 		}
 		{^(-?[0-9]+)[, ](-?[0-9]+)$} {
 			set table_x [split $index ",. "]
-			set table_y [lpop table_x]
+			set table_y [list_pop table_x]
 			return [list $table_x $table_y]
 		}
 		{^active$} {
@@ -1162,12 +1162,12 @@ Classy::Table method activate {{index {}}} {
 	} else {
 		set old [array names selection]
 		set new [$object _block2cells [list $data(select) $active]]
-		set clear [llremove $old $new]
+		set clear [list_lremove $old $new]
 		foreach cell $clear {
 			unset selection($cell)
 			$object _redrawcell $cell
 		}
-		set set [llremove $new $old]
+		set set [list_lremove $new $old]
 		foreach cell $set {
 			set selection($cell) 1
 			$object _redrawcell $cell
@@ -1211,7 +1211,7 @@ Classy::Table method _edit {index} {
 		$canvas coords $data(edit) -1000 -1000
 		$canvas itemconfigure $data(edit) -width 1 -height 1
 	} else {
-		set y [lpop x]
+		set y [list_pop x]
 		array set style $data(style,default)
 		if [info exists data(style,$table_x,)] {array set style $data(style,$table_x,)}
 		if [info exists data(style,,$table_y)] {array set style $data(style,,$table_y)}
@@ -1258,7 +1258,7 @@ Classy::Table method _edit {index} {
 		$object.edit insert end $new
 		if [scan $index @%d,%d x y] {
 			set cx [$canvas coords $data(edit)]
-			set cy [lpop cx]
+			set cy [list_pop cx]
 			set x [expr {int($x-$cx)}]
 			set y [expr {int($y-$cy)}]
 			$object _selectedit $x $y
@@ -1933,7 +1933,7 @@ Classy::Table method _drawvalues {sx sy} {
 	set ey $data(y,num)
 	# active
 	set ax [$object _table2canvas $data(active)]
-	set ay [lpop ax]
+	set ay [list_pop ax]
 	if {($ax >= 0)&&($ax < $ex)} {
 		set x $ax
 		set table_x [lindex $data(active) 0]
@@ -2045,7 +2045,7 @@ Classy::Table method _selectedit {x y} {
 Classy::Table method _selectmotion {w x y {edit {}}} {
 	private $object data canvas selection options
 	set cx [$canvas coords $data(edit)]
-	set cy [lpop cx]
+	set cy [list_pop cx]
 	if [string length $edit] {
 		set x [expr {int($x+$cx)}]
 		set y [expr {int($y+$cy)}]
@@ -2075,7 +2075,7 @@ Classy::Table method _selectmotion {w x y {edit {}}} {
 	$object selection anchor
 	set index [$object index @$x,$y]
 	set cx [$object _table2canvas $index]
-	set cy [lpop cx]
+	set cy [list_pop cx]
 	if {$cx < $options(-titlecols)} {
 		set index [lreplace $index 0 0 [expr {$data(x,start) - $options(-titlerows) + $cx}]]
 	}

@@ -329,7 +329,7 @@ Classy::NoteBook method button {label} {
 #}
 Classy::NoteBook method delete {label} {
 	private $object widget button managed_options cmd current labels
-	set labels [lremove $labels $label]
+	set labels [list_remove $labels $label]
 	if [info exists cmd($label)] {
 		unset cmd($label)
 	}
@@ -361,7 +361,7 @@ Classy::NoteBook method rename {old new} {
 	catch {set managed_options($new) $managed_options($old)}
 	catch {set button($new) $button($old)}
 	$object.tab$button($old) configure -text $new -command [list $object select $new]
-	set pos [lfind $labels $old]
+	set pos [list_find $labels $old]
 	set labels [lreplace $labels $pos $pos $new]
 	catch {unset cmd($old)}
 	catch {unset widget($old)}
@@ -397,7 +397,7 @@ Classy::NoteBook method reorder {args} {
 
 Classy::NoteBook method _children {} {
 	set result ""
-	foreach w [lremove [winfo children $object] $object.label $object.book $object.cover_] {
+	foreach w [list_remove [winfo children $object] $object.label $object.book $object.cover_] {
 		if ![regexp "^$object.tab\[0-9\]+\$" $w] {
 			lappend result $w
 		}

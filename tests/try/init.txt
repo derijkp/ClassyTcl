@@ -1,6 +1,8 @@
 #==========================================
 #============== Start of try ==============
 #==========================================
+puts ok
+
 catch {destroy .try}
 source classes/PeosDialog.tcl
 source classes/SaveBox.tcl

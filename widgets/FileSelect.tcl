@@ -189,7 +189,7 @@ Classy::FileSelect method refresh {} {
 	set list ""
 	if [true $options(-hidden)] {
 		catch {set list [lsort [glob .*]]}
-		set list [lremove $list . ..]
+		set list [list_remove $list . ..]
 	}
 	catch {eval lappend list [lsort [glob *]]}
 	# We need to get the directories which do not match the pattern!
@@ -222,7 +222,7 @@ Classy::FileSelect method get {} {
 		return $file 
 	} else {
 		set split [file split $file]
-		set split [lremove $split .]
+		set split [list_remove $split .]
 		return [eval file join [pwd] $split]
 	}
 }

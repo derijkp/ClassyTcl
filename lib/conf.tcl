@@ -72,10 +72,10 @@ proc Classy::realfont {font} {
 			set temp [font actual [.classy__.dummy cget -font]]
 			switch $font {
 				Font {set font $temp}
-				BoldFont {set font [structlset $temp -weight bold]}
-				ItalicFont {set font [structlset $temp -slant italic]}
-				BoldItalicFont {set font [structlset $temp -weight bold -slant italic]}
-				NonPropFont {set font [structlset $temp -family courier]}
+				BoldFont {set font [structlist_set $temp -weight bold]}
+				ItalicFont {set font [structlist_set $temp -slant italic]}
+				BoldItalicFont {set font [structlist_set $temp -weight bold -slant italic]}
+				NonPropFont {set font [structlist_set $temp -family courier]}
 			}
 		}
 	}
@@ -230,8 +230,11 @@ proc Classy::initconf {} {
 		if [catch {Classy::conf_buildcache $files} cache] {
 			error "error while loading configuration files: $cache"
 		}
-		writefile $cachefile $cache
+		file_write $cachefile $cache
 	} else {
+		foreach event [event info] {
+			event delete $event
+		}
 		uplevel 0 source $cachefile
 	}
 }

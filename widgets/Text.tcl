@@ -121,7 +121,7 @@ Classy::Text method _getlink {} {
 Classy::Text method unlink {} {
 	private $object linked
 	foreach link $linked {
-		uplevel #0 [concat set [privatevar $link linked] \[lremove \$\{[privatevar $link linked]\} $object\]]
+		uplevel #0 [concat set [privatevar $link linked] \[list_remove \$\{[privatevar $link linked]\} $object\]]
 	}
 	set linked ""
 }
@@ -254,7 +254,7 @@ Classy::Text method undo {{link {}}} {
 	if {$undobuffer == ""} {
 		error "Nothing to undo"
 	}
-	set undo [lpop undobuffer]
+	set undo [list_pop undobuffer]
 	set index1 [lindex $undo 2]
 	if {"$link" == ""} {
 		$w mark set insert $index1
@@ -287,7 +287,7 @@ Classy::Text method redo {{link {}}} {
 	if {$redobuffer == ""} {
 		error "Nothing to redo"
 	}
-	set redo [lpop redobuffer]
+	set redo [list_pop redobuffer]
 	set index1 [lindex $redo 2]
 	if {"$link" == ""} {
 		$w mark set insert $index1

@@ -199,15 +199,15 @@ Classy::CmdWidget method complete {{what file}} {
 		set completion [string range $flist [string length $start] end]
 		$w insert insert $completion
 	} else {
-		set list [lregsub "^$start" $flist {}]
+		set list [list_regsub "^$start" $flist {}]
 		set completion ""
 		while {"[lindex $list 0]"!=""} {
-			set flet [lremdup [lmanip extract $list {^(.)}]]
+			set flet [list_remdup [list_extract $list {^(.)}]]
 			if {[llength $flet]!=1} {
 				break
 			}
 			append completion $flet
-			set list [lregsub "^." $list {}]
+			set list [list_regsub "^." $list {}]
 		}
 		if {"$completion"==""} {
 			public $object prompt
@@ -294,7 +294,7 @@ Classy::CmdWidget method undo {} {
 	if {$undobuffer == ""} {
 		error "Nothing to undo"
 	}
-	set undo [lpop undobuffer]
+	set undo [list_pop undobuffer]
 	set index1 [lindex $undo 2]
 	$w mark set insert $index1
 	$w see $index1
@@ -318,7 +318,7 @@ Classy::CmdWidget method redo {} {
 	if {$redobuffer == ""} {
 		error "Nothing to redo"
 	}
-	set redo [lpop redobuffer]
+	set redo [list_pop redobuffer]
 	set index1 [lindex $redo 2]
 	$w mark set insert $index1
 	$w see $index1

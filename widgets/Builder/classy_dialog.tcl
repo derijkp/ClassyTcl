@@ -4,7 +4,7 @@
 
 proc ::Classy::WindowBuilder::start_Classy::Dialog {object base} {
 	private $object data
-	set buttons [lremove [winfo children $base.actions] $base.actions.close $base.actions.help]
+	set buttons [list_remove [winfo children $base.actions] $base.actions.close $base.actions.help]
 	$object startedit $buttons
 	foreach b $buttons {
 		set data(class,$b) Classy::DialogButton
@@ -51,7 +51,7 @@ proc ::Classy::WindowBuilder::generate_Classy::Dialog {object base} {
 	append body [$object gridconf $base.options]
 	append body "\n"
 	set def 1
-	foreach b [llremove [$base button] {close help}] {
+	foreach b [list_lremove [$base button] {close help}] {
 		catch {
 			append data(parse) "\t$outw add $b [$object getoption $base.actions.$b -text]"
 			append data(parse) " [$object getoption $base.actions.$b -command]"
@@ -103,8 +103,8 @@ proc ::Classy::WindowBuilder::attr_Classy::DialogButton_name {object w args} {
 proc ::Classy::WindowBuilder::attr_Classy::DialogButton_persistent {object w args} {
 	private $object data
 	set split [split $w {\.}]
-	set l [lpop split]
-	lpop split
+	set l [list_pop split]
+	list_pop split
 	set parent [join $split .]
 	set list [$parent persistent]
 	if {"$args" == ""} {

@@ -14,7 +14,7 @@ puts "Converting $src"
 	}
 	set f [open $src]
 	while {![eof $f]} {
-		set line [getcomplete $f]
+		set line [cmd_get $f]
 		if [regexp ^Classy::config $line] {
 			foreach {type name descr value} $line {}
 			regsub -all \n\n\n* $value \n value
@@ -47,7 +47,7 @@ puts "Converting $src"
 	set f [open $src]
 	set result ""
 	while {![eof $f]} {
-		set line [getcomplete $f]
+		set line [cmd_get $f]
 		if [regexp ^Classy::configmisc $line] {
 			foreach {type title cmd} $line {}
 			foreach {name key value type descr} $cmd {
@@ -110,12 +110,12 @@ proc class::convrec {src} {
 			switch $file {
 				Toolbars.tcl - Menus.tcl {
 					set c [::class::convtool [file join $src $file]]
-					writefile [file join $src [file root $file].conf] $c
+					file_write [file join $src [file root $file].conf] $c
 					file delete [file join $src $file]
 				}
 				Keys.tcl - Mouse.tcl - Colors.tcl - Fonts.tcl - Misc.tcl {
 					set c [::class::convother [file join $src $file]]
-					writefile [file join $src [file root $file].conf] $c
+					file_write [file join $src [file root $file].conf] $c
 					file delete [file join $src $file]
 				}
 			}
@@ -127,7 +127,7 @@ invoke {file} {
 	set dir [file dir $file]
 	puts "file $dir in older format: converting"
 	set c [class::convfiles [glob [file join $dir conf init *.tcl]]]
-	writefile [file join $dir conf init.conf] $c
+	file_write [file join $dir conf init.conf] $c
 	catch {file delete [file join $dir conf init]}
 	class::convrec [file join $dir conf]
 	file copy -force [file join $::class::dir template template.tcl] $file

@@ -77,7 +77,7 @@ Classy::Dialog method init {args} {
 	frame $object.options
 	frame $object.actions
 	button $object.actions.close -text "Close"
-	bindtags $object.actions.close [lregsub Button [bindtags $object.actions.close] Classy::DialogButton]
+	bindtags $object.actions.close [list_regsub Button [bindtags $object.actions.close] Classy::DialogButton]
 	pack $object.actions.close -side right -expand yes -padx 5 -pady 10
 	grid $object.options -sticky nwse
 	grid $object.actions -sticky we
@@ -143,13 +143,13 @@ Classy::Dialog addoption -help {help Help {}} {
 Classy::Dialog method add {button text command args} {
 	if {"$args" == "default"} {
 		button $object.actions.$button -default active -text $text -command $command
-		bindtags $object.actions.$button [lregsub Button [bindtags $object.actions.$button] Classy::DialogButton]
+		bindtags $object.actions.$button [list_regsub Button [bindtags $object.actions.$button] Classy::DialogButton]
 		pack $object.actions.$button -side left -expand yes
 		bind $object <KeyPress-Return> "$object invoke $button"
 	} else {
 		private $object shortcuts persistent
 		button $object.actions.$button -text $text -command $command
-		bindtags $object.actions.$button [lregsub Button [bindtags $object.actions.$button] Classy::DialogButton]
+		bindtags $object.actions.$button [list_regsub Button [bindtags $object.actions.$button] Classy::DialogButton]
 		pack $object.actions.$button -side left -expand yes -padx 5 -pady 10
 		set text [string tolower $text]
 		set pos 0
@@ -178,7 +178,7 @@ Classy::Dialog method add {button text command args} {
 Classy::Dialog method delete {button} {
 	private $object shortcuts persistent
 	destroy $object.actions.$button
-	catch {set persistent [lremove $persistent $button]}
+	catch {set persistent [list_remove $persistent $button]}
 }
 
 #doc {Dialog command rename} cmd {
@@ -193,7 +193,7 @@ Classy::Dialog method rename {button newname} {
 	eval {$object add $newname} $conf
 	pack $object.actions.$newname -before $w
 	$object delete $button
-	catch {set persistent [lremove $persistent $button]}
+	catch {set persistent [list_remove $persistent $button]}
 }
 
 #doc {Dialog command button} cmd {
@@ -237,18 +237,18 @@ Classy::Dialog method persistent {{option {}} args} {
 	}
 	if {"[lindex $args 0]"=="-all"} {
 		set all [winfo children $object.actions]
-		set all [lremove $all $object.actions.default $object.actions.close $object.actions.help]
-		set args [lregsub {^.*\.} $all {}]
+		set all [list_remove $all $object.actions.default $object.actions.close $object.actions.help]
+		set args [list_regsub {^.*\.} $all {}]
 	}
 	switch $option {
 		set {
 			set persistent $args
 		}
 		add {
-			eval laddnew persistent $args
+			eval list_addnew persistent $args
 		}
 		remove {
-			set persistent [llremove $persistent $args]
+			set persistent [list_lremove $persistent $args]
 		}
 		default {
 			error "bad option \"$option\": must be set, add or remove"

@@ -242,7 +242,7 @@ Classy::Canvas method undo {{action {}} args} {
 
 Classy::Canvas method _undoone {current} {
 	private $object w data undo del
-	set action [lshift current]
+	set action [list_shift current]
 	switch $action {
 		check {
 			set list [lindex $current 0]
@@ -428,7 +428,7 @@ Classy::Canvas method redo {} {
 
 Classy::Canvas method _redoone {current} {
 	private $object w data undo del
-	set action [lshift current]
+	set action [list_shift current]
 	switch $action {
 		check {
 			foreach item [lindex $current 0] {
@@ -585,7 +585,7 @@ proc Classy::tag2items {object w tagOrId} {
 	} elseif {"$tagOrId" == "all"} {
 		private $object del
 		set result [$w find withtag all]
-		return [llremove $result [array names del]]
+		return [list_lremove $result [array names del]]
 	} else {
 		return [$w find withtag $tagOrId]
 	}
@@ -842,7 +842,7 @@ Classy::Canvas method itemconfigure {tagOrId args} {
 			set ws ""
 			set optionslist ""
 			set citems [Classy::tag2items $object $w $tagOrId]
-			set options [lunmerge $args]
+			set options [list_unmerge $args]
 			if {$wpos != -1} {
 				private $object widths itemw
 				incr wpos
@@ -874,7 +874,7 @@ Classy::Canvas method itemconfigure {tagOrId args} {
 			$object addundo [list itemconfigure $tagOrId $kargs] [list itemconfigure $citems $optionslist $ws]
 		} else {
 			set citems [Classy::tag2items $object $w $tagOrId]
-			set options [lunmerge $args]
+			set options [list_unmerge $args]
 			if {$wpos != -1} {
 				private $object widths itemw
 				incr wpos
@@ -972,8 +972,8 @@ Classy::Canvas method move {tagOrId xAmount yAmount} {
 		if {("[lindex $lastundo 0]" != "move")||("[lindex $lastundo 1]" != "$tagOrId")} {
 			$object addundo [list move $tagOrId $xAmount $yAmount] [list move $tagOrId $xAmount $yAmount]
 		} else {
-			lpop undo(undo)			
-			lpop undo(redo)			
+			list_pop undo(undo)			
+			list_pop undo(redo)			
 			set x [expr {[lindex $lastundo 2]+$xAmount}]
 			set y [expr {[lindex $lastundo 3]+$yAmount}]
 			$object addundo [list move $tagOrId $x $y] [list move $tagOrId $x $y]
@@ -1117,13 +1117,13 @@ Classy::Canvas method addtag {tag searchcommand args} {
 			tags {
 				set citems [Classy::tag2items $object $w [lindex $args 0]]
 				foreach temp [lrange $args 1 end] {
-					set citems [lunion $citems [Classy::tag2items $object $w $temp]]
+					set citems [list_union $citems [Classy::tag2items $object $w $temp]]
 				}
 			}
 			andtags {
 				set citems [Classy::tag2items $object $w [lindex $args 0]]
 				foreach temp [lrange $args 1 end] {
-					set citems [lcommon $citems [Classy::tag2items $object $w $temp]]
+					set citems [list_common $citems [Classy::tag2items $object $w $temp]]
 				}
 			}
 			withtag {
@@ -1168,7 +1168,7 @@ Classy::Canvas method addtag {tag searchcommand args} {
 			tags {
 				set citems [Classy::tag2items $object $w [lindex $args 0]]
 				foreach temp [lrange $args 1 end] {
-					set citems [lunion $citems [Classy::tag2items $object $w $temp]]
+					set citems [list_union $citems [Classy::tag2items $object $w $temp]]
 				}
 				foreach item $citems {
 					$w addtag $tag withtag $item
@@ -1177,7 +1177,7 @@ Classy::Canvas method addtag {tag searchcommand args} {
 			andtags {
 				set citems [Classy::tag2items $object $w [lindex $args 0]]
 				foreach temp [lrange $args 1 end] {
-					set citems [lcommon $citems [Classy::tag2items $object $w $temp]]
+					set citems [list_common $citems [Classy::tag2items $object $w $temp]]
 				}
 				foreach item $citems {
 					$w addtag $tag withtag $item
@@ -1208,14 +1208,14 @@ Classy::Canvas method find {searchcommand args} {
 			tags {
 				set citems [Classy::tag2items $object $w [lindex $args 0]]
 				foreach tag [lrange $args 1 end] {
-					set citems [lunion $citems [Classy::tag2items $object $w $tag]]
+					set citems [list_union $citems [Classy::tag2items $object $w $tag]]
 				}
 				return $citems
 			}
 			andtags {
 				set citems [Classy::tag2items $object $w [lindex $args 0]]
 				foreach tag [lrange $args 1 end] {
-					set citems [lcommon $citems [Classy::tag2items $object $w $tag]]
+					set citems [list_common $citems [Classy::tag2items $object $w $tag]]
 				}
 				return $citems
 			}
@@ -1236,7 +1236,7 @@ Classy::Canvas method find {searchcommand args} {
 				}
 			}
 			default {
-				return [llremove [leval $w find $searchcommand $args] [array names del]]
+				return [list_lremove [leval $w find $searchcommand $args] [array names del]]
 			}
 		}
 	} else {
@@ -1244,19 +1244,19 @@ Classy::Canvas method find {searchcommand args} {
 			tags {
 				set citems [Classy::tag2items $object $w [lindex $args 0]]
 				foreach tag [lrange $args 1 end] {
-					set citems [lunion $citems [Classy::tag2items $object $w $tag]]
+					set citems [list_union $citems [Classy::tag2items $object $w $tag]]
 				}
 				return $citems
 			}
 			andtags {
 				set citems [Classy::tag2items $object $w [lindex $args 0]]
 				foreach tag [lrange $args 1 end] {
-					set citems [lcommon $citems [Classy::tag2items $object $w $tag]]
+					set citems [list_common $citems [Classy::tag2items $object $w $tag]]
 				}
 				return $citems
 			}
 			default {
-				return [llremove [leval $w find $searchcommand $args] [array names del]]
+				return [list_lremove [leval $w find $searchcommand $args] [array names del]]
 			}
 		}
 	}
@@ -1321,8 +1321,8 @@ Classy::Canvas method xview {args} {
 		if {"[lindex $lastundo 0]" != "xview"} {
 			$object addundo [list xview $args] [list xview [$w xview]]
 		} else {
-			lpop undo(redo)			
-			lpop undo(undo)
+			list_pop undo(redo)			
+			list_pop undo(undo)
 			$object addundo [list xview $args] [list xview [lindex $lastundo 1]]
 			set undo(undo)
 		}
@@ -1340,8 +1340,8 @@ Classy::Canvas method yview {args} {
 		if {"[lindex $lastundo 0]" != "yview"} {
 			$object addundo [list yview $args] [list yview [$w yview]]
 		} else {
-			lpop undo(redo)			
-			lpop undo(undo)
+			list_pop undo(redo)			
+			list_pop undo(undo)
 			$object addundo [list yview $args] [list yview [lindex $lastundo 1]]
 			set undo(undo)
 		}
@@ -1562,7 +1562,7 @@ Classy::Canvas method selection {action {list {}}} {
 #doc {Canvas command current} cmd {
 #pathname current ?item?
 #} descr {
-# returns the current item. If current is given, it chabges the
+# returns the current item. If current is given, it changes the
 # the current item to the item given.
 #}
 Classy::Canvas method current {args} {
@@ -1589,12 +1589,13 @@ Classy::Canvas method current {args} {
 	} else {
 		set data(ind) 0
 	}
-	set bbox [$w bbox $data(current)]
-	if {"$bbox" != ""} {
-		eval $w coords $data(cur) $bbox
-		$w raise $data(cur)
-	} else {
-		$w coords $data(cur) -1000 -1000 -1000 -1000
+	$w coords $data(cur) -1000 -1000 -1000 -1000
+	if [llength $data(current)] {
+		set bbox [$w bbox $data(current)]
+		if [llength $bbox] {
+			eval $w coords $data(cur) $bbox
+			$w raise $data(cur)
+		}
 	}
 }
 
@@ -1628,7 +1629,7 @@ proc ::Classy::Canvas_load_text {object w idata tags} {
 	if ![info exists fonts($font)] {
 		$object _font $font
 	}
-	set args [lmerge {-anchor -fill -justify -stipple -text -width} \
+	set args [list_merge {-anchor -fill -justify -stipple -text -width} \
 		[lrange $idata 3 8]]
 	leval $w create text $coords $args -font [list $fonts($font) -tags $tags]
 }
@@ -1664,7 +1665,7 @@ foreach {type opts} {
 		if ![info exists widths($width)] {
 			$object _width $width
 		}
-		set args [lmerge {@opt@} \
+		set args [list_merge {@opt@} \
 			[lrange $idata 3 @end@]]
 		set item [leval $w create @type@ $coords $args -width $widths($width) [list -tags $tags]]
 		set itemw($item) $width
@@ -1731,7 +1732,7 @@ proc ::Classy::Canvas_load_image {object w idata tags} {
 			set load(image,$name) [image create $type $base$num -data $img]
 		}
 	}
-	set args [lmerge {-anchor} \
+	set args [list_merge {-anchor} \
 		[lrange $idata 6 6]]
 	leval $w create image $coords $args [list -tags $tags -image $load(image,$name)]
 }
@@ -1745,7 +1746,7 @@ proc ::Classy::Canvas_save_bitmap {object w item} {
 	if [regexp ^@ $name] {
 		if ![info exists save(bitmap,$name)] {
 			set file [string range $name 1 end]
-			set img [readfile $file]
+			set img [file_read $file]
 			set save(bitmap,$name) 1
 		}
 	}
@@ -1763,13 +1764,13 @@ proc ::Classy::Canvas_load_bitmap {object w idata tags} {
 	set img [lindex $idata 3]
 	if {"$img" != ""} {
 		set tempf [tempfile get]
-		writefile $tempf $img
+		file_write $tempf $img
 		set load(bitmap,$name) "@$tempf"
 		set name $load(bitmap,$name)
 	} elseif [info exists load(bitmap,$name)] {
 		set name $load(bitmap,$name)
 	}
-	set args [lmerge {-anchor -background -foreground} \
+	set args [list_merge {-anchor -background -foreground} \
 		[lrange $idata 4 6]]
 	leval $w create bitmap $coords $args [list -tags $tags -bitmap $name]
 }
@@ -1789,7 +1790,7 @@ proc ::Classy::Canvas_load_order {object w idata tags} {
 	}
 }
 
-#doc {Canvas command undo} cmd {
+#doc {Canvas command save} cmd {
 #pathname save ?tag?
 #} descr {
 # returns a list that can be used to restore the drawing in the canvas
@@ -1804,7 +1805,7 @@ Classy::Canvas method save {{tag all}} {
 	$w delete _np
 	set list [Classy::tag2items $object $w $tag]
 	set slist [lsort -integer $list]
-	lappend order {} [lcor $slist $list] {}
+	lappend order {} [list_cor $slist $list] {}
 	foreach item $slist {
 		set type [$w type $item]
 		set idata [::Classy::Canvas_save_$type $object $w $item]
@@ -1829,7 +1830,7 @@ Classy::Canvas method load {c} {
 	$w dtag _new
 	foreach {type idata} [lrange $c 0 end] {
 		set tags [lindex $idata 0]
-		foreach pos [lfind -glob $tags _g*] {
+		foreach pos [list_find -glob $tags _g*] {
 			set g [lindex $tags $pos]
 			if ![info exists tag($g)] {
 				incr data(group)
@@ -1869,7 +1870,7 @@ Classy::Canvas method group {args} {
 Classy::Canvas method findgroup {tagOrId} {
 	private $object w data
 	set tags [$w gettags $tagOrId]
-	set poss [lfind -glob $tags _g*]
+	set poss [list_find -glob $tags _g*]
 	if {"$poss" != ""} {
 		return [lindex $tags [lindex $poss end]]
 	} else {

@@ -119,7 +119,7 @@ Classy::DragDrop classmethod start {x y value args} {
 	$from configure -cursor hand2
 	eval $class configure $args
 	bindtags $from {Classy::DragDrop_extra Classy::DragDrop}
-    foreach app [lremove [winfo interps] [tk appname]] {
+    foreach app [list_remove [winfo interps] [tk appname]] {
 		send -async -- $app ::class::setprivate Classy::DragDrop data(prev) {{}}
 		send -async -- $app ::class::setprivate Classy::DragDrop data(remote) [list [tk appname]]
 	}
@@ -417,7 +417,7 @@ Classy::DragDrop classmethod move {} {
 		}
 		event generate $dropw <<Drag-Motion>> -x $rx -y $ry
 	} else {
-	    foreach app [lremove [winfo interps] $curapp] {
+	    foreach app [list_remove [winfo interps] $curapp] {
 			send -async -- $app Classy::DragDrop _events [list $curapp] $x $y
 		}
 	}

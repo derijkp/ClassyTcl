@@ -94,7 +94,7 @@ Classy::Default classmethod add {type key value} {
 	if ![info exists defaults_${type}($key)] {
 		set defaults_${type}($key) [list $value]
 	} elseif {[lsearch -exact [set defaults_${type}($key)] $value]==-1} {
-		lunshift defaults_${type}($key) $value
+		list_unshift defaults_${type}($key) $value
 	}
 }
 
@@ -155,7 +155,7 @@ Classy::Default classmethod load {{type {}} {file {}}} {
 			foreach type [dirglob $dir *] {
 				private $class defaults_$type
 				if [file readable [file join $dir $type]] {
-					catch {array set defaults_$type [readfile [file join $dir $type]]}
+					catch {array set defaults_$type [file_read [file join $dir $type]]}
 				}
 			}
 		}
@@ -163,7 +163,7 @@ Classy::Default classmethod load {{type {}} {file {}}} {
 	}
 	private $class defaults_$type
 	if [string length $file] {
-		array set defaults_$type [readfile $file]
+		array set defaults_$type [file_read $file]
 		return
 	}
 	set file $type.def
@@ -171,7 +171,7 @@ Classy::Default classmethod load {{type {}} {file {}}} {
 		set dir [file join $dir def]
 		foreach file [dirglob $dir *] {
 			if [file readable [file join $dir $type]] {
-				array set defaults_$type [readfile [file join $dir $file]]
+				array set defaults_$type [file_read [file join $dir $file]]
 			}
 		}
 	}

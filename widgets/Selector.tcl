@@ -51,6 +51,8 @@ Classy::Selector method init {args} {
 #doc {Selector options -variable} option {-variable variable Variable} descr {
 #}
 Classy::Selector addoption -variable {variable Variable {}} {
+	upvar #0 $value var
+	if ![info exists var] {set var {}}
 	Classy::todo $object redraw
 }
 

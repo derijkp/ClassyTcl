@@ -162,7 +162,7 @@ Classy::Tree method _drawnode {node} {
 	array set drawinfo $data($node)
 	set tag $options(-tag)
 	set x [$canvas coords $drawinfo(i)]
-	set y [lpop x]
+	set y [list_pop x]
 	set sy $y
 	set bbox [$canvas bbox $drawinfo(i)]
 	set height [expr {[lindex $bbox 3]-[lindex $bbox 1]}]
@@ -236,7 +236,7 @@ Classy::Tree method _redraw {} {
 	if {("$options(-rootimage)" == "")&&("$options(-roottext)" == "")} {
 		set i [$canvas create text $options(-startx) $options(-starty) -text "" \
 			-tags [list $options(-tag) classy::Tree {}] -fill $options(-foreground)]
-		set data() [structlset $data() i $i]
+		set data() [structlist_set $data() i $i]
 	} else {
 		if {"$options(-font)" == ""} {
 			set font [option get . treeFont Font]
@@ -258,7 +258,7 @@ Classy::Tree method _redraw {} {
 				-fill $options(-foreground) \
 				-tags [list $options(-tag) classy::Tree {}]]
    	if {"$font" != ""} {$canvas itemconfigure $ti -font $font}
-		set data() [structlset $data() i $i ti $ti]
+		set data() [structlist_set $data() i $i ti $ti]
 	}
 	$object _drawnode {}
 	$canvas delete $options(-tag)_selection
@@ -283,7 +283,7 @@ Classy::Tree method _redraw {} {
 					-fill $bg -outline $bg
 			}
 		}] {
-			set selection [lremove $selection $node]
+			set selection [list_remove $selection $node]
 		}
 	}
 	$canvas lower $options(-tag)_selection
@@ -347,7 +347,7 @@ Classy::Tree method addnode {parent node args} {
 #}
 Classy::Tree method closenode {node} {
 	private $object data options
-	set data($node) [structlset $data($node) t c]
+	set data($node) [structlist_set $data($node) t c]
 	Classy::todo $object _redraw
 }
 
@@ -357,7 +357,7 @@ Classy::Tree method closenode {node} {
 #}
 Classy::Tree method opennode {node} {
 	private $object data options
-	set data($node) [structlset $data($node) t f]
+	set data($node) [structlist_set $data($node) t f]
 	Classy::todo $object _redraw
 }
 
@@ -421,7 +421,7 @@ Classy::Tree method deletenode {node} {
 	$canvas delete $ca(x)
 	set parent $ca(p)
 	array set pa $data($parent)
-	set pa(l) [lremove $pa(l) $node]
+	set pa(l) [list_remove $pa(l) $node]
 	if {[llength $pa(l)] == 0} {
 		$object clearnode $parent
 #		$canvas delete $ca(s)
@@ -532,9 +532,9 @@ Classy::Tree method selection {{cmd {}} args} {
 			set selection $list
 			return $selection
 		}
-		add {eval laddnew selection $args}
+		add {eval list_addnew selection $args}
 		set {set selection $args}
-		remove {set selection [llremove $selection $args]}
+		remove {set selection [list_lremove $selection $args]}
 		clear {set selection ""}
 		default {return -code error "Unknown option \"$cmd\""}
 	}

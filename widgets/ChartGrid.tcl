@@ -171,8 +171,8 @@ Classy::ChartGrid method _drawgrid {} {
 		set rxstep [expr 10*$rxstep]
 	}
 	set xnum [expr $xsize/$rxstep+1]
-	set linepos [lmanip ffill $xnum $xstart [expr $rxstep*$xscale]]
-	set textpos [lmanip ffill $xnum [expr $xstart+0.5*($rxstep*$xscale)] [expr $rxstep*$xscale]]
+	set linepos [list_ffill $xnum $xstart [expr $rxstep*$xscale]]
+	set textpos [list_ffill $xnum [expr $xstart+0.5*($rxstep*$xscale)] [expr $rxstep*$xscale]]
 	set xpos [lindex $options(-xrange) 0]
 	for {set i 0} {$i<$xnum} {incr i} {
 		set x [lindex $linepos $i]
@@ -188,7 +188,7 @@ Classy::ChartGrid method _drawgrid {} {
 		set rystep [expr 10*$rystep]
 	}
 	set ynum [expr $ysize/$rystep+1]
-	set pos [lmanip ffill $ynum [expr $ystart+$height] [expr -$rystep*$yscale]]
+	set pos [list_ffill $ynum [expr $ystart+$height] [expr -$rystep*$yscale]]
 	set ypos [lindex $options(-yrange) 0]
 	for {set i 0} {$i<$ynum} {incr i} {
  		set y [lindex $pos $i]

@@ -238,7 +238,7 @@ Classy::WindowBuilder method _drawborders {{always 0}} {
 	if ![info exists current(p)] return
 	set parent $current(p)
 	set colsize [grid size $parent]
-	set rowsize [lpop colsize]
+	set rowsize [list_pop colsize]
 	if [info exists border(parent)] {
 		if {"$border(parent)" == "$parent"} {
 			incr colsize -2
@@ -561,7 +561,7 @@ Classy::WindowBuilder method code {{function {}}} {
 Classy::WindowBuilder method open {file} {
 	global auto_index
 	private $object data current border
-	set c [splitcomplete [readfile $file]]
+	set c [cmd_split [file_read $file]]
 	foreach line $c {
 		if [string length $c] break
 	}
@@ -585,8 +585,8 @@ Classy::WindowBuilder method open {file} {
 	set data(param) {}
 	set pos [lsearch -glob $c [list $function method init *]]
 	set code [lindex $c $pos]
-	set poss [lfind -glob $c [list $function addoption *]]
-	foreach line [lsub $c $poss] {
+	set poss [list_find -glob $c [list $function addoption *]]
+	foreach line [list_sub $c $poss] {
 		set option [lindex $line 2]
 		lappend data(options) $option
 		set temp [lindex $line 3]
@@ -596,8 +596,8 @@ Classy::WindowBuilder method open {file} {
 		set data(options,$option,code) [lindex $line 4]
 	}
 	catch {$object.code.book.options.options configure -content $data(options)}
-	set poss [lfind -glob $c [list $function method *]]
-	foreach line [lsub $c $poss] {
+	set poss [list_find -glob $c [list $function method *]]
+	foreach line [list_sub $c $poss] {
 		set method [lindex $line 2]
 		if {"$method" == "init"} continue
 		lappend data(methods) $method
@@ -667,7 +667,7 @@ Classy::WindowBuilder method parsecode {code {window {}}} {
 	private $object data
 	if {"$window" == ""} {
 		set window $data(base)
-		set list [splitcomplete [lindex $code 4]]
+		set list [cmd_split [lindex $code 4]]
 		# initialise
 		set pos [lsearch -regexp $list {^# ClassyTcl Initialise}]
 		set init ""
@@ -700,20 +700,20 @@ Classy::WindowBuilder method parsecode {code {window {}}} {
 		set pos [lsearch -regexp $list {^# ClassyTcl Finalise}]
 		if {$pos != -1} {
 			set range [lrange $list [expr {$pos+1}] end]
-			set range [lremove $range "\treturn \$object"]
+			set range [list_remove $range "\treturn \$object"]
 			$object.code.book.f3.finalise set [join $range \n]
 		} else {
 			$object.code.book.f3.finalise set {}
 		}
 	} else {
 		set parse ""
-		set list [splitcomplete $code]
+		set list [cmd_split $code]
 	}
 	set data(opt-menuwin,$window) ""
 	set i 0
 	set len [llength $parse]
 	while {$i<$len} {
-		set line [parsecommand [lindex $parse $i]]
+		set line [cmd_parse [lindex $parse $i]]
 		if {"[lindex $line 0]" == "bind"} {
 			set keep $object
 			set object $window
@@ -871,7 +871,7 @@ Classy::WindowBuilder method gridwconf {base} {
 Classy::WindowBuilder method gridconf {base} {
 	set body ""
 	set col [grid size $base]
-	set row [lpop col]
+	set row [list_pop col]
 	set outw [$object outw $base]
 	for {set i 0} {$i<$col} {incr i} {
 		set options ""
@@ -1012,7 +1012,7 @@ Classy::WindowBuilder method delete {{list {}}} {
 
 Classy::WindowBuilder method outw {base} {
 	private $object data
-	return [string::change $base [list $data(base) {$object}]]
+	return [string_change $base [list $data(base) {$object}]]
 }
 
 Classy::WindowBuilder method generatebindings {base outw} {
@@ -1125,7 +1125,7 @@ Classy::WindowBuilder method save {{file {}}} {
 		error "error: generated code not complete (contains unmatched braces, parentheses, ...)"
 	}
 	uplevel #0 $code
-	writefile $file "Classy::$type subclass $function\n$code"
+	file_write $file "Classy::$type subclass $function\n$code"
 	set result $function
 	return $result
 }
@@ -1310,7 +1310,7 @@ Classy::WindowBuilder method _sticky {action w x y} {
 		set Y [expr {$y - [winfo rooty $current(p)]}]
 		raise $object.work.classy__$side
 		set col [grid location $current(p) $X $Y]
-		set row [lpop col]
+		set row [list_pop col]
 		set colspan $current(-columnspan)
 		set rowspan $current(-rowspan)
 		if {"$side" == "e"} {
@@ -1658,7 +1658,7 @@ Classy::WindowBuilder method attribute {action args} {
 				if [info exists ::Classy::WindowBuilder::options($option)] {
 					set entry [set ::Classy::WindowBuilder::options($option)]
 					if {[llength $entry] == 2} {
-						set type [lshift entry]
+						set type [list_shift entry]
 					} else {
 						set type Misc
 					}
@@ -1669,9 +1669,9 @@ Classy::WindowBuilder method attribute {action args} {
 				lappend current(group,All) $option
 				if {[lsearch [set ::Classy::WindowBuilder::options(common)] $option] != -1} {
 					lappend current(group,Common) $option
-					laddnew list Common
+					list_addnew list Common
 				}
-				laddnew list $type
+				list_addnew list $type
 			}
 			foreach name [array names current group,*] {
 				set current($name) [lsort $current($name)]
@@ -1834,7 +1834,7 @@ Classy::WindowBuilder method bindings {action args} {
 			foreach event [bind $w] {
 				lappend result $event
 			}
-			return [lsort [lremdup $result]]
+			return [lsort [list_remdup $result]]
 		}
 		default {
 			grid configure $current(w) $type $value
@@ -2045,7 +2045,7 @@ Classy::WindowBuilder method drop {dst} {
 	set x [expr {[winfo pointerx $newp]-[winfo rootx $newp]-1}]
 	set y [expr {[winfo pointery $newp]-[winfo rooty $newp]-1}]
 	set col [grid location $newp $x $y]
-	set row [lpop col]
+	set row [list_pop col]
 	if {"$newp" != "$p"} {
 		regexp {\.([^.]*[^.0-9])[0-9]*$} $src temp base 
 		set num 1
@@ -2090,15 +2090,15 @@ Classy::WindowBuilder method _place {w parent col row} {
 		set rowspan $info(-rowspan)
 		set sticky $info(-sticky)
 	}
-	if {"[lremove [Classy::griditem $parent $col $row] $w]" != ""} {
+	if {"[list_remove [Classy::griditem $parent $col $row] $w]" != ""} {
 		return
 	}
 	set ecol [expr {$col+$colspan-1}]
 	set erow [expr {$row+$rowspan-1}]
-	if {"[lremove [Classy::griditem $parent $col $row $ecol $erow] $w]" != ""} {
+	if {"[list_remove [Classy::griditem $parent $col $row $ecol $erow] $w]" != ""} {
 		set i $col
 		while {$i <= $ecol} {
-			if {"[lremove [Classy::griditem $parent $i $row] $w]" != ""} break
+			if {"[list_remove [Classy::griditem $parent $i $row] $w]" != ""} break
 			incr i
 		}
 		set colspan [expr {$i-$col}]
@@ -2106,7 +2106,7 @@ Classy::WindowBuilder method _place {w parent col row} {
 		incr ecol -1
 		set i $row
 		while {$i <= $erow} {
-			if {"[lremove [Classy::griditem $parent $col $i $ecol $i] $w]" != ""} break
+			if {"[list_remove [Classy::griditem $parent $col $i $ecol $i] $w]" != ""} break
 			incr i
 		}
 		set rowspan [expr {$i-$row}]
@@ -2131,7 +2131,7 @@ Classy::WindowBuilder method _dialogoption {option} {
 Classy::WindowBuilder method _dialogoptiondelete {option} {
 	private $object data
 	if ![regexp ^- $option] {set option "-$option"}
-	set data(options) [lremove $data(options) $option]
+	set data(options) [list_remove $data(options) $option]
 	catch {unset data(options,$option,def)}
 	catch {unset data(options,$option,name)}
 	catch {unset data(options,$option,class)}
@@ -2165,7 +2165,7 @@ Classy::WindowBuilder method _dialogmethod {method} {
 
 Classy::WindowBuilder method _dialogmethoddelete {method} {
 	private $object data
-	set data(methods) [lremove $data(methods) $method]
+	set data(methods) [list_remove $data(methods) $method]
 	catch {unset data(methods,$method,args)}
 	catch {unset data(methods,$method,code)}
 	$object.code.book.methods.methods configure -content $data(methods)

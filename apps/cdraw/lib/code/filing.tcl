@@ -5,7 +5,7 @@ global status
 if ![info exists status($w,file)] {
 	saveas $w
 } else {
-	writefile $status($w,file) [$w save]
+	file_write $status($w,file) [$w save]
 }
 }
 
@@ -21,7 +21,7 @@ set temp [Classy::selectfile -title Open -selectmode persistent \
 	-initialfile $init]
 if {"$temp" == ""} return
 set status($w,file) [lindex $temp 0]
-$w load [readfile $status($w,file)]
+$w load [file_read $status($w,file)]
 }
 
 proc saveas w {
@@ -36,6 +36,6 @@ set temp [Classy::savefile -title "Save as" \
 	-initialfile $init]
 if {"$temp" == ""} return
 set status($w,file) $temp
-writefile $status($w,file) [$w save]
+file_write $status($w,file) [$w save]
 }
 

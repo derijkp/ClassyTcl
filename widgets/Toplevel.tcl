@@ -213,7 +213,7 @@ Classy::Toplevel method place {} {
 #}
 Classy::Toplevel method destroy {} {
 	private $object options
-	if ![winfo mapped $object] return
+	if ![winfo ismapped $object] return
 	if {"[wm grid $object]" == ""} {
 		set geom [winfo geometry $object]
 	} else {
@@ -222,5 +222,4 @@ Classy::Toplevel method destroy {} {
 	Classy::Default set geometry $object $geom
 	uplevel #0 $options(-destroycommand)
 }
-
 

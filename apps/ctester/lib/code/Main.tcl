@@ -42,7 +42,7 @@ if $grid(hscroll) {
 catch {$window.test.widget {}} result
 regsub {,? or ([^,]*)$} $result {, \1} result
 regexp {^(bad|ambiguous) option "": must be (.*)$} $result temp t f l
-set list [lremove [split $f ", "] {}]
+set list [list_remove [split $f ", "] {}]
 lappend list $l
 $window.cmds configure -content $list
 

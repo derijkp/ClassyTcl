@@ -244,7 +244,7 @@ Classy::Browser method _redrawrow {} {
 		}
 		if $options(-dataunder) {
 			set ny [$object _drawdataunder $x $ny $name $id]
-			set x [lshift ny]
+			set x [list_shift ny]
 		}
 		incr endpos
 		if {$notfirst&&($x > $sw)} {
@@ -327,7 +327,7 @@ Classy::Browser method _redrawcolumn {} {
 			$w move $id 0 [expr {-$height/2}]
 			$w itemconfigure $id -anchor nw
 			set y [$object _drawdataunder $nx $y $name $id]
-			set nx [lshift y]
+			set nx [list_shift y]
 		}
 		if {($y > $sh)&&$notfirst} {
 			if !$options(-dataunder) {
@@ -498,7 +498,7 @@ Classy::Browser method _redrawlist {} {
 			$w move $id 0 [expr {-$height/2+$padtext}]
 			$w itemconfigure $id -anchor w
 			set y [$object _drawdataunder $nx $y $name $id]
-			set nx [lshift y]
+			set nx [list_shift y]
 		}
 		incr endpos
 		if {$y > $sh} break

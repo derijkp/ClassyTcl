@@ -70,9 +70,9 @@ package require Tk 8.0
 ;proc ::class::findoptions {class object} {
 	private $class options _chain
 	set result [array names options]
-	eval laddnew result [lremove [array names _chain] {}]
+	eval list_addnew result [list_remove [array names _chain] {}]
 	if [info exists _chain()] {
-		eval laddnew result [::class::getwidgetoptions [subst $_chain()]]
+		eval list_addnew result [::class::getwidgetoptions [subst $_chain()]]
 	}
 	return $result
 }

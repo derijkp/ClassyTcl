@@ -2,7 +2,7 @@
 
 proc Classy::config args {# ClassyTcl generated Toplevel
 	if [regexp {^\.} $args] {
-		set window [lshift args]
+		set window [list_shift args]
 	} else {
 		set window .classy__.config
 	}
@@ -155,7 +155,7 @@ proc Classy::config_saveas window {
 	if ![string length $file] return
 	set level $::Classy::config_level
 	set data [Classy::config_get $level {}]
-	writefile $file $data
+	file_write $file $data
 }
 
 proc Classy::config_start window {
@@ -175,7 +175,7 @@ proc Classy::config_start window {
 	}
 	set fields {Colors Fonts Keys Mouse Misc Toolbars Menus}
 	foreach field [structlfields $conf(tree)] {
-		laddnew fields $field
+		list_addnew fields $field
 	}
 	foreach field $fields {
 		if [catch {Classy::geticon config_$field} icon] {
@@ -340,7 +340,7 @@ proc Classy::config_save window {
 		set conf(forsave) ""
 		set data [Classy::config_get $level {}]
 		set file [file join $::Classy::dir($level) init.conf]
-		if [catch {writefile $file $data} result] {
+		if [catch {file_write $file $data} result] {
 			set msg "Could not save $type data at level "
 			append msg [replace $level {def Default user User appdef Application appuser Final}]
 			append msg ":\n$result\n\ncontinue saving?"
@@ -493,7 +493,7 @@ proc Classy::config_loadfile {file level {reload {}}} {
 		if [catch {structlget $conf(tree) $pos} id] {
 			incr conf(lastid)
 			set id $conf(lastid)
-			set conf(tree) [structlset $conf(tree) $pos $id]
+			set conf(tree) [structlist_set $conf(tree) $pos $id]
 		}
 		set descr [string trimleft [gets $f] "# "]
 		set line [gets $f]
@@ -542,7 +542,7 @@ foreach node [$window.browse children {}] {
 }
 set fields {Colors Fonts Keys Mouse Misc Toolbars Menus}
 foreach field [structlfields $conf(tree)] {
-	laddnew fields $field
+	list_addnew fields $field
 }
 foreach field $fields {
 	if [catch {Classy::geticon config_$field} icon] {
@@ -551,7 +551,7 @@ foreach field $fields {
 	$window.browse addnode {} $field -text $field -image $icon
 }
 
-set end [lpop selection]
+set end [list_pop selection]
 catch {
 	set current ""
 	foreach node $selection {
@@ -667,7 +667,7 @@ proc Classy::config_get {level root} {
 
 proc Classy::configedit args {# ClassyTcl generated Toplevel
 	if [regexp {^\.} $args] {
-		set window [lshift args]
+		set window [list_shift args]
 	} else {
 		set window .classy__.configedit
 	}
@@ -750,10 +750,10 @@ if ![catch {structlget $conf(tree) $tonode}] {
 if ![Classy::yorn "Are you sure you want to move node \n\"$node\"\nto\n\"$tonode\""] return
 set conf($id,pos) $tonode
 set conf(tree) [structlunset $conf(tree) $node]
-set conf(tree) [structlset $conf(tree) $tonode $id]
+set conf(tree) [structlist_set $conf(tree) $tonode $id]
 Classy::config_redraw $window
 set selection $tonode
-set end [lpop selection]
+set end [list_pop selection]
 catch {
 	set current ""
 	foreach node $selection {
@@ -781,7 +781,7 @@ if ![catch {structlget $conf(tree) $node}] {
 	error "Cannot create node \"$node\": already exists"
 }
 set parent $node
-lpop parent
+list_pop parent
 if ![llength $parent] {
 	error "root can only contain subnodes"
 }
@@ -790,7 +790,7 @@ if ![llength $parent] {
 #		error "node \"$parent\" already contains subnodes, so you cannot add a value to it"
 #	}
 #}
-set conf(tree) [structlset $conf(tree) $node $id]
+set conf(tree) [structlist_set $conf(tree) $node $id]
 set conf($id,pos) $node
 set conf($id,value) $value
 set conf($id,type) $type
@@ -802,7 +802,7 @@ set conf($id,descr) $descr
 set conf($id,value,$level) $value
 Classy::config_redraw $window
 set selection $node
-set end [lpop selection]
+set end [list_pop selection]
 catch {
 	set current ""
 	foreach node $selection {
@@ -860,7 +860,7 @@ switch $what {
 			unset conf($id,$item)
 		}
 		set node $conf($value,pos)
-		set conf(tree) [structlset $conf(tree) $node $value]
+		set conf(tree) [structlist_set $conf(tree) $node $value]
 		foreach level {def user appdef appuser} {
 			catch {
 				set conf($value,value,$level) $conf($id,value,$level)

@@ -77,7 +77,7 @@ Classy::DynaTool addoption -type {type Type {}} {
 	private $class tooldata tools
 	set prev $options(-type)
 	if [info exists tools($prev)] {
-		set tools($prev) [lremove $tools($prev) $object]
+		set tools($prev) [list_remove $tools($prev) $object]
 	}
 	lappend tools($value) $object
 	set cmdw $data(cmdw)
@@ -91,21 +91,21 @@ Classy::DynaTool addoption -type {type Type {}} {
 			return -code error "Toolbar type \"$value\" not defined"
 		}
 	}
-	set list [splitcomplete $tooldata($value)]
+	set list [cmd_split $tooldata($value)]
 	if {[lsearch -regexp $list "^\[\t \]*nodisplay\[\t \]*\$"] != -1} {
 		[Classy::window $object] configure -height 0 -width 0
 		return
 	}
 	foreach current $list {
 		if {"$current" == ""} continue
-		set type [lshift current]
+		set type [list_shift current]
 		incr num
 		set key b$num
-		set id [lshift current]
-		set help [lshift current]
+		set id [list_shift current]
+		set help [list_shift current]
 		if {"$type"=="action"} {
-			set command [lshift current]
-			set command [string::change $command [list %% % %W "\[$object cmdw\]"]]
+			set command [list_shift current]
+			set command [string_change $command [list %% % %W "\[$object cmdw\]"]]
 			if ![catch {set image [Classy::geticon $id reload]}] {
 				button $object.$key -image $image -highlightthickness 0 -command [list Classy::check $command]
 			} else {
@@ -113,21 +113,21 @@ Classy::DynaTool addoption -type {type Type {}} {
 			}
 			lappend data(slaves) $object.$key
 		} elseif {"$type"=="check"} {
-			set command [lshift current]
+			set command [list_shift current]
 			if ![catch {set image [Classy::geticon $id reload]}] {
 				checkbutton $object.$key -image $image -indicatoron 0 -highlightthickness 0
 			} else {
 				checkbutton $object.$key -text $id -highlightthickness 0
 			}
-			set tempcmd [string::change $command [list %% % %W $cmdw]]
+			set tempcmd [string_change $command [list %% % %W $cmdw]]
 			if [string length $cmdw] {
 				eval $object.$key configure $tempcmd
 			}
 			append data(checks) "$object.$key configure $command\n"
 			lappend data(slaves) $object.$key
 		} elseif {"$type"=="radio"} {
-			set command [lshift current]
-			set tempcmd [string::change $command [list %% % %W $cmdw]]
+			set command [list_shift current]
+			set tempcmd [string_change $command [list %% % %W $cmdw]]
 			if ![catch {set image [Classy::geticon $id reload]}] {
 				eval {radiobutton $object.$key -image $image -indicatoron 0 -highlightthickness 0} $tempcmd
 			} else {
@@ -137,8 +137,8 @@ Classy::DynaTool addoption -type {type Type {}} {
 			lappend data(slaves) $object.$key
 		} elseif {"$type"=="widget"} {
 			$id $object.$key
-			set command [lshift current]
-			set tempcmd [string::change $command [list %% % %W $cmdw]]
+			set command [list_shift current]
+			set tempcmd [string_change $command [list %% % %W $cmdw]]
 			eval $object.$key configure $tempcmd
 			append data(checks) "$object.$key configure $command\n"
 			update idletasks
@@ -146,7 +146,7 @@ Classy::DynaTool addoption -type {type Type {}} {
 		} elseif {"$type"=="tool"} {
 			set cmd [$id $object.$key]
 			if {"$cmdw" != ""} {
-				eval [string::change $cmd [list %% % %W $cmdw]]
+				eval [string_change $cmd [list %% % %W $cmdw]]
 			}
 			append data(checks) "$cmd\n"
 			update idletasks
@@ -263,12 +263,12 @@ Classy::DynaTool classmethod types {{pattern *}} {
 	set list ""
 	foreach tool [array names ::Classy::configtoolbar] {
 		if [string match $pattern $tool] {
-			laddnew list $tool
+			list_addnew list $tool
 		}
 	}
 	foreach tool [array names tooldata $pattern] {
 		if [string match $pattern $tool] {
-			laddnew list $tool
+			list_addnew list $tool
 		}
 	}
 	return $list
@@ -324,7 +324,7 @@ Classy::DynaTool classmethod _refresh {tooltype} {
 			if [winfo exists $tool] {
 				set code [catch {$tool configure -type $tooltype} result]
 			} else {
-				set tools($tooltype) [lremove tools($tooltype) $tool]
+				set tools($tooltype) [list_remove tools($tooltype) $tool]
 			}
 		}
 	}
@@ -349,7 +349,7 @@ Classy::DynaTool method cmdw {{cmdw {}}} {
 		set data(cmdw) $cmdw
 		if [info exists data(checks)] {
 			if [string length $cmdw] {
-				set command [string::change $data(checks) [list %% % %W $cmdw]]
+				set command [string_change $data(checks) [list %% % %W $cmdw]]
 				eval $command
 			}
 		}

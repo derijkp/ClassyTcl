@@ -12,6 +12,7 @@ test Classy::Toplevel {destroycommand} {
 	grid .try.b1 -sticky nwse
 	grid .try.b2 -sticky nwse
 	grid columnconfigure . 0 -weight 1
+	update
 	destroy .try
 	set ::try
 } {1}

@@ -150,7 +150,7 @@ REM clientdata received: [set clientdata]
 
 proc d&d__handlemem_indirect {from w recdata sentdata} {
     set num [expr [llength $recdata]/2]
-    set reclist [lsub $recdata [lmanip fill $num 0 2]]
+    set reclist [list_sub $recdata [list_fill $num 0 2]]
     array set recar $recdata
     array set sentar $sentdata
     foreach type $reclist {
@@ -171,7 +171,7 @@ proc d&d__handlemem_indirect {from w recdata sentdata} {
 
 proc d&d__handlescratchfile {from w recdata sentdata} {
     set num [expr [llength $recdata]/2]
-    set reclist [lsub $recdata [lmanip fill $num 0 2]]
+    set reclist [list_sub $recdata [list_fill $num 0 2]]
     array set recar $recdata
     array set sentar $sentdata
     foreach type $reclist {

@@ -132,7 +132,7 @@ Classy::Editor method destroy {} {
 	private $class editing
 	set temp [::Classy::fullpath $curfile]
 	if [info exists editing($temp)] {
-		set editing($temp) [lremove $editing($temp) $object]
+		set editing($temp) [list_remove $editing($temp) $object]
 		if {"$editing($temp)"==""} {unset editing($temp)}
 	}
 }
@@ -333,7 +333,7 @@ Classy::Editor method closefile {} {
 	$object.edit delete 1.0 end
 	set temp [::Classy::fullpath $curfile]
 	if [info exists editing($temp)] {
-		set editing($temp) [lremove $editing($temp) $object]
+		set editing($temp) [list_remove $editing($temp) $object]
 		if {"$editing($temp)"==""} {unset editing($temp)}
 	}
 	return true
@@ -375,7 +375,7 @@ Classy::Editor method load {{file {}} args} {
 		$object see insert
 	}
 	if [info exists curmarkers($curfile)] {
-		eval $object marker lset $curmarkers($curfile)
+		eval $object marker list_set $curmarkers($curfile)
 	}
 	if [info exists cur(curmarker,$curfile)] {
 		set curmarker $cur(curmarker,$curfile)
@@ -383,13 +383,13 @@ Classy::Editor method load {{file {}} args} {
 	if [info exists cur(prevmarker,$curfile)] {
 		set prevmarker $cur(prevmarker,$curfile)
 	}
-	laddnew reopenlist $curfile
+	list_addnew reopenlist $curfile
 	if {"$args" != ""} {
 		foreach otherfile $args {
 			lappend reopenlist [::Classy::fullpath $otherfile]
 		}
 	}
-	set reopenlist [lremdup $reopenlist]
+	set reopenlist [list_remdup $reopenlist]
 	set reopenlist [lsort $reopenlist]
 	set loadcommand [getprivate $object options(-loadcommand)]
 	if {"$loadcommand" != ""} {
@@ -420,7 +420,7 @@ Classy::Editor method set {data} {
 #}
 Classy::Editor method forget {args} {
 	private $object reopenlist
-	set reopenlist [lsort [llremove $reopenlist $args]]
+	set reopenlist [lsort [list_lremove $reopenlist $args]]
 }
 
 #doc {Editor command reopenlist} cmd {
@@ -654,7 +654,7 @@ Classy::Editor method indent {number} {
 }
 
 proc Classy::trace {var command} {
-	lshift command
+	list_shift command
 	if {[info level] == 1} {
 		if {[lsearch {trace index} [lindex $command 0]] == -1} {
 			lappend $var "\$object $command"
@@ -732,7 +732,7 @@ Classy::Editor method setmacro {name command {key {}}} {
 		return
 	}
 	set macros [Classy::Default get app Classy::Editor_macros]
-	laddnew macros $name
+	list_addnew macros $name
 	Classy::Default set app Classy::Editor_macros $macros
 	Classy::Default set app Classy::Editor_macro_$name [list $command $key]
 	update idletasks
@@ -980,7 +980,7 @@ Classy::Editor method matchingbrackets {} {
 #<dt>previous
 #<dt>select
 #<dt>refresh
-#<dt>lset
+#<dt>list_set
 #<dt>lget
 #</dl>
 #}
@@ -997,7 +997,7 @@ Classy::Editor method marker {command args} {
 				set newmarker mark
 			}
 			set names [$we mark names]
-			set names [lremove $names anchor current insert]
+			set names [list_remove $names anchor current insert]
 			if {[lsearch $names $newmarker] != -1} {
 				set num 1
 				regsub { [0-9]+$} $newmarker {} base
@@ -1068,11 +1068,11 @@ Classy::Editor method marker {command args} {
 		refresh {
 			set w $object.selectmark
 			set names [$we mark names]
-			set names [lremove $names anchor current insert]
-			set names [lsub $names -exclude [lfind -regexp $names {'$}]]
+			set names [list_remove $names anchor current insert]
+			set names [list_sub $names -exclude [list_find -regexp $names {'$}]]
 			if {"$names" != ""} {$w fill $names}
 		}
-		lset {
+		list_set {
 			array set temp $args
 			foreach name [array names temp] {
 				$we mark set $name $temp($name)
@@ -1082,7 +1082,7 @@ Classy::Editor method marker {command args} {
 		lget {
 			set result ""
 			set names [$we mark names]
-			set names [lremove $names anchor current insert]
+			set names [list_remove $names anchor current insert]
 			foreach name $names {
 				lappend result $name
 				lappend result [$we index $name]

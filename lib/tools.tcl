@@ -7,7 +7,7 @@
 
 proc ::Classy::todo {object args} {
 	set exists [info exists ::Classy::__todolist__$object]
-	laddnew ::Classy::__todolist__$object $args
+	list_addnew ::Classy::__todolist__$object $args
 	if !$exists {
 		after idle ::Classy::handletodo $object
 	}
@@ -15,7 +15,7 @@ proc ::Classy::todo {object args} {
 
 proc ::Classy::canceltodo {object args} {
 	if [info exists ::Classy::__todolist__$object] {
-		set ::Classy::__todolist__$object [lremove [set ::Classy::__todolist__$object] $args]
+		set ::Classy::__todolist__$object [list_remove [set ::Classy::__todolist__$object] $args]
 	}
 }
 
@@ -117,7 +117,7 @@ proc Classy::parseopt {real variable possible {remain {}}} {
 		if {"$options" == "0 1"} {
 			set pos [lsearch $real $option]
 			if {$pos!=-1} {
-				lpop real $pos
+				list_pop real $pos
 				set var($option) 1
 			} else {
 				set var($option) 0
@@ -125,8 +125,8 @@ proc Classy::parseopt {real variable possible {remain {}}} {
 		} else {
 			set pos [lsearch $real $option]
 			if {$pos!=-1} {
-				lpop real $pos
-				set value [lpop real $pos]
+				list_pop real $pos
+				set value [list_pop real $pos]
 				if {("$options"!="")&&([lsearch $options $value]==-1)} {
 					error "Incorrect value \"$value\" for option $option: must be one of: $options"
 				}
@@ -171,7 +171,7 @@ proc Classy::cleargrid w {
 	catch {eval grid forget [grid slaves $w]}
 	while 1 {
 		set col [grid size $w]
-		set row [lpop col]
+		set row [list_pop col]
 		if {($col == 0)&&($row == 0)} break
 		if {$col != 0} {
 			grid columnconfigure $w [expr {$col-1}] -weight 0
@@ -185,14 +185,14 @@ proc Classy::cleargrid w {
 proc Classy::griditem {w col row args} {
 #putsvars w col row args
 	if {"$args" == ""} {
-		return [lcommon [grid slaves $w -column $col] [grid slaves $w -row $row]]
+		return [list_common [grid slaves $w -column $col] [grid slaves $w -row $row]]
 	} else {
 		set result ""
 		set endcol [lindex $args 0]
 		set endrow [lindex $args 1]
 		for {} {$row <= $endrow} {incr row} {
 			for {set x $col} {$x <= $endcol} {incr x} {
-				set item [lcommon [grid slaves $w -column $x] [grid slaves $w -row $row]]
+				set item [list_common [grid slaves $w -column $x] [grid slaves $w -row $row]]
 				if {"$item" != ""} {
 					lappend result $item
 				}
@@ -379,7 +379,7 @@ proc Classy::auto_mkindex {dir args} {
 		set f ""
 		set error [catch {
 			set f [open $file]
-			set c [splitcomplete [read $f]]
+			set c [cmd_split [read $f]]
 			close $f
 			catch {unset definedhere}
 			foreach line $c {

@@ -180,7 +180,7 @@ Classy::BarChart method configure {args} {
 # A barchart can have several ranges of data. Each range has a name.
 # This method is used to set (or change) the data in a range.
 # $values is a list of values that give the value for each data item. Optionally labels
-# can be set with the labelset method
+# can be set with the labelist_set method
 #}
 Classy::BarChart method dataset {name values} {
 	private $object data tag options order
@@ -221,12 +221,12 @@ Classy::BarChart method dataget {name} {
 }
 
 
-#doc {BarChart command labelset} cmd {
-#pathname labelset labels
+#doc {BarChart command labelist_set} cmd {
+#pathname labelist_set labels
 #} descr {
 # sets the labels associated with the barchart
 #}
-Classy::BarChart method labelset {values} {
+Classy::BarChart method labelist_set {values} {
 	private $object labels
 	if {"$values"==""} {
 		unset labels
@@ -246,7 +246,7 @@ Classy::BarChart method delete {name} {
 	$options(-canvas) delete $options(-tag)
 	unset data($name)
 	unset tag($name)
-	set order [lremove $order $name]
+	set order [list_remove $order $name]
 	::Classy::todo $object redraw
 }
 
@@ -343,7 +343,7 @@ Classy::BarChart method _drawlegend {} {
 	set hs [expr $h-2]
 	foreach name $names {
 		set conf [$canvas itemconfigure $tag($name)]
-		set conf [lmerge [lmanip subindex $conf 0] [lmanip subindex $conf 4]]
+		set conf [list_merge [list_subindex $conf 0] [list_subindex $conf 4]]
 		set temp [expr $legendx+10]
 		eval $options(-canvas) create polygon $legendx $y $temp $y $temp [expr $y+$hs] $legendx [expr $y+$hs] $conf {-tags [list $options(-tag) $options(-tag)::legend Classy::BarChart]}
 		set y [expr $y+$h]
@@ -390,10 +390,10 @@ Classy::BarChart method _drawlabels {} {
 		set gap $options(-labelgap)
 	}
 	if {$gap>1} {
-		set labels [lunmerge $labels [expr $gap-1]]
+		set labels [list_unmerge $labels [expr $gap-1]]
 	}
 	if {"$options(-labelorient)" == "vertical"} {
-		set labels [lregsub -all {(.)} $labels "\\1\n"]
+		set labels [list_regsub -all {(.)} $labels "\\1\n"]
 	}
 	foreach label $labels {
 		$canvas create text $x $y -anchor nw -text $label -font $options(-labelfont) \
@@ -427,38 +427,38 @@ Classy::BarChart method _drawdata {} {
 	set d [lrange $data([lindex $order 0]) $datastart $dataend]
 	set dlen [llength $d]
 	if [true $options(-stacked)]&&($number>1) {
-		set prev [lmanip fill $dlen 0]
+		set prev [list_fill $dlen 0]
 		set ldisplace 0
 	}
 	if [true $options(-percentages)]&&($number>1)  {
-		set perc [lmanip fill $dlen 100]
+		set perc [list_fill $dlen 100]
 		set list $order
-		set totals [lrange $data([lpop list 0]) $datastart $dataend]
+		set totals [lrange $data([list_pop list 0]) $datastart $dataend]
 		foreach name $list {
-			set totals [lmath calc $totals + [lrange $data($name) $datastart $dataend]]
+			set totals [lmath_calc $totals + [lrange $data($name) $datastart $dataend]]
 		}
-		set totals [lregsub {^0.0$} $totals {1.0}]
+		set totals [list_regsub {^0.0$} $totals {1.0}]
 	}
 	set pos 0
-	set yb [lmanip fill $dlen 0]
-	set x1 [lmanip ffill $dlen $pos 1]
-	set x2 [lmanip ffill $dlen $options(-barwidth) 1]
-	set x [lmerge [lmerge $x1 $x2] [lmerge $x1 $x2]]
+	set yb [list_fill $dlen 0]
+	set x1 [list_ffill $dlen $pos 1]
+	set x2 [list_ffill $dlen $options(-barwidth) 1]
+	set x [list_merge [list_merge $x1 $x2] [list_merge $x1 $x2]]
 	set lower ""
 	foreach name $order {
 		if [info exists hidden($name)] continue
 		set d [lrange $data($name) $datastart $dataend]
 		if [true $options(-stacked)]&&($number>1) {
-			set d [lmath calc $prev + $d]
+			set d [lmath_calc $prev + $d]
 			set prev $d
 		}
 		if [true $options(-percentages)]&&($number>1) {
-			set d [lmath calc $d * $perc]
-			set d [lmath calc $d / $totals]
+			set d [lmath_calc $d * $perc]
+			set d [lmath_calc $d / $totals]
 		}
-		set d [lmath between $d [lindex $options(-yrange) 0] [lindex $options(-yrange) 1]]
-		set y [lmerge [lmerge $yb $d] [lmerge $d $yb]]
-		eval $canvas coords $tag($name) [lmerge $x $y]
+		set d [lmath_between $d [lindex $options(-yrange) 0] [lindex $options(-yrange) 1]]
+		set y [list_merge [list_merge $yb $d] [list_merge $d $yb]]
+		eval $canvas coords $tag($name) [list_merge $x $y]
 		$canvas scale $tag($name) 0 0 $xscale -$yscale
 		if {$datastart<0} {
 			set xmove [expr $xstart+$pos-$datastart*$xscale]

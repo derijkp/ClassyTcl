@@ -69,9 +69,20 @@ Classy::Progress addoption -step {step Step 1}
 #}
 Classy::Progress addoption -width {width Width 200}
 
+#doc {Progress options -height} option {-height height Height} descr {
+#}
+Classy::Progress addoption -height {height Height 20} {
+	$object.frame configure -height $value
+	$object.frame.prog configure -height $value
+}
+
 #doc {Progress options -fg} option {-fg ? ?} descr {
 #}
 Classy::Progress chainoption -fg {$object.frame.prog} -bg
+
+#doc {Progress options -font} option {-font font Font} descr {
+#}
+Classy::Progress chainoption -font {$object.frame.percent} -font
 
 # ------------------------------------------------------------------
 #  Methods

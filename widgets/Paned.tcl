@@ -55,7 +55,7 @@ Classy::Paned method init {args} {
 
 Classy::Paned method destroy {} {
 	private $object data
-	bindtags $data(parent) [lremove [bindtags $data(parent)] Classy::Paned::$object]	
+	bindtags $data(parent) [list_remove [bindtags $data(parent)] Classy::Paned::$object]	
 }
 
 # ------------------------------------------------------------------

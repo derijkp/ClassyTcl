@@ -51,7 +51,7 @@ proc tkMenuMotion {menu y state} {
 
 proc opt {w} {
     set list [$w configure]
-    lmanip extract $list {(-[^ ]+)}
+    list_extract $list {(-[^ ]+)}
 }
 proc debug {text} {
     puts stdout $text
@@ -166,12 +166,12 @@ bind Button <ButtonRelease-2> {
 }
 
 proc larrset {var items values} {
-    set temp [lmanip join [lmanip merge $items $values] { } all]
+    set temp [list_join [lmanip merge $items $values] { } all]
     uplevel [list array set $var $temp]
 }
 
 proc lstrset {var type items values} {
-    set temp [lmanip join [lmanip merge [lregsub {^(.+)$} $items "$type,\\1"] $values] { } all]
+    set temp [list_join [lmanip merge [list_regsub {^(.+)$} $items "$type,\\1"] $values] { } all]
     uplevel [list array set $var $temp]
 }
 
@@ -188,7 +188,7 @@ proc allchildren w {
     }
 }
 
-proc lset {listref value args} {
+proc list_set {listref value args} {
     upvar $listref list
     foreach index $args {
         set list [lreplace $list $index $index $value]

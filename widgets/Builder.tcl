@@ -253,7 +253,7 @@ Classy::Builder method infile {cmd file args} {
 	switch $cmd {
 		get {
 			set function [lindex $args 0]
-			set c [splitcomplete [readfile $file]]
+			set c [cmd_split [file_read $file]]
 			set pos [lsearch -glob $c [list proc $function *]]
 			if {$pos != -1} {
 				return [lindex $c $pos]\n
@@ -263,11 +263,11 @@ Classy::Builder method infile {cmd file args} {
 					error "\"$function\" not found in file \"$file\""
 				}
 				set result [lindex $c $pos]\n
-				set poss [lfind -glob $c [list $function addoption *]]
+				set poss [list_find -glob $c [list $function addoption *]]
 				foreach pos $poss {
 					append result [lindex $c $pos]\n
 				}
-				set poss [lfind -glob $c [list $function method *]]
+				set poss [list_find -glob $c [list $function method *]]
 				foreach pos $poss {
 					append result [lindex $c $pos]\n
 				}
@@ -278,7 +278,7 @@ Classy::Builder method infile {cmd file args} {
 			set function [lindex $args 0]
 			set code [lindex $args 1]
 			set done 0
-			set c [splitcomplete [readfile $file]]
+			set c [cmd_split [file_read $file]]
 			if [string match "proc *" $code] {
 				uplevel #0 $code
 				set pos [lsearch -glob $c [list proc $function *]]
@@ -295,10 +295,10 @@ Classy::Builder method infile {cmd file args} {
 				} else {
 					regsub "^\[^\n\]+subclass $function\n" $code {} temp
 					uplevel #0 $temp
-					set poss [lfind -glob $c [list $function addoption *]]
-					set c [lsub $c -exclude $poss]
-					set poss [lfind -glob $c [list $function method *]]
-					set c [lsub $c -exclude $poss]
+					set poss [list_find -glob $c [list $function addoption *]]
+					set c [list_sub $c -exclude $poss]
+					set poss [list_find -glob $c [list $function method *]]
+					set c [list_sub $c -exclude $poss]
 					set c [lreplace $c $pos1 $pos1 $code]
 				}
 			}
@@ -327,7 +327,7 @@ Classy::Builder method infile {cmd file args} {
 			set ::auto_index($function) [list source $file]
 		}
 		ls {
-			set c [splitcomplete [readfile $file]]
+			set c [cmd_split [file_read $file]]
 			set result ""
 			foreach line $c {
 				if {"[lindex $line 0]" == "proc"} {
@@ -340,7 +340,7 @@ Classy::Builder method infile {cmd file args} {
 		}
 		delete {
 			set function [lindex $args 0]
-			set c [splitcomplete [readfile $file]]
+			set c [cmd_split [file_read $file]]
 			set pos [lsearch -glob $c [list proc $function *]]
 			if {$pos != -1} {
 				set c [lreplace $c $pos $pos]
@@ -350,10 +350,10 @@ Classy::Builder method infile {cmd file args} {
 					error "\"$function\" not found in file \"$file\""
 				}
 				set c [lreplace $c $pos $pos]
-				set poss [lfind -glob $c [list $function addoption *]]
-				set c [lsub $c -exclude $poss]
-				set poss [lfind -glob $c [list $function method *]]
-				set c [lsub $c -exclude $poss]
+				set poss [list_find -glob $c [list $function addoption *]]
+				set c [list_sub $c -exclude $poss]
+				set poss [list_find -glob $c [list $function method *]]
+				set c [list_sub $c -exclude $poss]
 			}
 			$object infile _save $file $function $c
 			catch {rename $function {}}
@@ -369,7 +369,7 @@ Classy::Builder method infile {cmd file args} {
 			if [string length [info commands $newfunction]] {
 				error "command \"$newfunction\" already exists"
 			}
-			set c [splitcomplete [readfile $file]]
+			set c [cmd_split [file_read $file]]
 			set pos [lsearch -glob $c [list proc $function *]]
 			if {$pos != -1} {
 				regsub "^proc $function" [lindex $c $pos] "proc $newfunction" line
@@ -385,8 +385,8 @@ Classy::Builder method infile {cmd file args} {
 				uplevel #0 $line
 				set c [lreplace $c $pos $pos $line]
 				uplevel #0 $line
-				set poss [lfind -glob $c [list $function addoption *]]
-				set poss [concat $poss [lfind -glob $c [list $function method *]]]
+				set poss [list_find -glob $c [list $function addoption *]]
+				set poss [concat $poss [list_find -glob $c [list $function method *]]]
 				foreach pos $poss {
 					regsub "^$function " [lindex $c $pos] "$newfunction " line
 					set c [lreplace $c $pos $pos $line]
@@ -402,7 +402,7 @@ Classy::Builder method infile {cmd file args} {
 			if [string match "proc *" $code] {
 				set function [lindex $code 1]
 			} else {
-				set split [splitcomplete $code]
+				set split [cmd_split $code]
 				set function [lindex [lindex $split 0] 2]
 			}
 			set funcs [$object infile ls $file]
@@ -473,7 +473,7 @@ Classy::Builder method copy {} {
 	switch $browse(type) {
 		file - dialog - toplevel - topframe {
 			set browse(clipbf) $file
-			set browse(clipb) [readfile $file]
+			set browse(clipb) [file_read $file]
 			clipboard clear
 			clipboard append $browse(clipb)
 			return $file
@@ -501,8 +501,8 @@ proc Classy::renameobj {c name newname} {
 	}
 	regsub "subclass $name\$" [lindex $c $pos] "subclass $newname" line
 	set c [lreplace $c $pos $pos $line]
-	set poss [lfind -glob $c [list $name addoption *]]
-	eval lappend poss [concat $poss [lfind -glob $c [list $name method *]]]
+	set poss [list_find -glob $c [list $name addoption *]]
+	eval lappend poss [concat $poss [list_find -glob $c [list $name method *]]]
 	foreach pos $poss {
 		regsub "^$name " [lindex $c $pos] "$newname " line
 		set c [lreplace $c $pos $pos $line]
@@ -540,7 +540,7 @@ Classy::Builder method paste {{file {}}} {
 		set file $base$ext
 		set name [file root [file tail $base]]
 		if [inlist {dialog toplevel topframe} $browse(cliptype)] {
-			set c [splitcomplete $browse(clipb)]
+			set c [cmd_split $browse(clipb)]
 			set c [Classy::renameobj $c $oldname $name]
 			set f [open $file w]
 			foreach line $c {
@@ -548,7 +548,7 @@ Classy::Builder method paste {{file {}}} {
 			}
 			close $f
 		} else {
-			writefile $file $browse(clipb)
+			file_write $file $browse(clipb)
 		}
 		if {"$browse(cliptype)" == "file"} {
 			$object.browse addnode $root [list $file {} file] -text [file tail $file] -image [Classy::geticon newfile]
@@ -723,9 +723,9 @@ Classy::Builder method rename {args} {
 		}
 		toplevel - dialog - topframe {
 			set dstfile [file join [file dir $src] $dst.tcl]
-			set c [readfile [lindex $src 0]]
+			set c [file_read [lindex $src 0]]
 			regexp "Classy::(Toplevel|Dialog|Topframe) subclass (\[^\n \t\]+)" $c temp temp oldname
-			set c [splitcomplete $c]
+			set c [cmd_split $c]
 			set c [Classy::renameobj $c $oldname $dst]
 			set f [open $dstfile w]
 			foreach line $c {
@@ -733,6 +733,7 @@ Classy::Builder method rename {args} {
 			}
 			close $f
 			file delete [lindex $src 0]
+			catch {Classy::auto_mkindex [file dirname $dstfile] *.tcl}
 			set parent [$object.browse parentnode $src]
 			$object.browse deletenode $src
 			$object.browse addnode $parent [list $dstfile $dst [lindex $src 2]] \

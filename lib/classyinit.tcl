@@ -58,16 +58,16 @@ proc destroy {args} {
 		}
 		Classy::destroyrebind $w
 	}
-	eval ::Tk::destroy [lremove $args .classy__]
+	eval ::Tk::destroy [list_remove $args .classy__]
 }
 
 if {"[info commands send]" == ""} {
 	proc send {args} {
 	while 1 {
-		set arg [lshift args]
+		set arg [list_shift args]
 		if ![regexp ^- $arg] break
 		if {"$arg" == "--"} {
-			lshift args
+			list_shift args
 			break
 		}
 		if {[llength $args] == 0} {return -code error "wrong # args: must be \"send ?options? appname args\""}

@@ -75,7 +75,7 @@ proc Classy::selectfile {args} {
 			Classy::Default set app Classy__FileSelect__curdir [list [file dirname $result]]
 			return $result
 		} else {
-			set dir [lshift result]
+			set dir [list_shift result]
 			Classy::Default set app Classy__FileSelect__curdir [list $dir]
 			set temp ""
 			foreach file $result {

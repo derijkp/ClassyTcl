@@ -140,7 +140,7 @@ proc select_updatedrag {w} {
 			$w move _sel [expr {$x-$current(x)}] [expr {$y-$current(y)}]
 		} else {
 			set rx [$w coords _rotatepos]
-			set ry [lpop rx]
+			set ry [list_pop rx]
 			set a [expr [sqangle $rx $ry $x $y]-[sqangle $rx $ry $current(x) $current(y)]]
 			$w rotate _sel $rx $ry $a
 			$w selection redraw

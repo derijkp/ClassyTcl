@@ -95,18 +95,18 @@ proc Classy::configcolor {name map} {
 	foreach {name option value descr} $map {
 		if {"[string index $name 0]" == "#"} continue
 		set ::Classy::configcolor($option) $value
-		laddnew ::Classy::configcolor() $option
+		list_addnew ::Classy::configcolor() $option
 	}
 }
 
 proc Classy::doconfigcolor {} {
 	set list [set ::Classy::configcolor()]
-	set common [lcommon {Background darkBackground lightBackground Foreground activeBackground activeForeground disabledForeground selectBackground selectForeground selectColor highlightBackground highlightColor} $list]
+	set common [list_common {Background darkBackground lightBackground Foreground activeBackground activeForeground disabledForeground selectBackground selectForeground selectColor highlightBackground highlightColor} $list]
 	foreach option $common {
 		set value [set ::Classy::configcolor($option)]
 		option add $option [Classy::realcolor $value] widgetDefault
 	}
-	foreach option [lremove $list $common] {
+	foreach option [list_remove $list $common] {
 		set value [set ::Classy::configcolor($option)]
 		option add $option [Classy::realcolor $value] widgetDefault
 	}
@@ -117,13 +117,13 @@ proc Classy::configfont {name map} {
 		if {"[string index $name 0]" == "#"} continue
 		if {"$value" == ""} continue
 		set ::Classy::configfont($option) $value
-		laddnew ::Classy::configfont() $option
+		list_addnew ::Classy::configfont() $option
 	}
 }
 
 proc Classy::doconfigfont {} {
 	set list [set ::Classy::configfont()]
-	set common [lcommon {Font BoldFont ItalicFont BoldItalicFont NonPropFont} $list]
+	set common [list_common {Font BoldFont ItalicFont BoldItalicFont NonPropFont} $list]
 	foreach option $common {
 		set value [set ::Classy::configfont($option)]
 		set font [Classy::realfont $value]
@@ -131,7 +131,7 @@ proc Classy::doconfigfont {} {
 			option add $option $font widgetDefault
 		}
 	}
-	foreach option [llremove $list $common] {
+	foreach option [list_lremove $list $common] {
 		set value [set ::Classy::configfont($option)]
 		set font [Classy::realfont $value]
 		if {"$font" != ""} {
@@ -145,7 +145,7 @@ proc Classy::configmisc {name map} {
 		if {"[string index $name 0]" == "#"} continue
 		if {"$value" == ""} continue
 		set ::Classy::configmisc($option) $value
-		laddnew ::Classy::configmisc() $option
+		list_addnew ::Classy::configmisc() $option
 	}
 }
 

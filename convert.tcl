@@ -80,9 +80,9 @@ proc convertoptions {c} {
 set files [glob *.tcl]
 foreach file $files {
 	puts $file
-	set c [readfile $file]
+	set c [file_read $file]
 	set c [convertoptions $c]
-	writefile $file $c
+	file_write $file $c
 }
 
 

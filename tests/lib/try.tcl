@@ -19,7 +19,7 @@ proc test2 {} {
 
 proc t2 args {# ClassyTcl generated Toplevel
 	if [regexp {^\.} $args] {
-		set window [lpop args]
+		set window [list_pop args]
 	} else {
 		set window .t2
 	}
@@ -48,7 +48,7 @@ puts ok
 
 proc testframe args {# ClassyTcl generated Frame
 	if [regexp {^\.} $args] {
-		set window [lpop args]
+		set window [list_pop args]
 	} else {
 		set window .t2
 	}
@@ -76,7 +76,7 @@ proc testframe args {# ClassyTcl generated Frame
 
 proc trfr args {# ClassyTcl generated Frame
 	if [regexp {^\.} $args] {
-		set window [lpop args]
+		set window [list_pop args]
 	} else {
 		set window .trfr
 	}

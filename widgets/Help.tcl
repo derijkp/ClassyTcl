@@ -24,8 +24,8 @@
 #	Help specific methods
 #}
 
-laddnew ::Classy::help_path [file join $class::dir help]
-laddnew ::Classy::help_path [file join $Extral::dir docs]
+list_addnew ::Classy::help_path [file join $class::dir help]
+list_addnew ::Classy::help_path [file join $Extral::dir docs]
 
 # ------------------------------------------------------------------
 #  Widget creation
@@ -118,9 +118,9 @@ Classy::Help method gethelp {name} {
 Classy::Help method save {filename {how {}}} {
 	private $object.html html
 	if {"$how" == "text"} {
-		writefile $filename [[Classy::window $object.html] get 1.0 end]
+		file_write $filename [[Classy::window $object.html] get 1.0 end]
 	} else {
-		writefile $filename $html
+		file_write $filename $html
 	}
 }
 
@@ -153,7 +153,7 @@ Classy::Help method search {what string} {
 			foreach dir $::Classy::help_path {
 				foreach file [glob [file join $dir *]] {
 					if ![file isdir $file] {
-						set c [readfile $file]
+						set c [file_read $file]
 						if [regexp -- $string $c] {
 							lappend files $file
 						}
@@ -182,7 +182,7 @@ Classy::Help method getcontentsmenu {} {
 	set w $object.html
 	set contentsmenu ""
 	set c [split [$w get 1.0 end] "\n"]
-	set poss [lfind $c ""]
+	set poss [list_find $c ""]
 	foreach pos $poss {
 		incr pos
 		set line [lindex $c $pos]

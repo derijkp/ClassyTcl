@@ -19,7 +19,7 @@ proc ::Classy::busy {{action {add}} args} {
 					set pattern $p.*,c
 				}
 				set list [lsort -decreasing [array names ::Classy::busy $pattern]]
-				laddnew list $p,c
+				list_addnew list $p,c
 				foreach w $list {
 					regexp {^(.*),c$} $w temp w
 					if [info exists ::Classy::busy($w,c)] {
@@ -46,7 +46,7 @@ proc ::Classy::busy {{action {add}} args} {
 		}
 		default {
 			update idletasks
-			if [regexp {^\.} $action] {lunshift args $action;set action add}
+			if [regexp {^\.} $action] {list_unshift args $action;set action add}
 			if {"$action"!="add"} {
 				error "Unkown action $action: should be one of add, remove status"
 			}
