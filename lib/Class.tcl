@@ -46,11 +46,6 @@ namespace eval ::class {
 	namespace export super
 	namespace export private setprivate getprivate privatevar
 }
-#if [catch {package require Extral 0.96}] {
-#	proc ::class::leval {args} {
-#		eval [eval concat $args]
-#	}
-#}
 
 if {"[info commands ::class::reinit]" != ""} {
 	set noc 0

@@ -66,6 +66,7 @@ proc bgerror {err} {
 		}
 		set ::Classy::error(action) ok
 	}
+	.bgerrorDialog persistent set {}
     # 2. Fill the top part with bitmap and message (use the option
     # database for -wraplength so that it can be overridden by
     # the caller).
