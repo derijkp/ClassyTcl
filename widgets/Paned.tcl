@@ -82,13 +82,11 @@ Classy::Paned method _start {x y} {
 	set info [grid info $window]
 	regexp -- {-in ([^ ]*)} $info temp data(master)
 	if {"$orient"=="vertical"} {
-		$window configure -width 0
 		regexp -- {-column ([^ ]*)} $info temp data(gridpos)
 		set data(pos) $x
 		set data(size) [winfo width $window]
 		grid columnconfigure $data(master) $data(gridpos) -minsize $data(size)
 	} else {
-		$window configure -height 0
 		regexp -- {-row ([^ ]*)} $info temp data(gridpos)
 		set data(pos) $y
 		set data(size) [winfo height $window]

@@ -6,10 +6,12 @@ proc ::Classy::WindowBuilder::add_Classy::ScrolledFrame {object base args} {
 	private $object data
 	Classy::ScrolledFrame $base -bd 2 -relief groove -width 10 -height 10
 	eval $base configure $args
+	return $base
 }
 
 proc ::Classy::WindowBuilder::start_Classy::ScrolledFrame {object base} {
-	private $object data
+	private $object data bindtags
+	set bindtags($base) [bindtags $base]
 	bindtags $base Classy::WindowBuilder_$object
 	$object _recursestartedit $base [winfo children $base]
 	catch {unset data(redir,$base.view.frame)}

@@ -24,6 +24,7 @@ Classy::configmouse {Change selection} {
 }
 
 Classy::configmouse {Drag & Drop keys} {
+	{start drag} <<Drag>> {<B1-Motion>} {start drag}
 	{drag move} <<Drag-Move>> {<KeyPress-Control_L> <KeyPress-Control_R>} {move instead of copy}
 	{drag link} <<Drag-Link>> {<KeyPress-Shift_L> <KeyPress-Shift_R>} {link instead of copy}
 }

@@ -37,7 +37,7 @@ proc ::Classy::WindowBuilder::generate_Classy::Dialog {object base} {
 	private $object current data
 	set outw [$object outw $base]
 	set body ""
-	append body "\tClassy::Dialog $outw [$object getoptions $base]\n"
+	append body "\tClassy::Dialog $outw [$object getoptions $base -menu]\n"
 	append body [$object generate [winfo children $base.options]]
 	append body [$object gridconf $base.options]
 	append body "\n"
@@ -47,6 +47,17 @@ proc ::Classy::WindowBuilder::generate_Classy::Dialog {object base} {
 			append body " [$object getoption $base.actions.$b -command]"
 			regsub -all "\\\\\n\t*" [$object getoptions $base.actions.$b -text -command] {} options
 			append body " $options\n"
+		}
+	}
+	if [info exists data(opt-mainmenu,$base)] {
+		if {"$data(opt-mainmenu,$base)" != ""} {
+			if {"$data(opt-menuwin,$base)" != ""} {
+				foreach win $data(opt-menuwin,$base) {
+					append body "\tClassy::DynaMenu attachmainmenu $data(opt-mainmenu,$base) $win\n"
+				}
+			} else {
+				append body "\tClassy::DynaMenu attachmainmenu $data(opt-mainmenu,$base)\n"
+			}
 		}
 	}
 	return $body

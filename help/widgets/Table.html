@@ -17,7 +17,7 @@ Table
  <dl>
  <dt>getcommand object w row col
  <dd>the parameter object is the name of the table, the parameter w gives the window of the cell
- associated with the row and column given in row and col.<br>
+ asCsociated with the row and column given in row and col.<br>
  The getcommand must return the value to be shown in the given cell. If the getcommand
  wishes to set the value itself (eg. in a text), it can return with a -code break, so
  that its return value will not be used.
@@ -85,18 +85,27 @@ pathname rowsize row ?value?
 </b><dd>
  query or change the current height of the given row
 <b><dt>
-pathname movey w step
+pathname set rrow rcol value
+</b><dd>
+ set the value of the cell at $rrow and $rcol to $value
+<b><dt>
+pathname paste ?column ...?
+</b><dd>
+ paste data in the table. The data must be a list where each element is a list that contains the values
+ for one column. If no arguments are given, the data in the clipboard is pasted.
+<b><dt>
+pathname movey w step ?sel?
 </b><dd>
 
 <b><dt>
-pathname movex w step
+pathname movex w step ?sel?
 </b><dd>
  
 <b><dt>
 pathname _redraw 
 </b><dd>
 <b><dt>
-pathname yview args
+pathname xview args
 </b><dd>
 <b><dt>
 pathname yview args

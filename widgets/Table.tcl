@@ -1008,6 +1008,3 @@ Classy::Table method yview {args} {
 	$object _scheduleredraw
 }
 
-Classy::Table method children {} {
-	return ""
-}

@@ -88,7 +88,7 @@ proc Classy::expand_accelerator {sym} {
 }
 
 proc Classy::check {command} {
-	if [catch {uplevel $command} error] {bgerror $error}
+	if [catch {uplevel $command} result] {bgerror $result} else {return $result}
 }
 
 proc Classy::fullpath {file} {
@@ -286,9 +286,34 @@ proc ::Classy::msg {text} {
 
 proc ::Classy::Message {window args} {
 	eval message $window $args
-	bind $window <Configure> [varsubst {window} {
+	::Tk::bind $window <Configure> [varsubst {window} {
 		$window configure -width [expr [winfo width $window] - 2*[$window cget -bd]]
 	}]
+}
+
+proc ::Classy::overwriteyn {file {append 1}} {
+	if [file exists $file] {
+		Classy::Dialog .classy__.overwr -title "Dialog box" -closecommand {set ::Classy::temp 0}
+		.classy__.overwr add overwr Overwrite "set ::Classy::temp 1 ; [list file delete $file]"
+		if {$append==1} {.classy__.overwr add append "Append" {set ::Classy::temp 2}}
+		.classy__.overwr.actions.close configure -text "Cancel"
+		.classy__.overwr persistent remove -all
+
+		#top part -->message
+		#-------------------
+		message .classy__.overwr.options.msg -justify center -aspect 250  -text "File \"$file\" exists!"
+		pack .classy__.overwr.options.msg -side top -expand yes -padx 3 -pady 3
+
+		bind .classy__.overwr <o> {.classy__.overwr invoke overwr}
+		if {$append==1} {bind .classy__.overwr <a> {.classy__.overwr invoke append}}
+		bind .classy__.overwr <c> {.classy__.overwr invoke close}
+		focus .classy__.overwr
+		update idletasks
+		grab .classy__.overwr
+		tkwait window .classy__.overwr
+		return $::Classy::temp
+	}
+	return 1
 }
 
 set Classy::bgid 0
@@ -308,3 +333,4 @@ proc Classy::bgcheck {id} {
 proc Classy::bgstop {id} {
 	catch {unset ::Classy::bg($id)}
 }
+

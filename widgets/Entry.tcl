@@ -37,16 +37,15 @@ option add *Classy::Entry.entry.relief sunken widgetDefault
 option add *Classy::Entry.label.anchor w widgetDefault
 
 bind Classy::Entry <Key-Return> {
-	[winfo parent %W] constrain warn
-	if [[winfo parent %W] command] break
+	%W constrain warn
+	if [%W command] break
 }
 
 bind Classy::Entry <<Empty>> {
-	[winfo parent %W] nocmdset ""
+	%W nocmdset ""
 }
 bind Classy::Entry <<Default>> {
-	set w [winfo parent %W]
-	if [winfo exists $w.defaults] {$w.defaults menu}
+	if [winfo exists %W.defaults] {%W.defaults menu}
 }
 bind Classy::Entry <<Drop>> {
 	%W insert insert [DragDrop get]
@@ -54,7 +53,7 @@ bind Classy::Entry <<Drop>> {
 bind Classy::Entry <<Drag-Motion>> {
 	tkEntryButton1 %W %x
 }
-bind Classy::Entry_frame <FocusIn> "focus %W.entry"
+bind Classy::Entry <Any-KeyRelease> {%W constrain warn}
 
 # ------------------------------------------------------------------
 #  Widget creation
@@ -71,14 +70,14 @@ Classy::Entry classmethod init {args} {
 	frame $object.frame.entry
 	pack $object.frame -expand yes -fill x -side left
 	pack $object.frame.entry -expand yes -fill x -side left
+	bindtags $object [lreplace [bindtags $object] 2 0 Entry]
 	entry $object.entry
+	::class::rebind $object.entry $object
+	::class::refocus $object $object.entry
 	pack $object.entry -in $object.frame.entry -side left -expand yes -fill x
 
 	# REM Create bindings
 	# -------------------
-	bindtags $object.entry [concat Classy::Entry [bindtags $object.entry]]
-	bindtags $object [concat Classy::Entry_frame [bindtags $object]]
-	bind $object.entry <Any-KeyRelease> [list $object constrain warn]
 
 	# REM Initialise variables
 	# ------------------------
@@ -265,8 +264,3 @@ Classy::Entry method _redrawentry {} {
 		return vertical
 	}
 }
-
-Classy::Entry method children {} {
-	return ""
-}
-

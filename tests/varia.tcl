@@ -57,9 +57,9 @@ test Classy::Progress {basic} {
 	.try get
 } {1000}
 
-test Classy::ProgressBox {basic} {
+test Classy::ProgressDialog {basic} {
 	classyclean
-	Classy::ProgressBox .try -message "Testing\n Please wait" -ticks 1000 -step 100
+	Classy::ProgressDialog .try -message "Testing\n Please wait" -ticks 1000 -step 100
 	#.try set 50
 	for {set i 0} {$i<1000} {incr i} {
 		.try incr
@@ -101,6 +101,7 @@ test Classy::ScrolledFrame {basic} {
 	classyclean
 	set w .try.test
 	set w [Classy::ScrolledFrame .try]
+	pack .try -fill both -expand yes
 	pack [button $w.b1 -text "Trying an terribly long button with lots of nonsense on it"]
 	pack [button $w.b2 -text "Try 1"] -fill x
 	pack [button $w.b3 -text "Try 2"]

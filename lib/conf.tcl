@@ -198,47 +198,6 @@ proc Classy::loadKeys {} {
 	} 
 }
 
-proc Classy::loadMouse {} {
-	foreach dir [set ::Classy::dirs] {
-		set file [file join $dir init Mouse.tcl]
-		if [file readable $file] {
-			source $file
-		}
-	} 
-
-	# Mouse button bindings
-	# Which mousebutton does what?
-	# Action = select, invoke button, ...
-	# Menu = popup associated popup menu
-	# Adjust = Alternative action, depends on the widget
-	#          e.g. when you click on a dialog button with Action,
-	#          it will execute the action, and close the dialog.
-	#          Often you can use the adjust button to execute
-	#          the action without closing the dialog.
-	#          In entries or texts under X, it works as the copy button 
-	# -----------------------------------------------------------------
-	set list ""
-	foreach {name num} {Action 1 Adjust 2 Menu 3} {
-		regexp {[0-9]+} [event info <<$name>>] num
-		lappend list $name $num
-	}
-	foreach {name key} $list {
-		foreach combo {ButtonRelease ButtonPress} {
-			if {"[event info <<$combo-$name>>]" == ""} {
-				setevent <<$combo-$name>> <$combo-$key>
-			}
-		}
-		
-		foreach combo {
-			Motion Leave Enter ButtonRelease ButtonPress
-		} {
-			if {"[event info <<$name-$combo>>]" == ""} {
-				setevent <<$name-$combo>> <B$key-$combo>
-			}
-		}
-	}
-}
-
 proc Classy::initconf {} {
 	foreach event [event info] {
 		event delete $event
@@ -253,11 +212,4 @@ proc Classy::initconf {} {
 			}
 		}
 	}
-#	::Classy::loadconf Misc
-#	::Classy::loadconf Fonts
-#	::Classy::loadconf Colors
-#	::Classy::loadKeys
-#	::Classy::loadMouse
-#	::Classy::loadconf Menus
-#	::Classy::loadconf Toolbars
 }

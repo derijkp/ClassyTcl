@@ -13,14 +13,34 @@ proc ::Classy::WindowBuilder::add_button {object w args} {
 	eval $w configure $args
 }
 
+#
+# Checkbutton
+#
+
 proc ::Classy::WindowBuilder::add_checkbutton {object w args} {
 	checkbutton $w -text button
 	eval $w configure $args
 }
 
+proc ::Classy::WindowBuilder::edit_Checkbutton {object w} {
+	::Classy::WindowBuilder::defattredit $object $w {
+		-variable Variable 0 -text Text 0 -image Image 0 -anchor Anchor 0 -command Command 1
+	} 8 0
+}
+
+#
+# Radiobutton
+#
+
 proc ::Classy::WindowBuilder::add_radiobutton {object w args} {
 	radiobutton $w -text button
 	eval $w configure $args
+}
+
+proc ::Classy::WindowBuilder::edit_Radiobutton {object w} {
+	::Classy::WindowBuilder::defattredit $object $w {
+		-variable Variable 0 -value Value 0 -text Text 0 -image Image 0 -anchor Anchor 0 -command Command 1
+	} 8 0
 }
 
 #
@@ -85,5 +105,11 @@ proc ::Classy::WindowBuilder::edit_Scrollbar {object w} {
 proc ::Classy::WindowBuilder::add_text {object w args} {
 	text $w -width 10 -height 5
 	eval $w configure $args
+}
+
+proc ::Classy::WindowBuilder::edit_Text {object w} {
+	::Classy::WindowBuilder::defattredit $object $w {
+		
+	} 10
 }
 

@@ -183,7 +183,3 @@ Classy::OptionBox method button {item} {
 	}
 	return ""
 }
-
-Classy::OptionBox method children {} {
-	return ""
-}

@@ -20,16 +20,7 @@ DynaTool
 <p>
  Toolbar definitions for tooltype are usually controlled from the
  Toolbars part of the <a href="../classy_configure.html">configuration 
- system</a>. Creation of a toolbar of a certain type, will get the toolbar
- definition from the option database by creating a dummy frame with 
- class $tooltype and getting its option value for toolbar (class Toolbar).
- you can add a tooltype in the configuration system by adding
-<pre>
-## Sometool {this is an example toolbar} tool
-option add *Sometool.Toolbar definition widgetDefault
-</pre>
- to the Toolbars configuration file. You will usually only need this 
- configuration and the maketool method to get working toolbars.
+ system</a>.
 <p>
  A toolbar managed by DynaTool can control several widgets: The commands 
  associated with the toolbar can include a %W, that on invocation is
@@ -47,10 +38,8 @@ pathname define tooltype ?data?
 </b><dd>
  set the definition describing the tools that will be generated 
  for $tooltype.
- If data is not given, the toolbar definition for $tooltype is obtained 
- from the option database. A dummy frame with class $tooltype is created,
- and the its option value for toolbar (class Toolbar) obtained. This option
- will usually be set in the Toolbars part 
+ If data is not given, the toolbar definition for $tooltype will be returned.
+ Definition of toolbars is usually done in the
  <a href="../classy_configure.html">configuration system</a>.
  You will usually not invoke this method, as the maketool
  method will automatically define a tooltype that isn't managed yet.

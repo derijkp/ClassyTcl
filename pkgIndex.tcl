@@ -10,7 +10,7 @@
 namespace eval __temp [list set dir $dir]
 namespace eval __temp {
 	# $Format: "set version $ProjectVersion$"$
-set version 0.10
+set version 0.16
 	regsub -all {[ab]} $version {} version
 	set loadcmd {
 		package provide Class @version@
@@ -24,7 +24,8 @@ set version 0.10
 
 	set loadcmd {
 		package provide ClassyTcl @version@
-		namespace eval ::Classy {set script [info script]}
+		namespace eval ::Classy {}
+		set ::Classy::script [info script]
 		source [file join @dir@ lib classyinit.tcl]
 	}
 	regsub -all {@version@} $loadcmd [list $version] loadcmd

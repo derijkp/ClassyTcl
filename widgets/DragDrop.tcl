@@ -39,10 +39,10 @@ Classy::export DragDrop {}
 #  Methods
 # ------------------------------------------------------------------
 
-bind Classy::DragDrop <Motion> {Classy::DragDrop move}
-bind Classy::DragDrop <ButtonRelease> {Classy::DragDrop drop}
-bind Classy::DragDrop <<Escape>> {Classy::DragDrop abort}
-bind Classy::DragDrop <KeyRelease> {Classy::DragDrop configure -transfer copy}
+::Tk::bind Classy::DragDrop <Motion> {Classy::DragDrop move}
+::Tk::bind Classy::DragDrop <ButtonRelease> {Classy::DragDrop drop}
+::Tk::bind Classy::DragDrop <<Escape>> {Classy::DragDrop abort}
+::Tk::bind Classy::DragDrop <KeyRelease> {Classy::DragDrop configure -transfer copy}
 
 #bind Classy::DragDrop <<Drag-Move>> {Classy::DragDrop configure -transfer move}
 #bind Classy::DragDrop <<Drag-Link>> {Classy::DragDrop configure -transfer link}
@@ -58,6 +58,11 @@ bind Classy::DragDrop <KeyRelease> {Classy::DragDrop configure -transfer copy}
 #}
 Classy::DragDrop method start {from value args} {
 	private $object data types ftypes
+	set from [winfo containing [winfo pointerx $from] [winfo pointery $from]]
+	catch {unset types}
+	set types() {}
+	catch {unset ftypes}
+	set ftypes() {}
 	set types() text/plain
 	set types(text/plain) $value
 	set data(transfer) none
@@ -67,7 +72,7 @@ Classy::DragDrop method start {from value args} {
 	set data(cursor) [$from cget -cursor]
 	set data(bindtags) [bindtags $from]
 	set ftypes() {}
-	foreach event [bind Classy::DragDrop_extra] {bind Classy::DragDrop_extra $event {}}
+	foreach event [::Tk::bind Classy::DragDrop_extra] {::Tk::bind Classy::DragDrop_extra $event {}}
 	set w .classy__.dragdrop
 	if ![winfo exists $w] {
 		toplevel $w -class Classy::DragDrop -width 10 -height 10
@@ -76,11 +81,17 @@ Classy::DragDrop method start {from value args} {
 		wm overrideredirect $w 1
 		label $w.small -image [Classy::geticon plus] -borderwidth 0 -highlightthickness 0
 		grid $w.small -row 0 -column 0 -sticky se
-		label $w.l -image [Classy::geticon file] -borderwidth 0 -highlightthickness 0
+		label $w.l -image [Classy::geticon sm_file] -borderwidth 0 -highlightthickness 0
 		grid $w.l -row 0 -column 0 -sticky se
 		raise $w.small
 		$w.l configure -cursor hand2
 		bindtags $w Classy::DragDrop
+	} else {
+		$w.small configure -image [Classy::geticon plus] -borderwidth 0 -highlightthickness 0
+		grid $w.small -row 0 -column 0 -sticky se
+		$w.l configure -image [Classy::geticon sm_file] -borderwidth 0 -highlightthickness 0
+		grid $w.l -row 0 -column 0 -sticky se
+		raise $w.small
 	}
 	lower .classy__.dragdrop.small
 	catch {unset data(remote)}
@@ -97,80 +108,6 @@ Classy::DragDrop method start {from value args} {
 		catch {send -- $app ::class::setprivate Classy::DragDrop data(remote) [list [tk appname]]}
 	}
 	focus $from
-}
-
-#doc {DragDrop command bind} cmd {
-# Classy::DragDrop start window value ?option value ...?<br>
-#} descr {
-# with this method, bindings can be added to the current drag, eg. to change the transfer type
-# in response to a keypress. Note that the command must come after the drag was
-# started with the start method.
-#}
-Classy::DragDrop method bind {args} {
-	eval bind Classy::DragDrop_extra $args
-}
-
-Classy::DragDrop method _events {app x y} {
-	private $object data
-	set dropw [winfo containing $x $y]
-	if {"$data(prev)" != ""} {
-		if {"$data(prev)" != "$dropw"} {
-			set rx [expr {$x-[winfo rootx $data(prev)]}]
-			set ry [expr {$y-[winfo rooty $data(prev)]}]
-			event generate $data(prev) <<Drag-Leave>> -x $rx -y $ry
-		}
-	}
-	if {"$dropw" == ""} {
-		set data(prev) ""
-		return ""
-	}
-	set rx [expr {$x-[winfo rootx $dropw]}]
-	set ry [expr {$y-[winfo rooty $dropw]}]
-	if {"$data(prev)" != "$dropw"} {
-		event generate $dropw <<Drag-Enter>> -x $rx -y $ry
-	}
-	event generate $dropw <<Drag-Motion>> -x $rx -y $ry
-	set data(prev) $dropw
-}
-
-#doc {DragDrop command move} cmd {
-# Classy::DragDrop move<br>
-#} descr {
-# This method is called while dragging. It updates the dragged window, and generates
-# the Drag events.
-#}
-Classy::DragDrop method move {} {
-	private $object data
-	set w .classy__.dragdrop
-	set x [winfo pointerx $w]
-	set y [winfo pointery $w]
-	if ![info exists data(withdrawn)] {
-		wm geometry  $w +[expr {$x+1}]+[expr {$y+1}]
-	}
-	set data(app) {}
-	set dropw [winfo containing $x $y]
-	set curapp [tk appname]
-	if {"$data(prev)" != ""} {
-		if {"$data(prev)" != "$dropw"} {
-			set rx [expr {$x-[winfo rootx $data(prev)]}]
-			set ry [expr {$y-[winfo rooty $data(prev)]}]
-			event generate $data(prev) <<Drag-Leave>> -x $rx -y $ry
-		}
-	}
-	if {"$dropw" != ""} {
-		set rx [expr {$x-[winfo rootx $dropw]}]
-		set ry [expr {$y-[winfo rooty $dropw]}]
-		set data(app) $curapp
-		if {"$data(prev)" != "$dropw"} {
-			event generate $dropw <<Drag-Enter>> -x $rx -y $ry
-		}
-		event generate $dropw <<Drag-Motion>> -x $rx -y $ry
-	} else {
-	    foreach app [lremove [winfo interps] $curapp] {
-			catch {send -- $app Classy::DragDrop _events [list $curapp] $x $y} res
-		}
-	}
-	set data(prev) $dropw
 }
 
 #doc {DragDrop command configure} cmd {
@@ -257,6 +194,7 @@ Classy::DragDrop method configure {args} {
 					}
 				}
 				-types {
+					unset types
 					set types() {}
 					foreach {type d} $value {
 						lappend types() $type
@@ -264,6 +202,7 @@ Classy::DragDrop method configure {args} {
 					}
 				}
 				-ftypes {
+					unset ftypes
 					set ftypes() {}
 					foreach {type d} $value {
 						lappend ftypes() $type
@@ -292,6 +231,80 @@ Classy::DragDrop method configure {args} {
 	}
 }
 
+#doc {DragDrop command bind} cmd {
+# Classy::DragDrop start window value ?option value ...?<br>
+#} descr {
+# with this method, bindings can be added to the current drag, eg. to change the transfer type
+# in response to a keypress. Note that the command must come after the drag was
+# started with the start method.
+#}
+Classy::DragDrop method bind {args} {
+	eval ::Tk::bind Classy::DragDrop_extra $args
+}
+
+Classy::DragDrop method _events {app x y} {
+	private $object data
+	set dropw [winfo containing $x $y]
+	if {"$data(prev)" != ""} {
+		if {"$data(prev)" != "$dropw"} {
+			set rx [expr {$x-[winfo rootx $data(prev)]}]
+			set ry [expr {$y-[winfo rooty $data(prev)]}]
+			event generate $data(prev) <<Drag-Leave>> -x $rx -y $ry
+		}
+	}
+	if {"$dropw" == ""} {
+		set data(prev) ""
+		return ""
+	}
+	set rx [expr {$x-[winfo rootx $dropw]}]
+	set ry [expr {$y-[winfo rooty $dropw]}]
+	if {"$data(prev)" != "$dropw"} {
+		event generate $dropw <<Drag-Enter>> -x $rx -y $ry
+	}
+	event generate $dropw <<Drag-Motion>> -x $rx -y $ry
+	set data(prev) $dropw
+}
+
+#doc {DragDrop command move} cmd {
+# Classy::DragDrop move<br>
+#} descr {
+# This method is called while dragging. It updates the dragged window, and generates
+# the Drag events.
+#}
+Classy::DragDrop method move {} {
+	private $object data
+	set w .classy__.dragdrop
+	set x [winfo pointerx $w]
+	set y [winfo pointery $w]
+	if ![info exists data(withdrawn)] {
+		wm geometry  $w +[expr {$x+1}]+[expr {$y+1}]
+	}
+	set data(app) {}
+	set dropw [winfo containing $x $y]
+	set curapp [tk appname]
+	if {"$data(prev)" != ""} {
+		if {"$data(prev)" != "$dropw"} {
+			set rx [expr {$x-[winfo rootx $data(prev)]}]
+			set ry [expr {$y-[winfo rooty $data(prev)]}]
+			event generate $data(prev) <<Drag-Leave>> -x $rx -y $ry
+		}
+	}
+	if {"$dropw" != ""} {
+		set rx [expr {$x-[winfo rootx $dropw]}]
+		set ry [expr {$y-[winfo rooty $dropw]}]
+		set data(app) $curapp
+		if {"$data(prev)" != "$dropw"} {
+			event generate $dropw <<Drag-Enter>> -x $rx -y $ry
+		}
+		event generate $dropw <<Drag-Motion>> -x $rx -y $ry
+	} else {
+	    foreach app [lremove [winfo interps] $curapp] {
+			catch {send -- $app Classy::DragDrop _events [list $curapp] $x $y} res
+		}
+	}
+	set data(prev) $dropw
+}
+
 #doc {DragDrop command types} cmd {
 # Classy::DragDrop types ?pattern?<br>
 #} descr {
@@ -303,7 +316,15 @@ Classy::DragDrop method types {{pattern *}} {
 	if [info exists data(remote)] {
 		return [send -- $data(remote) Classy::DragDrop types $pattern]
 	} else {
-		return [concat $types() $ftypes()]
+		if {"$pattern" == "*"} {
+			return [concat $types() $ftypes()]
+		} else {
+			set list ""
+			foreach item [concat $types() $ftypes()] {
+				if [string match $pattern $item] {lappend list $item}
+			}
+			return $list
+		}
 	}
 }
 

@@ -28,12 +28,16 @@ Widget subclass Classy::TreeWidget
 Classy::export TreeWidget {}
 
 bind Classy::TreeWidget <Configure> {%W redraw}
+bind Classy::TreeWidget <<Action>> {%W _action %x %y}
+bind Classy::TreeWidget <<MExecute>> {%W _execute %x %y}
 
 Classy::TreeWidget classmethod init {args} {
 	# REM Create object
 	# -----------------
 	super
 	canvas $object.c -xscrollcommand [list $object.hbar set] -yscrollcommand [list $object.vbar set]
+	::class::rebind $object.c $object
+	::class::refocus $object $object.c
 	scrollbar $object.vbar -command [list $object.c yview] -orient vertical
 	scrollbar $object.hbar -command [list $object.c xview] -orient horizontal
 	Classy::Tree $object.tree
@@ -46,8 +50,6 @@ Classy::TreeWidget classmethod init {args} {
 
 	# REM Create bindings
 	# -------------------
-	bind $object.c <<Action>> "$object _action %x %y"
-	bind $object.c <<MExecute>> "$object _execute %x %y"
 
 	# REM Initialise variables
 	# ------------------------
@@ -71,7 +73,27 @@ Classy::TreeWidget method destroy {} {
 #  Widget options
 # ------------------------------------------------------------------
 
-Classy::TreeWidget chainoptions {$object.c}
+#Classy::TreeWidget chainoptions {$object.c}
+
+foreach option {
+	background cursor height highlightbackground highlightcolor highlightthickness
+	insertbackground insertborderwidth insertofftime insertontime inertwidth
+	offset relief selectbackground selectborderwidth selectforeground 
+	state takefocus width
+} {
+	Classy::TreeWidget chainoption -$option {$object.c} -$option
+}
+
+Classy::TreeWidget addoption -rootimage {rootImage RootImage {}} {
+	$object.tree configure -rootimage $value
+}
+Classy::TreeWidget addoption -roottext {rootText RootText {}} {
+	$object.tree configure -roottext $value
+}
+foreach {option def} {font {} startx 10 starty 10 padx 10 pady 2 padtext 4} {
+	Classy::TreeWidget addoption -$option [list $option [string toupper [string index $option 0]][string range $option 1 end] $def] \
+		"\$object.tree configure -$option \$value"
+}
 
 Classy::TreeWidget addoption -opencommand {openCommand OpenCommand {}} {
 }
@@ -83,13 +105,6 @@ Classy::TreeWidget addoption -endnodecommand {endnodeCommand EndnodeCommand {}} 
 }
 
 Classy::TreeWidget addoption -executecommand {executeCommand ExecuteCommand {}} {
-}
-
-Classy::TreeWidget addoption -font {font Font {}} {
-	if {"$value" == ""} {
-		set value [option get $object.c font Font]
-	}
-	Classy::todo $object redraw
 }
 
 # ------------------------------------------------------------------
@@ -153,3 +168,4 @@ Classy::TreeWidget method _execute {x y} {
 	uplevel #0 $options(-executecommand) [list $node]
 	$object _handlebars
 }
+

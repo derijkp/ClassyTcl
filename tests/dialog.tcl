@@ -76,6 +76,20 @@ test Classy::Dialog {add options} {
 	set ::try
 } {test2}
 
+test Classy::Dialog {with Classy::Entry} {
+	classyclean
+	Classy::Dialog .try
+	.try add go "Go" {puts stdout go;set ::try [.try.options.entry get]} default
+	.try add test "Test" {puts stdout test;set ::try [.try.options.entry get]}
+	Classy::Entry .try.options.entry
+	.try.options.entry set try
+	pack .try.options.entry
+	set ::try 1
+	update
+	.try invoke go
+	set ::try
+} {try}
+
 test Classy::Dialog {no shifting} {
 	classyclean
 	Classy::Dialog .try -closecommand {

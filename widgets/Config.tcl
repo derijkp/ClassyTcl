@@ -1,4 +1,4 @@
-puts#
+#
 # ClassyTcl Widgets 
 # ----------------- Peter De Rijk
 #

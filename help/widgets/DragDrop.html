@@ -1,0 +1,27 @@
+<HEAD>
+<TITLE>
+DragDrop
+</TITLE>
+</HEAD>
+<BODY>
+<h1>
+DragDrop
+</h1>
+
+ subclass of <a href="../basic/Class.html">Class</a><br>
+ DragDrop is not a widget and is not intended to produce instances. 
+ It is a class that manages drag and drop.
+ A drop can be started using the command <br>
+ Classy::DragDrop start window value ...<br>
+ This should be bound to the <<Action-Motion>> event od source window.<p>
+ A window will be notified of a drop by the virtual event &lt;&lt;Drop&gt;&gt;, so<br>
+ bind window &lt;&lt;Drop&gt;&gt; command<br>
+ will execute command when somethind is dropped on the window<p>
+ The window is also notified of the current drag entering, moving in, or leaving the
+ window by the &lt;&lt;Drag-Enter&gt;&gt; &lt;&lt;Drag-Motion&gt;&gt; and\
+ &lt;&lt;Drag-Leave&gt;&gt; events, and can take apropriate actions.
+ The program can get the data associated with the drag using the command <br>
+ Classy::DragDrop get ?type?
+
+
+</body>

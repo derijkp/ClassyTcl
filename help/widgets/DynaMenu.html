@@ -63,30 +63,14 @@ DynaMenu makepopup menu curmenu data cmdw bindtag
 DynaMenu define menutype ?data?
 </b><dd>
  set the definition describing the menus that will be generated 
- for menutype to $data.
- If data is not given, the menu definition for menutype is obtained 
- from the option database. A dummy frame with class $menutype is created,
- and the its option value for menu (class Menu) obtained. This option
- will usually be set in the Menus part 
- <a href="../classy_configure.html">configuration system</a>.
- You will usually not invoke this method, as the maketop and 
- makepopup methods will automatically define a menutype
- that isn't managed yet.
+ for $menutype to $data. If data is empty, the data for $menutype
+ will be removed. If data is not given, the current definition for
+ $menutype will be returned.
 
 <b><dt>
 DynaMenu names 
 </b><dd>
  returns a list of menutypes managed by Dynamenu
-
-<b><dt>
-DynaMenu menus menutype
-</b><dd>
- returns a list of menus of type $menutype managed by Dynamenu
-
-<b><dt>
-DynaMenu get menutype
-</b><dd>
- returns the definition of $menutype
 
 <b><dt>
 DynaMenu delete menutype
@@ -102,9 +86,14 @@ DynaMenu cmdw menu ?cmdw?
  defined by DynaMenu recieves the focus.
 
 <b><dt>
-DynaMenu post menu ?x y?
+DynaMenu menu menutype
 </b><dd>
- post menu
+ returns the window name of the menu of type $menutype for use in a program.
+
+<b><dt>
+DynaMenu popup menutype ?x y?
+</b><dd>
+ popup menu of type $menutype
 
 <b><dt>
 DynaMenu invoke curmenu index
@@ -113,6 +102,14 @@ DynaMenu invoke curmenu index
 
 <b><dt>
 DynaMenu confmenu menutype
+</b><dd>
+
+<b><dt>
+DynaMenu attachmainmenu menutype window ?menuroot?
+</b><dd>
+
+<b><dt>
+DynaMenu attachmenu menutype window
 </b><dd>
 
 </body>

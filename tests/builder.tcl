@@ -37,3 +37,30 @@ if 0 {
 
 set object .try.dedit
 set window .try.dedit.work
+
+proc browse {w dir} {
+	$w clearnode $dir
+	set dirs {}
+	set files {}
+	foreach file [glob -nocomplain $dir/*] {
+		if {[file isdirectory $file]} {
+			lappend dirs $file
+		} else {
+			lappend files $file
+		}
+	}
+	foreach file [lsort $dirs] {
+		$w addnode $dir $file -text [file tail $file]
+	}
+	foreach file [lsort $files] {
+		$w addnode $dir $file -type end -text [file tail $file] -length [expr [file size $file]/1000.0]
+	}
+}
+
+#testapp
+if 0 {
+	set object .try
+	Classy::Builder .try
+	set object .try.dedit
+	set window .try.dedit.work
+}

@@ -28,7 +28,6 @@ option add *Classy::Editor.KeyMatchingBrackets "Alt-bracketleft" widgetDefault
 option add *Classy::Editor.KeyIndentCr Control-j widgetDefault
 option add *Classy::Editor.KeyComment "Alt-numbersign" widgetDefault
 option add *Classy::Editor.KeyDelComment "Control-Alt-numbersign" widgetDefault
-bind Classy::Editor <FocusIn> {focus %W.edit}
 
 # ------------------------------------------------------------------
 #  Widget creation
@@ -46,15 +45,12 @@ Classy::Editor classmethod init {args} {
 			set top [winfo toplevel $object]
 			if ![regexp {\*$} [wm title $top]] {catch [wm title $top "[wm title $top] *"]}
 		}]
-	bindtags $object.edit [list $object Classy::Text $object.edit all]
+	bindtags $object [list $object Classy::Menu_macro Classy::Menu_pattern Classy::Editor Classy::Text all]
+	Classy::DynaMenu attachmainmenu Classy::Editor $object
+	::class::rebind $object.edit $object
+	::class::refocus $object $object.edit
 	scrollbar $object.vbar -orient vertical -command "$object.edit yview"
 	scrollbar $object.hbar -orient horizontal -command "$object.edit xview"
-
-	set menu .classy__.editormenu
-	Classy::DynaMenu makemenu Classy::Editor .classy__.editormenu $object Classy::EditorMenu
-	# replace default cmdw commands to make Editor cmdw instead of Editor.edit
-	bind $object <FocusIn> "Classy::DynaMenu cmdw .classy__.editormenu $object"
-	bind $object <Enter> "Classy::DynaMenu cmdw .classy__.editormenu $object"
 	Classy::DynaTool maketool Classy::Editor $object.tool $object
 	grid $object.tool - -sticky we
 	grid rowconfigure $object 1 -weight 1
@@ -67,7 +63,6 @@ Classy::Editor classmethod init {args} {
 		grid $object.hbar -column 0 -sticky nswe
 		grid columnconfigure $object 0 -weight 1
 	}
-
 	# REM Initialise options and variables
 	# ------------------------------------
 	private $object curfile reopenlist findwhat replace marker curmarker prevmarker
@@ -78,11 +73,8 @@ Classy::Editor classmethod init {args} {
 	set marker Mark
 	set curmarker {}
 	set prevmarker {}
-
 	# REM Create bindings
 	# --------------------
-	bindtags $object.edit "Classy::EditorMenu Classy::EditorMenu::macros [bindtags $object.edit]"
-
 	# REM Configure initial arguments
 	# -------------------------------
 	if {"$args" != ""} {eval $object configure $args}
@@ -122,10 +114,6 @@ Classy::Editor addoption -searchcase {searchCase SearchCase nocase}
 Classy::Editor addoption -searchreopen {SearchReopen searchReopen 0}
 Classy::Editor addoption -connection [list connection Connection [tk appname]]
 
-#doc {Editor options -menu} option {-menu menu Menu} descr {
-#}
-Classy::Editor addoption -menu {menu Menu popup}
-
 #doc {Editor options -closecommand} option {-closecommand closeCommand CloseCommand} descr {
 #}
 Classy::Editor addoption -closecommand {closeCommand CloseCommand {}}
@@ -158,7 +146,6 @@ Classy::Editor chainallmethods {$object.edit} Classy::Text
 #} descr {
 #}
 Classy::Editor method cut {} {
-puts ok[info level]
 	private $object replace
 	clipboard clear -displayof $object			  
 	catch {									
@@ -251,14 +238,17 @@ Classy::Editor method save {} {
 #} descr {
 #}
 Classy::Editor method saveas {file} {
+	private $object options
+	if {"$file" == ""} return
 	if {"$options(-savecommand)" != ""} {
 		return -code error "\"Save as\" not supported from this editorwindow"
 	}
-	if ![Classyoverwriteyn $file 0] return
+	if ![Classy::overwriteyn $file 0] return
 	private $object curfile reopenlist
 	$object unlink
 	set curfile $file
 	lappend reopenlist $file
+	set reopenlist [lsort $reopenlist]
 	$object save
 	$object textchanged 0
 	catch {wm title [winfo toplevel $object] "$curfile"}
@@ -396,6 +386,7 @@ Classy::Editor method load {{file {}} args} {
 		}
 	}
 	set reopenlist [lmanip remdup $reopenlist]
+	set reopenlist [lsort $reopenlist]
 	set loadcommand [getprivate $object options(-loadcommand)]
 	if {"$loadcommand" != ""} {
 		 eval $loadcommand [list $curfile]
@@ -411,8 +402,7 @@ Classy::Editor method load {{file {}} args} {
 #} descr {
 #}
 Classy::Editor method set {data} {
-	private $object curfile curmarkers curmarker prevmarker
-	private $object reopenlist cur
+	private $object curfile curmarkers curmarker prevmarker cur
 
 	if {"[$object closefile]" != "true"} {return}
 	set curfile ""
@@ -427,7 +417,7 @@ Classy::Editor method set {data} {
 #}
 Classy::Editor method forget {args} {
 	private $object reopenlist
-	set reopenlist [llremove $reopenlist $args]
+	set reopenlist [lsort [llremove $reopenlist $args]]
 }
 
 #doc {Editor command reopenlist} cmd {
@@ -442,7 +432,8 @@ Classy::Editor method reopenlist {} {
 	Classy::SelectDialog $w -title "Reopen list" \
 		-command "$object load \[$w get\]" \
 		-deletecommand "$object forget \[$w get\]"
-	$w fill [lsort $reopenlist]
+	set reopenlist [lsort $reopenlist]
+	$w fill $reopenlist
 	$w set $curfile
 }
 
@@ -662,8 +653,8 @@ Classy::Editor method indent {number} {
 
 proc Classy::trace {var command} {
 	lshift command
-	if {[info level] == 2} {
-		if {"[lindex $command 0]" != "trace"} {
+	if {[info level] == 1} {
+		if {[lsearch {trace index} [lindex $command 0]] == -1} {
 			lappend $var "\$object $command"
 		}
 	}
@@ -678,7 +669,6 @@ Classy::Editor method macro {} {
 	set obj $object
 	Classy::Dialog $object.macro -title "Make macro" -closecommand [varsubst object {
 		$object trace {}
-		$object.edit trace {}
 		catch {unset [privatevar $object macro]}
 		destroy $object.macro
 	}] -resize {1 1}
@@ -691,13 +681,11 @@ Classy::Editor method macro {} {
 		$stop configure -state normal
 		focus $object
 		$object trace [list Classy::trace [privatevar $object macro]]
-		$object.edit trace [list Classy::trace [privatevar $object macro]]
 	}]
 	$stop configure -command [varsubst {stop record object} {
 		$record configure -text "Record" -state normal
 		$stop configure -state disabled
 		$object trace {}
-		$object.edit trace {}
 		$object.macro.options.text insert end [join [set [privatevar $object macro]] "\n"]
 		catch {unset [privatevar $object macro]}
 	}]
@@ -719,13 +707,10 @@ Classy::Editor method macro {} {
 	Classy::Entry $object.macro.options.name -label "Name" -default Classy::Editor_macros \
 		-textvariable [privatevar $object macroname] -command [varsubst object {
 			$object.macro invoke get
-#			set key [Classy::Default get Classy__EditorMacro [$object.macro.options.name get]]
-#			if {"$key"!=""} {$object.macro.options.key set $key}
 		}]
 	Classy::Entry $object.macro.options.key -textvariable [privatevar $object macrokey] -label "Key-code"
 	scrollbar $object.macro.options.scroll -command "$object.macro.options.text yview"
 	Classy::Text $object.macro.options.text -yscrollcommand "$object.macro.options.scroll set" -width 20 -height 10
-
 	if {"$macroname"==""} {set macroname temp}
 	pack $object.macro.options.key -side bottom -fill x
 	pack $object.macro.options.name -side bottom -fill x
@@ -736,7 +721,7 @@ Classy::Editor method macro {} {
 }
 
 #doc {Editor command setmacro} cmd {
-#pathname setmacro
+#pathname setmacro name command ?key?
 #} descr {
 #}
 Classy::Editor method setmacro {name command {key {}}} {
@@ -748,7 +733,7 @@ Classy::Editor method setmacro {name command {key {}}} {
 	laddnew macros $name
 	Classy::Default set app Classy::Editor_macros $macros
 	Classy::Default set app Classy::Editor_macro_$name [list $command $key]
-	eval [.classy__.editormenu.macros cget -postcommand]
+	eval [[Classy::DynaMenu menu Classy::Editor].macros cget -postcommand]
 }
 
 #doc {Editor command deletemacro} cmd {
@@ -761,7 +746,7 @@ Classy::Editor method deletemacro {name} {
 		return
 	}
 	Classy::Default unset app Classy::Editor_macro_$name
-	eval [.classy__.editormenu.macros cget -postcommand]
+	eval [[Classy::DynaMenu menu Classy::Editor].macros cget -postcommand]
 }
 
 #doc {Editor command getmacromenu} cmd {
@@ -785,7 +770,7 @@ Classy::Editor method getmacromenu {} {
 		lappend names $name
 	}
 	Classy::Default set app Classy::Editor_macros $names
-	return $data
+	return [list $data Classy::Menu_macro]
 }
 
 #doc {Editor command pattern} cmd {
@@ -823,7 +808,7 @@ Classy::Editor method getpatternmenu {} {
 		incr num
 		set index "$r +1c"
 	}
-	return $data
+	return [list $data Classy::Menu_pattern]
 }
 
 #doc {Editor command getmacro} cmd {

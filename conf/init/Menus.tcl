@@ -100,18 +100,27 @@ menu option "Options" {
 
 Classy::configmenu Classy::Builder {menu used in the ClassyTcl Builder} {
 menu sel "File" {
-	action New "New" {%W new}
-	action Save "Save" {%W save}
-	action Delete "Delete" {%W delete}
-	action Close "Close" {%W destroy}
+	action newfile "New file" {%W new file}
+	action newtoplevel "New Toplevel" {%W new toplevel}
+	action newdialog "New Dialog" {%W new dialog}
+	action newframe "New Frame" {%W new frame}
+	action newfunction "New function" {%W new function}
+	separator
+	action DefaultDir "Application dir" {%W configure -dir {}}
+	action Dir "Select dir" {%W configure -dir [Classy::selectfile -default Classy::Builder]}
+	action save "Save" {%W save}
 }
-menu option "Windows" {
-	action AddLabel "Add Label" {%W add label}
-	action AddEntry "Add Entry" {%W add entry}
-	action AddText "Add Text" {%W add text}
-	action AddFrame "Add Frame" {%W add frame}
+menu edit "Edit" {
+	action copy "Copy" {%W copy}
+	action cut "Cut" {%W cut}
+	action paste "Paste" {%W paste}
 }
-action Test "Test" {%W test}
+menu help "Help" {
+	action Help "Builder" {Classy::help widgets/Builder}
+	separator
+	action HelpClassyTcl "ClassyTcl" {Classy::help ClassyTcl}
+	action HelpHelp "Help" {Classy::help help}
+}
 }
 
 Classy::configmenu Classy::WindowBuilder {menu used in the ClassyTcl WindowBuilder} {
@@ -128,5 +137,33 @@ menu option "Windows" {
 	action AddFrame "Add Frame" {%W add frame}
 }
 action Test "Test" {%W test}
+}
+
+Classy::configmenu Classy::Dummy {menu used in the Builder as a dummy} {
+menu sel "Menu" {
+}
+}
+
+Classy::configmenu Classy::Test {menu used for testing} {
+	menu file "File" {
+		action Load "Open file" {%W insert insert "Open: %W"}
+		action LoadNext "Open next" {%W insert insert "Open next: %W"}
+		action Try "Test" {%W insert insert "Test: %W"}
+		menu trying "Trying" {
+			action Try "Trying" {%W insert insert "submenu: %W"} Alt-d
+		}
+		action Save Save {puts save}
+		radio Radio1 "Radio try" {-variable test -value try}
+		radio Radio2 "Radio try2" {-variable test -value try2}
+	} Alt-f
+	# The find menu
+	menu find "Find" {
+		action Goto "Goto line" {puts "Goto line"}
+		action Find "Find" {%W insert end find}
+		separator
+		action ReplaceFindNext "Replace & Find next" {%W insert end replace}
+		check SearchReopen "Search Reopen" {-variable test%W -onvalue yes -offvalue no}
+	}
+	action Trytop "Test" {%W insert insert "Test: %W"} Alt-t
 }
 

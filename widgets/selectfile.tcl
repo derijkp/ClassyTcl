@@ -41,11 +41,7 @@ proc Classy::selectfile {args} {
 		-selectmode {single browse multiple extended persistent} browse
 		-default {} Classy__fileselect
 		-help {} Classy_file_select
-	} remain
-	if {"$remain"!=""} {
-		error "Unknown options \"$remain\""
 	}
-
 	set filter $opt(-filter)
 	if {"$filter"==""} {
 		set dir [::Classy::Default get app Classy__FileSelect__curfilter]
@@ -91,7 +87,6 @@ proc Classy::selectfile {args} {
 			-title $opt(-title) -textvariable ::Classy::selectfile \
 			-filter $filter -default $opt(-default) -selectmode $opt(-selectmode) -help $opt(-help) \
 			-closecommand {set ::Classy::selectfile ""}
-		if {"$remain"!=""} {eval .clasy__selectfile configure $remain}
 		if {"$opt(-initialfile)" != ""} {
 			.classy__.selectfile set $opt(-initialfile)
 		}

@@ -51,11 +51,11 @@ bind Classy::Text <<Drop>> {
 	catch {%W textinsert [DragDrop get]}
 }
 bind Classy::Text <<Drag-Motion>> {
-	%W position [::class::Tk_%W index @%x,%y]
+	%W position [%W index @%x,%y]
 }
 
 bind Classy::Text <<Action>> {
-	%W position [::class::Tk_%W index @%x,%y]
+	%W position [%W index @%x,%y]
 }
 bind Classy::Text <<Action-Motion>> {
 	set tkPriv(x) %x
@@ -291,7 +291,6 @@ set tkPriv(prevPos) {}
 proc Classy::Text_SelectTo {w x y} {
 	global tkPriv
 
-	set w [Classy::window $w]
 	set cur [$w index @$x,$y]
 	if [catch {$w index anchor}] {
 		$w mark set anchor $cur
@@ -352,13 +351,13 @@ proc Classy::Text_AutoScan {w} {
 	global tkPriv
 	if {![winfo exists $w]} return
 	if {$tkPriv(y) >= [winfo height $w]} {
-		::class::Tk_$w yview scroll 2 units
+		$w yview scroll 2 units
 	} elseif {$tkPriv(y) < 0} {
-		::class::Tk_$w yview scroll -2 units
+		$w yview scroll -2 units
 	} elseif {$tkPriv(x) >= [winfo width $w]} {
-		::class::Tk_$w xview scroll 2 units
+		$w xview scroll 2 units
 	} elseif {$tkPriv(x) < 0} {
-		::class::Tk_$w xview scroll -2 units
+		$w xview scroll -2 units
 	} else {
 		return
 	}
@@ -383,7 +382,6 @@ proc Classy::Text_AutoScan {w} {
 proc Classy::Text_ResetAnchor {w index} {
 	global tkPriv
 
-	set w [Classy::window $w]
 	if {[$w tag ranges sel] == ""} {
 		$w mark set anchor $index
 		return

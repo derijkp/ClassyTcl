@@ -122,6 +122,3 @@ Classy::Progress method get {} {
 	return $current
 }
 
-Classy::Progress method children {} {
-	return ""
-}

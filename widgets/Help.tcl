@@ -32,55 +32,29 @@ laddnew ::Classy::help_path [file join $Extral::dir docs]
 #  Widget creation
 # ------------------------------------------------------------------
 
-Widget subclass Classy::Help
+Classy::Toplevel subclass Classy::Help
 Classy::export Help {}
 
 Classy::Help classmethod init {args} {
-	set geom [Classy::Default get geometry $object]
-	super toplevel
-	if [regexp {^([0-9]+)x([0-9]+)\+([0-9]+)\+([0-9]+)} $geom temp w h prevx prevy] {
-		set maxx [expr [winfo vrootwidth $object]-$w]
-		set maxy [expr [winfo vrootheight $object]-$h]
-		set x [expr [winfo pointerx .]-$w/2]
-		set y [expr [winfo pointery .]-$h/2]
-		if {$x>$maxx} {set x $maxx}
-		if {$y>$maxy} {set y $maxy}
-		if {$x<0} {set x 0}
-		if {$y<0} {set y 0}
-		set temp [expr [winfo pointerx .]-$prevx]
-		if {($temp>0)&&($temp<$w)} {
-			set temp [expr [winfo pointery .]-$prevy]
-			if {($temp>0)&&($temp<$h)} {
-				set keeppos 1
-				set x $prevx
-				set y $prevy
-			}
-		}
-		wm geometry $object ${w}x${h}+$x+$y
-	}
-	set w $object
-	wm protocol $w WM_DELETE_WINDOW "destroy $w"
-	Classy::HTML $w.html -yscrollcommand "$w.vbar set" \
+	super
+	Classy::HTML $object.html -yscrollcommand "$object.vbar set" \
 		-state disabled -wrap word -cursor hand2 \
 		-width 70 -height 28 -relief sunken \
 		-errorcommand [list $object retry]
-	$w.html bindlink <<Adjust>> {newhelp [%W linkat %x %y]}
-	scrollbar $w.vbar -orient vertical -command "$w.html yview"
-	Classy::DynaMenu makemenu Classy::Help $w.menu $object Classy::Help
-	bindtags $object "Classy::Help [bindtags $object]"
-	Classy::DynaTool maketool Classy::Help $w.tool $object
-	pack $w.tool -side top -fill x
-	if {"[option get $w scrollSide ScrollSide]" == "right"} {
-		pack $w.vbar -side right -fill y
+	$object.html bindlink <<Adjust>> {newhelp [%W linkat %x %y]}
+	scrollbar $object.vbar -orient vertical -command "$object.html yview"
+	Classy::DynaMenu attachmainmenu Classy::Help $object
+	Classy::DynaTool maketool Classy::Help $object.tool $object
+	pack $object.tool -side top -fill x
+	if {"[option get $object scrollSide ScrollSide]" == "right"} {
+		pack $object.vbar -side right -fill y
 	} else {
-		pack $w.vbar -side left -fill y
+		pack $object.vbar -side left -fill y
 	}
-	pack $w.html -expand yes -fill both
+	pack $object.html -expand yes -fill both
 	private $object curfile history
 	set curfile ""
 	set history {}
-	private $object contentstag
-	set contentstag h2
 
 	# REM Configure initial arguments
 	# -------------------------------
@@ -128,7 +102,7 @@ Classy::Help method gethelp {name} {
 	$object.html geturl $url
 }
 
-#doc {Help command gethelp} cmd {
+#doc {Help command save} cmd {
 #pathname save filename ?text?
 #} descr {
 # save the current content. You can save as a plain text file by 
@@ -150,25 +124,7 @@ Classy::Help method historymenu {} {
 	$w fill [$object.html history]
 }
 
-Classy::Help method contents {tag} {
-	private $object contentstag
-	set contentstag $tag
-	if {"$tag"==""} {return}
-	set current 1.0
-	set w $object.html
-	while 1 {
-		set pos [$w tag nextrange $tag $current end]
-		if {"$pos"==""} {break}
-		set begin [lindex $pos 0]
-		set end [lindex $pos 1]
-		$object.menu.contents.menu add command -label "[$w get $begin $end]" \
-			-command "$w yview [$w index $begin]"
-		set current [$w index $end]
-	}
-}
-
 Classy::Help method search {what string} {
-#	set string [$object.menu.entry get]
 	if {"$string"==""} {return}
 	switch $what {
 		file {$object gethelp $string}
@@ -215,8 +171,22 @@ Classy::Help method edit {} {
 }
 
 Classy::Help method getcontentsmenu {} {
-	set data "action TopHelp Top {%W see 1.0}\n"
-	return $data
+	set current 1.0
+	set w $object.html
+	set contentsmenu ""
+	set c [split [$w get 1.0 end] "\n"]
+	set poss [lfind $c ""]
+	foreach pos $poss {
+		incr pos
+		set line [lindex $c $pos]
+		set len [llength $line]
+		if {($len > 0)&&($len < 6)} {
+			append contentsmenu "\t[list action None "$line" "$w yview [expr {$pos+1}].0"]\n"
+		}
+	}
+	$object contents
+	set data "action TopHelp Top {%W see 1.0}\n$contentsmenu"
+	return [list $data Classy::Help_contents]
 }
 
 Classy::Help method retry {url query result} {
@@ -227,13 +197,14 @@ Classy::Help method getgeneralmenu {} {
 	private $object generalmenu
 	if [info exists generalmenu] {
 		if {"$generalmenu" != ""} {
-			return $generalmenu
+			set result $generalmenu
 		} else {
-			return [getprivate $class generalmenu]
+			set result [getprivate $class generalmenu]
 		}
 	} else {
-		return [getprivate $class generalmenu]
+		set result [getprivate $class generalmenu]
 	}
+	return [list $result Classy::Help_general]
 }
 
 set ::Classy::helpfind word

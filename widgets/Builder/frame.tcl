@@ -2,13 +2,15 @@
 # Frame
 #
 
-proc ::Classy::WindowBuilder::add_frame {object w args} {
-	frame $w -bd 2 -relief groove -width 10 -height 10
-	eval $w configure $args
+proc ::Classy::WindowBuilder::add_frame {object base args} {
+	frame $base -bd 2 -relief groove -width 10 -height 10
+	eval $base configure $args
+	return $base
 }
 
 proc ::Classy::WindowBuilder::start_Frame {object base} {
-	private $object data
+	private $object data bindtags
+	set bindtags($base) [bindtags $base]
 	$object startedit [winfo children $base]
 	if ![info exists data(bind,$base)] {
 		bindtags $base Classy::WindowBuilder_$object

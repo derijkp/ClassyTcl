@@ -29,10 +29,18 @@ proc ::Classy::WindowBuilder::attr_Listbox_xscroll {object w args} {
 		return [lindex [$w cget -xscrollcommand] 0]
 	} else {
 		set value [lindex $args 0]
-		set data(opt-command,$value) "\"[$object outw $w] xview\""
-		set data(opt-xscrollcommand,$w) "\"[$object outw $value] set\""
-		$value configure -command "$w xview"
-		$w configure -xscrollcommand "$value set"
+		if {"$value" != ""} {
+			set data(opt-command,$value) "\"[$object outw $w] xview\""
+			set data(opt-xscrollcommand,$w) "\"[$object outw $value] set\""
+			$value configure -command "$w xview"
+			$w configure -xscrollcommand "$value set"
+		} else {
+			set scroll [lindex [$w cget -xscrollcommand] 0]
+			$scroll configure -command ""
+			$w configure -xscrollcommand ""
+			catch {unset data(opt-command,$value)}
+			catch {unset data(opt-xscrollcommand,$w)}
+		}
 	}
 }
 
@@ -42,16 +50,24 @@ proc ::Classy::WindowBuilder::attr_Listbox_yscroll {object w args} {
 		return [lindex [$w cget -yscrollcommand] 0]
 	} else {
 		set value [lindex $args 0]
-		set data(opt-command,$value) "\"[$object outw $w] yview\""
-		set data(opt-yscrollcommand,$w) "\"[$object outw $value] set\""
-		$value configure -command "$w yview"
-		$w configure -yscrollcommand "$value set"
+		if {"$value" != ""} {
+			set data(opt-command,$value) "\"[$object outw $w] yview\""
+			set data(opt-yscrollcommand,$w) "\"[$object outw $value] set\""
+			$value configure -command "$w yview"
+			$w configure -yscrollcommand "$value set"
+		} else {
+			set scroll [lindex [$w cget -yscrollcommand] 0]
+			$scroll configure -command ""
+			$w configure -yscrollcommand ""
+			catch {unset data(opt-command,$value)}
+			catch {unset data(opt-yscrollcommand,$w)}
+		}
 	}
 }
 
 proc ::Classy::WindowBuilder::edit_Listbox {object w} {
 	::Classy::WindowBuilder::defattredit $object $w {
-		xscroll "Hor. scrollbar" 0 yscroll "Vert. scrollbar" 0 command Command 1 list List 1
+		yscroll "Vert. scrollbar" 0 xscroll "Hor. scrollbar" 0 command Command 1 list List 1
 	} 12
 }
 

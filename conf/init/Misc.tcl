@@ -1,7 +1,8 @@
 #ClassyTcl misc configuration file
 
 Classy::configmisc {Misc settings} {
-	{patch Tk} *PatchTk 1 {select 0 1} {patch Tk to to use virtual events. This will be only be really activated after a restart of the program (0/1)}
+	{patch Tk} *PatchTk 1 {select 0 1} {patch Tk to use virtual events. This will be only be really activated after a restart of the program (0/1)}
+	{bgerror} *Bgerror Classy {select Classy Tk} {patch Tk to use a different bgerror routine. This will be only be really activated after a restart of the program}
 	Menutype *MenuType top {select popup top} {Menutype: can be popup or top}
 	{Scrollbar position} *ScrollSide right {select left right} {Scrollbar position (left/right)}
 }

@@ -7,10 +7,12 @@ proc ::Classy::WindowBuilder::add_Classy::Table {object base args} {
 	Classy::Table $base -rows 10 -cols 4 -getcommand {get table(%x,%y)} \
 		-setcommand {set table(%x,%y) %v} -xlabelcommand {echo %x}  -ylabelcommand {echo %y}
 	eval $base configure $args
+	return $base
 }
 
 proc ::Classy::WindowBuilder::start_Classy::Table {object base} {
-	private $object data
+	private $object data bindtags
+	set bindtags($base) [bindtags $base]
 	bindtags $base Classy::WindowBuilder_$object
 	$object _recursestartedit $base [winfo children $base]
 	$base redraw

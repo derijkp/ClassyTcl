@@ -122,9 +122,22 @@ can eg. be used to link a private variable to an entry:
  returns the names of all children of the class ClassName.
  These include all instances and all direct subclasses of ClassName.
 <b><dt>
+ pathName info <u>option</u> ?...?
+</b><dd>
+<dl>
+<dt>pathName info class<dd>
+ returns the class of the object given by pathName
+<dt>pathName info methods ?pattern?<dd>
+ returns a list of all available 
+ methods except the hidden methods (those starting with an underscore
+ is returned. When it is invoked with one argument, a list
+ of all methods matching the pattern is returned
+<b><dt>
  ClassName method <u>name</u> <u>args</u> <u>body</u>
 <br>
  ClassName method <u>pattern</u>
+<br>
+ ClassName method body/args <u>name</u>
 </b><dd>
  define a new method named $<u>name</u> for class ClassName.
  Whenever the method is invoked, the contents of body will be executed.
@@ -154,6 +167,7 @@ can eg. be used to link a private variable to an entry:
  Because a classmethod can only be invoked from a class, they are both
  contain the name of the class that invoked the method.
 <br>
+ delete the method named $<u>name</u> from class ClassName.
  When classmethod is invoked without arguments, a list of all available 
  classmethods except the hidden methods (those starting with an underscore)
  is returned. When it is invoked with one argument, a list
@@ -189,10 +203,6 @@ can eg. be used to link a private variable to an entry:
  The destroy method of the objects class (if defined) and those
  of its superclasses (if defined) will be invoked before the 
  destruction of the actual object.
-<b><dt>
- pathName class
-</b><dd>
- returns the class of the object given by pathName
 <b><dt>
  ClassName private ?<u>name</u>? ?<u>value</u>?
 </b><dd>

@@ -340,11 +340,7 @@ Classy::NoteBook method delete {label} {
 	}
 }
 
-#doc {NoteBook command children} cmd {
-#pathname children
-#} descr {
-#}
-Classy::NoteBook method children {} {
+Classy::NoteBook method _children {} {
 	set result ""
 	foreach w [lremove [winfo children $object] $object.label $object.book $object.cover_] {
 		if ![regexp "^$object.tab\[0-9\]+\$" $w] {

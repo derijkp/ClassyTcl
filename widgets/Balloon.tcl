@@ -34,12 +34,12 @@ bind all <Leave> {Balloon revoke}
 Class subclass Classy::Balloon
 Classy::export Balloon {}
 
-if [winfo exists .classy::balloon] {destroy .classy::balloon}
-toplevel .classy::balloon -class Balloon
-wm withdraw .classy::balloon
-label .classy::balloon.text
-pack .classy::balloon.text -fill x -expand no -padx 1 -pady 1
-wm overrideredirect .classy::balloon 1
+if [winfo exists .classy__.balloon] {destroy .classy__.balloon}
+toplevel .classy__.balloon -class Balloon
+wm withdraw .classy__.balloon
+label .classy__.balloon.text
+pack .classy__.balloon.text -fill x -expand no -padx 1 -pady 1
+wm overrideredirect .classy__.balloon 1
 
 # REM Initialise variables and options
 # ------------------------------------
@@ -55,7 +55,7 @@ wm overrideredirect .classy::balloon 1
 # ------------------------------------------------------------------
 
 Classy::Balloon classmethod destroy {} {
-	destroy .classy::balloon
+	destroy .classy__.balloon
 	bind all <Enter> {}
 	bind all <Leave> {}
 }
@@ -86,18 +86,18 @@ Classy::Balloon method add {widget text} {
 Classy::Balloon method display {widget} {
 	private $object help
 	if ![info exists help($widget)] return
-	if ![winfo exists .classy::balloon] {
-		toplevel .classy::balloon -class Balloon
-		wm withdraw .classy::balloon
-		label .classy::balloon.text
-		pack .classy::balloon.text -fill x -expand no -padx 1 -pady 1
-		wm overrideredirect .classy::balloon 1
+	if ![winfo exists .classy__.balloon] {
+		toplevel .classy__.balloon -class Balloon
+		wm withdraw .classy__.balloon
+		label .classy__.balloon.text
+		pack .classy__.balloon.text -fill x -expand no -padx 1 -pady 1
+		wm overrideredirect .classy__.balloon 1
 	}
-	.classy::balloon.text configure -text $help($widget)
-	wm geometry .classy::balloon +[winfo rootx $widget]+[expr [winfo rooty $widget]+[winfo height $widget]]
+	.classy__.balloon.text configure -text $help($widget)
+	wm geometry .classy__.balloon +[winfo rootx $widget]+[expr [winfo rooty $widget]+[winfo height $widget]]
 	update idle
-	wm deiconify .classy::balloon
-	raise .classy::balloon
+	wm deiconify .classy__.balloon
+	raise .classy__.balloon
 }
 
 #doc {Balloon revoke} cmd {
@@ -111,7 +111,7 @@ Classy::Balloon method revoke {} {
 		after cancel $id
 		unset id
 	}
-	catch {wm withdraw .classy::balloon}
+	catch {wm withdraw .classy__.balloon}
 }
 
 Classy::Balloon method _schedule {widget} {

@@ -15,12 +15,12 @@ Editor
 <h2>
 	Editor specific options
 </h2><dl><b><dt>Command-Line Name: -loadcommand</b><b><dt>Database Name: loadCommand</b><b><dt>Database Class: LoadCommand</b><dd>
+<b><dt>Command-Line Name: -savecommand</b><b><dt>Database Name: saveCommand</b><b><dt>Database Class: SaveCommand</b><dd>
 <b><dt>Command-Line Name: -icon</b><b><dt>Database Name: icon</b><b><dt>Database Class: Icon</b><dd>
 <b><dt>Command-Line Name: -searchtype</b><b><dt>Database Name: searchType</b><b><dt>Database Class: SearchType</b><dd>
 <b><dt>Command-Line Name: -searchdir</b><b><dt>Database Name: searchDir</b><b><dt>Database Class: SearchDir</b><dd>
 <b><dt>Command-Line Name: -searchcase</b><b><dt>Database Name: searchCase</b><b><dt>Database Class: SearchCase</b><dd>
 <b><dt>Command-Line Name: -searchreopen</b><b><dt>Database Name: SearchReopen</b><b><dt>Database Class: searchReopen</b><dd>
-<b><dt>Command-Line Name: -menu</b><b><dt>Database Name: menu</b><b><dt>Database Class: Menu</b><dd>
 <b><dt>Command-Line Name: -closecommand</b><b><dt>Database Name: closeCommand</b><b><dt>Database Class: CloseCommand</b><dd>
 
 </dl><h2>
@@ -111,13 +111,19 @@ pathname indent number
 pathname macro 
 </b><dd>
 <b><dt>
-pathname setmacro
+pathname setmacro name command ?key?
 </b><dd>
 <b><dt>
 pathname deletemacro
 </b><dd>
 <b><dt>
-pathname macromenu 
+pathname getmacromenu
+</b><dd>
+<b><dt>
+pathname pattern ?value?
+</b><dd>
+<b><dt>
+pathname getpatternmenu
 </b><dd>
 <b><dt>
 pathname getmacro 

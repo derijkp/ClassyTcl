@@ -33,9 +33,12 @@ Classy::Browser classmethod init {args} {
 	# -----------------
 	super
 	canvas $object.c -xscrollcommand [list $object.hbar set]
+	::class::rebind $object.c $object
+	::class::refocus $object $object.c
 	scrollbar $object.vbar -command [list $object _view] -orient vertical
 	scrollbar $object.hbar -command [list $object _view] -orient horizontal
-	grid $object.c $object.vbar -row 0 -sticky nwse
+	grid $object.c -row 0 -sticky nwse
+	grid $object.hbar -row 1 -sticky we
 	grid columnconfigure $object 0 -weight 1
 	grid columnconfigure $object 1 -weight 0
 	grid rowconfigure $object 0 -weight 1
@@ -56,16 +59,23 @@ Classy::Browser classmethod init {args} {
 
 Classy::Browser component canvas {$object.c}
 # ------------------------------------------------------------------
+#  Widget destroy
+# ------------------------------------------------------------------
+Classy::Browser method destroy {} {
+	::class::rebind $object.c {}
+}
+
+# ------------------------------------------------------------------
 #  Widget options
 # ------------------------------------------------------------------
 
 Classy::Browser chainoptions {$object.c}
 
-Classy::Browser addoption -minx {minX MinX 50} {
+Classy::Browser addoption -minx {minX MinX 0} {
 	Classy::todo $object redraw
 }
 
-Classy::Browser addoption -miny {minY MinY 50} {
+Classy::Browser addoption -miny {minY MinY 0} {
 	Classy::todo $object redraw
 }
 
@@ -110,7 +120,7 @@ Classy::Browser addoption -dataalign {dataAlign DataAlign l} {
 	Classy::todo $object redraw
 }
 
-Classy::Browser addoption -order {order Order row} {
+Classy::Browser addoption -order {order Order column} {
 	switch $value {
 		column {
 			grid forget $object.vbar
@@ -199,7 +209,7 @@ Classy::Browser method _redrawrow {} {
 			set text [eval $options(-gettext) {$name}]
 		}
 		if {"$options(-getimage)" == ""} {
-			set image [Classy::geticon file]
+			set image [Classy::geticon sm_file]
 		} else {
 			set image [eval $options(-getimage) {$name}]
 		}
@@ -283,7 +293,7 @@ Classy::Browser method _redrawcolumn {} {
 			set text [eval $options(-gettext) {$name}]
 		}
 		if {"$options(-getimage)" == ""} {
-			set image [Classy::geticon file]
+			set image [Classy::geticon sm_file]
 		} else {
 			set image [eval $options(-getimage) {$name}]
 		}
@@ -442,7 +452,7 @@ Classy::Browser method _redrawlist {} {
 			set text [eval $options(-gettext) {$name}]
 		}
 		if {"$options(-getimage)" == ""} {
-			set image [Classy::geticon file]
+			set image [Classy::geticon sm_file]
 		} else {
 			set image [eval $options(-getimage) {$name}]
 		}

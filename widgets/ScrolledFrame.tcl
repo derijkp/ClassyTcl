@@ -35,10 +35,11 @@ Classy::ScrolledFrame classmethod init {args} {
 	# -----------------
 	super
 	frame $object.view
-	grid $object.view -column 0 -row 0 -sticky nwse
 	frame $object.view.frame
+	::class::rebind $object.view.frame $object
+	::class::refocus $object $object.view.frame
+	grid $object.view -column 0 -row 0 -sticky nwse
 	grid $object.view.frame -column 0 -row 0 -sticky nwse
-
 	# REM Configure initial arguments
 	# -------------------------------
 	if {"$args" != ""} {eval $object configure $args}
@@ -46,6 +47,13 @@ Classy::ScrolledFrame classmethod init {args} {
 	return $object.view.frame
 }
 Classy::ScrolledFrame component frame {$object.view.frame}
+
+# ------------------------------------------------------------------
+#  Widget destroy
+# ------------------------------------------------------------------
+Classy::ScrolledFrame method destroy {} {
+	::class::rebind $object.view.frame {}
+}
 
 # ------------------------------------------------------------------
 #  Widget options
@@ -67,10 +75,8 @@ Classy::ScrolledFrame method redraw {} {
 	update idletasks
 	set reqw [winfo reqwidth $w]
 	set reqh [winfo reqheight $w]
-#	$object configure -width $reqw -height $reqh
-	update idletasks
-	set width [winfo width $object.view]
-	set height [winfo height $object.view]
+	set width [winfo width $object]
+	set height [winfo height $object]
 	if {$reqw > $width} {
 		if ![winfo exists $object.hbar] {
 			scrollbar $object.hbar -command [list $object xview] -orient horizontal
@@ -195,7 +201,7 @@ Classy::ScrolledFrame method _setvbar {args} {
 	$object.vbar set [expr -$y/$realh] [expr ($y+double($viewh))/$realh]
 }
 
-Classy::ScrolledFrame method children {} {
+Classy::ScrolledFrame method _children {} {
 	return [winfo children $object.view.frame]
 }
 

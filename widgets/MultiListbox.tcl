@@ -22,21 +22,19 @@ proc ::Classy::MultiListbox {} {}
 proc MultiListbox {} {}
 }
 
-bind Classy::MultiListbox <<Action>> {set w [winfo parent %W];$w select [$w nearest %y]}
-bind Classy::MultiListbox <<Action-Motion>> {set w [winfo parent %W];$w select [$w nearest %y]}
-bind Classy::MultiListbox <<MExecute>> {[winfo parent %W] command}
-bind Classy::MultiListbox <<Return>> {[winfo parent %W] command}
+bind Classy::MultiListbox <<Action>> {%W select [%W nearest %y]}
+bind Classy::MultiListbox <<Action-Motion>> {%W select [%W nearest %y]}
+bind Classy::MultiListbox <<MExecute>> {%W command}
+bind Classy::MultiListbox <<Return>> {%W command}
 bind Classy::MultiListbox <<Up>> {
-	set w [winfo parent %W]
-	set sel [$w curselection]
+	set sel [%W curselection]
 	incr sel -1
-	$w select $sel
+	%W select $sel
 }
 bind Classy::MultiListbox <<Down>> {
-	set w [winfo parent %W]
-	set sel [$w curselection]
+	set sel [%W curselection]
 	incr sel 1
-	$w select $sel
+	%W select $sel
 }
 
 # ------------------------------------------------------------------
@@ -51,6 +49,8 @@ Classy::MultiListbox classmethod init {args} {
 	# -----------------
 	super
 	listbox $object.list -yscroll "$object.vbar set" -exportselection no -selectmode browse
+	::class::rebind $object.list $object
+	::class::refocus $object $object.list
 	bindtags $object.list "$object.list Classy::MultiListbox . all"
 	scrollbar $object.vbar -orient vertical -command "$object.list yview" -takefocus 0
 	pack $object.vbar -side right -fill y

@@ -32,7 +32,7 @@ test NumEntry {create, destroy, create} {
 
 test NumEntry {create with configuration configure} {
 	classyclean
-	NumEntry .try -label try -orient vert
+	NumEntry .try -label try -orient vertical
 	pack .try
 	.try cget -orient
 } {vertical}
@@ -70,5 +70,16 @@ test NumEntry {int} {
 	.try set 5.5
 	.try get
 } {5}
+
+test NumEntry {int} {
+	classyclean
+	NumEntry .try -label try -min 0 -max 10 -constraint int -command {set ::try 10}
+	pack .try
+	update
+	set ::try 1
+	.try set 1
+	update
+	set ::try
+} {10}
 
 testsummarize

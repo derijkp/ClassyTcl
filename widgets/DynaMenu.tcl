@@ -71,34 +71,19 @@ Classy::export DynaMenu {}
 # a menubar. If not given the toplevel of the cmdw is used. In this case,
 # the cmdw has to exist when the menu is made.
 #}
-Classy::DynaMenu method makemenu {menutype menu cmdw bindtag {menuroot {}}} {
-	private $object mtype cmdws checks bindtags bindings
-	private $object menudata menutypes
+Classy::DynaMenu method makemenu {menutype menu cmdw bindtag} {
+	private $object cmdws checks bindtags bindings
+	private $object menudata
 	if ![info exists menudata($menutype)] {
-		$object define $menutype
+		return -code error "Menu type \"$menutype\" not defined"
 	}
-	set menutypes($menu) $menutype
-	set bindtags($menu) $bindtag
-	set cmdws($menu) $cmdw
-	set checks($menu) ""
-	bind $bindtag <<KeyMenu>> [list $object post $menu %X %Y]
-	bind $bindtag <<MainMenu>> [list $object post $menu %X %Y]
-	bind $bindtag <FocusIn> [list $object cmdw $menu %W]
+	set bindtags($menutype) $bindtag
+	set cmdws($menutype) $cmdw
+	set checks($menutype) ""
+	bind $bindtag <FocusIn> [list $object cmdw $menutype %W]
 	if ![winfo exists $menu] {
 		menu $menu -title [lindex $menutype 0]
-		$object makepopup $menu $menu $menudata($menutype) $cmdw $bindtag
-	}
-	if {"$menuroot" == ""} {
-		set root [winfo toplevel $cmdw]
-	} else {
-		set root [winfo toplevel $menuroot]
-	}
-	if {"[option get $root menuType MenuType]"=="top"} {
-		set mtype($menu) top
-		$menu configure -type menubar
-		[Classy::window $root] configure -menu $menu
-	} else {
-		set mtype($menu) popup
+		$object makepopup $menutype $menu $menu $menudata($menutype) $cmdw $bindtag
 	}
 }
 #doc {DynaMenu makepopup} cmd {
@@ -109,7 +94,7 @@ Classy::DynaMenu method makemenu {menutype menu cmdw bindtag {menuroot {}}} {
 # are bound to $bindtag. Adding $bindtag to the bindtags of a widget
 # will make all shortcuts available from that widget.
 #}
-Classy::DynaMenu method makepopup {menu curmenu data cmdw bindtag} {
+Classy::DynaMenu method makepopup {menutype menu curmenu data cmdw bindtag} {
 	private $object checks base bindings
 	if [info exists bindings($curmenu)] {
 		foreach binding $bindings($curmenu) {
@@ -118,7 +103,6 @@ Classy::DynaMenu method makepopup {menu curmenu data cmdw bindtag} {
 	}
 	$curmenu delete 0 end
 	set bindings($curmenu) ""
-	set base($curmenu) $menu
 	set num 1
 	foreach current [splitcomplete $data] {
 		set type [lindex $current 0]
@@ -126,7 +110,7 @@ Classy::DynaMenu method makepopup {menu curmenu data cmdw bindtag} {
 		set text [lindex $current 2]
 		if {"$type"=="menu"} {
 			menu $curmenu.$key -title $key
-			$object makepopup $menu $curmenu.$key [lindex $current 3] $cmdw $bindtag
+			$object makepopup $menutype $menu $curmenu.$key [lindex $current 3] $cmdw $bindtag
 			set shortcut [lindex $current 4]
 			if {"$shortcut"!=""} {
 				lappend bindings($curmenu) <$shortcut>
@@ -141,12 +125,13 @@ Classy::DynaMenu method makepopup {menu curmenu data cmdw bindtag} {
 			incr num
 		} elseif {"$type"=="activemenu"} {
 			set command [lindex $current 3]
-			regsub -all {%W} $command "\[$object cmdw $menu\]" command
+			regsub -all {%W} $command "\[$object cmdw $menutype\]" command
 			regsub -all {%%} $command % command
-
 			set data [uplevel #0 $command]
-			menu $curmenu.$key -title $key -postcommand [list $object _activemenu $menu $curmenu.$key $key $command]
-			$object makepopup $menu $curmenu.$key $data $cmdw $bindtag
+			menu $curmenu.$key -title $key -postcommand [list $object _activemenu $menutype $menu $curmenu.$key $key $command]
+			$object _activemenu $menutype $menu $curmenu.$key $key $command
+			append checks($menutype) "[list $object _activemenu $menutype $menu $curmenu.$key $key $command]\n"
+			#$object makepopup $menutype $menu $curmenu.$key $data $cmdw $bindtag
 			set shortcut [lindex $current 4]
 			if {"$shortcut"!=""} {
 				lappend bindings($curmenu) <$shortcut>
@@ -164,7 +149,7 @@ Classy::DynaMenu method makepopup {menu curmenu data cmdw bindtag} {
 		} elseif {"$type"=="action"} {
 			set command [lindex $current 3]
 			set shortcut [lindex $current 4]
-			regsub -all {%W} $command "\[$object cmdw $menu\]" command
+			regsub -all {%W} $command "\[$object cmdw $menutype\]" command
 			regsub -all {%%} $command % command
 			if {"$shortcut"!=""} {
 				lappend bindings($curmenu) <$shortcut>
@@ -190,7 +175,7 @@ Classy::DynaMenu method makepopup {menu curmenu data cmdw bindtag} {
 				catch {bind $bindtag <<$key>> "$object invoke $curmenu $num;break"}
 			}
 			eval {$curmenu add check -label $text -accelerator $shortcut} $temp
-			append checks($menu) "$curmenu entryconfigure [$curmenu index last] $command\n"
+			append checks($menutype) "$curmenu entryconfigure [$curmenu index last] $command\n"
 			incr num
 		} elseif {"$type"=="radio"} {
 			set command [lindex $current 3]
@@ -206,7 +191,7 @@ Classy::DynaMenu method makepopup {menu curmenu data cmdw bindtag} {
 				catch {bind $bindtag <<$key>> "$object invoke $curmenu $num;break"}
 			}
 			eval {$curmenu add radio -label $text -accelerator $shortcut} $temp
-			append checks($menu) "$curmenu entryconfigure [$curmenu index last] $command\n"
+			append checks($menutype) "$curmenu entryconfigure [$curmenu index last] $command\n"
 			incr num
 		} elseif [regexp ^# $type] {
 		} elseif {"$type" ==""} {
@@ -220,47 +205,51 @@ Classy::DynaMenu method makepopup {menu curmenu data cmdw bindtag} {
 #DynaMenu define menutype ?data?
 #} descr {
 # set the definition describing the menus that will be generated 
-# for menutype to $data.
-# If data is not given, the menu definition for menutype is obtained 
-# from the option database. A dummy frame with class $menutype is created,
-# and the its option value for menu (class Menu) obtained. This option
-# will usually be set in the Menus part 
-# <a href="../classy_configure.html">configuration system</a>.
-# You will usually not invoke this method, as the maketop and 
-# makepopup methods will automatically define a menutype
-# that isn't managed yet.
+# for $menutype to $data. If data is empty, the data for $menutype
+# will be removed. If data is not given, the current definition for
+# $menutype will be returned.
 #}
-Classy::DynaMenu method define {menutype {data {}}} {
-	private $object menudata menutypes mtype cmdws checks bindtags flag
-	if {"$data" == ""} {
-		catch {destroy .classy__.temp}
-		frame .classy__.temp -class $menutype
-		set data [option get .classy__.temp menu Menu]
-		destroy .classy__.temp
+Classy::DynaMenu method define {menutype args} {
+	private $object menudata cmdws checks bindtags flag menus
+	switch [llength $args] {
+		0 {
+			return $menudata($menutype)
+		}
+		1 {
+			set data [lindex $args 0]
+		}
+		default {
+			return -code error "wrong # args: should be \"$object define menutype ?data?\""
+		}
 	}
-	foreach menu [$object menus $menutype] {
-		if ![winfo exists $menu] {
-			catch {unset menutypes($menu)}
-			catch {unset mtype($menu)}
-			catch {unset cmdws($menu)}
-			catch {unset bindtags($menu)}
-			catch {unset checks($menu)}
-		} else {
-			eval destroy [winfo children $menu]
-			if [catch {$object makepopup $menu $menu $data $cmdws($menu) $bindtags($menu)} error] {
-				if [info exists flag] {
+	regsub -all :: $menutype __ temp
+	set menus($menutype) .classy__.menu_$temp
+	set menu $menus($menutype)
+	if {"$data" == ""} {
+		catch {destroy $menu}
+		catch {unset checks($menutype)}
+		catch {unset menudata($menutype)}
+		catch {unset cmdws($menutype)}
+		catch {unset bindtags($menutype)}
+		return ""
+	} elseif [winfo exists $menu] {
+		catch {unset checks($menutype)}
+		eval destroy [winfo children $menu]
+		if [catch {$object makepopup $menutype $menu $menu $data $cmdws($menutype) $bindtags($menutype)} error] {
+			if [info exists flag] {
+				unset flag
+				return -code error -errorinfo $::errorInfo \
+					"error while defining menu; could not restore old: $error"
+			} else {
+				if [info exists menudata($menutype)] {
+					set flag 1
+					eval destroy [winfo children $menu]
+					$object define $menutype $menudata($menutype)
 					unset flag
-					error "error while defining menu; could not restore old: $error"
-				} else {
-					if [info exists menudata($menutype)] {
-						set flag 1
-						eval destroy [winfo children $menu]
-						$object define $menutype $menudata($menutype)
-						unset flag
-					}
 				}
-				error "error while defining menu; restored old: $error"
 			}
+			return -code error -errorinfo $::errorInfo \
+				"error while defining menu; restored old: $error"
 		}
 	}
 	set menudata($menutype) $data
@@ -276,94 +265,19 @@ Classy::DynaMenu method types {} {
 	return [array names menudata]
 }
 
-#doc {DynaMenu menus} cmd {
-#DynaMenu menus menutype
-#} descr {
-# returns a list of menus of type $menutype managed by Dynamenu
-#}
-Classy::DynaMenu method menus {menutype} {
-	private $object menutypes
-	if ![info exists menutypes] {return ""}
-	set menulist [array get menutypes]
-	set poss [lfind -exact $menulist $menutype]
-	set result ""
-	foreach pos $poss {
-		lappend result [lindex $menulist [expr $pos-1]]
-	}
-	return $result
-}
-
-Classy::DynaMenu method add {menutype data} {
-#	private $object menudata keep
-#	set data [split $data "\n"]
-#	set data [lremove $data {}]
-#	
-#	if ![info exists menudata($menutype)] {
-#		$object define $menutype $data
-#		return
-#	}
-#	set mdata $menudata($menutype)
-#
-#	set pos end
-#	foreach line $data {
-#		if [regexp {^menu} $line] {
-#			set menus [lsub $mdata [lfind -regexp $mdata {^menu}]]
-#			set search [lsearch -exact $menus $line]
-#			if {$search==-1} {
-#				lappend mdata $line
-#				set pos end
-#			} else {
-#				set len [llength [lfind -regexp $mdata {^menu}]]
-#				incr search
-#				if {$search==$len} {
-#					set pos end
-#				} else {
-#					set pos [lindex [lfind -regexp $mdata {^menu}] $search]
-#				}
-#			}
-#		} else {
-#			set item [lindex $line 1]
-#			set temp [lsearch -regexp $mdata "\[ \t\]*\[a-z\]* $item "]
-#			if {$temp==-1} {
-#				set mdata [linsert $mdata $pos $line]
-#			} else {
-#				set mdata [lreplace $mdata $temp $temp $line]
-#			}
-#		}
-#	}
-#
-#	set keep $menudata($menutype)
-#	set menudata($menutype) $mdata
-#	after cancel "$object redraw $menutype"
-#	after idle "$object redraw $menutype"
-#}
-
-#doc {DynaMenu get} cmd {
-#DynaMenu get menutype
-#} descr {
-# returns the definition of $menutype
-#}
-Classy::DynaMenu method get {menutype} {
-	private $object menudata
-	return $menudata($menutype)
-}
-
 #doc {DynaMenu delete} cmd {
 #DynaMenu delete menutype
 #} descr {
 # delete the definition and all menus of $menutype
 #}
 Classy::DynaMenu method delete {menutype} {
-	private $object menudata menutypes mtype cmdws checks bindtags active
+	private $object menudata cmdws checks bindtags menus
 	unset menudata($menutype)
-	foreach menu [$object menus $menutype] {
-		if [winfo exists $menu] {destroy $menu}
-		unset menutypes($menu)
-		unset mtype($menu)
-		unset cmdws($menu)
-		unset checks($menu)
-		unset bindtags($menu)
-	}
+	unset menus($menutype)
+	unset cmdws($menutype)
+	unset checks($menutype)
+	unset bindtags($menutype)
+	catch {destroy .classy__.menu_$menutype}
 }
 
 #doc {DynaMenu cmdw} cmd {
@@ -374,21 +288,16 @@ Classy::DynaMenu method delete {menutype} {
 # This method is automatically called when a widget which has bindtags
 # defined by DynaMenu recieves the focus.
 #}
-Classy::DynaMenu method cmdw {menu {cmdw {}}} {
-	private $object cmdws base
-	if [info exists base($menu)] {
-		set basemenu $base($menu)
-	} else {
-		set basemenu $menu
-	}
+Classy::DynaMenu method cmdw {menutype {cmdw {}}} {
+	private $object cmdws
 	if {"$cmdw"==""} {
-		return $cmdws($basemenu)
+		return $cmdws($menutype)
 	} else {
-		if {"$cmdws($basemenu)"=="$cmdw"} {return $cmdw}
-		set cmdws($basemenu) $cmdw
+		if {"$cmdws($menutype)"=="$cmdw"} {return $cmdw}
+		set cmdws($menutype) $cmdw
 		private $object checks
-		if [info exists checks($basemenu)] {
-			regsub -all {%W} $checks($basemenu) $cmdw command
+		if [info exists checks($menutype)] {
+			regsub -all {%W} $checks($menutype) $cmdw command
 			regsub -all {%%} $command % command
 			eval $command
 		}
@@ -396,22 +305,65 @@ Classy::DynaMenu method cmdw {menu {cmdw {}}} {
 	}
 }
 
-#doc {DynaMenu post} cmd {
-#DynaMenu post menu ?x y?
+#doc {DynaMenu menu} cmd {
+#DynaMenu menu menutype
 #} descr {
-# post menu
+# returns the window name of the menu of type $menutype for use in a program.
 #}
-Classy::DynaMenu method post {menu {x {}} {y {}}} {
-	private $object mtype
-	if {"$mtype($menu)"=="popup"} {
-		tk_popup $menu $x $y 1
-	} else {
-	    set w [tkMenuFind $menu ""]
-	    if {$w != ""} {
-			tkMbPost $w
-			tkMenuFirstEntry [$w cget -menu]
+Classy::DynaMenu method menu {menutype {cmdw {}}} {
+	private $object cmdws menus
+	set menu $menus($menutype)
+	if {"$cmdw" == ""} {
+		if [info exists cmdws($menutype)] {
+			set cmdw $cmdws($menutype)
+		} else {
+			set cmdw .
 		}
 	}
+	if ![winfo exists $menu] {
+		$object makemenu $menutype $menu $cmdw Classy::Menu_$menutype
+	} else {
+		$object cmdw $menutype $cmdw
+	}
+	return $menu
+}
+
+#doc {DynaMenu menu} cmd {
+#DynaMenu bindtag menutype
+#} descr {
+# returns the sequence to which all key-shortcuts for $menutype are bound.
+# add this to the bindtags of the window that must be controlled by the menu.
+#}
+Classy::DynaMenu method bindtag {menutype} {
+	private $object cmdws menus
+	set menu $menus($menutype)
+	if ![winfo exists $menu] {
+		$object makemenu $menutype $menu . Classy::Menu_$menutype
+	}
+	return Classy::Menu_$menutype
+}
+
+#doc {DynaMenu popup} cmd {
+#DynaMenu popup menutype ?x y?
+#} descr {
+# popup menu of type $menutype
+#}
+Classy::DynaMenu method popup {menutype x y {cmdw {}}} {
+	private $object cmdws menus
+	set menu $menus($menutype)
+	if {"$cmdw" == ""} {
+		if [info exists cmdws($menutype)] {
+			set cmdw $cmdws($menutype)
+		} else {
+			set cmdw .
+		}
+	}
+	if ![winfo exists $menu] {
+		$object makemenu $menutype $menu $cmdw Classy::Menu_$menutype
+	} else {
+		$object cmdw $menutype $cmdw
+	}
+	tk_popup $menu $x $y 1
 }
 
 #doc {DynaMenu invoke} cmd {
@@ -431,91 +383,55 @@ Classy::DynaMenu method confmenu {menutype} {
 	Classy::Configurator confmenu $menutype
 }
 
-#Classy::DynaMenu method loadmenu {menutype {file {}}} {
-#	if {"$file"==""} {
-#		set file [Classygetconffile $menutype.mnu]
-#	}
-#	if [file exists $file] {
-#		set f [open $file]
-#		set c [read $f]
-#		close $f
-#		$object define $menutype $c
-#		return $file
-#	} else {
-#		error "Menu file $menutype.mnu not found in search path"
-#	}
+#doc {DynaMenu attachmainmenu} cmd {
+#DynaMenu attachmainmenu menutype window ?menuroot?
+#} descr {
 #}
-
-Classy::DynaMenu method reqwidth {menu} {
-	set slaves [place slaves $menu]
-	set x 0
-	foreach slave $slaves {
-		incr x [winfo reqwidth $slave]
+Classy::DynaMenu method attachmainmenu {menutype cmdw {menuroot {}}} {
+	private $object menus
+	set menu $menus($menutype)
+	if {"$menuroot" == ""} {
+		set root [winfo toplevel $cmdw]
+	} else {
+		set root [winfo toplevel $menuroot]
 	}
-	return $x
+	if ![winfo exists $menu] {
+		$object makemenu $menutype $menu $cmdw Classy::Menu_$menutype
+	}
+	$object cmdw $menutype $cmdw
+	catch {bindtags $cmdw [lreplace [bindtags $cmdw] 1 0 Classy::Menu_$menutype]}
+	if {"[option get $root menuType MenuType]"=="top"} {
+		[Classy::window $root] configure -menu $menu
+	} else {
+		bind $cmdw <<MainMenu>> "$object popup $menutype %X %Y"
+	}
+	return {}
 }
 
-
-Classy::DynaMenu method reqheight {menu} {
-	set slaves [place slaves $menu]
-	set mh 0
-	foreach slave $slaves {
-		set h [winfo reqheight $slave]
-		if {$h>$mh} {set mh $h}
+#doc {DynaMenu attachmenu} cmd {
+#DynaMenu attachmenu menutype window
+#} descr {
+#}
+Classy::DynaMenu method attachmenu {menutype cmdw} {
+	private $object menus
+	set menu $menus($menutype)
+	if ![winfo exists $menu] {
+		$object makemenu $menutype $menu $cmdw Classy::Menu_$menutype
+	} else {
+		$object cmdw $menutype $cmdw
 	}
-	return $mh
+	bindtags $cmdw [lreplace [bindtags $cmdw] 1 0 Classy::Menu_$menutype]
+	bind $cmdw <<Menu>> "$object popup $menutype %X %Y $cmdw"
+	return {}
 }
 
-Classy::DynaMenu method _placetopfirst {menu} {
-	set slaves [place slaves $menu]
-	set mh 0
-	set x 0
-	while {"$slaves"!=""} {
-		set slave [lpop slaves]
-		set w [winfo reqwidth $slave]
-		set h [winfo reqheight $slave]
-		if {$h>$mh} {set mh $h}
-		set temp [expr $x+$w]
-		place forget $slave
-		place $slave -x $x -y 0
-		incr x $w
-	}
-	$menu configure -height $mh -width $x
-	bind $menu <Configure> "$object _placetop $menu"
-}
-
-Classy::DynaMenu method _placetop {menu} {
-	set keep [bind $menu <Configure>]
-	bind $menu <Configure> {}
-	set width [winfo width $menu]
-	set slaves [place slaves $menu]
-	set y 0
-	set mh 0
-	set x 0
-	while {"$slaves"!=""} {
-		set slave [lpop slaves]
-		set w [winfo reqwidth $slave]
-		set h [winfo reqheight $slave]
-		if {$h>$mh} {set mh $h}
-		set temp [expr $x+$w]
-		if {$temp>$width} {
-			set x 0
-			incr y $mh
-			set mh $h
-		}
-		place forget $slave
-		place $slave -x $x -y $y
-		incr x $w
-	}
-	incr y $mh
-	$menu configure -height $y
-	after idle "bind $menu <Configure> [list $keep]"
-}
-
-Classy::DynaMenu method _activemenu {menu curmenu key command} {
+Classy::DynaMenu method _activemenu {menutype menu curmenu key command} {
 	private $object cmdws bindtags bindings
 	set data [uplevel #0 $command]
-	set cmdw $cmdws($menu)
-	set bindtag $bindtags($menu)
-	$object makepopup $menu $curmenu $data $cmdw $bindtag
+	set data [lindex $data 0]
+	set bindtag [lindex $data 1]
+	set cmdw $cmdws($menutype)
+	foreach event [bind $bindtag] {bind $bindtag $event {}}
+	$object makepopup $menutype $menu $curmenu $data $cmdw $bindtag
 }
+

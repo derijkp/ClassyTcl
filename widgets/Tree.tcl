@@ -144,7 +144,6 @@ Classy::Tree method _drawnode {node} {
 	private $object data options
 	set canvas $options(-canvas)
 	if {"$canvas" == ""} return
-
 	array set drawinfo $data($node)
 	set tag $options(-tag)
 	set x [$canvas coords $drawinfo(i)]

@@ -9,7 +9,13 @@
 # ----------------------------------------------------------------------
 #auto_load Classy::dialog
 #auto_load busy
-catch {set ::Classy::keepbgerror [info body bgerror]}
+if {"[option get . bgerror Bgerror]" == "Classy"} {
+
+auto_load bgerror
+namespace eval Tk {}
+if {"[info commands ::Tk::bgerror]" == ""} {
+	rename bgerror ::Tk::bgerror
+}
 proc bgerror {err} {
 	global errorInfo
 	foreach grab [grab current .] {
@@ -74,3 +80,4 @@ proc bgerror {err} {
 	return -code $::Classy::error(action)
 }
 
+}

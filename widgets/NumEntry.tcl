@@ -42,6 +42,8 @@ Classy::export NumEntry {}
 
 Classy::NumEntry classmethod init {args} {
 	super
+	bindtags $object [lreplace [bindtags $object] 2 0 Classy::Entry]
+	bindtags $object.entry [lreplace [bindtags $object.entry] 3 0 Classy::Entry]
 	frame $object.controls
 	button $object.controls.incr -image [Classy::geticon incr.xbm]
 	button $object.controls.decr -image [Classy::geticon decr.xbm]

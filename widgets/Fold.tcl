@@ -110,6 +110,6 @@ Classy::Fold method close {} {
 	uplevel #0 $options(-closecommand)
 }
 
-Classy::Fold method children {} {
+Classy::Fold method _children {} {
 	return $object.content
 }

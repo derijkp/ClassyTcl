@@ -8,7 +8,7 @@
 #doc BarChart title {
 #BarChart
 #} descr {
-# subclass of <a href="../basic/Widget.html">Widget</a><br>
+# subclass of <a href="../basic/Class.html">Class</a><br>
 # <b>BarChart is not a widget type</b>. It is a class whose objects can 
 # be associated with a canvas widget. When a BarChart instance is 
 # associated with a canvas, it will draw a barchart on this canvas. 

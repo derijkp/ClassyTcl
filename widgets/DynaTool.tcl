@@ -122,6 +122,14 @@ Classy::DynaTool method maketool {tooltype tool cmdw} {
 			eval $id $tool.$key
 			update idletasks
 			lappend slaves($tool) $tool.$key
+		} elseif {"$type"=="label"} {
+			set image [Classy::geticon $id reload]
+			if {"$image"!=""} {
+				label $tool.$key -image $image
+			} else {
+				label $tool.$key -text $id
+			}
+			lappend slaves($tool) $tool.$key
 		} elseif {"$type"=="separator"} {
 			lappend slaves($tool) separator
 		} elseif [regexp ^# $type] {
@@ -269,9 +277,6 @@ Classy::DynaTool method delete {tooltype} {
 		error "Couldn't delete $tooltype; it is not a tooltype managed by $object."
 	}
 	unset tooldata($tooltype)
-#	foreach image [info commands Classy::Tool__img_$tooltype_*] {
-#		image delete $image
-#	}
 	if [info exists tooltypes] {
 		set toollist [array get tooltypes]
 		set poss [lfind -exact $toollist $tooltype]
@@ -453,7 +458,6 @@ Classy::DynaTool method _placetop {tool} {
 			set curslaves ""
 			set x 0
 			incr y $mh
-#			incr y 2
 			set mh $h
 		}
 		if {"$slave"!="separator"} {

@@ -51,17 +51,6 @@ Classy::Text classmethod init {args} {
 	# REM Create bindings
 	# --------------------
 	bindtags $object [list $object Classy::Text . all]
-#	bindtags $object [lremove [bindtags $object] Text]
-#	d&d__addreceiver $object files [varsubst object {
-#		foreach file $files {
-#			set f [open $file r]
-#			$object insert current [read $f]
-#			close $f
-#		}
-#	}]
-#	d&d__addreceiver $object mem_indirect [varsubst object {
-#		* {$object insert current [eval $getdata]}
-#	}]
 
 	# REM Configure initial arguments
 	# -------------------------------

@@ -2,39 +2,39 @@
 # ClassyTcl Widgets 
 # ----------------- Peter De Rijk
 #
-# Classy::ProgressBox
+# Classy::ProgressDialog
 # ----------------------------------------------------------------------
-#doc ProgressBox title {
-#ProgressBox
+#doc ProgressDialog title {
+#ProgressDialog
 #} descr {
 # subclass of <a href="Dialog.html">Dialog</a><br>
-# creates a dialog in which the ProgressBox of some action will be displayed.
-# The ProgressBox will be displayed as the fraction of ticks passed (
+# creates a dialog in which the ProgressDialog of some action will be displayed.
+# The ProgressDialog will be displayed as the fraction of ticks passed (
 # ticks are passed by invoking the incr method), compared to the number 
 # of ticks to go (-ticks options). The display will be updated every
 # -step ticks
 #}
-#doc {ProgressBox options} h2 {
-#	ProgressBox specific options
+#doc {ProgressDialog options} h2 {
+#	ProgressDialog specific options
 #}
-#doc {ProgressBox command} h2 {
-#	ProgressBox specific methods
+#doc {ProgressDialog command} h2 {
+#	ProgressDialog specific methods
 #}
 # Next is to get the attention of auto_mkindex
 if 0 {
-proc ::Classy::ProgressBox {} {}
-proc ProgressBox {} {}
+proc ::Classy::ProgressDialog {} {}
+proc ProgressDialog {} {}
 }
 
 # ------------------------------------------------------------------
 #  Widget creation
 # ------------------------------------------------------------------
 
-Classy::Dialog subclass Classy::ProgressBox
-Classy::export ProgressBox {}
+Classy::Dialog subclass Classy::ProgressDialog
+Classy::export ProgressDialog {}
 
-Classy::ProgressBox classmethod init {args} {
-	super -title "ProgressBox"
+Classy::ProgressDialog classmethod init {args} {
+	super -title "ProgressDialog"
 	message $object.options.message -text "Progress" -justify center
 	frame $object.options.frame -relief sunken -height 20
 	frame $object.options.frame.prog -relief raised -bg green -width 0 -height 20
@@ -57,40 +57,40 @@ Classy::ProgressBox classmethod init {args} {
 	update idletasks
 }
 
-Classy::ProgressBox component message {$object.options.message}
+Classy::ProgressDialog component message {$object.options.message}
 # ------------------------------------------------------------------
 #  Widget options
 # ------------------------------------------------------------------
 
-#doc {ProgressBox options -ticks} option {-ticks ticks Ticks} descr {
+#doc {ProgressDialog options -ticks} option {-ticks ticks Ticks} descr {
 #}
-Classy::ProgressBox addoption -ticks {ticks Ticks 100}
+Classy::ProgressDialog addoption -ticks {ticks Ticks 100}
 
-#doc {ProgressBox options -step} option {-step step Step} descr {
+#doc {ProgressDialog options -step} option {-step step Step} descr {
 #}
-Classy::ProgressBox addoption -step {step Step 1}
+Classy::ProgressDialog addoption -step {step Step 1}
 
-#doc {ProgressBox options -width} option {-width width Width} descr {
+#doc {ProgressDialog options -width} option {-width width Width} descr {
 #}
-Classy::ProgressBox addoption -width {width Width 200}
+Classy::ProgressDialog addoption -width {width Width 200}
 
-#doc {ProgressBox options -fg} option {-fg ? ?} descr {
+#doc {ProgressDialog options -fg} option {-fg ? ?} descr {
 #}
-Classy::ProgressBox chainoption -fg {$object.options.frame.prog} -bg
+Classy::ProgressDialog chainoption -fg {$object.options.frame.prog} -bg
 
-#doc {ProgressBox options -message} option {-message ? ?} descr {
+#doc {ProgressDialog options -message} option {-message ? ?} descr {
 #}
-Classy::ProgressBox chainoption -message {$object.options.message} -text
+Classy::ProgressDialog chainoption -message {$object.options.message} -text
 
 # ------------------------------------------------------------------
 #  Methods
 # ------------------------------------------------------------------
 
-#doc {ProgressBox command incr} cmd {
+#doc {ProgressDialog command incr} cmd {
 #pathname incr ?value?
 #} descr {
 #}
-Classy::ProgressBox method incr {{value 1}} {
+Classy::ProgressDialog method incr {{value 1}} {
 	set step [getprivate $object options(-step)]
 	set ticks [getprivate $object options(-ticks)]
 	private $object current next
@@ -105,11 +105,11 @@ Classy::ProgressBox method incr {{value 1}} {
 	update idletasks
 }
 
-#doc {ProgressBox command set} cmd {
+#doc {ProgressDialog command set} cmd {
 #pathname set value
 #} descr {
 #}
-Classy::ProgressBox method set {value} {
+Classy::ProgressDialog method set {value} {
 	set ticks [getprivate $object options(-ticks)]
 	private $object current
 	set current $value
@@ -120,11 +120,11 @@ Classy::ProgressBox method set {value} {
 	$object.options.frame.prog configure -width [expr int($ratio*[winfo width $object.options.frame])]
 }
 
-#doc {ProgressBox command get} cmd {
+#doc {ProgressDialog command get} cmd {
 #pathname get 
 #} descr {
 #}
-Classy::ProgressBox method get {} {
+Classy::ProgressDialog method get {} {
 	private $object current
 	return $current
 }

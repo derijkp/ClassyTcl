@@ -2,18 +2,20 @@
 # Classy::NoteBook
 #
 
-proc ::Classy::WindowBuilder::add_Classy::NoteBook {object w args} {
-	Classy::NoteBook $w
-	if {"$args" != ""} {eval $w configure $args}
-	frame $w.f1 -width 10 -height 10
+proc ::Classy::WindowBuilder::add_Classy::NoteBook {object base args} {
+	Classy::NoteBook $base
+	if {"$args" != ""} {eval $base configure $args}
+	frame $base.f1 -width 10 -height 10
 	update idletasks
-	raise $w.f1
-	$w manage label $w.f1 -sticky nwse
-	$w select label
+	raise $base.f1
+	$base manage label $base.f1 -sticky nwse
+	$base select label
+	return $base
 }
 
 proc ::Classy::WindowBuilder::start_Classy::NoteBook {object base} {
-	private $object data
+	private $object data bindtags
+	set bindtags($base) [bindtags $base]
 	foreach w [list $base $base.label $base.book $base.cover_] {
 		bindtags $w Classy::WindowBuilder_$object
 	}

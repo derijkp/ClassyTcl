@@ -36,21 +36,20 @@ Classy::Builder classmethod init {args} {
 	Classy::DynaMenu makemenu Classy::Builder .classy__.buildermenu $object Classy::BuilderMenu
 	bindtags $object [list $object Classy::Builder all]
 	Classy::DynaTool maketool Classy::Builder $object.tool $object
-	grid $object.tool -row 0 -columnspan 3 -sticky ew
-	grid rowconfigure $object 0 -weight 0
-	grid rowconfigure $object 1 -weight 1
-
 	frame $object.bframe
-	Classy::OptionMenu $object.dirmenu
 	Classy::TreeWidget $object.browse -width 80 -height 10 \
 		-opencommand "$object opennode" \
 		-closecommand "$object closenode" \
 		-endnodecommand "$object openendnode"
-	grid $object.dirmenu -in $object.bframe -row 0 -column 0 -columnspan 2 -sticky nsew
+	::class::rebind $object.browse $object
+	::class::refocus $object $object.browse
+	Classy::DynaMenu attachmainmenu Classy::Builder $object
+	grid $object.tool -row 0 -columnspan 3 -sticky ew
+	grid rowconfigure $object 0 -weight 0
+	grid rowconfigure $object 1 -weight 1
 	grid $object.browse -in $object.bframe -row 1 -column 0 -sticky nsew
 	grid columnconfigure $object.bframe 0 -weight 1
 	grid rowconfigure $object.bframe 1 -weight 1
-
 	grid $object.bframe -sticky nsew
 	grid columnconfigure $object 0 -weight 1	
 
@@ -71,11 +70,7 @@ Classy::Builder classmethod init {args} {
 #  Widget options
 # ------------------------------------------------------------------
 Classy::Builder addoption -dir {dir Directory {}} {
-	if {"$value" == ""} {
-		grid $object.dirmenu -in $object.bframe -row 0 -column 0 -columnspan 2 -sticky nsew
-	} else {
-		grid forget $object.dirmenu
-	}
+	set value [string trimright $value /]
 	Classy::todo $object _drawtree
 }
 
@@ -94,9 +89,6 @@ Classy::Builder addoption -dirs {dirs Directories {}} {
 	foreach {name dir} $dirs {
 		lappend list $name
 	}
-	$object.dirmenu configure -list $list
-	$object.dirmenu configure -command "Classy::todo $object _drawtree"
-	$object.dirmenu set [lindex $list 0]
 	Classy::todo $object _drawtree
 }
 
@@ -120,7 +112,8 @@ Classy::Builder method close {} {
 	private $object open
 	if ![info exists open(type)] {return 0}
 	switch $open(type) {
-		dialog - toplevel {
+		dialog - frame - toplevel {
+			if ![winfo exists $object.dedit] {return 0}
 			return [catch {$object.dedit close}]
 		}
 		file {}
@@ -136,7 +129,7 @@ Classy::Builder method close {} {
 			}
 		}
 		default {
-			return [$object.confedit.edit close]
+			return [catch {$object.confedit.edit close}]
 		}
 	}
 	return 0
@@ -168,7 +161,7 @@ Classy::Builder method new {type {name {}}} {
 		}
 		set dir [file dir $file]
 		if {"$options(-dir)" == ""} {
-			set defdir [structlget $dirs [list [$object.dirmenu get]]]
+			set defdir $::Classy::appdir
 		} else {
 			set defdir $options(-dir)
 		}
@@ -202,6 +195,10 @@ Classy::Builder method new {type {name {}}} {
 			$object _creatededit $object.dedit
 			$object.dedit new toplevel $name $file
 		}
+		frame {
+			$object _creatededit $object.dedit
+			$object.dedit new frame $name $file
+		}
 	}
 	set base [list $file $name $type]
 	$object.browse addnode [list $file {} file] $base -type end -text $name -image [Classy::geticon new$type]
@@ -230,6 +227,7 @@ Classy::Builder method open {file function type} {
 	set open(type) $type
 	switch $type {
 		toplevel -
+		frame -
 		dialog {
 			$object _creatededit $object.dedit
 			$object.dedit open $file $function
@@ -343,7 +341,7 @@ Classy::Builder method save {} {
 	private $object browse
 	set file $browse(file)
 	switch $browse(type) {
-		dialog - toplevel {
+		dialog - frame - toplevel {
 			set result [$object.dedit save]
 		}
 		function {	
@@ -418,7 +416,7 @@ Classy::Builder method opennode {args} {
 					set f [open $file]
 					set line [gets $f]
 					close $f
-					if [regexp {^#ClassyTcl ([^ ]+) configuration file} $line temp type] {
+					if [regexp {^#[^ ]+ ([^ ]+) configuration file} $line temp type] {
 						set image [Classy::geticon Builder/config_$type]
 					} else {
 						set image [Classy::geticon newfile]
@@ -451,6 +449,9 @@ Classy::Builder method opennode {args} {
 				} elseif [regexp {# ClassyTcl generated Toplevel} $line] {
 					$object.browse addnode $root [list $browse(file) $func toplevel] \
 						-type end -text $func -image [Classy::geticon newtoplevel]
+				} elseif [regexp {# ClassyTcl generated Frame} $line] {
+					$object.browse addnode $root [list $browse(file) $func frame] \
+						-type end -text $func -image [Classy::geticon newframe]
 				} else {
 					$object.browse addnode $root [list $browse(file) $func function] -type end -text $func -image [Classy::geticon newfunction]
 				}
@@ -476,13 +477,14 @@ Classy::Builder method _drawtree {} {
 	if [$object close] return
 	$object.browse clearnode {}
 	if {"$options(-dir)" == ""} {
-		set dir [structlget $dirs [list [$object.dirmenu get]]]
+		set dir $::Classy::appdir
 	} else {
 		set dir $options(-dir)
 	}
 	catch {auto_mkindex $dir *.tcl}
 	catch {source [file join $dir tclIndex]}
 	$object opennode {} [list $dir {} dir]
+	$object.browse redraw
 	update idletasks
 	set select [lindex [$object.browse children {}] 0]
 	$object opennode $select

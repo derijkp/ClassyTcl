@@ -47,34 +47,6 @@ package require Tk
 catch {Widget destroy}
 
 # ----------------------------------------------------------------------
-# Change the destroy command
-# ----------------------------------------------------------------------
-if {"[info commands ::class::Tk_destroy]" == ""} {
-	rename destroy ::class::Tk_destroy
-	proc destroy {args} {
-		foreach w $args {
-			if {"$w" == "."} {
-				exit
-			}
-			if {"$w" == ".classy__"} continue
-			foreach c [info commands ::class::Tk_$w.*] {
-				regexp {^::class::Tk_(.*)$} $c temp tempw
-				catch {$tempw destroy}
-			}
-			if {"[info commands ::class::Tk_$w]" != ""} {
-				catch {$w destroy}
-			}
-		}
-		eval ::class::Tk_destroy [lremove $args .classy__]
-	}
-}
-
-# ----------------------------------------------------------------------
-# Change the bgerror command
-# ----------------------------------------------------------------------
-source [file join $::class::dir lib error.tcl]
-
-# ----------------------------------------------------------------------
 # special commands
 # ----------------------------------------------------------------------
 
@@ -209,7 +181,7 @@ Widget classmethod init {args} {
 				default {
 					$args $object
 					set tags [bindtags $object]
-					bindtags $object [concat [lindex $tags 0] $class [lrange $tags 1 end]]
+					bindtags $object [lreplace $tags 1 0 $class]
 				}
 			}
 		} else {
@@ -222,7 +194,6 @@ Widget classmethod init {args} {
 	}
 	rename $object ::class::Tk_$object
 	rename ::class::tempcmd ::$object
-
 	# set options
 	foreach option [array names ::class::${class},,v,options] {
 		set default [set ::class::${class},,v,options($option)]
@@ -515,9 +486,11 @@ Widget classmethod chainoption {option widget woption args} {
 # SomeWidgetClass addoption -try {try Try 1} {return [true $value]}
 #}
 Widget classmethod destroy {} {
-	rename ::destroy {}
-	rename ::class::Tk_destroy ::destroy
 	proc ::bgerror {err} $::Classy::keepbgerror
+}
+
+Widget classmethod _children {} {
+	return ""
 }
 
 # ------------------------------------------------------------------
@@ -539,11 +512,17 @@ Widget method destroy {} {
 		exit
 	}
 	Classy::cleartodo $object
+	foreach name [array names ::class::rebind $object.*] {
+		unset ::class::rebind($name)
+	}
+	catch {unset ::class::rebind($object)}
+	foreach name [array names ::class::refocus $object.*] {
+		unset ::class::refocus($name)
+	}
+	catch {unset ::class::refocus($object)}
 	foreach c [info commands ::class::Tk_$object.*] {
 		regexp {^::class::Tk_(.*)$} $c temp child
 		catch {$child destroy}
 	}
-	catch {::class::Tk_destroy $object}
+	catch {::Tk::destroy $object}
 }
-
-frame .classy__

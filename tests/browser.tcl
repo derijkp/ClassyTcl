@@ -59,9 +59,11 @@ proc getdir {dir} {
 
 classyclean
 set object .try
-
-Browser .try -gettext gettext -getimage getimage -getdata getdata
+Browser .try -list [glob [pwd]/*]
 pack .try -fill both -expand yes
+bind .try <<Action-Motion>> {DragDrop start %W test}
+
+.try configure -gettext gettext -getimage getimage -getdata getdata
 bind [.try component canvas] <<Action>> {
 	set name [.try name %x %y]
 	set type [.try type %x %y]

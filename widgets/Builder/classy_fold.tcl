@@ -6,10 +6,12 @@ proc ::Classy::WindowBuilder::add_Classy::Fold {object base args} {
 	private $object data
 	Classy::Fold $base -title Fold
 	eval $base configure $args
+	return $base
 }
 
 proc ::Classy::WindowBuilder::start_Classy::Fold {object base} {
-	private $object data
+	private $object data bindtags
+	set bindtags($base) [bindtags $base]
 	bindtags $base Classy::WindowBuilder_$object
 	foreach w {title spacer} {
 		bindtags $base.$w Classy::WindowBuilder_$object

@@ -1,0 +1,31 @@
+#!/bin/sh
+# the next line restarts using wish \
+exec wish8.0 "$0" "$@"
+#
+# ClassyTcl
+# --------- Peter De Rijk
+#
+
+wm withdraw .
+set script [info script]
+if {"$script"==""} {
+	set appname classyapp
+} else {
+	if {"$tcl_platform(platform)"=="unix"} {
+		if {"[file pathtype $script]"!="absolute"} {set script [file join [pwd] [string trimleft $script "./"]]}
+		while 1 {
+			if [catch {set link [file readlink $script]}] break
+			if {"[file pathtype $link]"=="absolute"} {
+				set script $link
+			} else {
+				set script [file join [file dirname $script] $link]
+			}
+		}
+	}
+	set appname [file tail $script]
+}
+tk appname $appname
+package require ClassyTcl
+set pwd [pwd]
+
+eval main $argv

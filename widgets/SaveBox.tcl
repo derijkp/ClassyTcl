@@ -65,7 +65,7 @@ Classy::SaveBox classmethod init {args} {
 
 	if {"$args" != ""} {eval $object configure $args}
 
-	bind $object.options.icon <<Action-Motion>> "$object startdrag"
+	bind $object.options.icon <<Action-Motion>> "DragDrop start %W $object"
 	focus $object.options.entry.entry
 }
 

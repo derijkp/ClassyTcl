@@ -98,9 +98,12 @@ Classy::Toplevel addoption -title {title Title "Toplevel"} {
 Classy::Toplevel addoption -resize {resize Resize {1 1}} {
 	set x [lindex $value 0]
 	set y [lindex $value 1]
-	if {$x>1} {set x 1}
-	if {$y>1} {set y 1}
+	set minw [winfo reqwidth $object]
+	set minh [winfo reqheight $object]
+	if {$x>1} {set minw $x ; set x 1}
+	if {$y>1} {set minh $y ; set y 1}
 	wm resizable $object $x $y
+	wm minsize $object $minw $minh
 	return $value
 }
 

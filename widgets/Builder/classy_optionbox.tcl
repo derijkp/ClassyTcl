@@ -3,7 +3,8 @@
 #
 
 proc ::Classy::WindowBuilder::start_Classy::OptionBox {object base} {
-	private $object data
+	private $object data bindtags
+	set bindtags($base) [bindtags $base]
 	bindtags $base Classy::WindowBuilder_$object
 	$object _recursestartedit $base [winfo children $base]
 	foreach b [winfo children $base.box] {

@@ -13,23 +13,15 @@ array set ::Classy::WindowBuilder::parents {
 }
 
 array set ::Classy::WindowBuilder::options {
-	-activebackground {Colors color}
 	-activeborderwidth {Sizes int}
-	-activeforeground {Colors color}
 	-anchor {Display anchor}
-	-background {Colors color}
 	-bitmap {Display bitmap}
 	-borderwidth {Display int}
 	-cursor {Display cursor}
-	-disabledforeground {Colors color}
 	-exportselection bool
 	-font {Display font}
-	-foreground {Colors color}
-	-highlightbackground {Colors color}
-	-highlightcolor {Colors color}
 	-highlightthickness {Sizes int}
 	-image {Display image}
-	-insertbackground {Colors color}
 	-insertborderwidth {Sizes int}
 	-insertofftime int
 	-insertontime int
@@ -42,19 +34,16 @@ array set ::Classy::WindowBuilder::options {
 	-relief {Display relief}
 	-repeatdelay int
 	-repeatinterval int
-	-selectbackground {Colors color}
 	-selectborderwidth {Sizes int}
 	-setgrid bool
 	-takefocus int
 	-text {Display text}
 	-textvariable {Code string}
-	-troughcolor {Colors color}
 	-underline int
 	-wraplength {Sizes int}
 	-height {Sizes int}
 	-width {Sizes int}
 	-offset {Sizes string}
-	-selectforground {Colors color}
 	-label {Display text}
 	-keepgeometry {Display line}
 	-title {Display line}
@@ -71,11 +60,31 @@ array set ::Classy::WindowBuilder::options {
 	-closecommand {Code text}
 	-opencommand {Code text}
 	-endnodecommand {Code text}
+	-getimage {Code text}
+	-gettext {Code text}
+	-getdata {Code text}
+	-variable {Code line}
+	-selectimage {Display image}
+	-indicatoron {Display bool}
+	-activebackground {Colors color}
+	-activeforeground {Colors color}
+	-background {Colors color}
+	-disabledforeground {Colors color}
+	-foreground {Colors color}
+	-highlightbackground {Colors color}
+	-highlightcolor {Colors color}
+	-insertbackground {Colors color}
+	-selectbackground {Colors color}
+	-selectforeground {Colors color}
+	-selectcolor {Colors color}
+	-troughcolor {Colors color}
+	-menu {Display menu}
 	command text
+	content text
 }
 set ::Classy::WindowBuilder::options(common) {
 	-textvariable -text -command -justify -image -orient -variable 
-	-label -title -destroycommand -closecommand -value
+	-label -title -destroycommand -closecommand -value -menu
 }
 
 proc ::Classy::WindowBuilder::attredit_line {object v option title {wide 0}} {
@@ -93,7 +102,7 @@ proc ::Classy::WindowBuilder::attredit_line {object v option title {wide 0}} {
 
 proc ::Classy::WindowBuilder::attredit_int {object v option title {wide 0}} {
 	set value [$object attribute get $option]
-	Classy::NumEntry $v.value -width 2 -label "$title Value"	-orient stacked \
+	Classy::NumEntry $v.value -width 2 -label "$title"	-orient stacked \
 		-command [varsubst {object v option} {
 			$object attribute setf? $option [$v.value get]
 		}]
@@ -154,6 +163,27 @@ proc ::Classy::WindowBuilder::attredit_justify {object v option title {wide 0}} 
 	frame $v.select
 	set column 0
 	foreach {type icon} {left justify_left.gif center justify_center.gif right justify_right.gif} {
+		radiobutton $v.select.$type -indicatoron 0 -text $type \
+			-image [Classy::geticon Builder/$icon] \
+			-command  "$v.value set $type" -value $type \
+			-variable [privatevar $object attredit($v)]
+		grid $v.select.$type -row 0 -column $column
+		incr column
+	}
+	if $wide {
+		grid $v.select -row 2 -column 1 -sticky nwe
+	} else {
+		grid $v.select -row 3 -column 0 -sticky nwe
+		grid rowconfigure $v 3 -weight 0
+		grid rowconfigure $v 4 -weight 1
+	}
+}
+
+proc ::Classy::WindowBuilder::attredit_bool {object v option title {wide 0}} {
+	attredit_line $object $v $option $title $wide
+	frame $v.select
+	set column 0
+	foreach {type icon} {1 true.gif 0 false.gif} {
 		radiobutton $v.select.$type -indicatoron 0 -text $type \
 			-image [Classy::geticon Builder/$icon] \
 			-command  "$v.value set $type" -value $type \
@@ -240,6 +270,53 @@ proc ::Classy::WindowBuilder::attredit_anchor {object v option title {wide 0}} {
 	}
 }
 
+proc ::Classy::WindowBuilder::menuset {object} {
+	private $object data bindtags current
+	set window $data(base)
+	eval set base $window
+	set menutype $data(opt-mainmenu,$base)
+	if {"$menutype" != ""} {
+		set cmdws data(opt-menuwin,$base)
+		$base configure -menu [eval Classy::DynaMenu menu $menutype [lindex $cmdws 0]]
+		set menu ""
+		foreach win [winfo children $base] {
+			if [regexp ^$base.#classy__#menu_ $win] {
+				set menu $win
+				break
+			}
+		}
+		set data(menu,$base) $menu
+		set data(class,$menu) Classy::DynaMenu
+		bindtags $menu Classy::WindowBuilder_$object
+		return $menu
+	} else {
+		$base configure -menu {}
+		set data(opt-menuwin,$base) ""
+		return ""
+	}
+}
+
+proc ::Classy::WindowBuilder::attredit_menu {object v option title {wide 0}} {
+	private $object current
+	set class [$object itemclass $current(w)]
+	if {("$class" != "Classy::Toplevel")&&("$class" != "Classy::Dialog")} {
+		::Classy::WindowBuilder::attredit_line $object $v $option $title $wide
+		return
+	}
+	Classy::Entry $v.menutype -width 2 -label "Menutype"	-orient stacked \
+		-command "::Classy::WindowBuilder::menuset $object" \
+		-textvariable [privatevar $object data(opt-mainmenu,$current(w))]
+	if $wide {$v.menutype configure -orient horizontal -labelwidth $wide}
+	grid $v.menutype -row 2 -column 0 -sticky we
+	Classy::Entry $v.cmdw -width 2 -label "Menu window(s)"	-orient stacked \
+		-command "::Classy::WindowBuilder::menuset $object" \
+		-textvariable [privatevar $object data(opt-menuwin,$current(w))]
+	if $wide {$v.cmdw configure -orient horizontal -labelwidth $wide}
+	grid $v.cmdw -row 3 -column 0 -sticky we
+	grid rowconfigure $v 4 -weight 1
+	grid columnconfigure $v 0 -weight 1
+}
+
 #
 # Def tool
 #
@@ -262,3 +339,4 @@ proc ::Classy::WindowBuilder::defattredit {object w list wide {fill 1}} {
 	if $fill {grid rowconfigure $w [incr row] -weight 1}
 	return $row
 }
+

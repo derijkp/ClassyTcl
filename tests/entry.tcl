@@ -38,7 +38,7 @@ test Classy::Entry {create with configuration configure} {
 
 test Classy::Entry {create with configuration configure} {
 	classyclean
-	Classy::Entry .try -label int -constraint {[0-9]}
+	Classy::Entry .try -label int -constraint {^[0-9]*$}
 	pack .try
 	.try cget -constraint
 } {[0-9]}
