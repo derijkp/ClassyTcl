@@ -1190,17 +1190,48 @@ Classy::Editor method _grepgoto {args} {
 	catch {$object tag add sel $line.[lindex $poss 0] $line.[expr {[lindex $poss 1]+1}]}
 }
 
-Classy::Editor method _grep {args} {
-	private $object options grep
+Classy::Editor method _grepcancel {} {
+	private $object grep
+	set grep(cancel) 1
+}
+
+Classy::Editor method _grepdo {pattern {files {}}} {
+	private $object grep
 	set w $object.grep
-	set files $grep(files)
-	if $grep(recursive) {
-		set result [eval exec grep -n -r [list $grep(pattern)] $files]
-	} else {
-		set result [eval exec grep -n -$grep(context) [list $grep(pattern)] $files]
+	set grep(cancel) 0
+	if {[llength $files] == 0} {set files $grep(files)}
+	foreach file $files {
+		$w.options.files configure -label "Searching $file"
+		update
+		if $grep(cancel) {return}
+		if [file isdir $file] {
+			if $grep(recursive) {
+				set temp [glob -nocomplain [file join $file *]]
+				if [llength $temp] {$object _grepdo $pattern $temp}
+			}
+		} else {
+			set f [open $file]
+			set num 1
+			while {![eof $f]} {
+				set line [gets $f]
+				if [regexp $pattern $line] {
+					$object.grep.options.list insert end "$file:$num:$line"
+				}
+				incr num
+			}
+			close $f
+		}
 	}
+}
+
+Classy::Editor method _grep {pattern {files {}}} {
+	private $object grep
+	set w $object.grep
+	$w.options.pattern configure -label "Searching Pattern"
 	$w.options.list delete 0 end
-	eval $w.options.list insert end [split $result \n]
+	$object _grepdo $pattern $files
+	$w.options.pattern configure -label "Pattern"
+	$w.options.files configure -label "Files"
 }
 
 Classy::Editor method grep {} {
@@ -1217,11 +1248,13 @@ Classy::Editor method grep {} {
 		wm title $w Grep
 		set what "\[$w.options.find get\] "
 		$w add goto Goto [list $object _grepgoto] default
+		$w add cancel Cancel [list $object _grepcancel]
 		$w persistent add grep goto
 		Classy::FileEntry $w.options.files -label Files -selectmode persistent -orient stacked \
 			-textvariable [privatevar $object grep(files)] -command "$object _grep ; break"
 		Classy::Entry $w.options.pattern -label Pattern \
-			-textvariable [privatevar $object grep(pattern)] -command [list $object _grep]
+			-textvariable [privatevar $object grep(pattern)] \
+			-command [list $object _grep]
 		Classy::ListBox $w.options.list -command [list $object _grepgoto]
 		checkbutton $w.options.recursive -variable [privatevar $object grep(recursive)] -text "Recursive"
 		Classy::NumEntry $w.options.context -label Context -textvariable [privatevar $object grep(context)]
