@@ -9,6 +9,9 @@
 #
 # ----------------------------------------------------------------------
 
+# namespace used for auto names
+namespace eval ::Class::Class {}
+
 #doc {Class cm} h2 {
 # Classmethods
 #} descr {
@@ -40,6 +43,7 @@ proc ::Class::correctcmd {fcmd cmd} {
 }
 
 proc ::Class::classerror {class object result cmd arg} {
+#putsvars class object result cmd arg
 	global errorInfo
 	set ::Class::error $result 
 	set ::Class::errorInfo $errorInfo 
@@ -77,10 +81,11 @@ if {![info exists ::Class::objectnum]} {set ::Class::objectnum 1}
 #<pre>super init ?...?</pre>.
 #}
 proc ::Class::new {class arg} {
-#puts [list new $class $arg]
+#putsvars class arg
 	set object [lindex $arg 0]
 	if {![llength $arg] || [string equal $object #auto]} {
-		set object Class::o$::Class::objectnum
+		set object ::Class::o$::Class::objectnum
+		set arg [list $object]
 		incr ::Class::objectnum
 		set namespace Class
 	} else {
@@ -116,7 +121,7 @@ proc ::Class::new {class arg} {
 			::Class::objectdestroy $class $object
 			return -code error -errorinfo $errorInfo $result
 		} else {
-			return $result
+			return $object
 		}
 	} elseif {"$class" != "Class"} {
 		if [catch {eval super init [lrange $arg 1 end]} result] {
@@ -124,7 +129,7 @@ proc ::Class::new {class arg} {
 			::Class::objectdestroy $class $object
 			return -code error -errorinfo $errorInfo $result
 		} else {
-			return $result
+			return $object
 		}
 	} else {
 		return $object

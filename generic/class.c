@@ -79,7 +79,7 @@ int Classy_ClassObjCmd(
 	class = (Class *)clientdata;
 	if (argc<=1) {
 		Tcl_ResetResult(interp);
-		Tcl_AppendResult(interp,"no value given for parameter \"cmd\" to \"",Tcl_GetStringFromObj(argv[0],NULL),"\"", (char *)NULL);
+		Tcl_AppendResult(interp,"wrong # args: should be \"",Tcl_GetStringFromObj(argv[0],NULL)," cmd args\"", (char *)NULL);
 		return TCL_ERROR;
 	}
 	if (class->trace != NULL) {

@@ -103,7 +103,8 @@ are also propagated, but only if the are changed using the private method.
 A class is destroyed by invoking its destroy classmethod:<br>
 <code>className destroy</code><br>
 The destroy classmethod can be redefined. However, it cannot have arguments, 
-and will always succeed: errors in it will not be reported.
+and will always succeed: The command can return errors, but the class will be 
+destroyed anyway.
 
 <h2>Creation and Destruction of new objects</h2>
 A new object can be created using the classmethod new:<BR>
@@ -123,8 +124,8 @@ Objects are destroyed by invoking their destroy method:<br>
 <code>objectName destroy</code><br>
 the destroy method can be redefined. However, upon destruction, all
 destroy methods defined in superclasses of the class will be invoked as wel.
-A destroy method cannot have arguments, and must always succeed: errors in it 
-will not be reported.
+A destroy method cannot have arguments, and must always succeed: The command 
+can return errors, but the object will be destroyed anyway.
 
 
 <H2>Class</H2>

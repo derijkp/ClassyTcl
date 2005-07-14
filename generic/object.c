@@ -44,7 +44,7 @@ int Classy_ObjectObjCmd(
 	class = object->parent;
 	if (argc<2) {
 		Tcl_ResetResult(interp);
-		Tcl_AppendResult(interp,"no value given for parameter \"cmd\" to \"",Tcl_GetStringFromObj(argv[0],NULL),"\"", (char *)NULL);
+		Tcl_AppendResult(interp,"wrong # args: should be \"",Tcl_GetStringFromObj(argv[0],NULL)," cmd args\"", (char *)NULL);
 		return TCL_ERROR;
 	}
 	if (object->trace != NULL) {
@@ -104,18 +104,32 @@ int Classy_ObjectObjCmd(
 /* This function destroys an object
  * it calls the destructors of each parent class
  */
+
+static Classy_destroyerror;
+
 void Classy_ObjectDestroy(ClientData clientdata) {
 	Class *class, *tempclass;
 	Object *object;
+	Tcl_Obj *destroy_errors = NULL;
 	Classy_HashEntry *entry;
 	char *string;
+	int error;
 	object = (Object *)clientdata;
 	Tcl_Preserve(clientdata);
 	class = object->parent;
 	tempclass = class;
 	while(1) {
 		if (tempclass->destroy != NULL) {
-			Classy_ExecMethod(class->interp,tempclass->destroy,class,object,0,NULL);
+			error = Classy_ExecMethod(class->interp,tempclass->destroy,class,object,0,NULL);
+			if (error) {
+				if (destroy_errors == NULL) {
+					destroy_errors = Tcl_GetObjResult(class->interp);
+					Tcl_IncrRefCount(destroy_errors);
+				} else {
+					Tcl_AppendToObj(destroy_errors,"\n",1);
+					Tcl_AppendObjToObj(destroy_errors,Tcl_GetObjResult(class->interp));
+				}
+			}
 		}
 		tempclass = tempclass->parent;
 		if (tempclass == NULL) break;
@@ -126,6 +140,12 @@ void Classy_ObjectDestroy(ClientData clientdata) {
 	Tcl_VarEval(class->interp,"foreach ::Class::var [info vars ::Class::", string,",,*] {unset $::Class::var}", (char *)NULL);
 	Tcl_EventuallyFree(clientdata,Classy_FreeObject);
 	Tcl_Release(clientdata);
+	if (destroy_errors != NULL) {
+		Tcl_SetVar2Ex(class->interp,"::errorInfo",NULL,destroy_errors,TCL_GLOBAL_ONLY);
+		Classy_destroyerror = 1;
+	} else {
+		Classy_destroyerror = 0;
+	}
 }
 
 int Classy_ObjectDestroyObjCmd(
@@ -138,7 +158,15 @@ int Classy_ObjectDestroyObjCmd(
 	Tcl_Preserve((ClientData)object);
 	Tcl_DeleteCommandFromToken(interp,object->token);
 	Tcl_Release((ClientData)object);
-	return TCL_OK;
+	if (Classy_destroyerror) {
+		CONST char *string;
+		string = Tcl_GetVar(interp,"::errorInfo",TCL_GLOBAL_ONLY);
+		Tcl_AppendResult(interp,"\"",(char *)string,"\" in destroy method of object \"",
+			Tcl_GetStringFromObj(object->name,NULL),"\" for class \"",Tcl_GetStringFromObj(class->class,NULL),"\"",(char *)NULL);
+		return TCL_ERROR;
+	} else {
+		return TCL_OK;
+	}
 }
 
 static Classy_HashTable classcurrent;

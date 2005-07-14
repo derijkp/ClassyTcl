@@ -21,6 +21,10 @@ if ![info exists env(TCL_TEST_ONLYERRORS)] {
 	}
 }
 
+set dontcleanerrors 1
+
 alltest class.tcl
 alltest autoload.tcl
 alltest version.tcl
+
+testsummarize

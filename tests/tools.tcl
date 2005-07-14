@@ -79,7 +79,7 @@ proc test {name description script expected {causeerror 0} args} {
 
 proc testsummarize {} {
 	if [info exists ::env(TCL_TEST_ONLYERRORS)] return
-	global errors
+	global errors dontcleanerrors
 	if [info exists errors] {
 		global currenttest
 		if [info exists currenttest] {
@@ -92,13 +92,18 @@ proc testsummarize {} {
 			append error "\n$err"
 		}
 		display $error
-		unset errors
+		if {![info exists dontcleanerrors]} {
+			unset errors
+		}
 	} else {
 		puts "All tests ok"
 	}
 }
 
-catch {unset errors}
+if {![info exists dontcleanerrors]} {
+	catch {unset errors}
+}
+
 if $testleak {
 	test test {initialise all memory for testing with leak detection} {
 		set try 1

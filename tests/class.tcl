@@ -107,6 +107,15 @@ test class {destroy method error} {
 	set ::temp
 } {"test error" in destroy method of object "try" for class "Base"} 1
 
+test class {destroy method error -> object destroyed?} {
+	clean
+	set ::temp 0
+	Base method destroy {} {error "test error" ; set ::temp 1}
+	Base new try
+	catch {try destroy}
+	try info class
+} {invalid command name "try"} 1
+
 test class {object destroy in method} {
 	clean
 	Base method try {} {
@@ -170,6 +179,7 @@ test class {object class} {
 	try info class
 } {Base}
 
+# source tools.tcl
 test class {3} {
 	clean
 	Base new try
@@ -386,28 +396,33 @@ test class {redefining init} {
 	clean
 	Base subclass Test
 	Test method init {} {
-		return [list [super init] 1]
+		lappend ::test 1
+		super init
 	}
 	Test subclass Test2
 	Test2 method init {} {
-		return [list [super init] 2]
+		lappend ::test 2
+		super init
 	}
+	set test {}
 	Test2 new try
-} {{try 1} 2}
+	set ::test
+} {2 1}
 
 test class {create other object in init with super} {
 	clean
 	Base subclass Test
 	Test method init {} {
 		Base new $object.try
-		return [list [super init] 1]
+		super init
 	}
 	Test subclass Test2
 	Test2 method init {} {
-		return [list [super init] 2]
+		super init
 	}
 	Test2 new try
-} {{try 1} 2}
+	try.try info class
+} {Base}
 
 test class {error in init} {
 	clean
@@ -431,16 +446,6 @@ test class {redefining init: test class} {
 	Test2 new try
 	try info class
 } {Test2}
-
-test class {redefining init: 1 of 2} {
-	clean
-	Base subclass Test
-	Test method init {} {
-		return [list [super init] 1]
-	}
-	Test subclass Test2
-	Test2 new try
-} {try 1}
 
 test class {redefining init: error in init} {
 	clean
@@ -987,6 +992,7 @@ test class {test super args} {
 	clean
 	Base subclass Test
 	Test method init {args} {
+		set ::test $args
 		return $args
 	}
 	Test subclass Test2
@@ -997,7 +1003,9 @@ test class {test super args} {
 	Test3 method init {args} {
 		return [super init]
 	}
+	set ::test try
 	Test3 new try
+	set ::test
 } {data}
 
 test class {super in method} {
