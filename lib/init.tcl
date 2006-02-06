@@ -14,8 +14,8 @@ set ::Class::patchlevel 1
 
 package provide Class $::Class::version
 
-source $Class::dir/lib/package.tcl
-package::init $Class::dir class Class lib/Class-tcl.tcl
+package require pkgtools
+pkgtools::init $Class::dir class Class lib/Class-tcl.tcl
 
 #
 # The lib dir contains the Tcl code defining the public Class 
