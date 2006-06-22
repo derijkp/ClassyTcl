@@ -2,6 +2,9 @@
 # the next line restarts using tclsh \
 exec tclsh "$0" "$@"
 
+package require pkgtools
+cd [pkgtools::startdir]
+
 # settings
 # --------
 
@@ -9,12 +12,13 @@ set libfiles {lib README pkgIndex.tcl help init.tcl DESCRIPTION.txt}
 set shareddatafiles README
 set docs {}
 set headers {}
-set libbinaries [glob *[info sharedlibextension]]
+puts "dir = [pkgtools::startdir]"
+set libbinaries [::pkgtools::findlib [file dir [pkgtools::startdir]] class]
+puts "libbinaries = $libbinaries"
 set binaries {}
 set extname Class
 
 # standard
 # --------
-source [file join [file dir [info script]] buildtools.tcl]
-install $argv
+pkgtools::install $argv
 
