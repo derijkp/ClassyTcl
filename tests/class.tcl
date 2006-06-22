@@ -199,11 +199,19 @@ test class {don't overwrite objects} {
 	Base new try
 } {command "try" exists} 1
 
-test class {don't overwrite classes} {
+test class {don't overwrite commands} {
+	clean
+	proc Test {} {}
+	set result [catch {Base subclass Test} temp]
+	lappend result $temp
+	set result
+} {1 {command "Test" exists}}
+
+test class {silently ignore require to subclass the same class again (good for reloading files)} {
 	clean
 	Base subclass Test
 	Base subclass Test
-} {command "Test" exists} 1
+} {Test}
 
 test class {delete child classes when destroyed ?} {
 	clean

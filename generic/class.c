@@ -228,6 +228,14 @@ int Classy_SubclassClassMethod(
 	name = Tcl_NewStringObj(subclassname,len);
 	found = Tcl_GetCommandInfo(interp,subclassname,&cmdinfo);
 	if (found == 1) {
+		if (cmdinfo.objProc == Classy_ClassObjCmd) {
+			Class *class;
+			class = (Class *)cmdinfo.objClientData;
+			if (strcmp(Tcl_GetStringFromObj(class->class,NULL),subclassname) == 0) {
+				Tcl_SetObjResult(interp,name);
+				return TCL_OK;
+			}
+		}
 		Tcl_ResetResult(interp);
 		Tcl_AppendResult(interp,"command \"",subclassname,"\" exists", (char *)NULL);
 		return TCL_ERROR;
@@ -238,7 +246,7 @@ int Classy_SubclassClassMethod(
 		Classy_SetHashValue(entry,(ClientData)subclass);
 	} else {
 		Tcl_ResetResult(interp);
-		Tcl_AppendResult(interp,"command \"",subclassname,"\" exists", (char *)NULL);
+		Tcl_AppendResult(interp,"class \"",subclassname,"\" exists", (char *)NULL);
 		return TCL_ERROR;
 	}
 	subclass->parent = class;
