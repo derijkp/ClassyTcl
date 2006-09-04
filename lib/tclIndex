@@ -6,10 +6,6 @@
 # element name is the name of a command and the value is
 # a script that loads the command.
 
-set auto_index(putsvars) [list source [file join $dir Class.tcl]]
-set auto_index(::Class::cmd_split) [list source [file join $dir tools.tcl]]
-set auto_index(::Class::auto_mkindex) [list source [file join $dir tools.tcl]]
-set auto_index(::Class::auto_load_method) [list source [file join $dir tools.tcl]]
 set auto_index(::Class::correctcmd) [list source [file join $dir Class-tcl.tcl]]
 set auto_index(::Class::classerror) [list source [file join $dir Class-tcl.tcl]]
 set auto_index(::Class::new) [list source [file join $dir Class-tcl.tcl]]
@@ -47,9 +43,7 @@ set auto_index(private) [list source [file join $dir Class-tcl.tcl]]
 set auto_index(privatevar) [list source [file join $dir Class-tcl.tcl]]
 set auto_index(setprivate) [list source [file join $dir Class-tcl.tcl]]
 set auto_index(getprivate) [list source [file join $dir Class-tcl.tcl]]
-set auto_index(::package::architecture) [list source [file join $dir package.tcl]]
-set auto_index(::package::init) [list source [file join $dir package.tcl]]
-
-# Addition of ClassyTcl classes defined in the directory
-set auto_index(::Class::Class,,cm,trace) [list source [file join $dir Class-tcl.tcl]]
-set auto_index(::Class::Class,,m,trace) [list source [file join $dir Class-tcl.tcl]]
+set auto_index(::Class::cmd_split) [list source [file join $dir tools.tcl]]
+set auto_index(::Class::auto_mkindex_parse) [list source [file join $dir tools.tcl]]
+set auto_index(::Class::auto_mkindex) [list source [file join $dir tools.tcl]]
+set auto_index(::Class::auto_load_method) [list source [file join $dir tools.tcl]]

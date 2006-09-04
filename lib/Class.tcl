@@ -19,14 +19,6 @@
 #}
 #}
 
-proc putsvars {args} {
-	foreach var $args {
-		puts [list set $var [uplevel set $var]]
-	}
-	puts ""
-}
-
-
 #
 # ------------------------------------------------------
 # Create the work namespace class
