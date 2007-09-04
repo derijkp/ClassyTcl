@@ -1351,6 +1351,15 @@ test class {check two auto named objects} {
 	set result
 } {::Class::o1 ::Class::o2 ::Class::o3}
 
+test class {auto named objects where init is defined} {
+	clean
+	Class subclass Test
+	Test method init {args} {
+		puts "init $object"
+	}
+	set result [Test new]
+} ::Class::o4
+
 test class {changeclass} {
 	clean
 	Class subclass Test

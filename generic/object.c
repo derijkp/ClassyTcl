@@ -278,10 +278,10 @@ int Classy_NewClassMethod(
 		}
 		tempclass = tempclass->parent;
 		if (tempclass == NULL) {
-		Tcl_SetObjResult(interp,name);
 			break;
 		}
 	}
+	Tcl_SetObjResult(interp,name);
 	return TCL_OK;
 }
 
