@@ -14,6 +14,9 @@ set ::Class::patchlevel 1
 
 package provide Class $::Class::version
 
+# namespace used for auto names
+namespace eval ::Class::Class {}
+
 package require pkgtools
 pkgtools::init $Class::dir class Class lib/Class-tcl.tcl
 

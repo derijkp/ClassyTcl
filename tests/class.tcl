@@ -1398,4 +1398,37 @@ test class {changeclass} {
 #	Try info method args destroy
 #} {}
 
+test class {private on object in namespace} {
+	clean
+	Class subclass Test
+	Test method setv {} {
+		private $object d
+		set d 1
+	}
+	Test method getv {} {
+		private $object d
+		return $d
+	}
+	namespace eval test {}
+	Test new test::o
+	$object setv
+	$object getv
+} {1}
+
+test class {private on autoname} {
+	clean
+	Class subclass Test
+	Test method setv {} {
+		private $object d
+		set d 1
+	}
+	Test method getv {} {
+		private $object d
+		return $d
+	}
+	set object [Test new]
+	$object setv
+	$object getv
+} {1}
+
 testsummarize
