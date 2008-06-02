@@ -1,5 +1,5 @@
 Identifier: ClassyTcl
-Version: 1.0.1
+Version: 1.0.2
 Title: ClassyTcl
 Creator: Peter De Rijk <Peter.DeRijk@ua.ac.be>
 Description: Tcl object system

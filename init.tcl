@@ -7,4 +7,4 @@
 namespace eval ::Class {}
 set ::Class::dir $dir
 source [file join $dir lib init.tcl]
-extension provide Class 1.0.1
+extension provide Class 1.0.2
