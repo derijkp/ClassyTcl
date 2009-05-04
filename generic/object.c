@@ -44,7 +44,7 @@ int Classy_ObjectObjCmd(
 	class = object->parent;
 	if (argc<2) {
 		Tcl_ResetResult(interp);
-		Tcl_AppendResult(interp,"wrong # args: should be \"",Tcl_GetStringFromObj(argv[0],NULL)," cmd args\"", (char *)NULL);
+		Tcl_AppendResult(interp,"wrong # args: should be \"",Tcl_GetStringFromObj(argv[0],NULL)," cmd ...\"", (char *)NULL);
 		return TCL_ERROR;
 	}
 	if (object->trace != NULL) {

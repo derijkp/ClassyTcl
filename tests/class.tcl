@@ -184,7 +184,7 @@ test class {3} {
 	clean
 	Base new try
 	try
-} {wrong # args: should be "try cmd args"} error
+} {wrong # args: should be "try cmd ..."} error
 
 test class {object command} {
 	clean
@@ -231,7 +231,7 @@ test class {subclass cmd} {
 	clean
 	Base subclass Subclass
 	Subclass
-} {wrong # args: should be "Subclass cmd args"} error
+} {wrong # args: should be "Subclass cmd ..."} error
 
 test class {subclass methods} {
 	clean
