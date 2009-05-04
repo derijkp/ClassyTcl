@@ -15,7 +15,7 @@ test class {destroy instance} {
 	Base new try
 	try destroy
 	try
-} {invalid command name "try"} 1
+} {invalid command name "try"} error
 
 test class {instances destroyed} {
 	catch {Base destroy}
@@ -23,7 +23,7 @@ test class {instances destroyed} {
 	Base new try
 	Base destroy
 	try
-} {invalid command name "try"} 1
+} {invalid command name "try"} error
 
 test class {destroy subclasses} {
 	catch {Base destroy}
@@ -31,7 +31,7 @@ test class {destroy subclasses} {
 	Base subclass Test
 	Base destroy
 	Test
-} {invalid command name "Test"} 1
+} {invalid command name "Test"} error
 
 test class {destroy instances from subclass} {
 	clean
@@ -40,7 +40,7 @@ test class {destroy instances from subclass} {
 	Subclass new subclass
 	subclass destroy
 	subclass try
-} {invalid command name "subclass"} 1
+} {invalid command name "subclass"} error
 
 test class {destroy instances from subclasses} {
 	clean
@@ -49,7 +49,7 @@ test class {destroy instances from subclasses} {
 	Subclass new subclass
 	Base destroy
 	subclass try
-} {invalid command name "subclass"} 1
+} {invalid command name "subclass"} error
 
 test class {find subclasses} {
 	clean
@@ -61,7 +61,7 @@ test class {create object 2 times} {
 	clean
 	Base new try
 	Base new try
-} {command "try" exists} 1
+} {command "try" exists} error
 
 test class {create object with short name} {
 	clean
@@ -105,7 +105,7 @@ test class {destroy method error} {
 	Base new try
 	try destroy
 	set ::temp
-} {"test error" in destroy method of object "try" for class "Base"} 1
+} {"test error" in destroy method of object "try" for class "Base"} error
 
 test class {destroy method error -> object destroyed?} {
 	clean
@@ -114,7 +114,7 @@ test class {destroy method error -> object destroyed?} {
 	Base new try
 	catch {try destroy}
 	try info class
-} {invalid command name "try"} 1
+} {invalid command name "try"} error
 
 test class {object destroy in method} {
 	clean
@@ -156,7 +156,7 @@ test class {init method info} {
 #	try private try 1
 #	rename try {}
 #	getprivate try try
-#} {can't read "::Class::try,,v,try": no such variable} 1
+#} {can't read "::Class::try,,v,try": no such variable} error
 
 test class {nop} {
 	clean
@@ -184,7 +184,7 @@ test class {3} {
 	clean
 	Base new try
 	try
-} {wrong # args: should be "try cmd args"} 1
+} {wrong # args: should be "try cmd args"} error
 
 test class {object command} {
 	clean
@@ -197,7 +197,7 @@ test class {don't overwrite objects} {
 	clean
 	Base new try
 	Base new try
-} {command "try" exists} 1
+} {command "try" exists} error
 
 test class {don't overwrite commands} {
 	clean
@@ -231,7 +231,7 @@ test class {subclass cmd} {
 	clean
 	Base subclass Subclass
 	Subclass
-} {wrong # args: should be "Subclass cmd args"} 1
+} {wrong # args: should be "Subclass cmd args"} error
 
 test class {subclass methods} {
 	clean
@@ -256,14 +256,14 @@ test class {do not show _method for instance} {
 	Base method _test {} {}
 	Base new try
 	try try
-} {bad option "try": must be changeclass, destroy, info, private, trace} 1
+} {bad option "try": must be changeclass, destroy, info, private, trace} error
 
 test class {subclass destroy: test command} {
 	clean
 	Base subclass Test
 	Test destroy
 	Test
-} {invalid command name "Test"} 1
+} {invalid command name "Test"} error
 
 test class {subclass with instance destroy: test command} {
 	clean
@@ -271,7 +271,7 @@ test class {subclass with instance destroy: test command} {
 	Test new try
 	Test destroy
 	try
-} {invalid command name "try"} 1
+} {invalid command name "try"} error
 
 test class {subclass with instance destroy: test children} {
 	clean
@@ -295,14 +295,14 @@ test class {subclass destroy: test method} {
 	Base subclass Test
 	Test destroy
 	Test method nop {} {}
-} {invalid command name "Test"} 1
+} {invalid command name "Test"} error
 
 test class {Base destroy: destroyed subclass?} {
 	clean
 	Base subclass Subclass
 	Base destroy
 	Subclass
-} {invalid command name "Subclass"} 1
+} {invalid command name "Subclass"} error
 
 test class {add method} {
 	clean
@@ -329,7 +329,7 @@ test class {add method: wrong # arguments} {
 	Base method try {a} {return $a}
 	Base new base
 	base try
-} {wrong # args: should be "base try a"} 1
+} {wrong # args: should be "base try a"} error
 
 test class {subclass inherits new methods} {
 	clean
@@ -390,7 +390,7 @@ test class {inherit method: wrong # arguments} {
 	Base subclass Subclass
 	Subclass new subclass
 	subclass try
-} {wrong # args: should be "subclass try a"} 1
+} {wrong # args: should be "subclass try a"} error
 
 test class {new} {
 	clean
@@ -439,7 +439,7 @@ test class {error in init} {
 		error error
 	}
 	Test new try
-} {error} 1
+} {error} error
 
 test class {redefining init: test class} {
 	clean
@@ -462,7 +462,7 @@ test class {redefining init: error in init} {
 		error "test error"
 	}
 	Test new try
-} {test error} 1
+} {test error} error
 
 test class {redefining init: error in init -> test object} {
 	clean
@@ -472,7 +472,7 @@ test class {redefining init: error in init -> test object} {
 	}
 	catch {Test new try}
 	try
-} {invalid command name "try"} 1
+} {invalid command name "try"} error
 
 test class {redefining 2 inits: error in init} {
 	clean
@@ -485,7 +485,7 @@ test class {redefining 2 inits: error in init} {
 		return [list [super init] 2]
 	}
 	Test2 new try
-} {test error} 1
+} {test error} error
 
 test class {method} {
 	clean
@@ -512,7 +512,7 @@ test class {redefine destroy: check destruction} {
 	Test new try
 	try destroy
 	try
-} {invalid command name "try"} 1
+} {invalid command name "try"} error
 
 test class {redefine destroy: error in destruction} {
 	clean
@@ -521,13 +521,13 @@ test class {redefine destroy: error in destruction} {
 	Test new try
 	try destroy
 	try
-} {invalid command name "try"} 1
+} {invalid command name "try"} error
 
 test class {redefine destroy: give arguments error} {
 	clean
 	Base subclass Test
 	Test method destroy {test} {return ok}
-} {destroy method cannot have arguments} 1
+} {destroy method cannot have arguments} error
 
 test class {redefine destroy: multiple} {
 	clean
@@ -595,7 +595,7 @@ test class {test method arguments: too many} {
 	}
 	Base new base
 	base try 1 1 1
-} {wrong # args: should be "base try ai bi"} 1
+} {wrong # args: should be "base try ai bi"} error
 
 test class {test method arguments: not enough} {
 	clean
@@ -606,7 +606,7 @@ test class {test method arguments: not enough} {
 	}
 	Base new base
 	base try 1
-} {wrong # args: should be "base try ai bi"} 1
+} {wrong # args: should be "base try ai bi"} error
 
 test class {test method arguments: ok} {
 	clean
@@ -689,7 +689,7 @@ test class {class private} {
 test class {class private non existing} {
 	clean
 	Base private try
-} {"Base" does not have a private variable "try"} 1
+} {"Base" does not have a private variable "try"} error
 
 test class {inherit class private} {
 	clean
@@ -821,14 +821,14 @@ test class {error in method} {
 	Base method try {} {error try}
 	Base new try
 	try try
-} {try} 1
+} {try} error
 
 test class {error in method} {
 	clean
 	Base method try {} {return -code error try}
 	Base new try
 	try try
-} {try} 1
+} {try} error
 
 test class {instance in namespace} {
 	clean
@@ -844,7 +844,7 @@ test class {instance in namespace: not in main} {
 	catch {::try::try destroy}
 	Base new ::try::try
 	try info class
-} {invalid command name "try"} 1
+} {invalid command name "try"} error
 
 test class {instance in namespace: destroy} {
 	clean
@@ -853,7 +853,7 @@ test class {instance in namespace: destroy} {
 	Base new ::try::try
 	Base destroy
 	try::try class
-} {invalid command name "try::try"} 1
+} {invalid command name "try::try"} error
 
 test class {instance in namespace: using variables} {
 	clean
@@ -906,7 +906,7 @@ test class {class in namespace: destroy} {
 	::try::Test new try
 	Base destroy
 	try::Test class
-} {invalid command name "try::Test"} 1
+} {invalid command name "try::Test"} error
 
 test class {class in namespace: variables} {
 	clean
@@ -1055,7 +1055,7 @@ test class {test super calling non-existing method} {
 	}
 	SubClass new try
 	try try 1 2
-} {No method "try" defined for super of try (at class "Base")} 1
+} {No method "try" defined for super of try (at class "Base")} error
 
 test class {super in classmethod} {
 	clean
@@ -1093,18 +1093,18 @@ test class {test super calling non-existing classmethod} {
 		return [list [super try $a] $b]
 	}
 	SubClass try 1 2
-} {No classmethod "try" defined for super of SubClass (at class "Base")} 1
+} {No classmethod "try" defined for super of SubClass (at class "Base")} error
 
 test class {class info error} {
 	clean
 	Base info e
-} {wrong option "e" must be parent, class, children, subclasses, methods, method, classmethods or classmethod} 1
+} {wrong option "e" must be parent, class, children, subclasses, methods, method, classmethods or classmethod} error
 
 test class {object info error} {
 	clean
 	Base new try
 	try info children
-} {wrong option "children" must be parent, class, methods or method} 1
+} {wrong option "children" must be parent, class, methods or method} error
 
 test class {method introspection: args} {
 	clean
@@ -1287,14 +1287,14 @@ test class {method with argument with no name} {
 	catch {Try destroy}
 	Class subclass Try
 	Try method test {try {}} {}
-} {procedure "Try,,m,test" has argument with no name} 1
+} {argument with no name} error
 
 test class {classmethod with argument with no name} {
 	clean
 	catch {Try destroy}
 	Class subclass Try
 	Try classmethod test {try {}} {}
-} {procedure "Try,,cm,test" has argument with no name} 1
+} {argument with no name} error
 
 test class {method definition error -> old still exists?} {
 	clean
@@ -1411,8 +1411,8 @@ test class {private on object in namespace} {
 	}
 	namespace eval test {}
 	Test new test::o
-	$object setv
-	$object getv
+	test::o setv
+	test::o getv
 } {1}
 
 test class {private on autoname} {
