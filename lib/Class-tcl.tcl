@@ -177,9 +177,6 @@ proc ::Class::subclass {class arg} {
 		return -code error "wrong # args: should be \"$class subclass class\""
 	}
 	set child [lindex $arg 0]
-	if {"[info commands ::$child]" != ""} {
-		return -code error "command \"$child\" exists"
-	}
 	regsub {^::} $child {} child
 	set namespace [namespace qualifiers $child]
 	if {"$namespace" != ""} {
@@ -205,8 +202,15 @@ proc ::Class::subclass {class arg} {
 		return $result
 	}
 	regsub -all @class@ $body [list $child] body
+	if {"[info commands ::$child]" != ""} {
+		set error [catch {info body ::$child} curbody]
+		if {$error || ([info args ::$child] ne "cmd args") || ($curbody ne $body)} {
+			return -code error "command \"$child\" exists"
+		} else {
+			return $child
+		}
+	}
 	proc ::$child {cmd args} $body
-
 	# copy methods
 	foreach cmd [info commands ::Class::${class},,m,*] {
 		regexp "^::Class::${class},,m,(.*)\$" $cmd temp name
@@ -220,7 +224,6 @@ proc ::Class::subclass {class arg} {
 		}
 		proc ::Class::${child},,m,${name} $args [info body $cmd]
 	}
-
 	# copy classmethods
 	foreach cmd [info commands ::Class::${class},,cm,*] {
 		regexp "^::Class::${class},,cm,(.*)\$" $cmd temp name
@@ -234,7 +237,6 @@ proc ::Class::subclass {class arg} {
 		}
 		proc ::Class::${child},,cm,${name} $args [info body $cmd]
 	}
-
 	# copy class variables
 	foreach var [info vars ::Class::${class},,v,*] {
 		regexp "^::Class::${class},,v,(.*)\$" $var temp name
@@ -244,7 +246,6 @@ proc ::Class::subclass {class arg} {
 			set ::Class::${child},,v,${name} [set $var]
 		}
 	}
-
 	return $child
 }
 

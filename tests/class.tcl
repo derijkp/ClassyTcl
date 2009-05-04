@@ -213,6 +213,16 @@ test class {silently ignore require to subclass the same class again (good for r
 	Base subclass Test
 } {Test}
 
+test class {do give error when tryin to subclass when command exists and is not the subclass} {
+	clean
+	Base subclass puts
+} {command "puts" exists} error
+
+test class {do give error when tryin to subclass when command exists (as a proc) and is not the subclass} {
+	clean
+	Base subclass clean
+} {command "clean" exists} error
+
 test class {delete child classes when destroyed ?} {
 	clean
 	Base subclass Test
