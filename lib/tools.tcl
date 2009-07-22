@@ -72,18 +72,20 @@ proc Class::auto_mkindex_parse {file code} {
 proc Class::auto_mkindex {dir args} {
 	global errorCode errorInfo
 	set oldDir [pwd]
+	cd $dir
+	set dir [pwd]
+	if {![llength $args]} {
+		set args [lsort -dictionary [glob -nocomplain *.tcl]]
+	} else {
+		set args [lsort -dictionary [eval glob -nocomplain $args]]
+	}
 	set error [catch {eval ::auto_mkindex $dir $args} result]
 	if $error {
 		cd $oldDir
 		return -code error $result
 	}
-	cd $dir
-	set dir [pwd]
 	append index "\n# Addition of ClassyTcl classes defined in the directory\n"
-	if {$args == ""} {
-		set args *.tcl
-	}
-	foreach file [eval glob -nocomplain $args] {
+	foreach file $args {
 		set f ""
 		set error [catch {
 			set f [open $file]
