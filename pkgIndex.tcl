@@ -8,7 +8,7 @@
 # full path name of this file's directory.
 
 # $Format: "package ifneeded Class $ProjectMajorVersion$.$ProjectMinorVersion$ \\"$
-package ifneeded Class 1.0 \
+package ifneeded Class 1.1 \
 [subst -nocommands {
 	namespace eval ::Class {}
 	set ::Class::dir [list $dir]

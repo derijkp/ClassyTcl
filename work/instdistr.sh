@@ -3,7 +3,7 @@
 /home/peter/dev/ClassyTcl/build/version.tcl
 
 # $Format: "export version=$ProjectMajorVersion$.$ProjectMinorVersion$.$ProjectPatchLevel$"$
-export version=1.0.2
+export version=1.1.0
 
 # sources
 cd /home/peter/dev/ClassyTcl

@@ -1,8 +1,8 @@
 #!/bin/sh
-set -ex
+set -e
 
 # $Format: "export version=$ProjectMajorVersion$.$ProjectMinorVersion$.$ProjectPatchLevel$"$
-export version=1.0.2
+export version=1.1.0
 name=ClassyTcl
 resultname=Class
 

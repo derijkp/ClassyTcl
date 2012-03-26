@@ -1,13 +1,13 @@
 #!/bin/sh
 
 # $Format: "export version=$ProjectMajorVersion$.$ProjectMinorVersion$.$ProjectPatchLevel$"$
-export version=1.0.2
+export version=1.1.0
 
 # quick install
 #!/bin/sh
 
 # $Format: "export version=$ProjectMajorVersion$.$ProjectMinorVersion$.$ProjectPatchLevel$"$
-export version=1.0.2
+export version=1.1.0
 
 # quick install linux
 cd /home/peter/dev/ClassyTcl/Linux-i686
