@@ -19,10 +19,15 @@ IMHO, it better follows the Tcl philosophy. The system is simple, but
 flexible. Classes and objects are dynamic, and can easily be queried, 
 changed and debugged at runtime.
 
+more information on the ClassyTcl object system can be found in
+https://derijkp.github.io/ClassyTcl/classy_object_system.html
+The Class commands is described in 
+https://derijkp.github.io/ClassyTcl/Class.html
+
 Installation
 ------------
 You should be able to obtain the latest version of ClassyTcl
-via www on url http://classytcl.sourceforge.net/
+via www on url https://github.com/derijkp/ClassyTcl
 
 Binary packages
 
@@ -41,14 +46,19 @@ make install
 The configure command has several options that can be examined using
 /configure --help
 
+You can make a portable Linux binary using the provided script (requires docker):
+build/hbb_build_ClassyTcl.sh
+
 Use
 ---
 
 The ClassyTcl object systen can be used by putting the directories (after
 unpacking) somewhere appropriate and using the command
 package require Class
-This will add one command (and a namespace) named Class, that forms the 
-basis of ClassyTcl.
+This will add one command (and a namespace) named
+[Class](https://derijkp.github.io/ClassyTcl/Class.html), that forms the
+basis of
+[ClassyTcl](https://derijkp.github.io/ClassyTcl/classy_object_system.html).
 
 Porting to other platforms
 --------------------------
@@ -74,13 +84,11 @@ How to contact me
 -----------------
 
 Peter De Rijk
-University of Antwerp
-VIB department of Molecular Genetics
-Universiteitsplein 1
-B-2610 Antwerp
+VIB - UAntwerp Center for Molecular Neurology
+University of Antwerp - CDE, Parking P4, Building V, Room V1.15
+Universiteitsplein 1, B-2610 Antwerpen, Belgium
 
-Tel. +32 3 265 10 30
-E-mail: Peter.DeRijk@molgen.vib-ua.be
+E-mail: Peter.DeRijk@uantwerpen.be
 
 Legalities
 ----------

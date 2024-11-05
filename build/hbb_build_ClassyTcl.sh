@@ -27,7 +27,7 @@ source "${dir}/start_hbb.sh"
 # ====
 
 name=Class
-version=2.1.0
+version=1.1.0
 tclversion=8.6.14
 
 # Parse extra arguments
@@ -103,7 +103,7 @@ $tcl /io/build/makedoc.tcl /io /io
 if [ -d /build/dirtcl$tclversion-$arch ]; then
 	cd /io
 	dirtcl=/build/dirtcl$tclversion-$arch
-	rm -rf $dirtcl/exts/${name}$version
+	rm -rf $dirtcl/exts/${name}$version || true
 	$tcl build/install.tcl $dirtcl/exts
 	echo "Installed binary $name $builddir/dirtcl$tclversion-$arch/exts"
 fi

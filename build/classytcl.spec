@@ -37,7 +37,7 @@ make install
 rm -rf /usr/doc/classytcl-$RPM_PACKAGE_VERSION
 mkdir /usr/doc/classytcl-$RPM_PACKAGE_VERSION
 ln -s /usr/lib/Class1.0/help /usr/doc/classytcl-$RPM_PACKAGE_VERSION/help
-ln -s /usr/lib/Class1.0/README /usr/doc/classytcl-$RPM_PACKAGE_VERSION/README
+ln -s /usr/lib/Class1.0/README.md /usr/doc/classytcl-$RPM_PACKAGE_VERSION/README.md
 
 %files
 /usr/lib/libClass1.0.so

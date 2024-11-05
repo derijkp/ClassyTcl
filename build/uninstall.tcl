@@ -8,8 +8,8 @@ cd [pkgtools::startdir]
 # settings
 # --------
 
-set libfiles {lib README pkgIndex.tcl docs}
-set shareddatafiles README
+set libfiles {lib README.md pkgIndex.tcl docs}
+set shareddatafiles README.md
 set docs {}
 set headers {}
 set binaries {}
